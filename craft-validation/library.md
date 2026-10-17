@@ -207,7 +207,7 @@ These notes are quoted in `docs/superpowers/specs/2026-10-10-phase-2g-library-po
 | Photo group page reloads instead of swapping | ✅ fixed (G7) | `src/features/library/photo-swap.ts` |
 | PDF opening animation lags | ✅ fixed at the cause (G8); not a server problem | the G8 spec |
 
-Count: 16 ✅ (done), 2 ⚠️ (partly), 9 ❌ open, counting the ❌ parts of mixed rows. No ❓.
+Count: 15 ✅ (done), 2 ⚠️ (partly), 9 ❌ open, counting the ❌ parts of mixed rows. No ❓.
 
 ### Diagram: where each note went
 ```mermaid
