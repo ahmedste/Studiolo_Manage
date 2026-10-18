@@ -39,9 +39,9 @@ section > p { max-width: 66ch; margin: 0; color: var(--ink-2); }
 .status { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 4px 9px; border-radius: 99px; margin-top: 18px; }
 
 /* The three names */
-.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.trio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .name { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.name .word { font-family: var(--read); font-size: 40px; line-height: 1; font-weight: 500; }
+.name .word { font-family: var(--read); font-size: 34px; line-height: 1.05; font-weight: 500; overflow-wrap: anywhere; }
 .name .say { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .name .tag { font-family: var(--read); font-style: italic; font-size: 18px; line-height: 1.35; margin-top: 8px; }
 .name .what { font-size: 13.5px; color: var(--ink-2); margin: 4px 0 0; }
@@ -111,7 +111,7 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 .foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); max-width: 80ch; }
 
 @media (max-width: 900px) {
-  .dests { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 26px; }
+  .dests, .trio { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 26px; }
   .words { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .assistant { grid-template-columns: 1fr; }
 }
@@ -125,12 +125,12 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 
 <main class="wrap">
   <p class="eyebrow">Studiolo · naming</p>
-  <h1>Three names, plain words for everything else</h1>
-  <p class="lede">Studiolo has three made-up names, Studiolo, Loci and Lumen, all from Latin, all short. Everything else uses words a learner already knows. This page maps every part of the app to its name and the one line that says what it does.</p>
+  <h1>Four names, plain words for everything else</h1>
+  <p class="lede">Studiolo has four names of its own: Studiolo, Loci, Commonplace and Lumen. Each comes from the world of the Renaissance study. Everything else uses words a learner already knows. This page maps every part of the app to its name and the one line that says what it does.</p>
   <span class="status">Draft for the owner's decision · 18 Oct 2026</span>
 
   <section aria-labelledby="names">
-    <h2 id="names">The three names</h2>
+    <h2 id="names">The four names</h2>
     <div class="trio">
       <article class="name">
         <span class="word">Studiolo</span>
@@ -142,13 +142,19 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
         <span class="word coined-word">Loci</span>
         <span class="say">LOH-sigh · Latin, "places"</span>
         <p class="tag">Your mind palace: everything you know, in one place you can walk through.</p>
-        <p class="what">The map of your areas, topics and sub-topics, with your Library and Lumens linked in. Named after the memory palace technique, the method of loci.</p>
+        <p class="what">The map of your areas, topics and sub-topics, with your Commonplace and Lumens linked in. Named after the memory palace technique, the method of loci.</p>
+      </article>
+      <article class="name">
+        <span class="word coined-word">Commonplace</span>
+        <span class="say">KOM-un-plays · from Latin <i>loci communes</i></span>
+        <p class="tag">Everything you gather, kept under your topics.</p>
+        <p class="what">Your sources, documents, notes and quotes. Renaissance scholars kept a commonplace book: extracts filed under topic headings, the <i>loci communes</i>. Loci holds your topics; the Commonplace holds what you gathered under them. Was: Library.</p>
       </article>
       <article class="name">
         <span class="word coined-word">Lumen</span>
         <span class="say">LOO-men · Latin, "light"</span>
         <p class="tag">Light on any topic, in a few narrated minutes.</p>
-        <p class="what">A short narrated, cited slide video made from a topic or a Library item. Lumens are also the parts of a course.</p>
+        <p class="what">A short narrated, cited slide video made from a topic or from something in your Commonplace. Lumens are also the parts of a course.</p>
       </article>
     </div>
   </section>
@@ -177,13 +183,14 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
             <li><b>Journal</b><span>What happened on a topic, in order.</span></li>
           </ul>
         </div>
-        <div class="dest">
-          <header><h3>Library</h3><span class="tg">Everything you have gathered, kept and connected.</span></header>
+        <div class="dest coined">
+          <header><h3>Commonplace</h3><span class="tg">Everything you gather, kept under your topics.</span><span class="was">Was: Library</span></header>
           <ul>
             <li><b>Collections</b><span>Your own shelves, filled by hand or by rule.</span></li>
             <li><b>To read</b><span>What you saved to come back to.</span></li>
             <li><b>Templates</b><span>Ready shapes for the things you keep.</span></li>
-            <li><b>Notes and quotes</b><span>Your words and marked passages, kept on the item they belong to.</span></li>
+            <li><b>Notes and quotes</b><span>Your words and marked passages, kept on what they belong to.</span></li>
+            <li><b>Sources, documents, works, people</b><span>Everything you keep, each called by its kind.</span></li>
           </ul>
         </div>
         <div class="dest">
@@ -195,8 +202,8 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
         </div>
       </div>
       <div class="everywhere">
-        <div class="chip"><small>Everywhere</small><b>✦ Ask Studiolo</b><span>Help that knows your map, your Library and how you learn.</span></div>
-        <div class="chip"><small>Everywhere</small><b>Capture</b><span>Save it now, sort it later.</span></div>
+        <div class="chip"><small>Everywhere</small><b>✦ Ask Studiolo</b><span>Help that knows your Loci, your Commonplace and how you learn.</span></div>
+        <div class="chip"><small>Everywhere</small><b>Capture</b><span>Save it to your Commonplace now, sort it later.</span></div>
         <div class="chip"><small>Everywhere</small><b>Search</b><span>Find anything, by name or by what it says.</span></div>
       </div>
       <div class="everywhere">
@@ -209,15 +216,15 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 
   <section aria-labelledby="assistant">
     <h2 id="assistant">The copilot: call it Studiolo</h2>
-    <p>Studiolo has one assistant, with six skills (product scope, "Graph copilot"). The app already says <b>✦ Ask Studiolo</b> in some places and <b>Copilot</b> in others, and Settings already has <b>Instructions for Studiolo</b>. The simplest fix is to let the assistant be Studiolo itself. Learners ask Studiolo; they do not have to learn a fourth name.</p>
+    <p>Studiolo has one assistant, with six skills (product scope, "Graph copilot"). The app already says <b>✦ Ask Studiolo</b> in some places and <b>Copilot</b> in others, and Settings already has <b>Instructions for Studiolo</b>. The simplest fix is to let the assistant be Studiolo itself. Learners ask Studiolo; they do not have to learn a fifth name.</p>
     <div class="assistant">
       <div class="mock">
         <span class="ask">✦ Ask Studiolo</span>
-        <p style="margin:0; font-family: var(--read); font-size: 17px; font-style: italic;">Help that knows your map, your Library and how you learn.</p>
+        <p style="margin:0; font-family: var(--read); font-size: 17px; font-style: italic;">Help that knows your Loci, your Commonplace and how you learn.</p>
         <div class="skills">
           <div class="skill"><b>Build my map</b><span>Suggests areas, topics and links. Asks before changing anything.</span></div>
           <div class="skill"><b>Find sources</b><span>Looks for good material on a topic.</span></div>
-          <div class="skill"><b>Tidy my Library</b><span>Suggests tags, collections and links between items.</span></div>
+          <div class="skill"><b>Tidy my Commonplace</b><span>Suggests topics, collections and links for what you keep.</span></div>
           <div class="skill"><b>Plan a course</b><span>Drafts a path of parts toward your goal.</span></div>
           <div class="skill"><b>Teach me</b><span>Explains, asks questions and checks what you know.</span></div>
           <div class="skill"><b>Explain…</b><span>Makes a Lumen on a topic or item.</span></div>
@@ -228,7 +235,7 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
           <thead><tr><th>Option</th><th>For and against</th></tr></thead>
           <tbody>
             <tr class="pick"><td>Studiolo<span class="note">"Ask Studiolo"</span></td><td>Already in the app. One brand, no character to maintain, and it matches "Instructions for Studiolo". Less distinctive on its own.</td></tr>
-            <tr><td>Socius<span class="note">Latin, "companion"</span></td><td>Fits the Latin family and feels warm. Hard to pronounce, and one more word to learn.</td></tr>
+            <tr><td>Socius<span class="note">Latin, "companion"</span></td><td>Fits the Latin family and feels warm. Hard to pronounce, and a fifth name to learn.</td></tr>
             <tr><td>Muse</td><td>Short and evocative. Crowded by other products, and suggests inspiration more than help.</td></tr>
             <tr><td>Mentor</td><td>Instantly understood. Generic, and claims a teacher's authority it should earn.</td></tr>
           </tbody>
@@ -239,7 +246,7 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 
   <section aria-labelledby="words">
     <h2 id="words">Words for things</h2>
-    <p>These stay plain English. In Library, call an item by its kind, "a note", "a source", never "an item".</p>
+    <p>These stay plain English. In the Commonplace, call each thing by its kind, "a note", "a source", never "an item".</p>
     <div class="words">
       <div class="group">
         <h3>In Loci</h3>
@@ -260,9 +267,9 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
         </dl>
       </div>
       <div class="group">
-        <h3>In Library</h3>
+        <h3>In the Commonplace</h3>
         <dl>
-          <dt>Note</dt><dd>Your own words, on its own or about another item.</dd>
+          <dt>Note</dt><dd>Your own words, on their own or about something you kept.</dd>
           <dt>Quote</dt><dd>A marked passage, with its page, time or section.</dd>
           <dt>Source</dt><dd>An article, video, book, podcast or website.</dd>
           <dt>Document</dt><dd>A file you added, such as a PDF.</dd>
@@ -270,7 +277,7 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
           <dt>Person</dt><dd>Someone whose work you follow.</dd>
           <dt>Conversation</dt><dd>A chat you kept.</dd>
           <dt>Image</dt><dd>A photo or drawing.</dd>
-          <dt>Collection</dt><dd>A shelf of items you choose.</dd>
+          <dt>Collection</dt><dd>A shelf you fill yourself.</dd>
         </dl>
       </div>
       <div class="group">
@@ -284,10 +291,10 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
       <div class="group">
         <h3>Links between things</h3>
         <dl>
-          <dt>On topics</dt><dd>The topics an item is tagged on: "On 3 topics".</dd>
+          <dt>On topics</dt><dd>The topics something is tagged on: "On 3 topics".</dd>
           <dt>Made from</dt><dd>What a Lumen or course was made from.</dd>
-          <dt>Draws on</dt><dd>The Library items a Lumen cites.</dd>
-          <dt>See also</dt><dd>A link between two Library items.</dd>
+          <dt>Draws on</dt><dd>What in your Commonplace a Lumen cites.</dd>
+          <dt>See also</dt><dd>A link between two things you kept.</dd>
         </dl>
       </div>
       <div class="group">
@@ -304,14 +311,14 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
   <section aria-labelledby="verbs">
     <h2 id="verbs">Buttons say what happens</h2>
     <div class="verbs">
-      <span class="verb">Capture<small>Save something to Library</small></span>
+      <span class="verb">Capture<small>Save something to your Commonplace</small></span>
       <span class="verb">✦ Ask Studiolo<small>Open the assistant</small></span>
       <span class="verb">Explain…<small>Make a Lumen</small></span>
       <span class="verb">Plan a course<small>Start a course with Studiolo</small></span>
       <span class="verb">Open in Loci<small>Show this in your palace</small></span>
       <span class="verb">Connect<small>Link two topics, with a reason</small></span>
       <span class="verb">Add to My Focus<small>Mark it to learn next</small></span>
-      <span class="verb">See all in Library<small>Go there, already filtered</small></span>
+      <span class="verb">See all in Commonplace<small>Go there, already filtered</small></span>
       <span class="verb">See all in Learn<small>Go there, already filtered</small></span>
     </div>
   </section>
@@ -323,10 +330,11 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
         <thead><tr><th>Where</th><th>Today</th><th>Becomes</th></tr></thead>
         <tbody>
           <tr><td>Navigation</td><td><span class="old">Graph</span></td><td><b>Loci</b>, with views Palace, Map, List and Overview</td></tr>
+          <tr><td>Navigation</td><td><span class="old">Library</span></td><td><b>Commonplace</b>; Collections, To read and Templates keep their names</td></tr>
           <tr><td>Learn</td><td><span class="old">Explainers</span></td><td><b>Lumens</b> (see the Lumen proposal)</td></tr>
           <tr><td>Assistant</td><td><span class="old">Copilot</span>, <span class="old">Ask the copilot</span></td><td><b>✦ Ask Studiolo</b></td></tr>
           <tr><td>Suggestion cards</td><td><span class="old">Proposed by the copilot</span></td><td><b>Suggested by Studiolo</b></td></tr>
-          <tr><td>Empty Learn shelf</td><td><span class="old">Explainers you make from the graph, your library or the copilot appear here.</span></td><td><b>Lumens you make from Loci, your Library or Studiolo appear here.</b></td></tr>
+          <tr><td>Empty Learn shelf</td><td><span class="old">Explainers you make from the graph, your library or the copilot appear here.</span></td><td><b>Lumens you make from Loci, your Commonplace or Studiolo appear here.</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -335,12 +343,12 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
   <section aria-labelledby="rules">
     <h2 id="rules">Rules</h2>
     <ol class="rules">
-      <li><span><b>Three coined names only.</b> Studiolo, Loci, Lumen. A new feature gets a plain name unless the owner agrees otherwise.</span></li>
-      <li><span><b>Capitals for names.</b> Destinations and coined names are capitalised: Today, Loci, Library, Learn, a Lumen. Everyday words are not: a topic, a note.</span></li>
-      <li><span><b>Plurals.</b> Lumens, never Lumina. Loci is already plural and is a place: "in Loci", never "a Loci" or "Locis".</span></li>
+      <li><span><b>Four names of our own, no more.</b> Studiolo, Loci, Commonplace, Lumen. A new feature gets a plain name unless the owner agrees otherwise.</span></li>
+      <li><span><b>Capitals for names.</b> Destinations and coined names are capitalised: Today, Loci, Commonplace, Learn, a Lumen. Everyday words are not: a topic, a note.</span></li>
+      <li><span><b>Plurals and articles.</b> Lumens, never Lumina. Loci is already plural and is a place: "in Loci", never "a Loci". In sentences say "your Commonplace"; on labels and buttons, just "Commonplace".</span></li>
       <li><span><b>Learner words, not system words.</b> No "node", "graph", "item" (use the kind), "AI", "bot", "prompt" or "generate". Say topic, note, Ask Studiolo, make, explain.</span></li>
       <li><span><b>Verbs stay plain.</b> Explain…, Capture, Connect. Coined names are never verbs: not "Lumen this".</span></li>
-      <li><span><b>Code keeps its names.</b> Routes, tables, events and analytics keep graph, explainer, copilot and content items. Only the words people see change.</span></li>
+      <li><span><b>Code keeps its names.</b> Routes, tables, events and analytics keep graph, library, explainer, copilot and content items. Only the words people see change.</span></li>
     </ol>
   </section>
 
@@ -348,9 +356,10 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
     <h2 id="decide">Decisions for the owner</h2>
     <ol class="decisions">
       <li>Rename the Graph destination to <b>Loci</b>, with the 3D view named <b>Palace</b> and made the default. The alternative is to keep Graph and use Loci only for the 3D view.</li>
+      <li>Rename Library to <b>Commonplace</b>. Test it with a few learners first: in everyday English "commonplace" also means ordinary. If it reads oddly, keep Library.</li>
       <li>Call the assistant <b>Studiolo</b> ("✦ Ask Studiolo") and retire "Copilot" in the interface.</li>
       <li>Adopt <b>Lumen</b> and <b>Lumens</b> for explainers, as in the 17 Oct proposal.</li>
-      <li>Approve the skill names: Build my map, Find sources, Tidy my Library, Plan a course, Teach me, Explain….</li>
+      <li>Approve the skill names: Build my map, Find sources, Tidy my Commonplace, Plan a course, Teach me, Explain….</li>
     </ol>
   </section>
 
