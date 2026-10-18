@@ -458,26 +458,29 @@ function neighboursOf(n) {
   n.tagged.forEach(t => s.add(t));
   return s;
 }
-function setFocus(n, opts = {}) {
-  focus = n;
+function setFocus(n) {
+  const prev = focus;
+  focus = n; focusAt = performance.now();
   if (!n) {
     neigh = new Set(); focusLinks = [];
-    goal.tx = goal.ty = goal.tz = 0; goal.dist = overviewDist;
     insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
     setHash('');
   } else {
     if (n.kind === 'lib' && !showLib) { showLib = true; optLib.checked = true; }
     neigh = neighboursOf(n);
     focusLinks = G.links.filter(l => l.a === n || l.b === n);
-    goal.tx = n.x; goal.ty = n.y; goal.tz = n.z;
-    goal.dist = Math.max(260, Math.min(520, 220 + neigh.size * 14));
     renderInspector(n);
     insp.classList.remove('closed'); insp.setAttribute('aria-hidden', 'false');
     setHash(n.id);
     document.getElementById('live').textContent = `${n.name}, ${n.kind === 'lib' ? 'Library item' : STATUS[n.status]}. ${neigh.size} connected.`;
   }
-  const c = viewCentre(); goal.cx = c[0]; goal.cy = c[1];
-  if (reduced || opts.instant) Object.assign(cam, goal);
+  const c = viewCentre();
+  if (!n) userZoomed = false;
+  const to = n
+    ? { tx: n.x, ty: n.y, tz: n.z, dist: Math.max(260, Math.min(520, 220 + neigh.size * 14)), cx: c[0], cy: c[1] }
+    : { tx: 0, ty: 0, tz: 0, dist: overviewDist, cx: c[0], cy: c[1] };
+  // Topic to topic arcs out and back in; entering or leaving a topic is a straight dolly.
+  flyTo(to, { hop: n && prev ? undefined : 0 });
   lastInteract = performance.now();
 }
 function setHash(id) { try { history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); } catch (e) {} }
@@ -537,48 +540,75 @@ function updateSummary() {
 }
 
 /* ---------- Drawing ---------- */
+const ease = {
+  out: t => 1 - Math.pow(1 - t, 3),
+  inOut: t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+  back: t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+};
+const clamp01 = t => (t < 0 ? 0 : t > 1 ? 1 : t);
+function lerpA(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+function rgb(a, al = 1) { return al >= 1 ? `rgb(${a[0] | 0},${a[1] | 0},${a[2] | 0})` : `rgba(${a[0] | 0},${a[1] | 0},${a[2] | 0},${al.toFixed(3)})`; }
 function quad(ax, ay, bx, by, bend) {
   const mx = (ax + bx) / 2, my = (ay + by) / 2, dx = bx - ax, dy = by - ay;
   return [mx - dy * bend, my + dx * bend];
 }
 const labelW = new Map();
 const UI_FONT = '"Instrument Sans", system-ui, -apple-system, sans-serif';
-function drawFrame(now) {
+const READ_FONT = '"Newsreader", Georgia, "Times New Roman", serif';
+let introAt = 0, focusAt = 0;
+
+/* Entry: each node grows in after its own delay (areas, then topics, then sub-topics and Library). */
+function reveal(n, now) { return reduced ? 1 : clamp01((now - introAt - n.delay) / 650); }
+
+function drawFrame(now, dt) {
   ctx.clearRect(0, 0, W, H);
   const N = G.nodes;
   while (P.length < N.length) P.push({});
-  for (let i = 0; i < N.length; i++) project(N[i], P[i]);
+  const kEm = reduced ? 1 : 1 - Math.exp(-dt * 7), kHv = reduced ? 1 : 1 - Math.exp(-dt * 16);
+  for (let i = 0; i < N.length; i++) {
+    const n = N[i];
+    project(n, P[i]);
+    n.rv = reveal(n, now);
+    // Emphasis eases between 1 (full colour) and 0 (greyed out) when the focus changes.
+    const target = !focus || n === focus || neigh.has(n) ? 1 : 0;
+    n.em += (target - n.em) * kEm;
+    n.hv += ((n === hover ? 1 : 0) - n.hv) * kHv;
+  }
   const proj = new Map(); for (let i = 0; i < N.length; i++) proj.set(N[i], P[i]);
   const bg = C.paper, focusing = !!focus;
+  const ringT = reduced ? 1 : ease.out(clamp01((now - focusAt) / 600));
 
-  // Links, batched by style and depth bucket.
-  const B = 4, buckets = { lk: [], rl: [], lib: [] };
-  for (const k in buckets) for (let i = 0; i < B; i++) buckets[k].push([]);
+  // Links, batched by type, depth and emphasis. Tree links grow out of their parent during the entry.
+  const B = 3, E = 3, buckets = {};
   for (const l of G.links) {
     if (focusing && (l.a === focus || l.b === focus)) continue;
     const pa = proj.get(l.a), pb = proj.get(l.b);
     if (!pa.vis || !pb.vis) continue;
+    const grow = l.type === 'rl' ? (l.a.rv > .98 && l.b.rv > .98 ? 1 : 0) : l.b.rv;
+    if (grow <= 0) continue;
     const d = Math.min(B - 1, ((pa.depth + pb.depth) / 2 * B) | 0);
-    buckets[l.type][d].push(pa.x, pa.y, pb.x, pb.y);
+    const e = Math.round(Math.min(l.a.em, l.b.em) * (E - 1));
+    const key = l.type + d + e;
+    (buckets[key] || (buckets[key] = { type: l.type, d, e, pts: [] })).pts.push(pa.x, pa.y, pa.x + (pb.x - pa.x) * grow, pa.y + (pb.y - pa.y) * grow);
   }
   ctx.lineCap = 'round';
-  for (const type of ['lk', 'lib', 'rl']) {
-    for (let d = B - 1; d >= 0; d--) {
-      const arr = buckets[type][d]; if (!arr.length) continue;
-      const base = type === 'rl' ? C.accent : C['ink-3'];
-      let t = .45 + d / B * .4; if (focusing) t = .86 + d / B * .1;
-      if (type === 'rl') t = focusing ? .9 : (G.nodes.length > 500 ? .8 : .35) + d / B * (G.nodes.length > 500 ? .15 : .45);
-      ctx.strokeStyle = mix(base, bg, t);
-      ctx.lineWidth = type === 'rl' ? 1 : .8;
-      ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' ? [1, 3] : []);
-      ctx.beginPath();
-      for (let i = 0; i < arr.length; i += 4) { ctx.moveTo(arr[i], arr[i + 1]); ctx.lineTo(arr[i + 2], arr[i + 3]); }
-      ctx.stroke();
-    }
+  const big = N.length > 500;
+  for (const k of Object.keys(buckets).sort()) {
+    const { type, d, e, pts } = buckets[k];
+    const em = e / (E - 1);
+    const base = type === 'rl' ? C.accent : C['ink-3'];
+    let t = type === 'rl' ? (big ? .8 : .35) + d / B * (big ? .15 : .45) : .45 + d / B * .4;
+    t = t + (.9 - t) * (1 - em);
+    ctx.strokeStyle = rgb(lerpA(base, bg, t));
+    ctx.lineWidth = type === 'rl' ? 1 : .8;
+    ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' ? [1, 3] : []);
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i += 4) { ctx.moveTo(pts[i], pts[i + 1]); ctx.lineTo(pts[i + 2], pts[i + 3]); }
+    ctx.stroke();
   }
   ctx.setLineDash([]);
 
-  // Focus links: curved, darker, with particles flowing into the centre.
+  // Focus links draw outward from the centre, then carry dots flowing back into it.
   if (focusing) {
     const pf = proj.get(focus);
     focusLinks.forEach((l, i) => {
@@ -586,19 +616,24 @@ function drawFrame(now) {
       if (!po.vis) return;
       const bend = (i % 2 ? 1 : -1) * .12;
       const [qx, qy] = quad(po.x, po.y, pf.x, pf.y, bend);
-      ctx.strokeStyle = l.type === 'rl' ? mix(C.accent, bg, .35) : mix(C['ink-2'], bg, .45);
+      const local = reduced ? 1 : ease.out(clamp01((now - focusAt - i * 35) / 520));
+      if (local <= 0) return;
+      const at = t => { const u = 1 - t; return [u * u * po.x + 2 * u * t * qx + t * t * pf.x, u * u * po.y + 2 * u * t * qy + t * t * pf.y]; };
+      ctx.strokeStyle = l.type === 'rl' ? rgb(lerpA(C.accent, bg, .3)) : rgb(lerpA(C['ink-2'], bg, .4));
       ctx.lineWidth = l.type === 'rl' ? 1.3 : 1;
       ctx.setLineDash(l.type === 'rl' ? [4, 4] : []);
-      ctx.beginPath(); ctx.moveTo(po.x, po.y); ctx.quadraticCurveTo(qx, qy, pf.x, pf.y); ctx.stroke();
+      ctx.beginPath();
+      const steps = 18;
+      for (let s = 0; s <= steps; s++) { const [x, y] = at(1 - local * s / steps); s ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
       ctx.setLineDash([]);
-      if (!reduced) {
-        ctx.fillStyle = l.type === 'rl' ? mix(C.accent, bg, .15) : mix(C['ink-2'], bg, .1);
+      if (!reduced && local >= 1) {
+        ctx.fillStyle = l.type === 'rl' ? rgb(lerpA(C.accent, bg, .1)) : rgb(lerpA(C['ink-2'], bg, .05));
         for (let k = 0; k < 3; k++) {
           const t = ((now / 2400) + k / 3 + i * .137) % 1;
-          const u = 1 - t;
-          const x = u * u * po.x + 2 * u * t * qx + t * t * pf.x, y = u * u * po.y + 2 * u * t * qy + t * t * pf.y;
+          const [x, y] = at(t);
           ctx.globalAlpha = Math.sin(t * Math.PI);
-          ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 6.283); ctx.fill();
         }
         ctx.globalAlpha = 1;
       }
@@ -606,75 +641,119 @@ function drawFrame(now) {
   }
 
   // Nodes, far to near.
-  const order = P.slice(0, N.length).filter(p => p.vis).sort((a, b) => b.zz - a.zz);
+  const order = P.slice(0, N.length).filter(p => p.vis && p.n.rv > 0).sort((a, b) => b.zz - a.zz);
+  const grey0 = C.dark ? lerpA(C['ink-3'], bg, .5) : lerpA(C['ink-3'], bg, .62);
   for (const p of order) {
-    const n = p.n, isF = n === focus, isN = neigh.has(n), isH = n === hover;
-    let fade = p.depth * .55;
-    if (focusing && !isF && !isN) fade = .82 + p.depth * .12;
-    if (isF || isN) fade = Math.min(fade, .12);
-    const r = Math.max(p.sr * (isH ? 1.18 : 1), n.kind === 'lib' ? 1.6 : 1.8);
-    const fill = mix(fillOf(n), bg, fade);
-    ctx.fillStyle = fill;
+    const n = p.n, isF = n === focus;
+    const sc = reduced ? 1 : ease.back(n.rv);
+    // Marks close to the camera stop growing, and greyed ones stop sooner, so the focus keeps the stage.
+    const r = Math.max(Math.min(p.sr, 13 + 15 * n.em) * sc * (1 + .18 * n.hv), n.kind === 'lib' ? 1.6 : 1.8);
+    const depthFade = p.depth * .55;
+    const grey = lerpA(grey0, bg, p.depth * .45);
+    let col = lerpA(grey, lerpA(fillOf(n), bg, depthFade), n.em);
+    if (n.rv < 1) col = lerpA(bg, col, n.rv);
+    ctx.fillStyle = rgb(col);
     if (n.kind === 'lib') {
       ctx.beginPath(); ctx.rect(p.x - r, p.y - r, r * 2, r * 2); ctx.fill();
     } else {
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
-      if (n.status === 0) { ctx.strokeStyle = mix(C['ink-3'], bg, fade); ctx.lineWidth = n.kind === 'area' ? 1.4 : 1; ctx.stroke(); }
-      if (n.kind === 'area' && n.status !== 0) { ctx.strokeStyle = mix(C['status-3'], bg, Math.max(fade, .55)); ctx.lineWidth = 1; ctx.stroke(); }
+      // Hollow Not-started marks fill in grey when greyed out, so they read like the rest of the background.
+      if (n.status === 0 || n.kind === 'area') {
+        const edge = n.status === 0 ? C['ink-3'] : C['status-3'];
+        const sAlpha = n.status === 0 ? 1 : .45;
+        ctx.strokeStyle = rgb(lerpA(edge, bg, depthFade + (1 - depthFade) * (1 - n.em * sAlpha) * .9), n.rv);
+        ctx.lineWidth = n.kind === 'area' ? 1.4 : 1;
+        ctx.stroke();
+      }
     }
     if (isF) {
-      ctx.strokeStyle = C.accent; ctx.lineWidth = 1.6;
-      ctx.beginPath(); ctx.arc(p.x, p.y, r + 5, 0, 6.283); ctx.stroke();
-      ctx.strokeStyle = mix(C.accent, bg, .7); ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(p.x, p.y, r + 10 + (reduced ? 0 : Math.sin(now / 700) * 1.5), 0, 6.283); ctx.stroke();
-    } else if (isH) {
-      ctx.strokeStyle = mix(C['ink-2'], bg, .2); ctx.lineWidth = 1;
+      ctx.strokeStyle = rgb(C.accent, ringT); ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r + 1 + 4 * ringT, 0, 6.283); ctx.stroke();
+      ctx.strokeStyle = rgb(lerpA(C.accent, bg, .7), ringT); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r + 3 + 7 * ringT + (reduced ? 0 : Math.sin(now / 700) * 1.5), 0, 6.283); ctx.stroke();
+    } else if (n.hv > .02) {
+      ctx.strokeStyle = rgb(lerpA(C['ink-2'], bg, .2), n.hv); ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(p.x, p.y, r + 4, 0, 6.283); ctx.stroke();
     }
   }
 
-  drawLabels(order, focusing, bg);
+  drawLabels(order, focusing, bg, dt);
 }
 
-function drawLabels(order, focusing, bg) {
-  const cands = [];
+/* Labels: the focused topic in Newsreader, its neighbours in sentence case, areas as small tracked capitals.
+   Size follows nearness; each label fades in and out instead of popping. */
+function drawLabels(order, focusing, bg, dt) {
   const big = G.nodes.length > 500;
+  const kLa = reduced ? 1 : 1 - Math.exp(-dt * 9);
+  const cands = [];
   for (const p of order) {
     const n = p.n;
     let pri = -1;
-    if (n === focus) pri = 5; else if (n === hover) pri = 4;
-    else if (focusing && neigh.has(n)) pri = 3;
-    else if (n.kind === 'area' && p.depth < (focusing ? .55 : .9)) pri = focusing ? 1 : 2;
-    else if (!focusing && !big && n.level === 2 && p.depth < .3 && p.sr > 7) pri = 0;
-    if (pri >= 0) cands.push([pri, p]);
+    if (n.rv > .75) {
+      if (n === focus) pri = 5; else if (n === hover) pri = 4;
+      else if (focusing && neigh.has(n)) pri = 3;
+      else if (n.kind === 'area' && p.depth < (focusing ? .5 : .92)) pri = focusing ? 1 : 2;
+      else if (!focusing && !big && n.level === 2 && p.depth < .28 && p.sr > 7) pri = 0;
+    }
+    if (pri >= 0 || n.la > .02) cands.push([pri, p]);
   }
   cands.sort((a, b) => b[0] - a[0] || a[1].zz - b[1].zz);
   const placed = [];
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '0.06em';
+  const hit = b => placed.some(q => b[0] < q[0] + q[2] && b[0] + b[2] > q[0] && b[1] < q[1] + q[3] && b[1] + b[3] > q[1]);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const hasLS = 'letterSpacing' in ctx;
   for (const [pri, p] of cands) {
-    const n = p.n;
-    const size = pri === 5 ? 12 : pri >= 3 ? 10.5 : 10;
-    const weight = pri >= 4 ? 650 : 600;
-    ctx.font = `${weight} ${size}px ${UI_FONT}`;
-    let text = n.name.toUpperCase();
-    if (text.length > 30 && pri < 4) text = text.slice(0, 28).trimEnd() + '…';
-    const key = text + size + weight;
+    const n = p.n, isArea = n.kind === 'area';
+    const near = Math.max(.88, Math.min(1.14, 1.16 - p.depth * .4));
+    let size, font, text, ls = '0px';
+    if (pri === 5) { size = 19; font = `500 ${size}px ${READ_FONT}`; text = n.name; }
+    else if (isArea) { size = Math.max(11, 11.5 * near); font = `650 ${size.toFixed(1)}px ${UI_FONT}`; text = n.name.toUpperCase(); ls = '0.08em'; }
+    else { size = Math.max(11.5, (pri >= 3 ? 13.5 : 12.5) * near); font = `${pri === 4 ? 600 : 500} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name; }
+    if (text.length > 34 && pri < 4) text = text.slice(0, 32).trimEnd() + '…';
+    ctx.font = font; if (hasLS) ctx.letterSpacing = ls;
+    const key = font + ls + text;
     let w = labelW.get(key); if (w === undefined) { w = ctx.measureText(text).width; labelW.set(key, w); }
-    const r = Math.max(p.sr, 2);
-    let x = p.x, y = p.y + r + (pri === 5 ? 15 : 6);
-    let box = [x - w / 2 - 3, y - 2, w + 6, size + 4];
-    const hit = b => placed.some(q => b[0] < q[0] + q[2] && b[0] + b[2] > q[0] && b[1] < q[1] + q[3] && b[1] + b[3] > q[1]);
-    if (hit(box)) { y = p.y - r - size - 6; box = [x - w / 2 - 3, y - 2, w + 6, size + 4]; if (hit(box) && pri < 4) continue; }
-    placed.push(box);
-    let fade = pri >= 3 ? 0 : pri === 2 ? .15 + p.depth * .5 : .35 + p.depth * .4;
-    const col = pri === 5 ? C.ink : pri === 0 ? C['ink-3'] : C['ink-2'];
-    ctx.lineWidth = 3; ctx.strokeStyle = mix(bg, bg, 0); ctx.lineJoin = 'round';
-    ctx.strokeText(text, x, y);
-    ctx.fillStyle = mix(col, bg, fade);
-    ctx.fillText(text, x, y);
+    const r = Math.max(p.sr * (1 + .18 * n.hv), 2);
+    const gap = pri === 5 ? 16 : 7;
+    let cy = p.y + r + gap + size / 2;
+    let box = [p.x - w / 2 - 5, cy - size / 2 - 3, w + 10, size + 6];
+    let want = pri >= 0;
+    if (want && hit(box)) {
+      cy = p.y - r - gap - size / 2; box[1] = cy - size / 2 - 3;
+      if (hit(box) && pri < 4) want = false;
+    }
+    n.la += ((want ? 1 : 0) - n.la) * kLa;
+    if (n.la < .02) continue;
+    if (want) placed.push(box);
+    const tone = pri === 5 ? C.ink : pri >= 3 ? lerpA(C.ink, C['ink-2'], .25) : isArea ? C['ink-2'] : C['ink-3'];
+    let fade = pri >= 3 ? 0 : isArea ? (focusing ? .45 : .05) + p.depth * .4 : .2 + p.depth * .4;
+    const a = n.la * clamp01((n.rv - .75) / .25);
+    // A soft paper backing keeps text off the lines without a hard box.
+    ctx.fillStyle = rgb(bg, .72 * a);
+    roundRect(box[0], box[1], box[2], box[3], 5); ctx.fill();
+    ctx.fillStyle = rgb(lerpA(tone, bg, fade), a);
+    ctx.fillText(text, p.x, cy + (pri === 5 ? 1 : .5));
   }
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  if (hasLS) ctx.letterSpacing = '0px';
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+/* ---------- Camera flights ---------- */
+let flight = null;
+function flyTo(to, opts = {}) {
+  Object.assign(goal, to);
+  if (opts.yaw !== undefined) goal.yaw = opts.yaw;
+  if (opts.pitch !== undefined) goal.pitch = opts.pitch;
+  if (reduced) { Object.assign(cam, goal); flight = null; return; }
+  const from = { tx: cam.tx, ty: cam.ty, tz: cam.tz, dist: cam.dist, cx: cam.cx, cy: cam.cy, yaw: cam.yaw, pitch: cam.pitch };
+  const travel = Math.hypot(to.tx - from.tx, to.ty - from.ty, to.tz - from.tz);
+  const dur = opts.dur || Math.min(1500, 700 + travel * 1.4);
+  const hop = opts.hop ?? Math.min(travel * .6, R0 * .9);
+  flight = { from, t0: performance.now(), dur, hop, yaw: opts.yaw, pitch: opts.pitch };
 }
 
 /* ---------- Loop ---------- */
@@ -685,19 +764,30 @@ function loop(now) {
     tick(G, alpha); if (G.nodes.length < 500) tick(G, alpha);
     alpha *= G.nodes.length > 500 ? .975 : .982;
     R0 = sceneRadius(G); overviewDist = R0 * 2.75;
-    if (!focus && !userZoomed) goal.dist = overviewDist;
-    else { goal.tx = focus.x; goal.ty = focus.y; goal.tz = focus.z; }
+    if (focus) { goal.tx = focus.x; goal.ty = focus.y; goal.tz = focus.z; }
+    else if (!userZoomed) goal.dist = overviewDist;
   }
-  const idle = !dragging && now - lastInteract > 2500;
+  const idle = !dragging && !flight && now - lastInteract > 2500;
   if (autoRotate && idle) goal.yaw += (focus ? .035 : .07) * dt;
   if (!dragging && (Math.abs(vel.yaw) > 1e-4 || Math.abs(vel.pitch) > 1e-4)) {
     goal.yaw += vel.yaw; goal.pitch = clampPitch(goal.pitch + vel.pitch);
     vel.yaw *= .92; vel.pitch *= .92;
   }
   const kMove = reduced ? 1 : 1 - Math.exp(-dt * 5.5), kTurn = reduced ? 1 : 1 - Math.exp(-dt * 14);
-  for (const k of ['tx', 'ty', 'tz', 'dist', 'cx', 'cy']) cam[k] += (goal[k] - cam[k]) * kMove;
-  cam.yaw += (goal.yaw - cam.yaw) * kTurn; cam.pitch += (goal.pitch - cam.pitch) * kTurn;
-  drawFrame(now);
+  if (flight) {
+    // An eased flight toward the live goal; the camera pulls back mid-way by `hop`, so long moves read as a jump.
+    const f = flight.from, t = clamp01((now - flight.t0) / flight.dur), e = ease.inOut(t);
+    for (const k of ['tx', 'ty', 'tz', 'cx', 'cy']) cam[k] = f[k] + (goal[k] - f[k]) * e;
+    cam.dist = f.dist + (goal.dist - f.dist) * e + flight.hop * Math.sin(Math.PI * e);
+    if (flight.yaw !== undefined) cam.yaw = goal.yaw = f.yaw + (flight.yaw - f.yaw) * e;
+    if (flight.pitch !== undefined) cam.pitch = goal.pitch = f.pitch + (flight.pitch - f.pitch) * e;
+    if (t >= 1) flight = null;
+  } else {
+    for (const k of ['tx', 'ty', 'tz', 'dist', 'cx', 'cy']) cam[k] += (goal[k] - cam[k]) * kMove;
+  }
+  if (!flight || flight.yaw === undefined) cam.yaw += (goal.yaw - cam.yaw) * kTurn;
+  if (!flight || flight.pitch === undefined) cam.pitch += (goal.pitch - cam.pitch) * kTurn;
+  drawFrame(now, dt);
   frames++;
   if (now - fpsT > 1000) { if (G.nodes.length > 500) document.getElementById('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now; }
   requestAnimationFrame(loop);
@@ -723,6 +813,7 @@ canvas.addEventListener('pointerdown', e => {
   const [x, y] = local(e);
   pointers.set(e.pointerId, { x, y });
   if (pointers.size === 1) { drag = { x, y, moved: 0 }; vel = { yaw: 0, pitch: 0 }; }
+  if (flight) { flight.yaw = flight.pitch = undefined; } // the viewer takes over turning mid-flight
   if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
   interacted();
 });
@@ -823,16 +914,33 @@ function choose(n) { q.value = ''; hits = []; renderResults(); setFocus(n); inte
 
 /* ---------- Boot ---------- */
 function load(g) {
-  G = g; focus = null; hover = null; neigh = new Set(); focusLinks = []; userZoomed = false;
+  G = g; focus = null; hover = null; neigh = new Set(); focusLinks = []; userZoomed = false; flight = null;
   insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
   initPositions(G);
   alpha = 1;
-  const pre = reduced ? 420 : G.nodes.length > 500 ? 40 : 90; // the first frame is already a recognisable shape
+  // Fewer warm-up ticks than a static view needs: the shape finishes settling while the entry plays.
+  const pre = reduced ? 420 : G.nodes.length > 500 ? 30 : 45;
   for (let i = 0; i < pre; i++) { tick(G, alpha); alpha *= .985; }
   if (reduced) alpha = 0;
   R0 = sceneRadius(G); overviewDist = R0 * 2.75;
-  goal.tx = goal.ty = goal.tz = 0; goal.dist = overviewDist;
-  Object.assign(cam, goal, { dist: overviewDist * (reduced ? 1 : 1.35) });
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const big = G.nodes.length > 500;
+  G.nodes.forEach(n => {
+    n.em = 1; n.hv = 0; n.la = 0; n.rv = 0;
+    const lvl = n.kind === 'lib' ? 4 : n.level;
+    n.delay = big ? (lvl - 1) * 260 + rnd() * 600
+      : n.kind === 'area' ? 150 + n.area * 45
+      : 150 + (lvl - 1) * 380 + n.area * 30 + rnd() * 180;
+  });
+  introAt = performance.now();
+  const c = viewCentre();
+  const home = { tx: 0, ty: 0, tz: 0, dist: overviewDist, cx: c[0], cy: c[1] };
+  if (reduced) { Object.assign(goal, home, { yaw: .7, pitch: -.32 }); Object.assign(cam, goal); }
+  else {
+    // The camera swings in from above while the graph grows: one orchestrated entry of about three seconds.
+    Object.assign(cam, home, { dist: overviewDist * 1.9, yaw: -.6, pitch: -.85 });
+    flyTo(home, { dur: 3000, hop: 0, yaw: .7, pitch: -.32 });
+  }
   updateSummary();
 }
 readTheme();
@@ -841,7 +949,7 @@ new MutationObserver(readTheme).observe(document.documentElement, { attributes: 
 resize();
 load(buildSample());
 const start = location.hash.slice(1);
-if (start && G.byId.get(start)) setTimeout(() => setFocus(G.byId.get(start)), 600);
+if (start && G.byId.get(start)) setTimeout(() => setFocus(G.byId.get(start)), 2400);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => labelW.clear());
 setTimeout(() => document.getElementById('hint').classList.add('gone'), 6000);
 requestAnimationFrame(loop);
