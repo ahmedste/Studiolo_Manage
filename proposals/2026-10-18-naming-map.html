@@ -4,73 +4,94 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&display=swap" rel="stylesheet">
 <style>
-/* Layout: a reading page on Studiolo's own paper. The three coined names lead, then the app as a map
-   (destinations as columns), then the assistant, the words for things, verbs, rules and decisions. */
+/* Layout: a reading page on Studiolo's own paper. Studiolo sits at the top as the product; the places inside it hang
+   from it as a tree; then the assistant, words for things, verbs, what changes, rules and decisions. */
 :root {
-  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3; --rail: #b9c0c4;
   --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
-  --accent: #1e3e9e; --accent-soft: #e6ebf8; --status-2: #6e86d0;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8;
   --read: "Newsreader", Georgia, "Times New Roman", serif;
   --ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47; --rail: #46535e;
     --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
-    --accent: #9db0f3; --accent-soft: #263156; --status-2: #7189d8;
+    --accent: #9db0f3; --accent-soft: #263156;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47; --rail: #46535e;
   --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
-  --accent: #9db0f3; --accent-soft: #263156; --status-2: #7189d8;
+  --accent: #9db0f3; --accent-soft: #263156;
   color-scheme: dark;
 }
 body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 72px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 72px; }
 h1, h2, h3 { text-wrap: balance; margin: 0; }
-h1 { font-family: var(--read); font-weight: 500; font-size: clamp(32px, 5vw, 46px); line-height: 1.08; letter-spacing: -.01em; }
+h1 { font-family: var(--read); font-weight: 500; font-size: clamp(30px, 5vw, 44px); line-height: 1.1; letter-spacing: -.01em; }
 h2 { font-family: var(--read); font-weight: 500; font-size: 26px; line-height: 1.2; }
 .eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 10px; }
-.lede { max-width: 62ch; color: var(--ink-2); font-size: 16.5px; margin: 14px 0 0; }
+.lede { max-width: 64ch; color: var(--ink-2); font-size: 16.5px; margin: 14px 0 0; }
 section { margin-top: 56px; display: flex; flex-direction: column; gap: 18px; }
-section > p { max-width: 66ch; margin: 0; color: var(--ink-2); }
+section > p { max-width: 68ch; margin: 0; color: var(--ink-2); }
 .status { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 4px 9px; border-radius: 99px; margin-top: 18px; }
+.say { font-size: 12.5px; color: var(--ink-3); }
+.c { color: var(--accent); }
 
-/* The three names */
-.trio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.name { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.name .word { font-family: var(--read); font-size: 34px; line-height: 1.05; font-weight: 500; overflow-wrap: anywhere; }
-.name .say { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.name .tag { font-family: var(--read); font-style: italic; font-size: 18px; line-height: 1.35; margin-top: 8px; }
-.name .what { font-size: 13.5px; color: var(--ink-2); margin: 4px 0 0; }
+/* ---- The tree ---- */
+.tree { display: flex; flex-direction: column; align-items: stretch; }
+.product { align-self: center; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 28px 16px; max-width: 520px; position: relative; display: flex; flex-direction: column; gap: 4px; }
+.product .word { font-family: var(--read); font-size: 44px; line-height: 1; font-weight: 500; }
+.product .tag { font-family: var(--read); font-style: italic; font-size: 18px; }
+.product small { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.stem { align-self: center; width: 1px; height: 26px; background: var(--rail); }
+.branches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; position: relative; padding-top: 22px; }
+.branches::before { content: ""; position: absolute; top: 0; left: calc((100% - 42px) / 8); right: calc((100% - 42px) / 8); height: 1px; background: var(--rail); } /* from the first column's centre to the last's */
+.place { position: relative; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--ink-2); border-radius: 12px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.place::before { content: ""; position: absolute; top: -26px; left: 50%; width: 1px; height: 22px; background: var(--rail); }
+.place.coined { border-top-color: var(--accent); }
+.place header { display: flex; flex-direction: column; gap: 2px; }
+.place h3 { font-family: var(--read); font-weight: 500; font-size: 24px; line-height: 1.1; overflow-wrap: anywhere; }
+.place .tg { font-family: var(--read); font-style: italic; font-size: 15px; color: var(--ink); line-height: 1.35; }
+.place .was { font-size: 11.5px; color: var(--ink-3); }
+.place ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; border-top: 1px solid var(--line); padding-top: 10px; }
+.place li { padding-left: 14px; position: relative; font-size: 13.5px; }
+.place li::before { content: ""; position: absolute; left: 0; top: .65em; width: 7px; height: 1px; background: var(--ink-3); }
+.place li b { font-weight: 600; }
+.place li b.c { color: var(--accent); }
+.place li span { display: block; color: var(--ink-2); font-size: 12.5px; }
+.across { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.band-label { margin-top: 22px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); display: flex; align-items: center; gap: 10px; }
+.band-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.tool { border: 1px dashed var(--rail); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tool b { font-weight: 600; font-size: 15px; }
+.tool span { color: var(--ink-2); font-size: 13px; }
+.tool.assist { border-style: solid; border-color: var(--accent); background: var(--accent-soft); }
+.tool.assist b { color: var(--accent); }
 
-/* The map */
-.map { display: flex; flex-direction: column; gap: 14px; }
-.root { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 14px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.root b { font-family: var(--read); font-weight: 500; font-size: 24px; }
-.root i { font-family: var(--read); color: var(--ink-2); font-size: 16px; }
-.dests { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; position: relative; }
-.dest { border-top: 2px solid var(--ink); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.dest.coined { border-top-color: var(--accent); }
-.dest > header { display: flex; flex-direction: column; gap: 2px; }
-.dest h3 { font-family: var(--read); font-weight: 500; font-size: 22px; }
-.dest .tg { font-size: 13.5px; color: var(--ink-2); }
-.dest .was { font-size: 11.5px; color: var(--ink-3); }
-.dest ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-.dest li { padding-left: 14px; position: relative; font-size: 13.5px; }
-.dest li::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 1px; background: var(--ink-3); }
-.dest li b { font-weight: 600; }
-.dest li span { display: block; color: var(--ink-2); font-size: 12.5px; }
-.everywhere { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.chip { border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.chip b { font-weight: 600; }
-.chip span { color: var(--ink-2); font-size: 13px; }
-.chip small { color: var(--ink-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
-.coined-word { color: var(--accent); }
+/* ---- Name cards ---- */
+.names { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.name { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.name .word { font-family: var(--read); font-size: 34px; line-height: 1.05; font-weight: 500; color: var(--accent); overflow-wrap: anywhere; }
+.name .tag { font-family: var(--read); font-style: italic; font-size: 17px; line-height: 1.35; margin-top: 6px; }
+.name p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
 
-/* Tables */
+/* ---- Assistant ---- */
+.assistant { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.mock { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.ask { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 8px 15px; border-radius: 99px; background: var(--accent); color: var(--panel); font-weight: 600; font-size: 14px; }
+.convo { display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; }
+.convo p { margin: 0; padding: 8px 12px; border-radius: 10px; max-width: 92%; }
+.convo .me { align-self: flex-end; background: var(--board); }
+.convo .it { align-self: flex-start; border: 1px solid var(--line); background: var(--paper); }
+.skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.skill { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: var(--paper); min-width: 0; }
+.skill b { display: block; font-size: 13.5px; }
+.skill span { font-size: 12px; color: var(--ink-2); }
+
+/* ---- Tables, words, verbs, rules ---- */
 .tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 table { border-collapse: collapse; width: 100%; font-size: 14px; }
 th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line); }
@@ -79,18 +100,7 @@ th { font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform:
 td:first-child { font-weight: 600; white-space: nowrap; }
 td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 400; }
 .pick td:first-child::after { content: "Recommended"; display: inline-block; margin-left: 8px; font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 99px; vertical-align: 1px; }
-.old { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
-
-/* Assistant */
-.assistant { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-.mock { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-.ask { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 8px 14px; border-radius: 99px; background: var(--accent); color: var(--panel); font-weight: 600; font-size: 14px; }
-.skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.skill { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; background: var(--paper); min-width: 0; }
-.skill b { display: block; font-size: 13.5px; }
-.skill span { font-size: 12px; color: var(--ink-2); }
-
-/* Words and verbs */
+.old { color: var(--ink-3); text-decoration: line-through; }
 .words { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .group { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
 .group h3 { font-size: 12px; font-family: var(--ui); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
@@ -100,24 +110,30 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 .verbs { display: flex; flex-wrap: wrap; gap: 8px; }
 .verb { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 7px 12px; font-weight: 600; font-size: 13.5px; display: inline-flex; flex-direction: column; }
 .verb small { font-weight: 400; color: var(--ink-2); font-size: 12px; }
-
-/* Rules */
 .rules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; counter-reset: r; }
 .rules li { counter-increment: r; display: grid; grid-template-columns: 28px 1fr; gap: 4px; font-size: 14.5px; }
 .rules li::before { content: counter(r); font-family: var(--read); font-size: 20px; color: var(--accent); line-height: 1.1; }
 .rules b { font-weight: 600; }
 .rules span { color: var(--ink-2); }
-.decisions { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 70ch; }
+.decisions { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 72ch; }
 .foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); max-width: 80ch; }
 
 @media (max-width: 900px) {
-  .dests, .trio { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 26px; }
+  .branches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .branches::before { left: calc((100% - 14px) / 4); right: calc((100% - 14px) / 4); }
+  .branches .place:nth-child(n+3)::before { display: none; }
+  .across { grid-template-columns: 1fr; }
   .words { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .assistant { grid-template-columns: 1fr; }
 }
 @media (max-width: 620px) {
-  .trio, .dests, .everywhere, .words, .rules { grid-template-columns: 1fr; }
-  .skills { grid-template-columns: 1fr; }
+  /* Phones: the tree becomes a rail down the left side. */
+  .product { align-self: stretch; text-align: left; }
+  .stem { align-self: flex-start; margin-left: 24px; }
+  .branches { grid-template-columns: 1fr; padding-top: 0; padding-left: 24px; border-left: 1px solid var(--rail); margin-left: 24px; gap: 12px; }
+  .branches::before { display: none; }
+  .branches .place::before, .branches .place:nth-child(n+3)::before { display: block; top: 22px; left: -25px; width: 24px; height: 1px; }
+  .names, .words, .rules, .skills { grid-template-columns: 1fr; }
   .wrap { padding-block: 28px 56px; }
   td:first-child { white-space: normal; }
 }
@@ -125,56 +141,32 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
 
 <main class="wrap">
   <p class="eyebrow">Studiolo · naming</p>
-  <h1>Four names, plain words for everything else</h1>
-  <p class="lede">Studiolo has four names of its own: Studiolo, Loci, Commonplace and Lumen. Each comes from the world of the Renaissance study. Everything else uses words a learner already knows. This page maps every part of the app to its name and the one line that says what it does.</p>
+  <h1>One product, three names inside it, plain words for everything else</h1>
+  <p class="lede">Studiolo is the product: a private study. Inside it are three places and things with names of their own, Loci, the Commonplace and Lumens, each from the world of the Renaissance study. Everything else uses words a learner already knows.</p>
   <span class="status">Draft for the owner's decision · 18 Oct 2026</span>
 
-  <section aria-labelledby="names">
-    <h2 id="names">The four names</h2>
-    <div class="trio">
-      <article class="name">
+  <section aria-labelledby="map">
+    <h2 id="map">The map of Studiolo</h2>
+    <p>Studiolo at the top. Under it, the four places in the main navigation. Blue marks a name of our own. Below them, what is available everywhere in Studiolo, and Settings.</p>
+    <div class="tree">
+      <div class="product">
+        <small>The product</small>
         <span class="word">Studiolo</span>
         <span class="say">stoo-dee-OH-loh · Italian, "little study"</span>
-        <p class="tag">A private study for everything you learn.</p>
-        <p class="what">The app, and the assistant inside it. A studiolo was a Renaissance scholar's private room for books, objects and thinking.</p>
-      </article>
-      <article class="name">
-        <span class="word coined-word">Loci</span>
-        <span class="say">LOH-sigh · Latin, "places"</span>
-        <p class="tag">Your mind palace: everything you know, in one place you can walk through.</p>
-        <p class="what">The map of your areas, topics and sub-topics, with your Commonplace and Lumens linked in. Named after the memory palace technique, the method of loci.</p>
-      </article>
-      <article class="name">
-        <span class="word coined-word">Commonplace</span>
-        <span class="say">KOM-un-plays · from Latin <i>loci communes</i></span>
-        <p class="tag">Everything you gather, kept under your topics.</p>
-        <p class="what">Your sources, documents, notes and quotes. Renaissance scholars kept a commonplace book: extracts filed under topic headings, the <i>loci communes</i>. Loci holds your topics; the Commonplace holds what you gathered under them. Was: Library.</p>
-      </article>
-      <article class="name">
-        <span class="word coined-word">Lumen</span>
-        <span class="say">LOO-men · Latin, "light"</span>
-        <p class="tag">Light on any topic, in a few narrated minutes.</p>
-        <p class="what">A short narrated, cited slide video made from a topic or from something in your Commonplace. Lumens are also the parts of a course.</p>
-      </article>
-    </div>
-  </section>
-
-  <section aria-labelledby="map">
-    <h2 id="map">The map of the app</h2>
-    <p>Four places in the main navigation, three things available everywhere, and Settings. Blue lines mark the places with a coined name.</p>
-    <div class="map">
-      <div class="root"><b>Studiolo</b><i>A private study for everything you learn.</i></div>
-      <div class="dests">
-        <div class="dest">
+        <span class="tag">A private study for everything you learn.</span>
+      </div>
+      <div class="stem" aria-hidden="true"></div>
+      <div class="branches">
+        <div class="place">
           <header><h3>Today</h3><span class="tg">What to pick up next.</span></header>
           <ul>
             <li><b>Next up</b><span>The one thing worth doing now.</span></li>
             <li><b>My Focus</b><span>Topics you said you want to learn next.</span></li>
-            <li><b>Sessions</b><span>Study time on your calendar, with a day and an optional time.</span></li>
+            <li><b>Sessions</b><span>Study time on your calendar.</span></li>
           </ul>
         </div>
-        <div class="dest coined">
-          <header><h3>Loci</h3><span class="tg">Your mind palace.</span><span class="was">Was: Graph</span></header>
+        <div class="place coined">
+          <header><h3 class="c">Loci</h3><span class="tg">Your mind palace.</span><span class="was">Was: Graph</span></header>
           <ul>
             <li><b>Palace</b><span>Walk through everything you know, in 3D. The default view.</span></li>
             <li><b>Map</b><span>Build and edit your topics, one branch at a time.</span></li>
@@ -183,61 +175,89 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
             <li><b>Journal</b><span>What happened on a topic, in order.</span></li>
           </ul>
         </div>
-        <div class="dest coined">
-          <header><h3>Commonplace</h3><span class="tg">Everything you gather, kept under your topics.</span><span class="was">Was: Library</span></header>
+        <div class="place coined">
+          <header><h3 class="c">Commonplace</h3><span class="tg">Everything you gather, kept under your topics.</span><span class="was">Was: Library</span></header>
           <ul>
-            <li><b>Collections</b><span>Your own shelves, filled by hand or by rule.</span></li>
+            <li><b>Collections</b><span>Your own shelves.</span></li>
             <li><b>To read</b><span>What you saved to come back to.</span></li>
-            <li><b>Templates</b><span>Ready shapes for the things you keep.</span></li>
+            <li><b>Templates</b><span>Ready shapes for what you keep.</span></li>
             <li><b>Notes and quotes</b><span>Your words and marked passages, kept on what they belong to.</span></li>
-            <li><b>Sources, documents, works, people</b><span>Everything you keep, each called by its kind.</span></li>
           </ul>
         </div>
-        <div class="dest">
+        <div class="place">
           <header><h3>Learn</h3><span class="tg">Lumens and courses made for what you are learning.</span></header>
           <ul>
-            <li><b class="coined-word">Lumens</b><span>Light on any topic, in a few narrated minutes.</span></li>
+            <li><b class="c">Lumens</b><span>Light on any topic, in a few narrated minutes.</span></li>
             <li><b>Courses</b><span>A path of Lumens toward a goal, in parts.</span></li>
           </ul>
         </div>
       </div>
-      <div class="everywhere">
-        <div class="chip"><small>Everywhere</small><b>✦ Ask Studiolo</b><span>Help that knows your Loci, your Commonplace and how you learn.</span></div>
-        <div class="chip"><small>Everywhere</small><b>Capture</b><span>Save it to your Commonplace now, sort it later.</span></div>
-        <div class="chip"><small>Everywhere</small><b>Search</b><span>Find anything, by name or by what it says.</span></div>
+      <div class="band-label">Everywhere in Studiolo</div>
+      <div class="across">
+        <div class="tool assist"><b>✦ Ask Loci</b><span>Ask your mind palace. It answers from what you know and helps you add to it.</span></div>
+        <div class="tool"><b>Capture</b><span>Save it to your Commonplace now, sort it later.</span></div>
+        <div class="tool"><b>Search</b><span>Find anything, by name or by what it says.</span></div>
       </div>
-      <div class="everywhere">
-        <div class="chip"><small>Settings</small><b>Instructions for Studiolo</b><span>Tell Studiolo how you like to learn.</span></div>
-        <div class="chip"><small>Settings</small><b>Memory</b><span>What Studiolo remembers about you. You can read, edit and delete it.</span></div>
-        <div class="chip"><small>Settings</small><b>Appearance and Privacy</b><span>Light, dark or system, and what you share.</span></div>
+      <div class="band-label">Settings</div>
+      <div class="across">
+        <div class="tool"><b>Instructions for Loci</b><span>Tell Loci how you like to learn.</span></div>
+        <div class="tool"><b>Memory</b><span>What Loci remembers about you. You can read, edit and delete it.</span></div>
+        <div class="tool"><b>Appearance and Privacy</b><span>Light, dark or system, and what you share.</span></div>
       </div>
     </div>
   </section>
 
+  <section aria-labelledby="names">
+    <h2 id="names">The three names inside Studiolo</h2>
+    <div class="names">
+      <article class="name">
+        <span class="word">Loci</span>
+        <span class="say">LOH-sigh · Latin, "places"</span>
+        <p class="tag">Your mind palace: everything you know, in one place you can walk through, and ask.</p>
+        <p>Your areas, topics and sub-topics, with your Commonplace and Lumens linked in. Named after the memory palace technique, the method of loci. It is also who you ask (see below).</p>
+      </article>
+      <article class="name">
+        <span class="word">Commonplace</span>
+        <span class="say">KOM-un-plays · from Latin <i>loci communes</i></span>
+        <p class="tag">Everything you gather, kept under your topics.</p>
+        <p>Renaissance scholars kept a commonplace book: extracts filed under topic headings, the <i>loci communes</i>. Loci holds your topics; the Commonplace holds what you gathered under them.</p>
+      </article>
+      <article class="name">
+        <span class="word">Lumen</span>
+        <span class="say">LOO-men · Latin, "light"</span>
+        <p class="tag">Light on any topic, in a few narrated minutes.</p>
+        <p>A short narrated, cited slide video made from a topic or from something in your Commonplace. Lumens are also the parts of a course.</p>
+      </article>
+    </div>
+  </section>
+
   <section aria-labelledby="assistant">
-    <h2 id="assistant">The copilot: call it Studiolo</h2>
-    <p>Studiolo has one assistant, with six skills (product scope, "Graph copilot"). The app already says <b>✦ Ask Studiolo</b> in some places and <b>Copilot</b> in others, and Settings already has <b>Instructions for Studiolo</b>. The simplest fix is to let the assistant be Studiolo itself. Learners ask Studiolo; they do not have to learn a fifth name.</p>
+    <h2 id="assistant">The assistant: Ask Loci</h2>
+    <p>Studiolo has one assistant with six skills. Calling it "Ask Studiolo" would mean asking the whole product, like asking the building. Asking <b>Loci</b> means asking your mind palace: the place that holds everything you know, your topics, your Commonplace and your Lumens. It answers from what is there, and helps you put more in. No fifth name, no character to invent, and every answer comes back to your Loci.</p>
     <div class="assistant">
       <div class="mock">
-        <span class="ask">✦ Ask Studiolo</span>
-        <p style="margin:0; font-family: var(--read); font-size: 17px; font-style: italic;">Help that knows your Loci, your Commonplace and how you learn.</p>
+        <span class="ask">✦ Ask Loci</span>
+        <div class="convo" aria-label="Example">
+          <p class="me">What do I already know about courtyards?</p>
+          <p class="it">Three topics and five things in your Commonplace touch it, mostly under Islamic architecture and Climate-responsive design. Shall I open them in your Palace?</p>
+        </div>
         <div class="skills">
           <div class="skill"><b>Build my map</b><span>Suggests areas, topics and links. Asks before changing anything.</span></div>
           <div class="skill"><b>Find sources</b><span>Looks for good material on a topic.</span></div>
           <div class="skill"><b>Tidy my Commonplace</b><span>Suggests topics, collections and links for what you keep.</span></div>
           <div class="skill"><b>Plan a course</b><span>Drafts a path of parts toward your goal.</span></div>
           <div class="skill"><b>Teach me</b><span>Explains, asks questions and checks what you know.</span></div>
-          <div class="skill"><b>Explain…</b><span>Makes a Lumen on a topic or item.</span></div>
+          <div class="skill"><b>Explain…</b><span>Makes a Lumen on a topic or something you kept.</span></div>
         </div>
       </div>
       <div class="tbl">
         <table>
           <thead><tr><th>Option</th><th>For and against</th></tr></thead>
           <tbody>
-            <tr class="pick"><td>Studiolo<span class="note">"Ask Studiolo"</span></td><td>Already in the app. One brand, no character to maintain, and it matches "Instructions for Studiolo". Less distinctive on its own.</td></tr>
-            <tr><td>Socius<span class="note">Latin, "companion"</span></td><td>Fits the Latin family and feels warm. Hard to pronounce, and a fifth name to learn.</td></tr>
-            <tr><td>Muse</td><td>Short and evocative. Crowded by other products, and suggests inspiration more than help.</td></tr>
-            <tr><td>Mentor</td><td>Instantly understood. Generic, and claims a teacher's authority it should earn.</td></tr>
+            <tr class="pick"><td>Ask Loci<span class="note">"ask your mind palace"</span></td><td>Uses a name learners already know from the app, and says what the assistant is for: your knowledge, answering. Loci becomes both the place and its voice, so "Open in Loci" and "Ask Loci" must stay clearly different buttons.</td></tr>
+            <tr><td>Ask Studiolo</td><td>Already in parts of the app. But Studiolo is the whole product and a place too, so it feels like asking the building.</td></tr>
+            <tr><td>Mnemo<span class="note">from Mnemosyne, memory</span></td><td>Mnemosyne was the goddess of memory and mother of the Muses, who decorated Renaissance studioli. A warm, distinct character. A fifth name, and close to "Nemo".</td></tr>
+            <tr><td>Socius<span class="note">Latin, "companion"</span></td><td>A companion in study. Hard to pronounce, and a fifth name.</td></tr>
           </tbody>
         </table>
       </div>
@@ -300,8 +320,8 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
       <div class="group">
         <h3>About you</h3>
         <dl>
-          <dt>Instructions</dt><dd>What you tell Studiolo directly.</dd>
-          <dt>Memory</dt><dd>What Studiolo learns over time, and you can edit.</dd>
+          <dt>Instructions</dt><dd>What you tell Loci directly.</dd>
+          <dt>Memory</dt><dd>What Loci learns over time, and you can edit.</dd>
           <dt>Journal</dt><dd>The history of a topic.</dd>
         </dl>
       </div>
@@ -311,11 +331,11 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
   <section aria-labelledby="verbs">
     <h2 id="verbs">Buttons say what happens</h2>
     <div class="verbs">
-      <span class="verb">Capture<small>Save something to your Commonplace</small></span>
-      <span class="verb">✦ Ask Studiolo<small>Open the assistant</small></span>
-      <span class="verb">Explain…<small>Make a Lumen</small></span>
-      <span class="verb">Plan a course<small>Start a course with Studiolo</small></span>
+      <span class="verb">✦ Ask Loci<small>Ask your mind palace</small></span>
       <span class="verb">Open in Loci<small>Show this in your palace</small></span>
+      <span class="verb">Capture<small>Save something to your Commonplace</small></span>
+      <span class="verb">Explain…<small>Make a Lumen</small></span>
+      <span class="verb">Plan a course<small>Start a course with Loci</small></span>
       <span class="verb">Connect<small>Link two topics, with a reason</small></span>
       <span class="verb">Add to My Focus<small>Mark it to learn next</small></span>
       <span class="verb">See all in Commonplace<small>Go there, already filtered</small></span>
@@ -332,9 +352,10 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
           <tr><td>Navigation</td><td><span class="old">Graph</span></td><td><b>Loci</b>, with views Palace, Map, List and Overview</td></tr>
           <tr><td>Navigation</td><td><span class="old">Library</span></td><td><b>Commonplace</b>; Collections, To read and Templates keep their names</td></tr>
           <tr><td>Learn</td><td><span class="old">Explainers</span></td><td><b>Lumens</b> (see the Lumen proposal)</td></tr>
-          <tr><td>Assistant</td><td><span class="old">Copilot</span>, <span class="old">Ask the copilot</span></td><td><b>✦ Ask Studiolo</b></td></tr>
-          <tr><td>Suggestion cards</td><td><span class="old">Proposed by the copilot</span></td><td><b>Suggested by Studiolo</b></td></tr>
-          <tr><td>Empty Learn shelf</td><td><span class="old">Explainers you make from the graph, your library or the copilot appear here.</span></td><td><b>Lumens you make from Loci, your Commonplace or Studiolo appear here.</b></td></tr>
+          <tr><td>Assistant</td><td><span class="old">Copilot</span>, <span class="old">Ask the copilot</span>, <span class="old">Ask Studiolo</span></td><td><b>✦ Ask Loci</b></td></tr>
+          <tr><td>Suggestion cards</td><td><span class="old">Proposed by the copilot</span></td><td><b>Suggested by Loci</b></td></tr>
+          <tr><td>Settings</td><td><span class="old">Instructions for Studiolo</span></td><td><b>Instructions for Loci</b></td></tr>
+          <tr><td>Empty Learn shelf</td><td><span class="old">Explainers you make from the graph, your library or the copilot appear here.</span></td><td><b>Lumens you make from your Loci or your Commonplace appear here.</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -343,11 +364,11 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
   <section aria-labelledby="rules">
     <h2 id="rules">Rules</h2>
     <ol class="rules">
-      <li><span><b>Four names of our own, no more.</b> Studiolo, Loci, Commonplace, Lumen. A new feature gets a plain name unless the owner agrees otherwise.</span></li>
-      <li><span><b>Capitals for names.</b> Destinations and coined names are capitalised: Today, Loci, Commonplace, Learn, a Lumen. Everyday words are not: a topic, a note.</span></li>
-      <li><span><b>Plurals and articles.</b> Lumens, never Lumina. Loci is already plural and is a place: "in Loci", never "a Loci". In sentences say "your Commonplace"; on labels and buttons, just "Commonplace".</span></li>
-      <li><span><b>Learner words, not system words.</b> No "node", "graph", "item" (use the kind), "AI", "bot", "prompt" or "generate". Say topic, note, Ask Studiolo, make, explain.</span></li>
-      <li><span><b>Verbs stay plain.</b> Explain…, Capture, Connect. Coined names are never verbs: not "Lumen this".</span></li>
+      <li><span><b>One product, three names inside.</b> Studiolo, then Loci, Commonplace and Lumen. A new feature gets a plain name unless the owner agrees otherwise.</span></li>
+      <li><span><b>Capitals for names.</b> Destinations and our names are capitalised: Today, Loci, Commonplace, Learn, a Lumen. Everyday words are not: a topic, a note.</span></li>
+      <li><span><b>Loci, the place and the voice.</b> As a place: "in Loci", "your Loci", never "a Loci". As the assistant: "Ask Loci", "Loci suggests". Never "the Loci".</span></li>
+      <li><span><b>Plurals and articles.</b> Lumens, never Lumina. "Your Commonplace" in sentences; just "Commonplace" on labels and buttons.</span></li>
+      <li><span><b>Learner words, not system words.</b> No "node", "graph", "item" (use the kind), "AI", "bot", "copilot", "prompt" or "generate". Say topic, note, Ask Loci, make, explain.</span></li>
       <li><span><b>Code keeps its names.</b> Routes, tables, events and analytics keep graph, library, explainer, copilot and content items. Only the words people see change.</span></li>
     </ol>
   </section>
@@ -355,9 +376,9 @@ td .note { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 
   <section aria-labelledby="decide">
     <h2 id="decide">Decisions for the owner</h2>
     <ol class="decisions">
-      <li>Rename the Graph destination to <b>Loci</b>, with the 3D view named <b>Palace</b> and made the default. The alternative is to keep Graph and use Loci only for the 3D view.</li>
+      <li>Rename Graph to <b>Loci</b>, covering both the 2D Map and the 3D Palace, with Palace as the default view.</li>
+      <li>Call the assistant <b>Loci</b> ("✦ Ask Loci", "Suggested by Loci", "Instructions for Loci") and retire "Copilot" and "Ask Studiolo".</li>
       <li>Rename Library to <b>Commonplace</b>. Test it with a few learners first: in everyday English "commonplace" also means ordinary. If it reads oddly, keep Library.</li>
-      <li>Call the assistant <b>Studiolo</b> ("✦ Ask Studiolo") and retire "Copilot" in the interface.</li>
       <li>Adopt <b>Lumen</b> and <b>Lumens</b> for explainers, as in the 17 Oct proposal.</li>
       <li>Approve the skill names: Build my map, Find sources, Tidy my Commonplace, Plan a course, Teach me, Explain….</li>
     </ol>
