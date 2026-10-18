@@ -221,7 +221,7 @@ canvas#g.over { cursor: pointer; }
         <label><input type="checkbox" id="optEx" checked>Explainers</label>
         <label><input type="checkbox" id="optRotate" checked>Slow turn</label>
       </div>
-      <p class="legend-note">Library items and explainers appear when you open an area.</p>
+      <p class="legend-note">Open an area to see its Library items and explainers as groups. Open a group to spread it out.</p>
       <div class="row">
         <button type="button" class="linkbtn" id="optScale">Try 2,000 topics</button>
         <span class="fps" id="fps"></span>
@@ -375,6 +375,20 @@ function buildSample() {
     sources.forEach(sn => addLink(g, need(itemByName, sn), ex, 'src'));
     (anchor.kind === 'lib' ? [...anchor.areas] : [anchor.area]).concat(ex.sources.flatMap(x => [...x.areas])).forEach(a => ex.areas.add(a));
   });
+  // Groups: per area, one stack for its Library items and one for its explainers. They sit beside the area, outside the simulation.
+  g.areaNodes = AREAS.map(a => byName[a.n]);
+  g.areaNodes.forEach((area, i) => {
+    for (const kind of ['lib', 'ex']) {
+      const members = g.nodes.filter(x => x.kind === kind && x.areas.has(i));
+      if (!members.length) continue;
+      const k = members.length;
+      const gr = addNode(g, { name: kind === 'lib' ? `${k} Library item${k === 1 ? '' : 's'}` : `${k} explainer${k === 1 ? '' : 's'}`, kind: 'group', groupType: kind, level: 4, status: 0, area: i, parent: null, members, areaNode: area, fixed: true });
+      gr.r = 6.5 + Math.sqrt(k) * 2;
+      addLink(g, area, gr, 'grp');
+      (area.groups || (area.groups = [])).push(gr);
+    }
+  });
+  g.sim = g.nodes.filter(n => !n.fixed);
   g.label = 'Prototype · sample graph';
   return g;
 }
@@ -399,6 +413,7 @@ function buildScale() {
     const b = rnd() < .7 ? all.filter(n => n.area === a.area)[Math.floor(rnd() * 80)] : all[Math.floor(rnd() * all.length)];
     if (b && a !== b) addLink(g, a, b, 'rl', 'Synthetic link for the scale test.');
   }
+  g.sim = g.nodes; g.areaNodes = null;
   g.label = 'Scale test · synthetic';
   return g;
 }
@@ -413,7 +428,7 @@ function initPositions(g) {
     a.x = Math.cos(th) * rr * R; a.y = y * R; a.z = Math.sin(th) * rr * R;
   });
   g.nodes.forEach(n => {
-    if (n.kind === 'area') return;
+    if (n.kind === 'area' || n.fixed) return;
     const host = n.parent || n.anchor;
     const len = Math.hypot(host.x, host.y, host.z) || 1;
     const d = n.kind === 'lib' || n.kind === 'ex' ? 26 : n.level === 2 ? 70 : 40;
@@ -430,7 +445,7 @@ function linkSpec(l) {
   return l.a.kind === 'area' ? [74, .1] : [40, .18];
 }
 function tick(g, a) {
-  const N = g.nodes, n = N.length, sampled = n > 500, S = 26, REP = 1500;
+  const N = g.sim || g.nodes, n = N.length, sampled = n > 500, S = 26, REP = 1500;
   for (let i = 0; i < n; i++) {
     const p = N[i];
     const m = sampled ? S : n;
@@ -449,6 +464,7 @@ function tick(g, a) {
     }
   }
   for (const l of g.links) {
+    if (l.type === 'grp') continue;
     const [L, k] = linkSpec(l);
     const p = l.a, q = l.b;
     const dx = q.x - p.x, dy = q.y - p.y, dz = q.z - p.z;
@@ -487,7 +503,7 @@ function makeGrain() {
   x.putImageData(im, 0, 0);
   document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`;
 }
-function fillOf(n) { return n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
+function fillOf(n) { return n.kind === 'group' ? (n.groupType === 'ex' ? C.accent : C['ink-2']) : n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
 
 /* ---------- Canvas, camera ---------- */
 const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
@@ -498,7 +514,7 @@ const cam = { yaw: .7, pitch: -.32, dist: 900, tx: 0, ty: 0, tz: 0, cx: 0, cy: 0
 const goal = { ...cam };
 let R0 = 300, overviewDist = 900;
 let focus = null, hover = null, neigh = new Set(), focusLinks = [];
-let hoverArea = null, hoverSet = new Set(), hoverLinks = [], hoverAt = 0, scope = new Set();
+let hoverArea = null, hoverSet = new Set(), hoverLinks = [], hoverAt = 0, scope = new Set(), expanded = null;
 let showLib = true, showEx = true, autoRotate = !reduced, lastInteract = -1e9;
 let vel = { yaw: 0, pitch: 0 };
 
@@ -550,9 +566,19 @@ function neighboursOf(n) {
   if (n.anchorNode) s.add(n.anchorNode);
   // An explainer also lights the topics its sources are tagged on: everything it ties together.
   if (n.kind === 'ex') n.sources.forEach(src => src.tagged.forEach(t => s.add(t)));
+  // A group lights its members and every topic they link to, in any area.
+  if (n.kind === 'group') {
+    s.add(n.areaNode);
+    n.members.forEach(m => {
+      s.add(m);
+      if (m.kind === 'lib') m.tagged.forEach(t => s.add(t));
+      else if (m.anchorNode.kind !== 'lib') s.add(m.anchorNode);
+    });
+  }
+  if (n.kind === 'area' && n.groups) n.groups.forEach(gr => s.add(gr));
   return s;
 }
-const KIND_LABEL = n => (n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : null);
+const KIND_LABEL = n => (n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : n.kind === 'group' ? 'Group' : null);
 /* Frame the focus with everything it connects to, leaning toward the focus itself. */
 function focusFrame(n) {
   const pts = [n, ...neigh];
@@ -562,7 +588,7 @@ function focusFrame(n) {
   const tx = n.x + (cx - n.x) * .6, ty = n.y + (cy - n.y) * .6, tz = n.z + (cz - n.z) * .6;
   let spread = 0;
   for (const p of pts) spread = Math.max(spread, Math.hypot(p.x - tx, p.y - ty, p.z - tz));
-  const dist = Math.max(260, Math.min(R0 * 2.6, spread * 2.5 + 120)) * (narrow() ? 1.15 : 1);
+  const dist = Math.max(260, Math.min(R0 * 2.6, spread * (n.kind === 'group' ? 2.05 : 2.5) + 120)) * (narrow() ? 1.15 : 1);
   return { tx, ty, tz, dist };
 }
 function setFocus(n) {
@@ -593,16 +619,28 @@ function setFocus(n) {
   flyTo(to, { hop: n && prev ? undefined : 0 });
   lastInteract = performance.now();
 }
-/* Which Library items and explainers are on stage: those in the open area, plus whatever the focus touches. */
+/* What is on stage beyond topics: the open area's two groups; an opened group's members (flying out of it);
+   and whatever an opened item or explainer touches. Items fly out of, and back into, their group (og). */
 function computeScope() {
   scope = new Set();
-  if (!focus) return;
-  const A = focus.kind === 'lib' || focus.kind === 'ex' ? null : focus.area;
-  for (const n of G.nodes) {
-    if (n.kind !== 'lib' && n.kind !== 'ex') continue;
-    if (n.kind === 'lib' ? !showLib : !showEx) continue;
-    if (n === focus || neigh.has(n) || (A !== null && n.areas.has(A))) scope.add(n);
-  }
+  if (!focus) { expanded = null; return; }
+  const on = n => ((n.groupType || n.kind) === 'lib' ? showLib : showEx);
+  if (focus.kind === 'group') expanded = focus;
+  else if (!(expanded && expanded.members.includes(focus))) expanded = null;
+  const A = expanded ? expanded.area : focus.area;
+  const groups = (G.areaNodes && G.areaNodes[A] && G.areaNodes[A].groups) || [];
+  groups.forEach(gr => { if (on(gr)) scope.add(gr); });
+  const groupFor = n => groups.find(gr => gr.groupType === n.kind && gr.members.includes(n)) || null;
+  const add = (n, og) => { if ((n.kind === 'lib' || n.kind === 'ex') && on(n)) { if (!scope.has(n) && n.sv < .05) n.og = og; scope.add(n); } };
+  if (expanded) expanded.members.forEach(m => add(m, expanded));
+  if (focus.kind === 'lib' || focus.kind === 'ex') { add(focus, groupFor(focus)); neigh.forEach(x => add(x, groupFor(x))); }
+}
+function placeGroup(gr) {
+  const a = gr.areaNode, len = Math.hypot(a.x, a.y, a.z) || 1;
+  const dx = a.x / len, dy = a.y / len, dz = a.z / len;
+  let px = dz, pz = -dx; const pl = Math.hypot(px, pz) || 1; px /= pl; pz /= pl;
+  const side = gr.groupType === 'lib' ? 1 : -1;
+  gr.x = a.x + dx * 46 + px * 24 * side; gr.y = a.y + dy * 46 + 6 * side; gr.z = a.z + dz * 46 + pz * 24 * side;
 }
 function setHover(h) {
   if (h === hover) return;
@@ -623,7 +661,7 @@ function setHash(id) { try { history.replaceState(null, '', id ? '#' + id : loca
 /* ---------- Inspector ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function pathOf(n) { const p = []; let c = n.parent; while (c) { p.unshift(c.name); c = c.parent; } return p; }
-function dotOf(n) { return n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 's' + n.status; }
+function dotOf(n) { return n.kind === 'group' ? n.groupType : n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 's' + n.status; }
 function item(n, extra = '') {
   const tag = n.kind === 'lib' ? n.libType : n.kind === 'ex' ? `${n.mins} min` : '';
   return `<li><button type="button" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i><span>${esc(n.name)}${extra}</span>${tag ? `<span class="type">${esc(tag)}</span>` : ''}</button></li>`;
@@ -634,6 +672,7 @@ const cap = w => w[0].toUpperCase() + w.slice(1);
 const ACTIONS = {
   topic: ['Open in Map', 'In the app this opens the radial Map on this topic.'],
   lib: ['Open in Library', 'In the app this opens the item in Library.'],
+  group: ['Fold back', 'Folds the group back beside its area.'],
   ex: ['Play explainer', 'In the app this opens the player.']
 };
 const libsHereCount = n => (n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)).length : n.libs.length);
@@ -641,9 +680,17 @@ function renderInspector(n) {
   const iBody = document.getElementById('iBody');
   const set = (id, t) => (document.getElementById(id).textContent = t);
   set('iName', n.name);
-  const [act, note] = ACTIONS[n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 'topic'];
+  const [act, note] = ACTIONS[n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? n.kind : 'topic'];
   set('iMap', act); set('iNote', note);
-  if (n.kind === 'lib') {
+  if (n.kind === 'group') {
+    const isLib = n.groupType === 'lib';
+    const topics = new Set();
+    n.members.forEach(m => (isLib ? m.tagged : [m.anchorNode].filter(x => x.kind !== 'lib')).forEach(t => topics.add(t)));
+    const areasN = new Set([...topics].map(t => t.area)).size;
+    set('iEyebrow', n.areaNode.name);
+    set('iMeta', `Linked to ${plural(topics.size, 'topic')} in ${plural(areasN, 'area')}`);
+    iBody.innerHTML = `<section><h3>${isLib ? 'Library items' : 'Explainers'} (${n.members.length})</h3><ul>${n.members.map(m => item(m, `<span class="why">${isLib ? `On ${plural(m.tagged.length, 'topic')}${m.areas.size > 1 ? ` in ${plural(m.areas.size, 'area')}` : ''}` : `Made from ${esc(m.anchorNode.name)}`}</span>`)).join('')}</ul></section>`;
+  } else if (n.kind === 'lib') {
     const areas = new Set(n.tagged.map(t => t.area)).size;
     const uses = [...new Set([...n.exps, ...n.usedBy])];
     set('iEyebrow', 'Library · ' + n.libType);
@@ -697,6 +744,7 @@ document.getElementById('iBody').addEventListener('click', e => {
 document.getElementById('iClose').addEventListener('click', () => setFocus(null));
 document.getElementById('iMap').addEventListener('click', () => {
   if (focus && focus.kind === 'ex') return playPreview();
+  if (focus && focus.kind === 'group') return setFocus(focus.areaNode);
   const t = document.getElementById('iNote').textContent;
   document.getElementById('live').textContent = t; flash(t);
 });
@@ -749,16 +797,20 @@ function drawFrame(now, dt) {
   const kEm = reduced ? 1 : 1 - Math.exp(-dt * 7), kHv = reduced ? 1 : 1 - Math.exp(-dt * 16);
   const kPl = reduced ? 1 : 1 - Math.exp(-dt * 4.5), kSv = reduced ? 1 : 1 - Math.exp(-dt * 6);
   const ha = hoverArea;
+  const kXp = reduced ? 1 : 1 - Math.exp(-dt * 4);
+  for (const n of N) if (n.kind === 'group') placeGroup(n);
   for (let i = 0; i < N.length; i++) {
     const n = N[i];
     // Hovering an area draws its topics in toward it; they ease back when the pointer leaves.
     const inHover = ha && hoverSet.has(n);
     n.pl += ((inHover ? (n.parent === ha ? .38 : .26) : 0) - n.pl) * kPl;
-    if (n.pt && n.pl > .001) { n.ox = (n.pt.x - n.x) * n.pl; n.oy = (n.pt.y - n.y) * n.pl; n.oz = (n.pt.z - n.z) * n.pl; }
+    n.xp += ((scope.has(n) ? 1 : 0) - n.xp) * kXp;
+    if (n.og && n.xp < .999) { const k = 1 - n.xp; n.ox = (n.og.x - n.x) * k; n.oy = (n.og.y - n.y) * k; n.oz = (n.og.z - n.z) * k; }
+    else if (n.pt && n.pl > .001) { n.ox = (n.pt.x - n.x) * n.pl; n.oy = (n.pt.y - n.y) * n.pl; n.oz = (n.pt.z - n.z) * n.pl; }
     else { n.ox = n.oy = n.oz = 0; }
     project(n, P[i]);
     // Library items and explainers live at area level: they grow in when an area (or anything in it) is open.
-    const side = n.kind === 'lib' || n.kind === 'ex';
+    const side = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group';
     n.sv += ((side ? (scope.has(n) ? 1 : 0) : 1) - n.sv) * kSv;
     n.rv = Math.min(reveal(n, now), n.sv);
     if (n.rv < .01) P[i].vis = false;
@@ -776,8 +828,10 @@ function drawFrame(now, dt) {
   // Links, batched by type, depth, emphasis and hover. Tree links grow out of their parent during the entry.
   const B = 3, E = 3, buckets = {};
   const star = focusing ? focus : ha;
+  const flowing = focusing && focus.kind === 'group' ? new Set(focus.members) : null;
   for (const l of G.links) {
     if (star && (l.a === star || l.b === star)) continue;
+    if (flowing && (l.type === 'lib' || l.type === 'ex') && (flowing.has(l.a) || flowing.has(l.b))) continue;
     const pa = proj.get(l.a), pb = proj.get(l.b);
     if (!pa.vis || !pb.vis) continue;
     const grow = l.type === 'rl' ? (l.a.rv > .98 && l.b.rv > .98 ? 1 : 0) : Math.min(l.a.rv, l.b.rv) < .02 ? 0 : l.b.rv;
@@ -843,6 +897,20 @@ function drawFrame(now, dt) {
     });
   }
 
+  // An opened group: each member sends arrowed, flowing lines to the topics it is tagged on or made from.
+  if (flowing) {
+    let i = 0;
+    for (const m of focus.members) {
+      const pm = proj.get(m);
+      if (!pm.vis || m.rv < .2) continue;
+      for (const t of m.kind === 'lib' ? m.tagged : [m.anchorNode]) {
+        const pt = proj.get(t);
+        if (!pt.vis || t.rv < .2) continue;
+        drawFlow(pm, pt, i++, now, m.kind === 'ex', Math.min(m.rv, m.xp), bg);
+      }
+    }
+  }
+
   // Nodes, far to near.
   const order = P.slice(0, N.length).filter(p => p.vis && p.n.rv > 0).sort((a, b) => b.zz - a.zz);
   const grey0 = C.dark ? lerpA(C['ink-3'], bg, .5) : lerpA(C['ink-3'], bg, .62);
@@ -856,7 +924,20 @@ function drawFrame(now, dt) {
     let col = lerpA(grey, lerpA(fillOf(n), bg, depthFade), n.em);
     if (n.rv < 1) col = lerpA(bg, col, n.rv);
     ctx.fillStyle = rgb(col);
-    if (n.kind === 'lib') {
+    if (n.kind === 'group') {
+      // A stack: the group reads as several marks, with its count on top.
+      const off = Math.max(2, r * .26);
+      for (let k = 2; k >= 0; k--) {
+        ctx.fillStyle = rgb(lerpA(col, bg, k * .3));
+        const x = p.x + k * off, y = p.y - k * off;
+        ctx.beginPath();
+        if (n.groupType === 'lib') roundRect(x - r, y - r, r * 2, r * 2, Math.max(2, r * .25)); else ctx.arc(x, y, r, 0, 6.283);
+        ctx.fill();
+      }
+      ctx.fillStyle = rgb(bg, n.rv); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `650 ${Math.max(9, r * .95).toFixed(1)}px ${UI_FONT}`;
+      ctx.fillText(String(n.members.length), p.x, p.y + .5);
+    } else if (n.kind === 'lib') {
       ctx.beginPath(); ctx.rect(p.x - r, p.y - r, r * 2, r * 2); ctx.fill();
     } else if (n.kind === 'ex') {
       // An explainer is a play mark: it is something you watch.
@@ -901,7 +982,8 @@ function drawLabels(order, focusing, bg, dt) {
     if (n.rv > .75) {
       if (n === focus) pri = 5; else if (n === hover) pri = 4;
       else if (!focusing && hoverArea && hoverSet.has(n) && n.parent === hoverArea) pri = 3;
-      else if (focusing && neigh.has(n)) pri = 3;
+      else if (focusing && n.kind === 'group' && scope.has(n)) pri = 3;
+      else if (focusing && neigh.has(n)) pri = focus.kind === 'group' && n.kind !== 'lib' && n.kind !== 'ex' ? 1 : 3;
       // Overview: area names only, all of them, fading with depth. Topic names wait for a hover or a focus.
       else if (n.kind === 'area' && (!focusing || p.depth < (small ? .3 : .5))) pri = focusing ? 1 : 2;
     }
@@ -947,6 +1029,41 @@ function drawLabels(order, focusing, bg, dt) {
     ctx.fillText(text, p.x, cy + (pri === 5 ? 1 : .5));
   }
   if (hasLS) ctx.letterSpacing = '0px';
+}
+function drawFlow(pa, pb, i, now, blue, alpha, bg) {
+  const bend = (i % 2 ? 1 : -1) * .1;
+  const [qx, qy] = quad(pa.x, pa.y, pb.x, pb.y, bend);
+  const local = reduced ? 1 : ease.out(clamp01((now - focusAt - 250 - i * 22) / 600));
+  if (local <= 0 || alpha <= .02) return;
+  const at = t => { const u = 1 - t; return [u * u * pa.x + 2 * u * t * qx + t * t * pb.x, u * u * pa.y + 2 * u * t * qy + t * t * pb.y]; };
+  // Stop short of the target mark so the arrowhead sits on its edge.
+  const len = Math.hypot(pb.x - pa.x, pb.y - pa.y) || 1;
+  const tEnd = Math.max(.5, 1 - (Math.max(pb.sr, 3) + 3) / len);
+  const col = blue ? lerpA(C.accent, bg, .25) : lerpA(C['ink-2'], bg, .35);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = rgb(col); ctx.lineWidth = 1;
+  ctx.beginPath();
+  const steps = 16;
+  for (let s = 0; s <= steps; s++) { const [x, y] = at(tEnd * local * s / steps); s ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke();
+  if (local >= 1) {
+    const [ex, ey] = at(tEnd), [bx, by] = at(tEnd - .04);
+    const ang = Math.atan2(ey - by, ex - bx), h = 5.5;
+    ctx.fillStyle = rgb(col);
+    ctx.beginPath(); ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - h * Math.cos(ang - .45), ey - h * Math.sin(ang - .45));
+    ctx.lineTo(ex - h * Math.cos(ang + .45), ey - h * Math.sin(ang + .45));
+    ctx.closePath(); ctx.fill();
+    if (!reduced) {
+      for (let k = 0; k < 2; k++) {
+        const t = ((now / 2600) + k / 2 + i * .173) % 1;
+        const [x, y] = at(t * tEnd);
+        ctx.globalAlpha = alpha * Math.sin(t * Math.PI);
+        ctx.beginPath(); ctx.arc(x, y, 1.4, 0, 6.283); ctx.fill();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
 }
 function roundRect(x, y, w, h, r) {
   ctx.beginPath();
@@ -1065,7 +1182,7 @@ function endPointer(e) {
     if (drag && drag.moved <= 5) {
       const [x, y] = local(e);
       const n = pick(x, y);
-      setFocus(n && n === focus ? focus : n);
+      setFocus(n && n === focus ? (n.kind === 'group' ? n.areaNode : focus) : n);
     }
     dragging = false; drag = null; pinch = 0; canvas.classList.remove('dragging');
   }
@@ -1117,7 +1234,7 @@ function renderResults() {
 q.addEventListener('input', () => {
   const s = q.value.trim().toLowerCase(); sel = 0;
   if (!s) { hits = []; return renderResults(); }
-  const pool = G.nodes.filter(n => (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
+  const pool = G.nodes.filter(n => n.kind !== 'group' && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
   hits = pool.filter(n => n.name.toLowerCase().startsWith(s)).concat(pool.filter(n => !n.name.toLowerCase().startsWith(s) && n.name.toLowerCase().includes(s))).slice(0, 8);
   renderResults();
 });
@@ -1134,7 +1251,7 @@ function choose(n) { q.value = ''; hits = []; renderResults(); q.blur(); setFocu
 /* ---------- Boot ---------- */
 function load(g) {
   G = g; focus = null; hover = null; neigh = new Set(); focusLinks = []; userZoomed = false; flight = null;
-  hoverArea = null; hoverSet = new Set(); hoverLinks = []; scope = new Set();
+  hoverArea = null; hoverSet = new Set(); hoverLinks = []; scope = new Set(); expanded = null;
   insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
   initPositions(G);
   alpha = 1;
@@ -1147,7 +1264,7 @@ function load(g) {
   const big = G.nodes.length > 500;
   G.nodes.forEach(n => {
     n.em = 1; n.hv = 0; n.la = 0; n.rv = 0; n.pl = 0; n.hl = 0; n.pt = null;
-    n.sv = n.kind === 'lib' || n.kind === 'ex' ? 0 : 1;
+    n.sv = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? 0 : 1; n.xp = 0; n.og = null;
     const lvl = n.kind === 'ex' ? 5 : n.kind === 'lib' ? 4 : n.level;
     n.delay = big ? (lvl - 1) * 260 + rnd() * 600
       : n.kind === 'area' ? 150 + n.area * 45
