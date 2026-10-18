@@ -1,4 +1,4 @@
-<title>Studiolo Graph 3D</title>
+<title>Studiolo Loci</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +39,7 @@
   color-scheme: dark;
 }
 html, body { height: 100%; }
+[hidden] { display: none !important; }
 body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 14px; line-height: 1.45; overflow: hidden; -webkit-font-smoothing: antialiased; }
 button, input { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -165,6 +166,17 @@ canvas#g.over { cursor: pointer; }
 .legend summary::after { content: ""; width: 6px; height: 6px; border-right: 1.5px solid var(--ink-2); border-bottom: 1.5px solid var(--ink-2); transform: rotate(-135deg); margin-left: auto; margin-top: 3px; }
 .legend:not([open]) summary::after { transform: rotate(45deg); margin-top: -3px; }
 .legend[open] summary { margin-bottom: 2px; }
+.trail { top: 62px; left: max(16px, env(safe-area-inset-left, 0px)); max-width: calc(100% - 32px); display: flex; align-items: center; gap: 2px; flex-wrap: wrap; padding: 4px 10px 4px 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 99px; box-shadow: var(--shadow-float); font-size: 12.5px; color: var(--ink-2); box-sizing: border-box; }
+.trail button { border: 0; background: none; padding: 3px 6px; border-radius: 99px; cursor: pointer; color: var(--ink-2); font-size: 12.5px; max-width: 16ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trail button:hover { background: var(--board); color: var(--ink); }
+.trail .back { width: 26px; height: 26px; padding: 0; display: grid; place-items: center; background: var(--board); color: var(--ink); font-size: 14px; max-width: none; margin-right: 4px; }
+.trail b { font-weight: 600; color: var(--ink); padding: 3px 4px; max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trail .sep, .trail .more { color: var(--ink-3); padding: 0 1px; }
+.dot.note { border-radius: 1px; background: transparent; border: 1.3px solid var(--ink-2); width: 8px; height: 8px; }
+.dot.quote { border-radius: 1px; background: var(--ink-2); width: 7px; height: 7px; transform: rotate(45deg); }
+.quote-box { border-left: 2px solid var(--accent); padding: 4px 0 4px 12px; }
+.quote-box .loc { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+.quote-box p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; }
 .legend-note { margin: 0; font-size: 11.5px; color: var(--ink-2); max-width: 34ch; }
 .legend-summary { display: none; margin: 0; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -186,6 +198,7 @@ canvas#g.over { cursor: pointer; }
   .insp .body { padding: 12px 16px 14px; gap: 14px; }
   .insp footer { padding: 10px 16px; }
   .insp footer small { display: none; }
+  .trail { top: 58px; font-size: 12px; }
   .gcard { top: auto; bottom: 0; left: 0; right: 0; width: auto; transform: none !important; border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); transform-origin: center bottom; }
   .insp { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 52%; border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
   .insp.closed { transform: translateY(calc(100% + 24px)); }
@@ -204,7 +217,7 @@ canvas#g.over { cursor: pointer; }
       <button type="button" title="Opens in the app" aria-disabled="true">Map</button>
       <button type="button" title="Opens in the app" aria-disabled="true">List</button>
       <button type="button" title="Opens in the app" aria-disabled="true">Overview</button>
-      <button type="button" aria-current="page">3D</button>
+      <button type="button" aria-current="page">Loci</button>
     </nav>
     <span class="summary" id="summary"></span>
     <span class="pill" id="datasetPill">Prototype · sample graph</span>
@@ -218,19 +231,20 @@ canvas#g.over { cursor: pointer; }
     <canvas id="g" tabindex="0" role="img" aria-label="Your whole topic graph in 3D"></canvas>
     <div class="grain" id="grain"></div>
 
+    <nav class="float trail" id="trail" aria-label="Where you are" hidden></nav>
     <div class="float search" role="search">
       <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
       <input id="q" type="search" placeholder="Find a topic" autocomplete="off" aria-label="Find a topic" aria-controls="results" aria-expanded="false" role="combobox">
       <ul class="results" id="results" role="listbox" hidden></ul>
     </div>
 
-    <div class="float hint" id="hint">Drag to turn · Scroll or pinch to zoom · Click a topic</div>
+    <div class="float hint" id="hint">Drag to turn · Scroll in to open an area, out to go back · Click to open</div>
 
     <details class="float legend" id="legend" open>
       <summary>Key and options</summary>
       <p class="legend-summary" id="summary2"></p>
       <div class="row">
-        <span><i class="lvl l1"></i>Area</span>
+        <span><i class="lvl l1"></i>Area (ring: share learned)</span>
         <span><i class="lvl l2"></i>Topic</span>
         <span><i class="lvl l3"></i>Sub-topic</span>
       </div>
@@ -246,6 +260,7 @@ canvas#g.over { cursor: pointer; }
         <label><input type="checkbox" id="optLib" checked>Library</label>
         <label><input type="checkbox" id="optEx" checked>Explainers</label>
         <label><input type="checkbox" id="optRotate" checked>Slow turn</label>
+        <label><input type="checkbox" id="optSound">Sound</label>
       </div>
       <p class="legend-note">Open an area to see its Library items and explainers as groups. Open a group to spread it out.</p>
       <div class="row">
@@ -344,6 +359,21 @@ const ITEMS = [
  ['Fire strategy for the atrium','doc',['Fire engineering','Egress & evacuation','Codes & authorities']]
 ];
 /* Explainers. As in studiolo.explainers, each has one anchor (a topic or a Library item) and is grounded in Library items. */
+/* Notes and quotes. In Studiolo both are Library items: a note's about_id points at the item it is about; a quote is an
+   annotation on a source with a locator (page, time or section). Notes are the learner's own words (sample). Quote text
+   is not reproduced here: the prototype names the passage and its place. Optional last value: topics it is tagged on. */
+const NOTES = [
+ ['note', 'Great Mosque of Kairouan', 'The minaret reads as a lighthouse from the courtyard.', null, ['Islamic architecture']],
+ ['note', 'Great Mosque of Kairouan', 'Reused columns in the prayer hall: no two capitals match.'],
+ ['quote', 'Hillenbrand, Islamic Architecture', 'On the hypostyle hall', 'p. 112'],
+ ['quote', 'Hillenbrand, Islamic Architecture', 'On muqarnas as structure and ornament', 'p. 187', ['Geometry & ornament']],
+ ['note', 'Hillenbrand, Islamic Architecture', 'Reread chapter 3 before the studio crit.'],
+ ['quote', 'Sultan Hassan walkthrough', 'The four iwans and the four schools', '14:05'],
+ ['note', 'Sultan Hassan walkthrough', 'Scale shift at the entrance: dark and narrow, then the court opens.', null, ['Space, sequence & threshold']],
+ ['quote', 'Fathy, Natural Energy and Vernacular Architecture', 'On the malqaf wind catcher', 'p. 47', ['Passive design']],
+ ['note', 'Fathy, Natural Energy and Vernacular Architecture', 'Test the malqaf on the studio site section.'],
+ ['note', 'Gehl, Life Between Buildings', 'Count how long people stay, not how many pass.', null, ['Streets & public realm']]
+];
 const EXPLAINERS = [
  ['Why the courtyard came first', 5, ['topic','Islamic architecture'], ['Great Mosque of Kairouan','Hillenbrand, Islamic Architecture','Sultan Hassan walkthrough']],
  ['Reading the Great Mosque of Kairouan', 4, ['item','Great Mosque of Kairouan'], ['Hillenbrand, Islamic Architecture','Qibla orientation note']],
@@ -416,6 +446,16 @@ function buildSample() {
     addLink(g, anchor, ex, 'ex');
     sources.forEach(sn => addLink(g, need(itemByName, sn), ex, 'src'));
     (anchor.kind === 'lib' ? [...anchor.areas] : [anchor.area]).concat(ex.sources.flatMap(x => [...x.areas])).forEach(a => ex.areas.add(a));
+  });
+  // Notes and quotes sit on their item: outside the simulation, placed in a small ring around it each frame.
+  NOTES.forEach(([shape, about, text, loc, tags]) => {
+    const host = need(itemByName, about);
+    const label = shape === 'quote' ? loc : text.split(' ').slice(0, 3).join(' ') + '…';
+    const nt = addNode(g, { name: label, title: shape === 'quote' ? text : 'Note', text, loc, shape, kind: 'note', level: 6, status: 0, area: host.area, parent: null, about: host, fixed: true });
+    nt.r = 3.2;
+    (host.notes || (host.notes = [])).push(nt);
+    addLink(g, host, nt, 'nt');
+    (tags || []).forEach(t => { const tp = need(byName, t); nt.tagged.push(tp); addLink(g, tp, nt, 'ntag'); });
   });
   // Groups: per area, one stack for its Library items and one for its explainers. They sit beside the area, outside the simulation.
   g.areaNodes = AREAS.map(a => byName[a.n]);
@@ -508,7 +548,7 @@ function tick(g, a) {
     }
   }
   for (const l of g.links) {
-    if (l.type === 'grp') continue;
+    if (l.type === 'grp' || l.type === 'nt' || l.type === 'ntag') continue;
     const [L, k] = linkSpec(l);
     const p = l.a, q = l.b;
     const dx = q.x - p.x, dy = q.y - p.y, dz = q.z - p.z;
@@ -547,7 +587,52 @@ function makeGrain() {
   x.putImageData(im, 0, 0);
   document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`;
 }
-function fillOf(n) { return n.kind === 'area' ? C['status-3'] : n.kind === 'group' ? (n.groupType === 'ex' ? C.accent : C['ink-2']) : n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
+function fillOf(n) { return n.kind === 'note' ? C['ink-2'] : n.kind === 'area' ? C['status-3'] : n.kind === 'group' ? (n.groupType === 'ex' ? C.accent : C['ink-2']) : n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
+
+/* ---------- Sound: short, soft, tuned to one pentatonic scale; off until the learner turns it on ---------- */
+const Sound = (() => {
+  let ac = null, on = false, noiseBuf = null;
+  try { on = localStorage.getItem('loci-sound') === 'on'; } catch (e) {}
+  const ctxA = () => {
+    if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; ac = new A(); }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  };
+  // A "tock": a triangle tone that drops a little in pitch as it starts, with a fast soft decay.
+  function tone(f, t0, dur, gain, type = 'triangle') {
+    const a = ctxA(); if (!a) return;
+    const t = a.currentTime + t0, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f * 1.06, t); o.frequency.exponentialRampToValueAtTime(f, t + .03);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .03);
+  }
+  // A "tick": a burst of filtered noise, like paper or a pencil.
+  function tick(freq, q, dur, gain) {
+    const a = ctxA(); if (!a) return;
+    if (!noiseBuf) { noiseBuf = a.createBuffer(1, Math.floor(a.sampleRate * .1), a.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const t = a.currentTime, s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    s.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + .002); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(f).connect(g).connect(a.destination); s.start(t); s.stop(t + dur + .03);
+  }
+  const F = { G3: 196, D4: 293.66, G4: 392, B4: 493.88, D5: 587.33, A5: 880 };
+  const SOUNDS = {
+    area: v => tone(F.G3, 0, .16, .08 * v),
+    topic: v => tone(F.D4, 0, .12, .06 * v),
+    sub: v => tone(F.G4, 0, .1, .05 * v),
+    item: v => tick(2400, 1.4, .04, .12 * v),
+    note: v => tick(4200, 2.2, .02, .09 * v),
+    ex: v => { tone(F.D5, 0, .45, .03 * v, 'sine'); tone(F.A5, .025, .4, .02 * v, 'sine'); },
+    bloom: v => { tone(F.D4, 0, .1, .04 * v); tone(F.G4, .03, .1, .04 * v); tone(F.B4, .06, .14, .04 * v); },
+    learned: v => { tone(F.G4, 0, .12, .05 * v, 'sine'); tone(F.D5, .09, .22, .05 * v, 'sine'); },
+    hover: v => tick(3000, 3, .012, .02 * v)
+  };
+  return {
+    get on() { return on; },
+    play(name, v = 1) { if (on && !document.hidden && SOUNDS[name]) SOUNDS[name](v); },
+    set(v) { on = v; try { localStorage.setItem('loci-sound', v ? 'on' : 'off'); } catch (e) {} if (v) SOUNDS.topic(1); }
+  };
+})();
 
 /* ---------- Canvas, camera ---------- */
 const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
@@ -605,6 +690,8 @@ function neighboursOf(n) {
   n.rels.forEach(r => s.add(r.other));
   n.libs.forEach(l => s.add(l));
   n.tagged.forEach(t => s.add(t));
+  (n.notes || []).forEach(x => s.add(x));
+  if (n.about) s.add(n.about);
   n.exps.forEach(x => s.add(x));
   n.usedBy.forEach(x => s.add(x));
   n.sources.forEach(x => s.add(x));
@@ -623,7 +710,7 @@ function neighboursOf(n) {
   if (n.kind === 'area' && n.groups) n.groups.forEach(gr => s.add(gr));
   return s;
 }
-const KIND_LABEL = n => (n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : n.kind === 'group' ? 'Group' : null);
+const KIND_LABEL = n => (n.kind === 'note' ? (n.shape === 'quote' ? 'Quote' : 'Note') : n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : n.kind === 'group' ? 'Group' : null);
 /* Frame the focus with everything it connects to, leaning toward the focus itself. */
 function focusFrame(n) {
   const pts = [n, ...neigh];
@@ -636,9 +723,39 @@ function focusFrame(n) {
   const dist = Math.max(260, Math.min(R0 * 2.6, spread * (n.kind === 'group' ? 2.05 : 2.5) + 120)) * (narrow() ? 1.15 : 1);
   return { tx, ty, tz, dist };
 }
-function setFocus(n) {
+/* The trail: what you opened, in order. It is both the path chip (where am I) and Back (how did I get here). */
+let trail = [], focusDist = 0, lastLevelChange = 0;
+function goBack() {
+  if (trail.length > 1) { trail.pop(); setFocus(trail[trail.length - 1], { back: true }); }
+  else setFocus(null, { back: true });
+}
+const trailEl = document.getElementById('trail');
+function renderTrail() {
+  if (!trail.length) { trailEl.hidden = true; return; }
+  const shown = trail.slice(-3);
+  const crumbs = [`<button type="button" data-crumb="home">All areas</button>`];
+  if (trail.length > 3) crumbs.push('<span class="more">…</span>');
+  shown.forEach((n, i) => crumbs.push(i === shown.length - 1 ? `<b aria-current="location">${esc(n.kind === 'note' ? KIND_LABEL(n) : n.name)}</b>` : `<button type="button" data-crumb="${n.id}">${esc(n.kind === 'note' ? KIND_LABEL(n) : n.name)}</button>`));
+  trailEl.innerHTML = `<button type="button" class="back" data-crumb="back" aria-label="Back">←</button>${crumbs.join('<span class="sep">›</span>')}`;
+  trailEl.hidden = false;
+}
+trailEl.addEventListener('click', e => {
+  const b = e.target.closest('[data-crumb]'); if (!b) return;
+  const c = b.dataset.crumb;
+  if (c === 'back') goBack(); else if (c === 'home') setFocus(null); else setFocus(G.byId.get(c));
+});
+function soundFor(n) { return n.kind === 'area' ? 'area' : n.kind === 'topic' ? (n.level === 2 ? 'topic' : 'sub') : n.kind === 'lib' ? 'item' : n.kind === 'note' ? 'note' : n.kind === 'ex' ? 'ex' : 'bloom'; }
+function setFocus(n, opts = {}) {
   const prev = focus;
   focus = n; focusAt = performance.now();
+  if (!n) trail = [];
+  else if (!opts.back) {
+    const i = trail.indexOf(n);
+    if (i >= 0) trail = trail.slice(0, i + 1); else { trail.push(n); if (trail.length > 12) trail.shift(); }
+    n.trailAt = focusAt;
+  }
+  renderTrail();
+  if (n) Sound.play(soundFor(n), opts.back ? .6 : 1); else if (prev) Sound.play('area', .45);
   if (!n) {
     neigh = new Set(); focusLinks = [];
     insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
@@ -660,6 +777,7 @@ function setFocus(n) {
   const to = n
     ? { ...focusFrame(n), cx: c[0], cy: c[1] }
     : { tx: 0, ty: 0, tz: 0, dist: overviewDist, cx: c[0], cy: c[1] };
+  focusDist = to.dist;
   // Topic to topic arcs out and back in; entering or leaving a topic is a straight dolly.
   flyTo(to, { hop: n && prev ? undefined : 0 });
   lastInteract = performance.now();
@@ -678,7 +796,10 @@ function computeScope() {
   const groupFor = n => groups.find(gr => gr.groupType === n.kind && gr.members.includes(n)) || null;
   const add = (n, og) => { if ((n.kind === 'lib' || n.kind === 'ex') && on(n)) { if (!scope.has(n) && n.sv < .05) n.og = og; scope.add(n); } };
   if (expanded) expanded.latest.forEach(m => add(m, expanded));
-  if (focus.kind === 'lib' || focus.kind === 'ex') { add(focus, groupFor(focus)); neigh.forEach(x => add(x, groupFor(x))); }
+  if (focus.kind === 'lib' || focus.kind === 'ex' || focus.kind === 'note') { add(focus, groupFor(focus)); neigh.forEach(x => add(x, groupFor(x))); }
+  // An opened item shows its notes and quotes; an opened note keeps its item and its siblings on stage.
+  const host = focus.kind === 'lib' ? focus : focus.kind === 'note' ? focus.about : null;
+  if (host && showLib) (host.notes || []).forEach(nt => scope.add(nt));
 }
 /* The group card: the latest four, and a way to see them all where they live (Learn or Library). */
 const gcard = document.getElementById('gcard');
@@ -714,6 +835,22 @@ gcard.addEventListener('click', e => {
   if (e.target.closest('#gAll')) { const m = e.target.closest('#gAll').dataset.msg; document.getElementById('live').textContent = m; flash(m); }
   if (e.target.closest('#gClose')) setFocus(focus.areaNode);
 });
+/* Notes bloom out of their item into a ring that faces the viewer, one after another, and drift slowly round. */
+function placeNotes(now) {
+  const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  const rx = cy, rz = -sy, dx = -sy * sp, dyy = cp, dz = -cy * sp; // screen right and screen down, in world space
+  for (const it of G.nodes) {
+    if (!it.notes) continue;
+    const k = it.notes.length, base = reduced ? 0 : now * .00012;
+    it.notes.forEach((nt, i) => {
+      const open = clamp01(nt.xp * 1.25 - i * .07);
+      const R = (12 + it.r * 2.6) * ease.out(open);
+      const a = base + i / k * Math.PI * 2 - Math.PI / 2;
+      const c = Math.cos(a) * R, s = Math.sin(a) * R;
+      nt.x = it.x + it.ox + rx * c + dx * s; nt.y = it.y + it.oy + dyy * s; nt.z = it.z + it.oz + rz * c + dz * s;
+    });
+  }
+}
 function placeGroup(gr) {
   const a = gr.areaNode, len = Math.hypot(a.x, a.y, a.z) || 1;
   const dx = a.x / len, dy = a.y / len, dz = a.z / len;
@@ -729,6 +866,7 @@ function setHover(h) {
   hoverArea = ha; hoverSet = new Set(); hoverLinks = [];
   if (!ha) return;
   hoverAt = performance.now();
+  Sound.play('hover');
   const stack = [...ha.children];
   while (stack.length) { const c = stack.pop(); hoverSet.add(c); c.children.forEach(k => stack.push(k)); }
   ha.rels.forEach(r => hoverSet.add(r.other));
@@ -740,10 +878,11 @@ function setHash(id) { try { history.replaceState(null, '', id ? '#' + id : loca
 /* ---------- Inspector ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function pathOf(n) { const p = []; let c = n.parent; while (c) { p.unshift(c.name); c = c.parent; } return p; }
-function dotOf(n) { return n.kind === 'group' ? n.groupType : n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 's' + n.status; }
+function dotOf(n) { return n.kind === 'note' ? n.shape : n.kind === 'group' ? n.groupType : n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 's' + n.status; }
 function item(n, extra = '') {
-  const tag = n.kind === 'lib' ? n.libType : n.kind === 'ex' ? `${n.mins} min` : '';
-  return `<li><button type="button" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i><span>${esc(n.name)}${extra}</span>${tag ? `<span class="type">${esc(tag)}</span>` : ''}</button></li>`;
+  const tag = n.kind === 'note' ? (n.shape === 'quote' ? n.loc : 'note') : n.kind === 'lib' ? n.libType : n.kind === 'ex' ? `${n.mins} min` : '';
+  const label = n.kind === 'note' ? (n.shape === 'quote' ? n.title : n.text) : n.name; // lists show what a note says, not its short map label
+  return `<li><button type="button" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i><span>${esc(label)}${extra}</span>${tag ? `<span class="type">${esc(tag)}</span>` : ''}</button></li>`;
 }
 const where = t => `<span class="why">${esc(pathOf(t).join(' › ') || 'Area')}</span>`;
 const plural = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
@@ -752,6 +891,7 @@ const ACTIONS = {
   topic: ['Open in Map', 'In the app this opens the radial Map on this topic.'],
   lib: ['Open in Library', 'In the app this opens the item in Library.'],
   group: ['Fold back', 'Folds the group back beside its area.'],
+  note: ['Open in Library', 'In the app this opens it in Library, on its item.'],
   ex: ['Play explainer', 'In the app this opens the player.'],
   course: ['Open course', 'In the app this opens the course.']
 };
@@ -760,9 +900,19 @@ function renderInspector(n) {
   const iBody = document.getElementById('iBody');
   const set = (id, t) => (document.getElementById(id).textContent = t);
   set('iName', n.name);
-  const [act, note] = ACTIONS[n.isCourse ? 'course' : n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? n.kind : 'topic'];
+  const [act, note] = ACTIONS[n.isCourse ? 'course' : n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' || n.kind === 'note' ? n.kind : 'topic'];
   set('iMap', act); set('iNote', note);
-  if (n.kind === 'group') {
+  if (n.kind === 'note') {
+    const isQuote = n.shape === 'quote';
+    set('iEyebrow', isQuote ? `Quote · ${n.loc}` : 'Note');
+    set('iName', isQuote ? n.title : n.text);
+    set('iMeta', `On ${n.about.name}`);
+    iBody.innerHTML = `
+      ${isQuote ? `<div class="quote-box"><span class="loc">${esc(n.loc)}</span><p>Sample quote. In the app the highlighted passage shows here, with its place in the source.</p></div>` : ''}
+      <section><h3>On</h3><ul>${item(n.about)}</ul></section>
+      ${n.tagged.length ? `<section><h3>Tagged on (${n.tagged.length})</h3><ul>${n.tagged.map(t => item(t, where(t))).join('')}</ul></section>` : ''}
+      ${n.about.notes.length > 1 ? `<section><h3>Also on this item (${n.about.notes.length - 1})</h3><ul>${n.about.notes.filter(x => x !== n).map(x => item(x)).join('')}</ul></section>` : ''}`;
+  } else if (n.kind === 'group') {
     const isLib = n.groupType === 'lib';
     const topics = new Set();
     n.members.forEach(m => (isLib ? m.tagged : [m.anchorNode].filter(x => x.kind !== 'lib')).forEach(t => topics.add(t)));
@@ -777,6 +927,7 @@ function renderInspector(n) {
     set('iMeta', `Tagged on ${plural(n.tagged.length, 'topic')} in ${plural(areas, 'area')}`);
     iBody.innerHTML = `
       <div class="preview"><span class="glyph" aria-hidden="true">${esc(n.libType[0].toUpperCase())}</span><div><strong>${esc(n.name)}</strong><small>${esc(cap(n.libType))} in your Library</small></div></div>
+      ${n.notes ? `<section><h3>Notes and quotes (${n.notes.length})</h3><ul>${n.notes.map(x => item(x)).join('')}</ul></section>` : ''}
       <section><h3>Tagged on (${n.tagged.length})</h3><ul>${n.tagged.map(t => item(t, where(t))).join('')}</ul></section>
       <section><h3>Explainers that use it (${uses.length})</h3>${uses.length ? `<ul>${uses.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this item' : 'Draws on this item'}</span>`)).join('')}</ul>` : '<p class="empty">No explainer draws on this yet.</p>'}</section>`;
   } else if (n.kind === 'ex') {
@@ -798,6 +949,7 @@ function renderInspector(n) {
     set('iEyebrow', p.length ? p.join(' › ') : 'Area');
     const desc = [n.kind === 'area' ? 'Area' : n.level === 2 ? 'Topic' : 'Sub-topic', plural(n.children.length, 'sub-topic')];
     if (n.rels.length) desc.push(`${n.rels.length} related`);
+    if (n.kind === 'area' && n.learnedOf) desc.push(`${n.learnedOf[0]} of ${n.learnedOf[1]} learned`);
     if (libsHereCount(n)) desc.push(plural(libsHereCount(n), 'item'));
     set('iMeta', desc.join(' · '));
     const kids = n.children.slice(0, 24);
@@ -819,7 +971,7 @@ document.getElementById('iBody').addEventListener('click', e => {
   if (go) { setFocus(G.byId.get(go.dataset.go)); return; }
   if (e.target.closest('#play')) { playPreview(); return; }
   const st = e.target.closest('[data-status]');
-  if (st && focus) { focus.status = +st.dataset.status; renderInspector(focus); updateSummary(); }
+  if (st && focus) { const was = focus.status; focus.status = +st.dataset.status; if (focus.status === 2 && was !== 2) Sound.play('learned'); else Sound.play('note', .7); renderInspector(focus); updateSummary(); }
 });
 document.getElementById('iClose').addEventListener('click', () => setFocus(null));
 document.getElementById('iMap').addEventListener('click', () => {
@@ -838,6 +990,12 @@ function flash(t) { const h = document.getElementById('hint'); h.textContent = t
 function updateSummary() {
   const topics = G.nodes.filter(n => n.kind === 'topic');
   const areas = G.nodes.filter(n => n.kind === 'area').length;
+  // Each area's progress ring: the share of the topics under it marked Learned.
+  G.nodes.filter(n => n.kind === 'area').forEach(a => {
+    let all = 0, done = 0; const st = [...a.children];
+    while (st.length) { const c = st.pop(); all++; if (c.status === 2) done++; c.children.forEach(k => st.push(k)); }
+    a.share = all ? done / all : 0; a.learnedOf = [done, all];
+  });
   const learned = topics.filter(n => n.status === 2).length;
   const libs = G.nodes.filter(n => n.kind === 'lib').length;
   const exs = G.nodes.filter(n => n.kind === 'ex' && !n.isCourse).length;
@@ -880,6 +1038,7 @@ function drawFrame(now, dt) {
   const ha = hoverArea;
   const kXp = reduced ? 1 : 1 - Math.exp(-dt * 4);
   for (const n of N) if (n.kind === 'group') placeGroup(n);
+  placeNotes(now);
   for (let i = 0; i < N.length; i++) {
     const n = N[i];
     // Hovering an area draws its topics in toward it; they ease back when the pointer leaves.
@@ -891,7 +1050,7 @@ function drawFrame(now, dt) {
     else { n.ox = n.oy = n.oz = 0; }
     project(n, P[i]);
     // Library items and explainers live at area level: they grow in when an area (or anything in it) is open.
-    const side = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group';
+    const side = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' || n.kind === 'note';
     n.sv += ((side ? (scope.has(n) ? 1 : 0) : 1) - n.sv) * kSv;
     n.rv = Math.min(reveal(n, now), n.sv);
     if (n.rv < .01) P[i].vis = false;
@@ -936,7 +1095,7 @@ function drawFrame(now, dt) {
     t = t - (t - .4) * (h / 2); // hovered area: a step stronger
     ctx.strokeStyle = rgb(lerpA(base, bg, t));
     ctx.lineWidth = type === 'rl' ? 1 : type === 'ex' ? .9 : .8;
-    ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' || type === 'src' ? [1, 3] : []);
+    ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' || type === 'src' || type === 'ntag' ? [1, 3] : []);
     ctx.beginPath();
     for (let i = 0; i < pts.length; i += 4) { ctx.moveTo(pts[i], pts[i + 1]); ctx.lineTo(pts[i + 2], pts[i + 3]); }
     ctx.stroke();
@@ -992,6 +1151,21 @@ function drawFrame(now, dt) {
     }
   }
 
+  // The trail: a faint dotted line through what you opened, fading over a minute like footprints.
+  if (focusing && trail.length > 1) {
+    ctx.setLineDash([2, 5]); ctx.lineWidth = 1.2;
+    for (let i = 1; i < trail.length; i++) {
+      const a = proj.get(trail[i - 1]), b = proj.get(trail[i]);
+      if (!a || !b || !a.vis || !b.vis) continue;
+      const age = clamp01(1 - (now - trail[i].trailAt) / 60000);
+      if (age <= 0) continue;
+      ctx.strokeStyle = rgb(lerpA(C.accent, bg, .35), .7 * age);
+      const [qx, qy] = quad(a.x, a.y, b.x, b.y, .18);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(qx, qy, b.x, b.y); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
   // Nodes, far to near.
   const order = P.slice(0, N.length).filter(p => p.vis && p.n.rv > 0).sort((a, b) => b.zz - a.zz);
   const grey0 = C.dark ? lerpA(C['ink-3'], bg, .5) : lerpA(C['ink-3'], bg, .62);
@@ -1019,6 +1193,11 @@ function drawFrame(now, dt) {
       ctx.fillStyle = rgb(bg, n.rv); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.font = `650 ${Math.max(9, r * .95).toFixed(1)}px ${UI_FONT}`;
       ctx.fillText(String(n.members.length), p.x, p.y + .5);
+    } else if (n.kind === 'note') {
+      // A note is an open square (a page of your own words); a quote is a small filled diamond (a marked passage).
+      ctx.beginPath();
+      if (n.shape === 'quote') { ctx.moveTo(p.x, p.y - r * 1.3); ctx.lineTo(p.x + r * 1.3, p.y); ctx.lineTo(p.x, p.y + r * 1.3); ctx.lineTo(p.x - r * 1.3, p.y); ctx.closePath(); ctx.fill(); }
+      else { ctx.rect(p.x - r, p.y - r, r * 2, r * 2); ctx.fillStyle = rgb(bg); ctx.fill(); ctx.strokeStyle = rgb(col); ctx.lineWidth = 1.2; ctx.stroke(); }
     } else if (n.kind === 'lib') {
       ctx.beginPath(); ctx.rect(p.x - r, p.y - r, r * 2, r * 2); ctx.fill();
     } else if (n.kind === 'ex') {
@@ -1035,6 +1214,17 @@ function drawFrame(now, dt) {
         ctx.strokeStyle = rgb(lerpA(edge, bg, depthFade + (1 - depthFade) * (1 - n.em * sAlpha) * .9), n.rv);
         ctx.lineWidth = n.kind === 'area' ? 1.4 : 1;
         ctx.stroke();
+      }
+    }
+    if (n.kind === 'area' && r > 4 && n.share !== undefined) {
+      // Progress ring: a faint track and an arc for the share learned, starting at twelve o'clock.
+      const rr = r + 3.5, a0 = -Math.PI / 2;
+      ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+      ctx.strokeStyle = rgb(lerpA(C.line, bg, .2 + (1 - n.em) * .6), n.rv);
+      ctx.beginPath(); ctx.arc(p.x, p.y, rr, 0, 6.283); ctx.stroke();
+      if (n.share > 0) {
+        ctx.strokeStyle = rgb(lerpA(C['status-2'], bg, depthFade + (1 - n.em) * .6), n.rv);
+        ctx.beginPath(); ctx.arc(p.x, p.y, rr, a0, a0 + n.share * Math.PI * 2); ctx.stroke();
       }
     }
     if (isF) {
@@ -1268,7 +1458,7 @@ canvas.addEventListener('pointermove', e => {
   } else if (pointers.size === 2) {
     const [a, b] = [...pointers.values()];
     const d = Math.hypot(a.x - b.x, a.y - b.y);
-    if (pinch) zoomBy(pinch / d);
+    if (pinch) zoomBy(pinch / d, (a.x + b.x) / 2, (a.y + b.y) / 2);
     pinch = d; dragging = true; drag = null;
   }
   interacted();
@@ -1288,19 +1478,35 @@ function endPointer(e) {
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
 canvas.addEventListener('pointerleave', () => { if (!pointers.size) setHover(null); });
-canvas.addEventListener('wheel', e => { e.preventDefault(); zoomBy(Math.exp(e.deltaY * .0012)); interacted(); }, { passive: false });
-function zoomBy(f) { userZoomed = true; goal.dist = Math.max(120, Math.min(overviewDist * 2.2, goal.dist * f)); }
+canvas.addEventListener('wheel', e => { e.preventDefault(); const [x, y] = local(e); zoomBy(Math.exp(e.deltaY * .0012), x, y); interacted(); }, { passive: false });
+/* Zoom changes level, not just scale: zooming well into the overview opens the area nearest the pointer;
+   zooming well out of anything open goes back one step. A short pause stops one long scroll skipping two levels. */
+function areaNear(x, y) {
+  let best = null, bd = Infinity;
+  for (const n of G.nodes) { if (n.kind !== 'area') continue; const p = P[n.idx]; if (!p || !p.vis) continue; const d = Math.hypot(p.x - x, p.y - y) + p.depth * 120; if (d < bd) { bd = d; best = n; } }
+  return best;
+}
+function zoomBy(f, x = W / 2, y = H / 2) {
+  const next = Math.max(120, Math.min(overviewDist * 2.2, goal.dist * f));
+  const now = performance.now();
+  if (now - lastLevelChange > 800 && G.areaNodes) {
+    if (!focus && f < 1 && next < overviewDist * .55) { const a = areaNear(x, y); if (a) { lastLevelChange = now; setFocus(a); return; } }
+    if (focus && f > 1 && next > focusDist * 1.8) { lastLevelChange = now; goBack(); return; }
+  }
+  if (now - lastLevelChange < 800) return;
+  userZoomed = true; goal.dist = next;
+}
 canvas.addEventListener('keydown', e => {
   const k = e.key;
   if (k === 'ArrowLeft') goal.yaw -= .15; else if (k === 'ArrowRight') goal.yaw += .15;
   else if (k === 'ArrowUp') goal.pitch = clampPitch(goal.pitch - .15); else if (k === 'ArrowDown') goal.pitch = clampPitch(goal.pitch + .15);
   else if (k === '+' || k === '=') zoomBy(.85); else if (k === '-') zoomBy(1.18);
-  else if (k === 'Escape') setFocus(null); else return;
+  else if (k === 'Escape') goBack(); else return;
   e.preventDefault(); interacted();
 });
 document.addEventListener('keydown', e => {
   if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
-  if (e.key === 'Escape' && document.activeElement !== canvas && document.activeElement !== q && focus) setFocus(null);
+  if (e.key === 'Escape' && document.activeElement !== canvas && document.activeElement !== q && focus) goBack();
 });
 document.getElementById('zIn').addEventListener('click', () => { zoomBy(.8); interacted(); });
 document.getElementById('zOut').addEventListener('click', () => { zoomBy(1.25); interacted(); });
@@ -1310,6 +1516,9 @@ const optLib = document.getElementById('optLib');
 optLib.addEventListener('change', () => { showLib = optLib.checked; if (!showLib && focus && focus.kind === 'lib') setFocus(null); else computeScope(); });
 const optEx = document.getElementById('optEx');
 optEx.addEventListener('change', () => { showEx = optEx.checked; if (!showEx && focus && focus.kind === 'ex') setFocus(null); else computeScope(); });
+const optSound = document.getElementById('optSound');
+optSound.checked = Sound.on;
+optSound.addEventListener('change', () => Sound.set(optSound.checked));
 const optRotate = document.getElementById('optRotate');
 optRotate.checked = autoRotate;
 optRotate.addEventListener('change', () => { autoRotate = optRotate.checked; });
@@ -1332,7 +1541,7 @@ function renderResults() {
 q.addEventListener('input', () => {
   const s = q.value.trim().toLowerCase(); sel = 0;
   if (!s) { hits = []; return renderResults(); }
-  const pool = G.nodes.filter(n => n.kind !== 'group' && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
+  const pool = G.nodes.filter(n => n.kind !== 'group' && n.kind !== 'note' && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
   hits = pool.filter(n => n.name.toLowerCase().startsWith(s)).concat(pool.filter(n => !n.name.toLowerCase().startsWith(s) && n.name.toLowerCase().includes(s))).slice(0, 8);
   renderResults();
 });
@@ -1362,8 +1571,8 @@ function load(g) {
   const big = G.nodes.length > 500;
   G.nodes.forEach(n => {
     n.em = 1; n.hv = 0; n.la = 0; n.rv = 0; n.pl = 0; n.hl = 0; n.pt = null;
-    n.sv = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? 0 : 1; n.xp = 0; n.og = null;
-    const lvl = n.kind === 'ex' ? 5 : n.kind === 'lib' ? 4 : n.level;
+    n.sv = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' || n.kind === 'note' ? 0 : 1; n.xp = 0; n.og = null;
+    const lvl = n.kind === 'note' ? 4 : n.kind === 'ex' ? 5 : n.kind === 'lib' ? 4 : n.level;
     n.delay = big ? (lvl - 1) * 260 + rnd() * 600
       : n.kind === 'area' ? 150 + n.area * 45
       : 150 + (lvl - 1) * 380 + n.area * 30 + rnd() * 180;
@@ -1394,7 +1603,7 @@ function applyTheme() {
 document.getElementById('theme').addEventListener('click', () => { themeIx = (themeIx + 1) % THEMES.length; applyTheme(); flash(`Theme: ${THEMES[themeIx][1]}`); });
 applyTheme();
 if (matchMedia('(max-width: 720px)').matches) document.getElementById('legend').open = false;
-if (matchMedia('(pointer: coarse)').matches) document.getElementById('hint').textContent = 'Drag to turn · Pinch to zoom · Tap a topic';
+if (matchMedia('(pointer: coarse)').matches) document.getElementById('hint').textContent = 'Drag to turn · Pinch in to open, out to go back · Tap to open';
 readTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTheme);
 new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
