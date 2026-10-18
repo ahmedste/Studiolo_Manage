@@ -76,6 +76,20 @@ canvas#g.over { cursor: pointer; }
 .dot.s1 { background: var(--status-1); }
 .dot.s2 { background: var(--status-2); }
 .dot.lib { border-radius: 2px; background: var(--ink-3); }
+.dot.ex { border-radius: 0; background: var(--accent); clip-path: polygon(12% 0, 100% 50%, 12% 100%); }
+.preview { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.glyph { width: 38px; height: 38px; border-radius: 7px; background: var(--board); display: grid; place-items: center; font-weight: 650; color: var(--ink-2); flex-shrink: 0; }
+.preview strong { display: block; font-family: var(--read); font-weight: 500; font-size: 16.5px; line-height: 1.25; }
+.preview small { color: var(--ink-2); font-size: 12px; }
+.poster { position: relative; border-radius: 12px; padding: 16px 16px 14px; background: linear-gradient(135deg, var(--accent-soft), var(--board)); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; min-height: 120px; box-sizing: border-box; }
+.poster-title { font-family: var(--read); font-size: 21px; line-height: 1.2; font-weight: 500; padding-right: 52px; text-wrap: balance; }
+.play { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--accent); color: var(--panel); cursor: pointer; display: grid; place-items: center; transition: transform .2s var(--ease); }
+.play:hover { transform: scale(1.06); }
+.play svg { width: 13px; height: 14px; fill: currentColor; margin-left: 3px; }
+.bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; margin-top: auto; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 8s linear; }
+.poster.playing .bar i { width: 100%; }
+.poster small { color: var(--ink-2); font-size: 12px; }
 
 .legend { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-float); font-size: 12px; color: var(--ink-2); max-width: calc(100% - 32px); box-sizing: border-box; }
 .legend .row { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
@@ -105,6 +119,7 @@ canvas#g.over { cursor: pointer; }
 .insp .close { position: absolute; top: 12px; right: 12px; border: 0; background: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; color: var(--ink-2); font-size: 18px; line-height: 1; }
 .insp .close:hover { background: var(--board); }
 .insp .body { overflow: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.insp .body > * { flex-shrink: 0; }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; background: var(--board); border-radius: 9px; }
 .seg button { border: 0; background: none; padding: 6px 4px; border-radius: 7px; font-size: 12.5px; cursor: pointer; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .seg button[aria-checked="true"] { background: var(--panel); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(34,48,58,.08); }
@@ -156,7 +171,7 @@ canvas#g.over { cursor: pointer; }
   .hint { top: auto; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); font-size: 11.5px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .insp, .zoom, .hint { transition: none; }
+  .insp, .zoom, .hint, .bar i, .play { transition: none; }
 }
 </style>
 
@@ -196,11 +211,13 @@ canvas#g.over { cursor: pointer; }
         <span><i class="dot s0"></i>Not started</span>
         <span><i class="dot s1"></i>Learning</span>
         <span><i class="dot s2"></i>Learned</span>
-        <span class="opt-wide"><i class="dot lib"></i>Library item</span>
+        <span><i class="dot lib"></i>Library item</span>
+        <span><i class="dot ex"></i>Explainer</span>
       </div>
       <div class="sep"></div>
       <div class="row">
-        <label><input type="checkbox" id="optLib" checked>Library items</label>
+        <label><input type="checkbox" id="optLib" checked>Library</label>
+        <label><input type="checkbox" id="optEx" checked>Explainers</label>
         <label><input type="checkbox" id="optRotate" checked>Slow turn</label>
       </div>
       <div class="row">
@@ -225,7 +242,7 @@ canvas#g.over { cursor: pointer; }
       <div class="body" id="iBody"></div>
       <footer>
         <button type="button" class="btn" id="iMap">Open in Map</button>
-        <small>In the app this opens the radial Map on this topic.</small>
+        <small id="iNote">In the app this opens the radial Map on this topic.</small>
       </footer>
     </aside>
 
@@ -265,25 +282,50 @@ const RELS = [
  ['Daylight & shading','Passive design','Shading is the first passive move in this climate.'],
  ['Typologies','Space, sequence & threshold','Type sets the sequence; threshold is where the type is felt.']
 ];
-const LIB = {
- 'Islamic architecture':[['Great Mosque of Kairouan','building'],['Hillenbrand, Islamic Architecture','book'],['Sultan Hassan walkthrough','lecture'],['The mausoleum at Sultan Hassan','note'],['What I took from Sultan Hassan','doc'],['Qibla orientation note','note'],['Capstone Studio: Design Synthesis','studio'],['Why the iwan replaced the hall','chat'],['Form, ritual, geometry','course']],
- 'Facade systems':[['Precast panel mock-up photos','photo'],['Kinetic facades, ten years on','link'],['Precast joints on the mihrab','chat']],
- 'Typologies':[['Capstone Studio: Design Synthesis','studio'],['Great Mosque of Kairouan','building'],['Bait Ur Rouf Mosque','link'],['Prayer hall structural mock-up','photo']],
- 'Daylight & shading':[['Light in architecture is not merely illumination','quote'],['Fathy, Natural Energy and Vernacular Architecture','book']],
- 'Space, sequence & threshold':[['The eye never quite finds the end of the field','quote'],['Bait Ur Rouf Mosque','link'],['What I took from Sultan Hassan','doc']],
- 'Detailing & interfaces':[['Precast mihrab panel joints','chat'],['Capstone Studio: Design Synthesis','studio']],
- 'Climate-responsive design':[['Hassan Fathy','person'],['We have to design for the climate, not against it.','quote'],['Fathy, Natural Energy and Vernacular Architecture','book']]
-};
+/* Library items and the topics they are tagged on. As in content_topic_tags, one item can carry many topics at any level, areas included. */
+const ITEMS = [
+ ['Great Mosque of Kairouan','building',['Islamic architecture','Typologies','Plan types & ritual','Religious']],
+ ['Hillenbrand, Islamic Architecture','book',['Islamic architecture','Geometry & ornament','Regional schools']],
+ ['Fathy, Natural Energy and Vernacular Architecture','book',['Climate-responsive design','Daylight & shading','Vernacular & regional','Passive design','Culture & Context']],
+ ['Capstone Studio: Design Synthesis','studio',['Islamic architecture','Typologies','Detailing & interfaces','Design & Composition']],
+ ['Bait Ur Rouf Mosque','link',['Typologies','Space, sequence & threshold','Religious','Daylight & shading']],
+ ['Precast panel mock-up photos','photo',['Facade systems','Precast','Concrete & precast']],
+ ['Kinetic facades, ten years on','link',['Facade systems','Facade performance']],
+ ['Precast joints on the mihrab','chat',['Precast','Detailing & interfaces','The contemporary mosque']],
+ ['Light in architecture is not merely illumination','quote',['Daylight & shading','Architectural lighting']],
+ ['The eye never quite finds the end of the field','quote',['Space, sequence & threshold']],
+ ['What I took from Sultan Hassan','doc',['Islamic architecture','Space, sequence & threshold','Plan types & ritual']],
+ ['Sultan Hassan walkthrough','lecture',['Islamic architecture','Plan types & ritual']],
+ ['Hassan Fathy','person',['Climate-responsive design','Vernacular & regional']],
+ ['Qibla orientation note','note',['Plan types & ritual']],
+ ['Why the iwan replaced the hall','chat',['Islamic architecture','Typologies']],
+ ['Prayer hall structural mock-up','photo',['Typologies','Structural principles','Religious']],
+ ['BIM execution plan template','doc',['BIM','Coordination & BIM','Stages & deliverables']],
+ ['Embodied carbon calculator notes','note',['Embodied carbon','Material selection','Certification']],
+ ['Gehl, Life Between Buildings','book',['Urban design principles','Streets & public realm','Urbanism & Landscape']],
+ ['Fire strategy for the atrium','doc',['Fire engineering','Egress & evacuation','Codes & authorities']]
+];
+/* Explainers. As in studiolo.explainers, each has one anchor (a topic or a Library item) and is grounded in Library items. */
+const EXPLAINERS = [
+ ['Why the courtyard came first', 5, ['topic','Islamic architecture'], ['Great Mosque of Kairouan','Hillenbrand, Islamic Architecture','Sultan Hassan walkthrough']],
+ ['Reading the Great Mosque of Kairouan', 4, ['item','Great Mosque of Kairouan'], ['Hillenbrand, Islamic Architecture','Qibla orientation note']],
+ ['Shading as the first passive move', 3, ['topic','Daylight & shading'], ['Fathy, Natural Energy and Vernacular Architecture','Light in architecture is not merely illumination','Bait Ur Rouf Mosque']],
+ ['How precast panels meet', 4, ['topic','Detailing & interfaces'], ['Precast panel mock-up photos','Precast joints on the mihrab']],
+ ['Thresholds in Bait Ur Rouf', 3, ['item','Bait Ur Rouf Mosque'], ['The eye never quite finds the end of the field','What I took from Sultan Hassan']],
+ ['Fathy’s climate lessons', 6, ['item','Fathy, Natural Energy and Vernacular Architecture'], ['Hassan Fathy']],
+ ['Streets that hold people', 4, ['topic','Streets & public realm'], ['Gehl, Life Between Buildings']],
+ ['Carbon starts with the material', 3, ['topic','Embodied carbon'], ['Embodied carbon calculator notes']]
+];
 const STATUS = ['Not started', 'Learning', 'Learned'];
-const KIND_R = { 1: 13, 2: 8.5, 3: 6, 4: 6, lib: 4.2 };
+const KIND_R = { 1: 13, 2: 8.5, 3: 6, 4: 6, lib: 4.2, ex: 5.6 };
 
 /* ---------- Graph model ---------- */
 let G = null;
 function newGraph() { return { nodes: [], links: [], byId: new Map() }; }
 function addNode(g, o) {
-  const n = Object.assign({ id: 'n' + g.nodes.length, children: [], rels: [], libs: [], tagged: [], x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 }, o);
-  n.r = n.kind === 'lib' ? KIND_R.lib : KIND_R[Math.min(n.level, 4)];
-  n.w = n.kind === 'area' ? 2.2 : n.kind === 'lib' ? .6 : 1;
+  const n = Object.assign({ id: 'n' + g.nodes.length, children: [], rels: [], libs: [], tagged: [], exps: [], usedBy: [], sources: [], x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 }, o);
+  n.r = n.kind === 'lib' ? KIND_R.lib : n.kind === 'ex' ? KIND_R.ex : KIND_R[Math.min(n.level, 4)];
+  n.w = n.kind === 'area' ? 2.2 : n.kind === 'lib' || n.kind === 'ex' ? .6 : 1;
   g.nodes.push(n); g.byId.set(n.id, n);
   if (n.parent) n.parent.children.push(n);
   return n;
@@ -293,6 +335,8 @@ function addLink(g, a, b, type, why) {
   g.links.push(l);
   if (type === 'rl') { a.rels.push({ other: b, why }); b.rels.push({ other: a, why }); }
   if (type === 'lib') { a.libs.push(b); b.tagged.push(a); }
+  if (type === 'ex') { a.exps.push(b); b.anchorNode = a; }
+  if (type === 'src') { a.usedBy.push(b); b.sources.push(a); }
   return l;
 }
 function buildSample() {
@@ -312,13 +356,20 @@ function buildSample() {
     });
   });
   RELS.forEach(([a, b, why]) => addLink(g, byName[a], byName[b], 'rl', why));
-  const libByName = {};
-  Object.entries(LIB).forEach(([topic, items]) => items.forEach(([name, type]) => {
-    const host = byName[topic];
-    let ln = libByName[name];
-    if (!ln) ln = libByName[name] = addNode(g, { name, kind: 'lib', level: 4, libType: type, status: 0, area: host.area, parent: null, anchor: host });
-    addLink(g, host, ln, 'lib');
-  }));
+  const need = (map, name) => { if (!map[name]) throw new Error('Unknown name in sample data: ' + name); return map[name]; };
+  const itemByName = {};
+  ITEMS.forEach(([name, type, tags]) => {
+    const hosts = tags.map(t => need(byName, t));
+    const ln = itemByName[name] = addNode(g, { name, kind: 'lib', level: 4, libType: type, status: 0, area: hosts[0].area, parent: null, anchor: hosts[0] });
+    hosts.forEach(h => addLink(g, h, ln, 'lib'));
+    ln.r = 4 + Math.min(4, hosts.length) * .55; // an item tagged in more places reads a little larger
+  });
+  EXPLAINERS.forEach(([title, mins, [kind, anchorName], sources]) => {
+    const anchor = need(kind === 'topic' ? byName : itemByName, anchorName);
+    const ex = addNode(g, { name: title, kind: 'ex', level: 5, mins, anchorKind: kind, status: 0, area: anchor.area, parent: null, anchor });
+    addLink(g, anchor, ex, 'ex');
+    sources.forEach(sn => addLink(g, need(itemByName, sn), ex, 'src'));
+  });
   g.label = 'Prototype · sample graph';
   return g;
 }
@@ -360,7 +411,7 @@ function initPositions(g) {
     if (n.kind === 'area') return;
     const host = n.parent || n.anchor;
     const len = Math.hypot(host.x, host.y, host.z) || 1;
-    const d = n.kind === 'lib' ? 26 : n.level === 2 ? 70 : 40;
+    const d = n.kind === 'lib' || n.kind === 'ex' ? 26 : n.level === 2 ? 70 : 40;
     n.x = host.x + (host.x / len) * d * .6 + (Math.random() - .5) * d * 1.6;
     n.y = host.y + (host.y / len) * d * .6 + (Math.random() - .5) * d * 1.6;
     n.z = host.z + (host.z / len) * d * .6 + (Math.random() - .5) * d * 1.6;
@@ -368,7 +419,9 @@ function initPositions(g) {
 }
 function linkSpec(l) {
   if (l.type === 'rl') return [170, .012];
-  if (l.type === 'lib') return [26, .22];
+  if (l.type === 'lib') { const k = l.b.tagged.length; return [28 + k * 6, .22 / k]; } // shared items settle between their topics
+  if (l.type === 'ex') return [26, .2];
+  if (l.type === 'src') return [46, .05];
   return l.a.kind === 'area' ? [74, .1] : [40, .18];
 }
 function tick(g, a) {
@@ -429,7 +482,7 @@ function makeGrain() {
   x.putImageData(im, 0, 0);
   document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`;
 }
-function fillOf(n) { return n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
+function fillOf(n) { return n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
 
 /* ---------- Canvas, camera ---------- */
 const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
@@ -440,7 +493,7 @@ const cam = { yaw: .7, pitch: -.32, dist: 900, tx: 0, ty: 0, tz: 0, cx: 0, cy: 0
 const goal = { ...cam };
 let R0 = 300, overviewDist = 900;
 let focus = null, hover = null, neigh = new Set(), focusLinks = [];
-let showLib = true, autoRotate = !reduced, lastInteract = -1e9;
+let showLib = true, showEx = true, autoRotate = !reduced, lastInteract = -1e9;
 let vel = { yaw: 0, pitch: 0 };
 
 function resize() {
@@ -472,7 +525,7 @@ function project(n, out) {
   const s = F / Math.max(zz, 1);
   out.n = n; out.zz = zz; out.s = s; out.x = cam.cx + x1 * s; out.y = cam.cy + y2 * s; out.sr = n.r * s;
   out.depth = Math.max(0, Math.min(1, (zz - (cam.dist - R0)) / (2 * R0)));
-  out.vis = zz > 30 && (showLib || n.kind !== 'lib');
+  out.vis = zz > 30 && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex');
   return out;
 }
 
@@ -485,7 +538,26 @@ function neighboursOf(n) {
   n.rels.forEach(r => s.add(r.other));
   n.libs.forEach(l => s.add(l));
   n.tagged.forEach(t => s.add(t));
+  n.exps.forEach(x => s.add(x));
+  n.usedBy.forEach(x => s.add(x));
+  n.sources.forEach(x => s.add(x));
+  if (n.anchorNode) s.add(n.anchorNode);
+  // An explainer also lights the topics its sources are tagged on: everything it ties together.
+  if (n.kind === 'ex') n.sources.forEach(src => src.tagged.forEach(t => s.add(t)));
   return s;
+}
+const KIND_LABEL = n => (n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : null);
+/* Frame the focus with everything it connects to, leaning toward the focus itself. */
+function focusFrame(n) {
+  const pts = [n, ...neigh];
+  let cx = 0, cy = 0, cz = 0;
+  for (const p of pts) { cx += p.x; cy += p.y; cz += p.z; }
+  cx /= pts.length; cy /= pts.length; cz /= pts.length;
+  const tx = n.x + (cx - n.x) * .6, ty = n.y + (cy - n.y) * .6, tz = n.z + (cz - n.z) * .6;
+  let spread = 0;
+  for (const p of pts) spread = Math.max(spread, Math.hypot(p.x - tx, p.y - ty, p.z - tz));
+  const dist = Math.max(260, Math.min(R0 * 2.6, spread * 2.5 + 120)) * (narrow() ? 1.15 : 1);
+  return { tx, ty, tz, dist };
 }
 function setFocus(n) {
   const prev = focus;
@@ -496,17 +568,18 @@ function setFocus(n) {
     setHash('');
   } else {
     if (n.kind === 'lib' && !showLib) { showLib = true; optLib.checked = true; }
+    if (n.kind === 'ex' && !showEx) { showEx = true; optEx.checked = true; }
     neigh = neighboursOf(n);
     focusLinks = G.links.filter(l => l.a === n || l.b === n);
     renderInspector(n);
     insp.classList.remove('closed'); insp.setAttribute('aria-hidden', 'false');
     setHash(n.id);
-    document.getElementById('live').textContent = `${n.name}, ${n.kind === 'lib' ? 'Library item' : STATUS[n.status]}. ${neigh.size} connected.`;
+    document.getElementById('live').textContent = `${n.name}, ${KIND_LABEL(n) || STATUS[n.status]}. ${neigh.size} connected.`;
   }
   const c = viewCentre();
   if (!n) userZoomed = false;
   const to = n
-    ? { tx: n.x, ty: n.y, tz: n.z, dist: Math.max(260, Math.min(520, 220 + neigh.size * 14)), cx: c[0], cy: c[1] }
+    ? { ...focusFrame(n), cx: c[0], cy: c[1] }
     : { tx: 0, ty: 0, tz: 0, dist: overviewDist, cx: c[0], cy: c[1] };
   // Topic to topic arcs out and back in; entering or leaving a topic is a straight dolly.
   flyTo(to, { hop: n && prev ? undefined : 0 });
@@ -517,43 +590,86 @@ function setHash(id) { try { history.replaceState(null, '', id ? '#' + id : loca
 /* ---------- Inspector ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function pathOf(n) { const p = []; let c = n.parent; while (c) { p.unshift(c.name); c = c.parent; } return p; }
+function dotOf(n) { return n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 's' + n.status; }
 function item(n, extra = '') {
-  const dot = n.kind === 'lib' ? 'lib' : 's' + n.status;
-  return `<li><button type="button" data-go="${n.id}"><i class="dot ${dot}"></i><span>${esc(n.name)}${extra}</span>${n.kind === 'lib' ? `<span class="type">${esc(n.libType)}</span>` : ''}</button></li>`;
+  const tag = n.kind === 'lib' ? n.libType : n.kind === 'ex' ? `${n.mins} min` : '';
+  return `<li><button type="button" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i><span>${esc(n.name)}${extra}</span>${tag ? `<span class="type">${esc(tag)}</span>` : ''}</button></li>`;
 }
+const where = t => `<span class="why">${esc(pathOf(t).join(' › ') || 'Area')}</span>`;
+const plural = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
+const cap = w => w[0].toUpperCase() + w.slice(1);
+const ACTIONS = {
+  topic: ['Open in Map', 'In the app this opens the radial Map on this topic.'],
+  lib: ['Open in Library', 'In the app this opens the item in Library.'],
+  ex: ['Play explainer', 'In the app this opens the player.']
+};
 function renderInspector(n) {
   const iBody = document.getElementById('iBody');
-  document.getElementById('iName').textContent = n.name;
+  const set = (id, t) => (document.getElementById(id).textContent = t);
+  set('iName', n.name);
+  const [act, note] = ACTIONS[n.kind === 'lib' ? 'lib' : n.kind === 'ex' ? 'ex' : 'topic'];
+  set('iMap', act); set('iNote', note);
   if (n.kind === 'lib') {
-    document.getElementById('iEyebrow').textContent = 'Library';
-    document.getElementById('iMeta').textContent = `${n.libType[0].toUpperCase() + n.libType.slice(1)} · tagged on ${n.tagged.length} topic${n.tagged.length === 1 ? '' : 's'}`;
-    iBody.innerHTML = `<section><h3>Tagged topics (${n.tagged.length})</h3><ul>${n.tagged.map(t => item(t)).join('')}</ul></section>`;
+    const areas = new Set(n.tagged.map(t => t.area)).size;
+    const uses = [...new Set([...n.exps, ...n.usedBy])];
+    set('iEyebrow', 'Library · ' + n.libType);
+    set('iMeta', `Tagged on ${plural(n.tagged.length, 'topic')} in ${plural(areas, 'area')}`);
+    iBody.innerHTML = `
+      <div class="preview"><span class="glyph" aria-hidden="true">${esc(n.libType[0].toUpperCase())}</span><div><strong>${esc(n.name)}</strong><small>${esc(cap(n.libType))} in your Library</small></div></div>
+      <section><h3>Tagged on (${n.tagged.length})</h3><ul>${n.tagged.map(t => item(t, where(t))).join('')}</ul></section>
+      <section><h3>Explainers that use it (${uses.length})</h3>${uses.length ? `<ul>${uses.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this item' : 'Draws on this item'}</span>`)).join('')}</ul>` : '<p class="empty">No explainer draws on this yet.</p>'}</section>`;
+  } else if (n.kind === 'ex') {
+    const touches = [...new Set(n.sources.flatMap(src => src.tagged).concat(n.anchorKind === 'topic' ? [n.anchorNode] : []))];
+    set('iEyebrow', `Explainer · ${n.mins} min`);
+    set('iMeta', `Made from ${n.anchorKind === 'topic' ? 'a topic' : 'a Library item'} · draws on ${plural(n.sources.length, 'item')}`);
+    iBody.innerHTML = `
+      <div class="poster" id="poster">
+        <div class="poster-title">${esc(n.name)}</div>
+        <button type="button" class="play" id="play" aria-label="Play a preview"><svg viewBox="0 0 12 14" aria-hidden="true"><path d="M1 1.2v11.6a.8.8 0 0 0 1.2.7l9.4-5.8a.8.8 0 0 0 0-1.4L2.2.5A.8.8 0 0 0 1 1.2z"/></svg></button>
+        <div class="bar"><i></i></div>
+        <small id="posterNote">Narrated slides · ${n.mins} min · cites ${plural(n.sources.length, 'source')}</small>
+      </div>
+      <section><h3>Made from</h3><ul>${item(n.anchorNode, n.anchorNode.kind === 'lib' ? '<span class="why">Library item</span>' : where(n.anchorNode))}</ul></section>
+      <section><h3>Draws on (${n.sources.length})</h3><ul>${n.sources.map(x => item(x)).join('')}</ul></section>
+      <section><h3>Ties together (${touches.length})</h3><ul>${touches.map(t => item(t, where(t))).join('')}</ul></section>`;
   } else {
     const p = pathOf(n);
-    document.getElementById('iEyebrow').textContent = p.length ? p.join(' › ') : 'Area';
-    const desc = [];
-    desc.push(n.kind === 'area' ? 'Area' : n.level === 2 ? 'Topic' : 'Sub-topic');
-    desc.push(`${n.children.length} sub-topic${n.children.length === 1 ? '' : 's'}`);
+    set('iEyebrow', p.length ? p.join(' › ') : 'Area');
+    const desc = [n.kind === 'area' ? 'Area' : n.level === 2 ? 'Topic' : 'Sub-topic', plural(n.children.length, 'sub-topic')];
     if (n.rels.length) desc.push(`${n.rels.length} related`);
-    document.getElementById('iMeta').textContent = desc.join(' · ');
+    if (n.libs.length) desc.push(plural(n.libs.length, 'item'));
+    set('iMeta', desc.join(' · '));
     const kids = n.children.slice(0, 24);
     const more = n.children.length - kids.length;
+    // Explainers made here, plus any that draw on this topic's Library items.
+    const exps = [...new Set([...n.exps, ...n.libs.flatMap(l => [...l.exps, ...l.usedBy])])];
     iBody.innerHTML = `
       <div class="seg" role="radiogroup" aria-label="Status">${STATUS.map((s, i) => `<button type="button" role="radio" aria-checked="${n.status === i}" data-status="${i}"><i class="dot s${i}"></i>${s}</button>`).join('')}</div>
-      <section><h3>Sub-topics (${n.children.length})</h3>${kids.length ? `<ul>${kids.map(c => item(c)).join('')}</ul>${more > 0 ? `<p class="empty">+ ${more} more in List</p>` : ''}` : '<p class="empty">No sub-topics yet.</p>'}</section>
-      <section><h3>Related (${n.rels.length})</h3>${n.rels.length ? `<ul>${n.rels.slice(0, 6).map(r => item(r.other, `<span class="why">${esc(r.why)}</span>`)).join('')}</ul>` : '<p class="empty">Not connected to other branches yet.</p>'}</section>
-      ${n.libs.length ? `<section><h3>In your Library (${n.libs.length})</h3><ul>${n.libs.map(l => item(l)).join('')}</ul></section>` : ''}`;
+      ${kids.length ? `<section><h3>Sub-topics (${n.children.length})</h3><ul>${kids.map(c => item(c)).join('')}</ul>${more > 0 ? `<p class="empty">+ ${more} more in List</p>` : ''}</section>` : ''}
+      ${n.libs.length ? `<section><h3>In your Library (${n.libs.length})</h3><ul>${n.libs.map(l => item(l, l.tagged.length > 1 ? `<span class="why">Also on ${plural(l.tagged.length - 1, 'other topic')}</span>` : '')).join('')}</ul></section>` : ''}
+      ${exps.length ? `<section><h3>Explainers (${exps.length})</h3><ul>${exps.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this topic' : 'Uses items tagged here'}</span>`)).join('')}</ul></section>` : ''}
+      <section><h3>Related (${n.rels.length})</h3>${n.rels.length ? `<ul>${n.rels.slice(0, 6).map(r => item(r.other, `<span class="why">${esc(r.why)}</span>`)).join('')}</ul>` : '<p class="empty">Not connected to other branches yet.</p>'}</section>`;
   }
   iBody.scrollTop = 0;
 }
 document.getElementById('iBody').addEventListener('click', e => {
   const go = e.target.closest('[data-go]');
   if (go) { setFocus(G.byId.get(go.dataset.go)); return; }
+  if (e.target.closest('#play')) { playPreview(); return; }
   const st = e.target.closest('[data-status]');
   if (st && focus) { focus.status = +st.dataset.status; renderInspector(focus); updateSummary(); }
 });
 document.getElementById('iClose').addEventListener('click', () => setFocus(null));
-document.getElementById('iMap').addEventListener('click', () => { document.getElementById('live').textContent = 'In the app this opens the Map.'; flash('In the app, this opens the radial Map on this topic.'); });
+document.getElementById('iMap').addEventListener('click', () => {
+  if (focus && focus.kind === 'ex') return playPreview();
+  const t = document.getElementById('iNote').textContent;
+  document.getElementById('live').textContent = t; flash(t);
+});
+function playPreview() {
+  const poster = document.getElementById('poster'); if (!poster) return;
+  poster.classList.add('playing');
+  document.getElementById('posterNote').textContent = 'Preview only. In the app the player opens with narration.';
+}
 function flash(t) { const h = document.getElementById('hint'); h.textContent = t; h.classList.remove('gone'); clearTimeout(flash.t); flash.t = setTimeout(() => h.classList.add('gone'), 2600); }
 
 function updateSummary() {
@@ -561,8 +677,9 @@ function updateSummary() {
   const areas = G.nodes.filter(n => n.kind === 'area').length;
   const learned = topics.filter(n => n.status === 2).length;
   const libs = G.nodes.filter(n => n.kind === 'lib').length;
+  const exs = G.nodes.filter(n => n.kind === 'ex').length;
   const rel = G.links.filter(l => l.type === 'rl').length;
-  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned · ${rel.toLocaleString()} related links${libs ? ` · ${libs} Library items` : ''}`;
+  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned` + (libs ? ` · ${libs} Library items · ${exs} explainers` : ` · ${rel.toLocaleString()} related links`);
   document.getElementById('summary').textContent = t;
   document.getElementById('summary2').textContent = t;
   canvas.setAttribute('aria-label', `Your whole topic graph in 3D: ${t}. Use the search box or the List view to move by keyboard.`);
@@ -626,12 +743,13 @@ function drawFrame(now, dt) {
   for (const k of Object.keys(buckets).sort()) {
     const { type, d, e, pts } = buckets[k];
     const em = e / (E - 1);
-    const base = type === 'rl' ? C.accent : C['ink-3'];
-    let t = type === 'rl' ? (big ? .8 : .35) + d / B * (big ? .15 : .45) : .45 + d / B * .4;
+    const blue = type === 'rl' || type === 'ex' || type === 'src';
+    const base = blue ? C.accent : C['ink-3'];
+    let t = blue ? (big ? .8 : .35) + d / B * (big ? .15 : .45) : .45 + d / B * .4;
     t = t + (.9 - t) * (1 - em);
     ctx.strokeStyle = rgb(lerpA(base, bg, t));
-    ctx.lineWidth = type === 'rl' ? 1 : .8;
-    ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' ? [1, 3] : []);
+    ctx.lineWidth = type === 'rl' ? 1 : type === 'ex' ? .9 : .8;
+    ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' || type === 'src' ? [1, 3] : []);
     ctx.beginPath();
     for (let i = 0; i < pts.length; i += 4) { ctx.moveTo(pts[i], pts[i + 1]); ctx.lineTo(pts[i + 2], pts[i + 3]); }
     ctx.stroke();
@@ -649,16 +767,17 @@ function drawFrame(now, dt) {
       const local = reduced ? 1 : ease.out(clamp01((now - focusAt - i * 35) / 520));
       if (local <= 0) return;
       const at = t => { const u = 1 - t; return [u * u * po.x + 2 * u * t * qx + t * t * pf.x, u * u * po.y + 2 * u * t * qy + t * t * pf.y]; };
-      ctx.strokeStyle = l.type === 'rl' ? rgb(lerpA(C.accent, bg, .3)) : rgb(lerpA(C['ink-2'], bg, .4));
-      ctx.lineWidth = l.type === 'rl' ? 1.3 : 1;
-      ctx.setLineDash(l.type === 'rl' ? [4, 4] : []);
+      const blue = l.type === 'rl' || l.type === 'ex' || l.type === 'src';
+      ctx.strokeStyle = blue ? rgb(lerpA(C.accent, bg, .3)) : rgb(lerpA(C['ink-2'], bg, .4));
+      ctx.lineWidth = blue ? 1.3 : 1;
+      ctx.setLineDash(l.type === 'rl' ? [4, 4] : l.type === 'src' ? [2, 3] : []);
       ctx.beginPath();
       const steps = 18;
       for (let s = 0; s <= steps; s++) { const [x, y] = at(1 - local * s / steps); s ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
       ctx.stroke();
       ctx.setLineDash([]);
       if (!reduced && local >= 1) {
-        ctx.fillStyle = l.type === 'rl' ? rgb(lerpA(C.accent, bg, .1)) : rgb(lerpA(C['ink-2'], bg, .05));
+        ctx.fillStyle = blue ? rgb(lerpA(C.accent, bg, .1)) : rgb(lerpA(C['ink-2'], bg, .05));
         for (let k = 0; k < 3; k++) {
           const t = ((now / 2400) + k / 3 + i * .137) % 1;
           const [x, y] = at(t);
@@ -685,6 +804,10 @@ function drawFrame(now, dt) {
     ctx.fillStyle = rgb(col);
     if (n.kind === 'lib') {
       ctx.beginPath(); ctx.rect(p.x - r, p.y - r, r * 2, r * 2); ctx.fill();
+    } else if (n.kind === 'ex') {
+      // An explainer is a play mark: it is something you watch.
+      ctx.beginPath(); ctx.moveTo(p.x - r * .75, p.y - r); ctx.lineTo(p.x + r * 1.05, p.y); ctx.lineTo(p.x - r * .75, p.y + r); ctx.closePath();
+      ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(1, r * .35); ctx.strokeStyle = ctx.fillStyle; ctx.fill(); ctx.stroke();
     } else {
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
       // Hollow Not-started marks fill in grey when greyed out, so they read like the rest of the background.
@@ -797,7 +920,7 @@ function loop(now) {
     tick(G, alpha); if (G.nodes.length < 500) tick(G, alpha);
     alpha *= G.nodes.length > 500 ? .975 : .982;
     R0 = sceneRadius(G); overviewDist = R0 * (W < 560 ? 2.2 : 2.75);
-    if (focus) { goal.tx = focus.x; goal.ty = focus.y; goal.tz = focus.z; }
+    if (focus) { const f = focusFrame(focus); goal.tx = f.tx; goal.ty = f.ty; goal.tz = f.tz; }
     else if (!userZoomed) goal.dist = overviewDist;
   }
   const idle = !dragging && !flight && now - lastInteract > 2500;
@@ -909,6 +1032,8 @@ document.getElementById('zReset').addEventListener('click', () => { userZoomed =
 
 const optLib = document.getElementById('optLib');
 optLib.addEventListener('change', () => { showLib = optLib.checked; if (!showLib && focus && focus.kind === 'lib') setFocus(null); });
+const optEx = document.getElementById('optEx');
+optEx.addEventListener('change', () => { showEx = optEx.checked; if (!showEx && focus && focus.kind === 'ex') setFocus(null); });
 const optRotate = document.getElementById('optRotate');
 optRotate.checked = autoRotate;
 optRotate.addEventListener('change', () => { autoRotate = optRotate.checked; });
@@ -917,7 +1042,7 @@ document.getElementById('optScale').addEventListener('click', e => {
   load(toScale ? buildScale() : buildSample());
   e.target.textContent = toScale ? 'Back to the sample graph' : 'Try 2,000 topics';
   document.getElementById('fps').textContent = '';
-  optLib.disabled = toScale;
+  optLib.disabled = optEx.disabled = toScale;
 });
 
 /* ---------- Search ---------- */
@@ -925,13 +1050,13 @@ const q = document.getElementById('q'), results = document.getElementById('resul
 let hits = [], sel = 0;
 function renderResults() {
   if (!hits.length) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); return; }
-  results.innerHTML = hits.map((n, i) => `<li role="option" id="r${i}" aria-selected="${i === sel}" data-go="${n.id}"><i class="dot ${n.kind === 'lib' ? 'lib' : 's' + n.status}"></i>${esc(n.name)}<small>${esc(n.kind === 'lib' ? 'Library' : pathOf(n).slice(-1)[0] || 'Area')}</small></li>`).join('');
+  results.innerHTML = hits.map((n, i) => `<li role="option" id="r${i}" aria-selected="${i === sel}" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i>${esc(n.name)}<small>${esc(KIND_LABEL(n) || pathOf(n).slice(-1)[0] || 'Area')}</small></li>`).join('');
   results.hidden = false; q.setAttribute('aria-expanded', 'true'); q.setAttribute('aria-activedescendant', 'r' + sel);
 }
 q.addEventListener('input', () => {
   const s = q.value.trim().toLowerCase(); sel = 0;
   if (!s) { hits = []; return renderResults(); }
-  const pool = G.nodes.filter(n => showLib || n.kind !== 'lib');
+  const pool = G.nodes.filter(n => (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
   hits = pool.filter(n => n.name.toLowerCase().startsWith(s)).concat(pool.filter(n => !n.name.toLowerCase().startsWith(s) && n.name.toLowerCase().includes(s))).slice(0, 8);
   renderResults();
 });
@@ -960,7 +1085,7 @@ function load(g) {
   const big = G.nodes.length > 500;
   G.nodes.forEach(n => {
     n.em = 1; n.hv = 0; n.la = 0; n.rv = 0;
-    const lvl = n.kind === 'lib' ? 4 : n.level;
+    const lvl = n.kind === 'ex' ? 5 : n.kind === 'lib' ? 4 : n.level;
     n.delay = big ? (lvl - 1) * 260 + rnd() * 600
       : n.kind === 'area' ? 150 + n.area * 45
       : 150 + (lvl - 1) * 380 + n.area * 30 + rnd() * 180;
