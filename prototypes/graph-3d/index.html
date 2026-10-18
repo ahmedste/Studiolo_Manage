@@ -11,7 +11,7 @@
   --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
   --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
   --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e;
-  --accent: #1e3e9e; --accent-soft: #e6ebf8;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --amber: #8a5a12; --amber-soft: #f6ecd8;
   --shadow-float: 0 1px 2px rgba(34,48,58,.06), 0 18px 48px rgba(34,48,58,.16);
   --grain-opacity: .2;
   --ui: "Instrument Sans", system-ui, -apple-system, sans-serif;
@@ -23,7 +23,7 @@
     --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
     --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
     --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6;
-    --accent: #9db0f3; --accent-soft: #263156;
+    --accent: #9db0f3; --accent-soft: #263156; --amber: #e5b56a; --amber-soft: #3a2f1c;
     --shadow-float: 0 0 0 1px rgba(255,255,255,.05), 0 18px 48px rgba(0,0,0,.42);
     --grain-opacity: .12;
     color-scheme: dark;
@@ -33,7 +33,7 @@
   --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
   --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
   --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6;
-  --accent: #9db0f3; --accent-soft: #263156;
+  --accent: #9db0f3; --accent-soft: #263156; --amber: #e5b56a; --amber-soft: #3a2f1c;
   --shadow-float: 0 0 0 1px rgba(255,255,255,.05), 0 18px 48px rgba(0,0,0,.42);
   --grain-opacity: .12;
   color-scheme: dark;
@@ -44,16 +44,41 @@ body { background: var(--paper); color: var(--ink); font-family: var(--ui); font
 button, input { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.app { height: 100%; display: flex; flex-direction: column; }
+.app { height: 100%; display: grid; grid-template-columns: 84px minmax(0, 1fr); }
+.main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+/* The app rail (Studiolo's destinations), as in the app shell. */
+.rail { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: 14px; padding-left: env(safe-area-inset-left, 0px); z-index: 4; }
+.rail .brand { width: 38px; height: 38px; border-radius: 10px; border: 0; background: var(--ink); color: var(--panel); font-family: var(--read); font-size: 22px; font-weight: 500; cursor: pointer; line-height: 1; }
+.rail .capture { display: flex; flex-direction: column; align-items: center; gap: 3px; border: 1px solid var(--line); background: var(--paper); border-radius: 12px; padding: 7px 6px 6px; width: 64px; cursor: pointer; font-size: 10.5px; color: var(--ink-2); }
+.rail .capture svg { width: 16px; height: 16px; stroke: var(--ink); stroke-width: 1.6; fill: none; }
+.rail ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.rail li button { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 72px; padding: 8px 4px; border: 0; background: none; border-radius: 10px; cursor: pointer; color: var(--ink-2); font-size: 10.5px; }
+.rail li button:hover { background: var(--board); color: var(--ink); }
+.rail li button[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.rail li svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.rail li svg .fill { fill: currentColor; }
+.titles { display: flex; align-items: baseline; gap: 10px; }
+.titles .sub { font-family: var(--read); font-style: italic; color: var(--ink-2); font-size: 15px; white-space: nowrap; }
+.askbtn { display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--accent); color: var(--panel); font-weight: 600; font-size: 13px; padding: 7px 14px; border-radius: 99px; cursor: pointer; white-space: nowrap; }
+.askbtn:hover { filter: brightness(1.08); }
+.askbtn[aria-expanded="true"] { background: var(--ink); }
+.tabs button { cursor: pointer; }
+.view { position: absolute; inset: 0; display: none; transition: right .38s var(--ease); }
+.stage.panel-open .view { right: var(--pr, 0px); }
+.view.scroll { overflow: auto; }
+.stage[data-view="map"] #mapView, .stage[data-view="list"] #listView, .stage[data-view="overview"] #overView { display: block; }
+.stage:not([data-view="palace"]) #g, .stage:not([data-view="palace"]) .legend, .stage:not([data-view="palace"]) .zoom, .stage:not([data-view="palace"]) .hint, .stage:not([data-view="palace"]) .gcard { display: none !important; }
+.stage[data-view="list"] .search, .stage[data-view="overview"] .search, .stage[data-view="list"] .trail, .stage[data-view="overview"] .trail { display: none !important; }
 
 /* Header */
-.top { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); background: var(--panel); border-bottom: 1px solid var(--line); position: relative; z-index: 3; }
+.top { display: flex; align-items: center; gap: 12px 20px; flex-wrap: nowrap; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); background: var(--panel); border-bottom: 1px solid var(--line); position: relative; z-index: 3; }
 .top h1 { font-family: var(--read); font-weight: 500; font-size: 22px; margin: 0; letter-spacing: -.005em; }
-.tabs { display: flex; gap: 2px; padding: 3px; background: var(--board); border-radius: 9px; }
-.tabs button { border: 0; background: none; padding: 5px 12px; border-radius: 7px; font-size: 13px; color: var(--ink-2); cursor: not-allowed; }
-.tabs button[aria-current="page"] { background: var(--panel); color: var(--ink); font-weight: 600; cursor: default; box-shadow: 0 1px 2px rgba(34,48,58,.08); }
-.summary { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.pill { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 4px 9px; border-radius: 99px; white-space: nowrap; }
+.tabs { display: flex; gap: 4px; align-self: stretch; align-items: flex-end; }
+.tabs button { border: 0; background: none; padding: 7px 12px 9px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -11px; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-current="page"] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
+.summary { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pill { margin-left: 0; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 4px 9px; border-radius: 99px; white-space: nowrap; }
 
 /* Stage */
 .stage { position: relative; flex: 1; min-height: 0; overflow: hidden; background: var(--paper); }
@@ -141,16 +166,22 @@ canvas#g.over { cursor: pointer; }
 .insp .close:hover { background: var(--board); }
 .insp .body { overflow: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .insp .body > * { flex-shrink: 0; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.chipbtn { border: 1px solid var(--line); background: var(--panel); border-radius: 99px; padding: 5px 11px; font-size: 12.5px; cursor: pointer; color: var(--ink); }
+.chipbtn:hover { background: var(--board); }
+.chipbtn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.chipbtn.ask { border-color: var(--accent); color: var(--accent); }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; background: var(--board); border-radius: 9px; }
 .seg button { border: 0; background: none; padding: 6px 4px; border-radius: 7px; font-size: 12.5px; cursor: pointer; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .seg button[aria-checked="true"] { background: var(--panel); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(34,48,58,.08); }
 .insp h3 { margin: 0 0 6px; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
 .insp ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
-.insp li button { width: 100%; text-align: left; border: 0; background: none; padding: 6px 8px; margin-left: -8px; border-radius: 7px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; }
-.insp li button:hover { background: var(--board); }
-.insp li .dot { margin-top: 5px; }
-.insp li .why { display: block; color: var(--ink-2); font-size: 12.5px; line-height: 1.4; margin-top: 2px; }
-.insp li .type { margin-left: auto; padding-left: 8px; color: var(--ink-2); font-size: 11.5px; white-space: nowrap; }
+.ovr ul, .insp ul { list-style: none; margin: 0; padding: 0; }
+.ovr li button, .insp li button { width: 100%; text-align: left; border: 0; background: none; padding: 6px 8px; margin-left: -8px; border-radius: 7px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; }
+.ovr li button:hover, .insp li button:hover { background: var(--board); }
+.ovr li .dot, .insp li .dot { margin-top: 5px; }
+.ovr li .why, .insp li .why { display: block; color: var(--ink-2); font-size: 12.5px; line-height: 1.4; margin-top: 2px; }
+.ovr li .type, .insp li .type { margin-left: auto; padding-left: 8px; color: var(--ink-2); font-size: 11.5px; white-space: nowrap; }
 .insp .empty { color: var(--ink-2); font-size: 13px; margin: 0; }
 .insp footer { border-top: 1px solid var(--line); padding: 12px 18px; display: flex; gap: 10px; align-items: center; }
 .btn { border: 1px solid var(--line); background: var(--panel); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
@@ -181,12 +212,194 @@ canvas#g.over { cursor: pointer; }
 .legend-summary { display: none; margin: 0; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* ---- Map (2D) ---- */
+#mapView { background: var(--paper); width: 100%; height: 100%; }
+.stage.panel-open #mapView { width: calc(100% - var(--pr, 0px)); }
+.mnode, .mcard, .mtext.act { cursor: pointer; }
+.mnode .m { transition: r .35s var(--ease), transform .18s var(--ease); }
+.mnode:hover .m { transform: scale(1.14); }
+.m.area { fill: var(--status-3); }
+.m.s0 { fill: var(--paper); stroke: var(--ink-3); stroke-width: 1; }
+.m.s1 { fill: var(--status-1); }
+.m.s2 { fill: var(--status-2); }
+.m.ghost { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 2 2; }
+.cov { fill: none; stroke-width: 2.5; }
+.cov.c2 { stroke: var(--status-2); } .cov.c1 { stroke: var(--status-1); } .cov.c0 { stroke: var(--line); }
+.myfocus { fill: none; stroke: var(--accent); stroke-width: 1.1; stroke-dasharray: 2 3; }
+.selring { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+#mapView text { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.kl { font: 400 12.5px var(--ui); fill: var(--ink-2); }
+.al { font: 600 10.5px var(--ui); letter-spacing: .1em; fill: var(--ink-2); }
+.ctrl { font: 500 19px var(--read); fill: var(--ink); }
+.ctrl2 { font: 500 16px var(--read); fill: var(--ink); }
+.ctrs { font: 400 11.5px var(--ui); fill: var(--ink-2); }
+.ctrs.up { fill: var(--accent); }
+.lh { font: 600 9.5px var(--ui); letter-spacing: .08em; fill: var(--ink-2); }
+.more { font: 500 12px var(--ui); fill: var(--accent); }
+.note { font: italic 400 14px var(--read); fill: var(--ink-2); }
+.mtext.act:hover text { text-decoration: underline; }
+#mLinks path { fill: none; transition: opacity .35s var(--ease); }
+.lk { stroke: var(--ink-3); stroke-opacity: .45; stroke-width: 1; }
+.lk.faint { stroke-opacity: .25; }
+.rl { stroke: var(--status-2); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.ghostl { stroke: var(--accent); stroke-opacity: .6; stroke-dasharray: 3 4; }
+.card { fill: var(--panel); stroke: var(--line); }
+.mcard:hover .card { stroke: var(--ink-3); }
+.card.on { stroke: var(--accent); stroke-width: 1.5; }
+.thumb { fill: var(--board); }
+.tglyph { font: 600 11px var(--ui); fill: var(--ink-2); stroke: none !important; }
+.poster { fill: var(--accent-soft); }
+.pplay { fill: var(--accent); }
+.ct { font: 500 12px var(--ui); fill: var(--ink); stroke: none !important; }
+.ck { font: 600 9.5px var(--ui); letter-spacing: .05em; text-transform: uppercase; fill: var(--ink-2); stroke: none !important; }
+
+/* ---- List ---- */
+.listwrap { max-width: 740px; margin: 0 auto; padding-block: 22px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ltool { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; padding: 4px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 8px; position: sticky; top: 0; background: var(--paper); z-index: 1; }
+.lq { flex: 1 1 260px; min-width: 0; border: 0; background: transparent; font: 400 24px var(--read); color: var(--ink); padding: 4px 0; }
+.lq::placeholder { color: var(--ink-3); }
+.lcount { color: var(--ink-2); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.lbtns { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.lbtns button { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.lbtns button:hover { background: var(--board); }
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree ul { margin-left: 15px; padding-left: 16px; border-left: 1px solid var(--line); }
+.tree .line { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; min-width: 0; }
+.tree li.area > .line { padding: 11px 8px; }
+.tree .line:hover { background: var(--board); }
+.tree li.sel > .line { background: var(--accent-soft); }
+.chev { width: 18px; height: 18px; border: 0; background: none; cursor: pointer; color: var(--ink-2); transition: transform .2s var(--ease); font-size: 13px; padding: 0; flex-shrink: 0; line-height: 1; }
+.chev.open { transform: rotate(90deg); }
+.chev.sp { display: inline-block; cursor: default; }
+.nm { border: 0; background: none; padding: 0; cursor: pointer; text-align: left; font-size: 14px; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.nm:hover { color: var(--accent); }
+li.area > .line .nm { font: 500 16.5px var(--read); }
+li.ghost > .line .nm { font-style: italic; color: var(--accent); }
+.foc { color: var(--accent); }
+.subc { color: var(--ink-3); font-size: 11.5px; }
+.bdg { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--ink-2); }
+.right { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.mini { display: flex; gap: 2px; width: 72px; height: 6px; }
+.mini i, .obar i { display: block; border-radius: 2px; min-width: 0; }
+.b2 { background: var(--status-2); } .b1 { background: var(--status-1); } .b0 { background: transparent; box-shadow: inset 0 0 0 1px var(--ink-3); }
+.st { display: inline-flex; align-items: center; gap: 6px; }
+.sugg { font-size: 11px; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 99px; }
+.addsub { border: 0; background: none; color: var(--accent); font-size: 12px; cursor: pointer; opacity: 0; transition: opacity .15s; white-space: nowrap; padding: 0; }
+.line:hover .addsub, .addsub:focus-visible { opacity: 1; }
+.listwrap .empty { color: var(--ink-2); padding: 24px 8px; }
+
+/* ---- Overview ---- */
+.ovwrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; max-width: 1060px; margin: 0 auto; padding-block: 28px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ovwrap h2 { font: 500 22px var(--read); margin: 0 0 14px; }
+.ovr h3 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 22px 0 6px; font-weight: 600; }
+.ovrows { display: flex; flex-direction: column; gap: 2px; }
+.ovrow { display: grid; grid-template-columns: 170px minmax(0, 1fr) 140px; gap: 14px; align-items: center; border: 0; background: none; text-align: left; padding: 9px 8px; border-radius: 8px; cursor: pointer; }
+.ovrow:hover { background: var(--board); }
+.ovrow.sel { background: var(--accent-soft); }
+.ovrow .on { font-size: 13.5px; }
+.obar { display: flex; gap: 2px; height: 10px; }
+.oc { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
+.cap { color: var(--ink-2); font-size: 12.5px; max-width: 62ch; margin: 14px 0 0; }
+.stat { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.stat b { font: 500 26px var(--read); font-variant-numeric: tabular-nums; min-width: 1.6em; }
+.stat span { color: var(--ink-2); font-size: 13px; }
+.ovr .empty { color: var(--ink-2); font-size: 13px; margin: 0; }
+
+/* ---- Ask Loci ---- */
+.ask { top: 12px; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: clamp(360px, 32vw, 420px); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-float); display: flex; flex-direction: column; overflow: hidden; transition: transform .38s var(--ease), opacity .25s var(--ease); z-index: 3; }
+.ask.closed { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+.ask header { padding: 14px 16px 0; border-bottom: 1px solid var(--line); }
+.ask .kicker { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 2px; font-weight: 600; }
+.ask .ttl { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ask .ttl h2 { font: 500 23px var(--read); margin: 0; overflow-wrap: anywhere; }
+.ask .close { border: 0; background: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; color: var(--ink-2); font-size: 18px; flex-shrink: 0; }
+.ask .close:hover { background: var(--board); }
+.atabs { display: flex; gap: 16px; margin-top: 6px; overflow-x: auto; scrollbar-width: none; }
+.atabs button { border: 0; background: none; padding: 8px 0; font-size: 13px; color: var(--ink-2); border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+.atabs button[aria-selected="true"] { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
+.abody { flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.home .kick { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0; font-weight: 600; }
+.greet { font: 500 26px var(--read); margin: 2px 0 12px; }
+.prog { display: flex; gap: 14px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--paper); }
+.prog svg { width: 64px; height: 64px; flex-shrink: 0; }
+.trk { fill: none; stroke: var(--line); stroke-width: 6; }
+.arcp { fill: none; stroke: var(--status-2); stroke-width: 6; stroke-linecap: round; }
+.prog b { display: block; font-size: 14px; }
+.prog span { color: var(--ink-2); font-size: 12.5px; }
+.home h4 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 18px 0 6px; font-weight: 600; }
+.wait { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 9px 11px; text-align: left; cursor: pointer; font-size: 13px; margin-bottom: 6px; }
+.wait small { display: block; color: var(--ink-2); font-size: 11.5px; }
+.wait em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-soft); padding: 3px 8px; border-radius: 99px; white-space: nowrap; }
+.fchips, .ochips { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--ui); }
+.fchips button, .ochip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 99px; padding: 5px 10px; font-size: 12.5px; cursor: pointer; text-align: left; }
+.fchips button:hover, .ochip:hover { background: var(--board); }
+.abody .me { align-self: flex-end; max-width: 85%; margin: 0; background: var(--board); padding: 8px 12px; border-radius: 14px 14px 4px 14px; font-size: 13.5px; }
+.abody .it { align-self: stretch; }
+.who { margin: 0 0 4px; font-size: 11.5px; font-weight: 600; color: var(--accent); }
+.say { font: 400 15.5px/1.45 var(--read); }
+.say p { margin: 0 0 8px; }
+.thinking { color: var(--ink-2); font-size: 13px; margin: 0; display: flex; align-items: center; gap: 4px; }
+.thinking i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); animation: blink 1s infinite; }
+.thinking i:nth-child(2) { animation-delay: .15s; } .thinking i:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+.acard { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--paper); margin-top: 8px; font-family: var(--ui); }
+.acard .ck { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+.acard .tag { font-size: 10px; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 99px; letter-spacing: .04em; }
+.props { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.props label { display: flex; align-items: center; gap: 8px; font-size: 13.5px; cursor: pointer; }
+.props input { accent-color: var(--accent); }
+.gdot { width: 9px; height: 9px; border-radius: 50%; border: 1.3px dashed var(--accent); flex-shrink: 0; }
+.cacts { display: flex; gap: 8px; flex-wrap: wrap; }
+.cacts button { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.cacts .primary { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.cnote { margin: 8px 0 0; font-size: 12px; color: var(--ink-2); }
+.req { margin: 0 0 10px; font-size: 13.5px; }
+.mkbar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.mkbar i { display: block; height: 100%; width: 40%; background: var(--accent); animation: mk 1.1s infinite ease-in-out; }
+@keyframes mk { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+.parts { margin: 0 0 6px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.parts span { display: inline-block; width: 52px; color: var(--ink-2); font-size: 12px; }
+.composer { border-top: 1px solid var(--line); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.pchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.pchips button { white-space: nowrap; border: 1px solid var(--line); background: var(--paper); border-radius: 99px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: var(--ink-2); }
+.pchips button:hover { color: var(--ink); }
+.crow { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 6px 6px 6px 12px; background: var(--paper); }
+.crow:focus-within { border-color: var(--accent); }
+.crow textarea { flex: 1; border: 0; background: transparent; resize: none; font: 14px var(--ui); color: var(--ink); outline: none; max-height: 120px; padding: 5px 0; min-width: 0; }
+.send { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--ink); color: var(--panel); cursor: pointer; font-size: 15px; flex-shrink: 0; }
+
+@media (max-width: 1250px) { .pill { display: none; } }
+@media (max-width: 900px) {
+  .ovwrap { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+}
 @media (max-width: 720px) {
-  .top { gap: 8px 10px; padding-block: 8px; flex-wrap: nowrap; }
-  .top h1 { font-size: 19px; }
-  .tabs button { padding: 4px 8px; font-size: 12px; }
+  .ask { top: 0; right: 0; bottom: 0; left: 0; width: auto; border-radius: 0; border: 0; padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); z-index: 6; }
+  .ovrow { grid-template-columns: minmax(0, 1fr) 90px; }
+  .ovrow .obar { grid-column: 1 / -1; grid-row: 2; }
+  .tree .right .lr { display: none; }
+  .addsub { display: none; }
+  .lq { font-size: 20px; }
+}
+@media (max-width: 720px) {
+  /* Phones: the rail becomes a bottom tab bar; the view tabs take their own row. */
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .main { grid-row: 1; }
+  .rail { grid-row: 2; flex-direction: row; justify-content: space-around; border-right: 0; border-top: 1px solid var(--line); padding: 4px max(8px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); gap: 0; }
+  .rail .brand { display: none; }
+  .rail .capture { order: 3; width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 50%; background: var(--ink); border: 0; }
+  .rail .capture svg { stroke: var(--panel); }
+  .rail .capture span { display: none; }
+  .rail ul { display: contents; margin: 0; }
+  .rail li:nth-child(1) { order: 1; } .rail li:nth-child(2) { order: 2; } .rail li:nth-child(3) { order: 4; } .rail li:nth-child(4) { order: 5; }
+  .rail li button { width: 64px; padding: 6px 2px; }
+  .top { gap: 8px 10px; padding-block: 8px; flex-wrap: wrap; }
+  .top h1 { font-size: 21px; }
+  .titles .sub { font-size: 13.5px; }
+  .tabs { order: 5; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tabs button { padding: 6px 4px 8px; font-size: 13px; margin-bottom: -9px; }
   .summary, .pill { display: none; }
-  .theme { margin-left: auto; padding: 6px 8px; }
+  .askbtn { margin-left: auto; padding: 7px 12px; }
+  .theme { padding: 6px 8px; }
   .theme span { display: none; }
   .legend-summary { display: block; }
   .search { top: 10px; }
@@ -211,24 +424,41 @@ canvas#g.over { cursor: pointer; }
 </style>
 
 <div class="app">
+  <nav class="rail" aria-label="Studiolo">
+    <button type="button" class="brand" data-dest="Today" aria-label="Studiolo home">S</button>
+    <button type="button" class="capture" data-dest="Capture" aria-label="Capture"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg><span>Capture</span></button>
+    <ul>
+      <li><button type="button" data-dest="Today"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><span>Today</span></button></li>
+
+      <li><button type="button" data-dest="Learn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L7.9 4.7a.6.6 0 0 0-.9.5z"/></svg><span>Learn</span></button></li>
+      <li><button type="button" data-dest="Commonplace"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3.5" width="5.5" height="5.5" rx="1"/><rect x="11.5" y="3.5" width="5.5" height="5.5" rx="1"/><rect x="3" y="11" width="5.5" height="5.5" rx="1"/><path d="M11.5 12.5h5.5M11.5 15.5h4"/></svg><span>Commonplace</span></button></li>
+      <li><button type="button" aria-current="page"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" class="fill"/><circle cx="4.5" cy="6" r="1.6"/><circle cx="15.5" cy="5.5" r="1.6"/><circle cx="15" cy="15" r="1.6"/><circle cx="5" cy="14.5" r="1.6"/><path d="M6 6.8l2 1.8M14 6.6l-2 1.8M13.8 13.8l-1.8-1.8M6.3 13.6l1.9-1.7"/></svg><span>Loci</span></button></li>
+
+    </ul>
+  </nav>
+  <div class="main">
   <header class="top">
-    <h1>Graph</h1>
-    <nav class="tabs" aria-label="Graph views">
-      <button type="button" title="Opens in the app" aria-disabled="true">Map</button>
-      <button type="button" title="Opens in the app" aria-disabled="true">List</button>
-      <button type="button" title="Opens in the app" aria-disabled="true">Overview</button>
-      <button type="button" aria-current="page">Loci</button>
+    <div class="titles"><h1>Loci</h1><span class="sub">Your mind palace</span></div>
+    <nav class="tabs" id="views" aria-label="Loci views">
+      <button type="button" data-view="palace" aria-current="page">Palace</button>
+      <button type="button" data-view="map">Map</button>
+      <button type="button" data-view="list">List</button>
+      <button type="button" data-view="overview">Overview</button>
     </nav>
     <span class="summary" id="summary"></span>
-    <span class="pill" id="datasetPill">Prototype · sample graph</span>
+    <span class="pill" id="datasetPill">Prototype · sample</span>
+    <button type="button" class="askbtn" id="askBtn" aria-expanded="false" aria-controls="ask"><span aria-hidden="true">✦</span> Ask Loci</button>
     <button type="button" class="theme" id="theme" aria-label="Theme: match system">
       <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 0 0 12z" class="half"/></svg>
       <span id="themeLabel">System</span>
     </button>
   </header>
 
-  <main class="stage" id="stage">
+  <main class="stage" id="stage" data-view="palace">
     <canvas id="g" tabindex="0" role="img" aria-label="Your whole topic graph in 3D"></canvas>
+    <svg id="mapView" class="view" role="img" aria-label="Map of your topics"></svg>
+    <div id="listView" class="view scroll"></div>
+    <div id="overView" class="view scroll"></div>
     <div class="grain" id="grain"></div>
 
     <nav class="float trail" id="trail" aria-label="Where you are" hidden></nav>
@@ -252,17 +482,17 @@ canvas#g.over { cursor: pointer; }
         <span><i class="dot s0"></i>Not started</span>
         <span><i class="dot s1"></i>Learning</span>
         <span><i class="dot s2"></i>Learned</span>
-        <span><i class="dot lib"></i>Library item</span>
-        <span><i class="dot ex"></i>Explainer</span>
+        <span><i class="dot lib"></i>Commonplace</span>
+        <span><i class="dot ex"></i>Lumen</span>
       </div>
       <div class="sep"></div>
       <div class="row">
-        <label><input type="checkbox" id="optLib" checked>Library</label>
-        <label><input type="checkbox" id="optEx" checked>Explainers</label>
+        <label><input type="checkbox" id="optLib" checked>Commonplace</label>
+        <label><input type="checkbox" id="optEx" checked>Lumens</label>
         <label><input type="checkbox" id="optRotate" checked>Slow turn</label>
         <label><input type="checkbox" id="optSound">Sound</label>
       </div>
-      <p class="legend-note">Open an area to see its Library items and explainers as groups. Open a group to spread it out.</p>
+      <p class="legend-note">Open an area to see what you gathered (Commonplace) and your Lumens beside it. Open a stack to see the latest four.</p>
       <div class="row">
         <button type="button" class="linkbtn" id="optScale">Try 2,000 topics</button>
         <span class="fps" id="fps"></span>
@@ -299,8 +529,22 @@ canvas#g.over { cursor: pointer; }
       <footer><button type="button" class="linkbtn" id="gAll"></button><small id="gNote"></small></footer>
     </section>
 
+    <aside class="float ask closed" id="ask" aria-label="Ask Loci" aria-hidden="true">
+      <header>
+        <p class="kicker" id="askKicker">Loci · your whole palace</p>
+        <div class="ttl"><h2 id="askTitle">Ask Loci</h2><button type="button" class="close" id="askClose" aria-label="Close Ask Loci">×</button></div>
+        <nav class="atabs" id="askTabs" aria-label="What to ask about"></nav>
+      </header>
+      <div class="abody" id="askBody" aria-live="polite"></div>
+      <form class="composer" id="askForm">
+        <div class="pchips" id="askChips"></div>
+        <div class="crow"><textarea id="askInput" rows="1" placeholder="Ask Loci about anything you know…" aria-label="Ask Loci"></textarea><button type="submit" class="send" aria-label="Send">↑</button></div>
+      </form>
+    </aside>
+
     <p class="sr" id="live" aria-live="polite"></p>
   </main>
+  </div>
 </div>
 
 <script>
@@ -428,6 +672,7 @@ function buildSample() {
     });
   });
   RELS.forEach(([a, b, why]) => addLink(g, byName[a], byName[b], 'rl', why));
+  ['Daylight & shading', 'Facade systems', 'Typologies'].forEach(nm => (byName[nm].focus = true)); // sample My Focus
   const need = (map, name) => { if (!map[name]) throw new Error('Unknown name in sample data: ' + name); return map[name]; };
   const itemByName = {};
   ITEMS.forEach(([name, type, tags]) => {
@@ -465,7 +710,7 @@ function buildSample() {
       if (!members.length) continue;
       const k = members.length;
       members.sort((a, b) => b.rec - a.rec);
-      const gr = addNode(g, { name: kind === 'lib' ? `${k} Library item${k === 1 ? '' : 's'}` : `${k} in Learn`, kind: 'group', groupType: kind, level: 4, status: 0, area: i, parent: null, members, areaNode: area, fixed: true });
+      const gr = addNode(g, { name: kind === 'lib' ? `${k} in Commonplace` : `${k} in Learn`, kind: 'group', groupType: kind, level: 4, status: 0, area: i, parent: null, members, areaNode: area, fixed: true });
       gr.r = 6.5 + Math.sqrt(k) * 2;
       gr.latest = members.slice(0, 4);
       addLink(g, area, gr, 'grp');
@@ -576,7 +821,7 @@ function hex(h) { h = h.trim().replace('#', ''); if (h.length === 3) h = [...h].
 function mix(a, b, t) { return `rgb(${(a[0] + (b[0] - a[0]) * t) | 0},${(a[1] + (b[1] - a[1]) * t) | 0},${(a[2] + (b[2] - a[2]) * t) | 0})`; }
 function readTheme() {
   const cs = getComputedStyle(document.documentElement);
-  ['paper', 'panel', 'line', 'ink', 'ink-2', 'ink-3', 'status-1', 'status-2', 'status-3', 'accent'].forEach(k => C[k] = hex(cs.getPropertyValue('--' + k) || '#888'));
+  ['paper', 'panel', 'line', 'ink', 'ink-2', 'ink-3', 'status-1', 'status-2', 'status-3', 'accent', 'accent-soft'].forEach(k => C[k] = hex(cs.getPropertyValue('--' + k) || '#888'));
   C.dark = (C.paper[0] + C.paper[1] + C.paper[2]) < 300;
   makeGrain();
 }
@@ -625,7 +870,8 @@ const Sound = (() => {
     ex: v => { tone(F.D5, 0, .45, .03 * v, 'sine'); tone(F.A5, .025, .4, .02 * v, 'sine'); },
     bloom: v => { tone(F.D4, 0, .1, .04 * v); tone(F.G4, .03, .1, .04 * v); tone(F.B4, .06, .14, .04 * v); },
     learned: v => { tone(F.G4, 0, .12, .05 * v, 'sine'); tone(F.D5, .09, .22, .05 * v, 'sine'); },
-    hover: v => tick(3000, 3, .012, .02 * v)
+    hover: v => tick(3000, 3, .012, .02 * v),
+    tab: v => tick(1800, 1.1, .03, .05 * v)
   };
   return {
     get on() { return on; },
@@ -659,9 +905,10 @@ new ResizeObserver(resize).observe(stage);
 
 function narrow() { return W <= 720; }
 function viewCentre() {
-  if (!focus) return [W / 2, H / 2];
+  if (!focus) return askOpen && !narrow() ? [(W - askWidth()) / 2, H / 2] : [W / 2, H / 2];
   // Phones: keep the focus above whichever sheet is open (the group card or the details panel).
   if (narrow()) { const sheet = focus.kind === 'group' ? gcard : insp; return [W / 2, (H - Math.min(H * .52, sheet.offsetHeight || H * .45)) / 2 + 10]; }
+  if (askOpen) return [(W - askWidth()) / 2, H / 2];
   if (focus.kind === 'group') return [W / 2, H / 2];
   return [(W - 354) / 2, H / 2];
 }
@@ -710,7 +957,7 @@ function neighboursOf(n) {
   if (n.kind === 'area' && n.groups) n.groups.forEach(gr => s.add(gr));
   return s;
 }
-const KIND_LABEL = n => (n.kind === 'note' ? (n.shape === 'quote' ? 'Quote' : 'Note') : n.kind === 'lib' ? 'Library item' : n.kind === 'ex' ? 'Explainer' : n.kind === 'group' ? 'Group' : null);
+const KIND_LABEL = n => (n.kind === 'note' ? (n.shape === 'quote' ? 'Quote' : 'Note') : n.kind === 'lib' ? 'Commonplace' : n.kind === 'ex' ? (n.isCourse ? 'Course' : 'Lumen') : n.kind === 'group' ? 'Group' : null);
 /* Frame the focus with everything it connects to, leaning toward the focus itself. */
 function focusFrame(n) {
   const pts = [n, ...neigh];
@@ -780,6 +1027,7 @@ function setFocus(n, opts = {}) {
   focusDist = to.dist;
   // Topic to topic arcs out and back in; entering or leaving a topic is a straight dolly.
   flyTo(to, { hop: n && prev ? undefined : 0 });
+  syncPanels(); refreshViews();
   lastInteract = performance.now();
 }
 /* What is on stage beyond topics: the open area's two groups; an opened group's members (flying out of it);
@@ -807,14 +1055,14 @@ function openCard(gr) {
   const isLib = gr.groupType === 'lib';
   const k = gr.members.length;
   document.getElementById('gEyebrow').textContent = gr.areaNode.name;
-  document.getElementById('gTitle').textContent = isLib ? 'Library' : 'Explainers and courses';
+  document.getElementById('gTitle').textContent = isLib ? 'Commonplace' : 'Lumens and courses';
   document.getElementById('gList').innerHTML = gr.latest.map(m => {
-    const meta = m.kind === 'lib' ? `${cap(m.libType)} · on ${plural(m.tagged.length, 'topic')}` : m.isCourse ? `Course · ${m.parts} parts` : `Explainer · ${m.mins} min`;
+    const meta = m.kind === 'lib' ? `${cap(m.libType)} · on ${plural(m.tagged.length, 'topic')}` : m.isCourse ? `Course · ${m.parts} parts` : `Lumen · ${m.mins} min`;
     return `<li><button type="button" data-go="${m.id}"><i class="dot ${m.kind === 'lib' ? 'lib' : 'ex'}${m.isCourse ? ' course' : ''}"></i><span><b>${esc(m.name)}</b><small>${esc(meta)}</small></span></button></li>`;
   }).join('');
   const all = document.getElementById('gAll');
-  all.textContent = isLib ? `See all ${k} in Library →` : `See all ${k} in Learn →`;
-  all.dataset.msg = isLib ? `In the app this opens Library filtered to ${gr.areaNode.name}.` : `In the app this opens Learn filtered to ${gr.areaNode.name}, explainers and courses.`;
+  all.textContent = isLib ? `See all ${k} in Commonplace →` : `See all ${k} in Learn →`;
+  all.dataset.msg = isLib ? `In the app this opens your Commonplace filtered to ${gr.areaNode.name}.` : `In the app this opens Learn filtered to ${gr.areaNode.name}, Lumens and courses.`;
   document.getElementById('gNote').textContent = k > 4 ? `Latest 4 of ${k}` : `${plural(k, isLib ? 'item' : 'entry')}`;
   gcard.hidden = false;
   requestAnimationFrame(() => gcard.classList.add('open'));
@@ -889,10 +1137,10 @@ const plural = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
 const cap = w => w[0].toUpperCase() + w.slice(1);
 const ACTIONS = {
   topic: ['Open in Map', 'In the app this opens the radial Map on this topic.'],
-  lib: ['Open in Library', 'In the app this opens the item in Library.'],
+  lib: ['Open in Commonplace', 'In the app this opens it in your Commonplace.'],
   group: ['Fold back', 'Folds the group back beside its area.'],
-  note: ['Open in Library', 'In the app this opens it in Library, on its item.'],
-  ex: ['Play explainer', 'In the app this opens the player.'],
+  note: ['Open in Commonplace', 'In the app this opens it in your Commonplace, on what it belongs to.'],
+  ex: ['Play Lumen', 'In the app this opens the player.'],
   course: ['Open course', 'In the app this opens the course.']
 };
 const libsHereCount = n => (n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)).length : n.libs.length);
@@ -900,7 +1148,8 @@ function renderInspector(n) {
   const iBody = document.getElementById('iBody');
   const set = (id, t) => (document.getElementById(id).textContent = t);
   set('iName', n.name);
-  const [act, note] = ACTIONS[n.isCourse ? 'course' : n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' || n.kind === 'note' ? n.kind : 'topic'];
+  const isTopic = n.kind === 'area' || n.kind === 'topic';
+  const [act, note] = isTopic ? (view === 'map' ? ['Open in Palace', 'See it among everything you know, in 3D.'] : ['Open in Map', 'Build and edit this branch in the 2D Map.']) : ACTIONS[n.isCourse ? 'course' : n.kind];
   set('iMap', act); set('iNote', note);
   if (n.kind === 'note') {
     const isQuote = n.shape === 'quote';
@@ -919,21 +1168,21 @@ function renderInspector(n) {
     const areasN = new Set([...topics].map(t => t.area)).size;
     set('iEyebrow', n.areaNode.name);
     set('iMeta', `Linked to ${plural(topics.size, 'topic')} in ${plural(areasN, 'area')}`);
-    iBody.innerHTML = `<section><h3>${isLib ? 'Library items' : 'Explainers'} (${n.members.length})</h3><ul>${n.members.map(m => item(m, `<span class="why">${isLib ? `On ${plural(m.tagged.length, 'topic')}${m.areas.size > 1 ? ` in ${plural(m.areas.size, 'area')}` : ''}` : `Made from ${esc(m.anchorNode.name)}`}</span>`)).join('')}</ul></section>`;
+    iBody.innerHTML = `<section><h3>${isLib ? 'In Commonplace' : 'Lumens'} (${n.members.length})</h3><ul>${n.members.map(m => item(m, `<span class="why">${isLib ? `On ${plural(m.tagged.length, 'topic')}${m.areas.size > 1 ? ` in ${plural(m.areas.size, 'area')}` : ''}` : `Made from ${esc(m.anchorNode.name)}`}</span>`)).join('')}</ul></section>`;
   } else if (n.kind === 'lib') {
     const areas = new Set(n.tagged.map(t => t.area)).size;
     const uses = [...new Set([...n.exps, ...n.usedBy])];
-    set('iEyebrow', 'Library · ' + n.libType);
+    set('iEyebrow', 'Commonplace · ' + n.libType);
     set('iMeta', `Tagged on ${plural(n.tagged.length, 'topic')} in ${plural(areas, 'area')}`);
     iBody.innerHTML = `
-      <div class="preview"><span class="glyph" aria-hidden="true">${esc(n.libType[0].toUpperCase())}</span><div><strong>${esc(n.name)}</strong><small>${esc(cap(n.libType))} in your Library</small></div></div>
+      <div class="preview"><span class="glyph" aria-hidden="true">${esc(n.libType[0].toUpperCase())}</span><div><strong>${esc(n.name)}</strong><small>${esc(cap(n.libType))} in your Commonplace</small></div></div>
       ${n.notes ? `<section><h3>Notes and quotes (${n.notes.length})</h3><ul>${n.notes.map(x => item(x)).join('')}</ul></section>` : ''}
       <section><h3>Tagged on (${n.tagged.length})</h3><ul>${n.tagged.map(t => item(t, where(t))).join('')}</ul></section>
-      <section><h3>Explainers that use it (${uses.length})</h3>${uses.length ? `<ul>${uses.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this item' : 'Draws on this item'}</span>`)).join('')}</ul>` : '<p class="empty">No explainer draws on this yet.</p>'}</section>`;
+      <section><h3>Lumens that use it (${uses.length})</h3>${uses.length ? `<ul>${uses.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this item' : 'Draws on this item'}</span>`)).join('')}</ul>` : '<p class="empty">No Lumen draws on this yet.</p>'}</section>`;
   } else if (n.kind === 'ex') {
     const touches = [...new Set(n.sources.flatMap(src => src.tagged).concat(n.anchorKind === 'topic' ? [n.anchorNode] : []))];
-    set('iEyebrow', n.isCourse ? `Course · ${n.parts} parts · ${n.mins} min` : `Explainer · ${n.mins} min`);
-    set('iMeta', `Made from ${n.anchorKind === 'topic' ? 'a topic' : 'a Library item'} · draws on ${plural(n.sources.length, 'item')}`);
+    set('iEyebrow', n.isCourse ? `Course · ${n.parts} parts · ${n.mins} min` : `Lumen · ${n.mins} min`);
+    set('iMeta', `Made from ${n.anchorKind === 'topic' ? 'a topic' : 'something in your Commonplace'} · draws on ${plural(n.sources.length, 'item')}`);
     iBody.innerHTML = `
       <div class="poster" id="poster">
         <div class="poster-title">${esc(n.name)}</div>
@@ -941,7 +1190,7 @@ function renderInspector(n) {
         <div class="bar"><i></i></div>
         <small id="posterNote">Narrated slides · ${n.mins} min · cites ${plural(n.sources.length, 'source')}</small>
       </div>
-      <section><h3>Made from</h3><ul>${item(n.anchorNode, n.anchorNode.kind === 'lib' ? '<span class="why">Library item</span>' : where(n.anchorNode))}</ul></section>
+      <section><h3>Made from</h3><ul>${item(n.anchorNode, n.anchorNode.kind === 'lib' ? '<span class="why">In your Commonplace</span>' : where(n.anchorNode))}</ul></section>
       <section><h3>Draws on (${n.sources.length})</h3><ul>${n.sources.map(x => item(x)).join('')}</ul></section>
       <section><h3>Ties together (${touches.length})</h3><ul>${touches.map(t => item(t, where(t))).join('')}</ul></section>`;
   } else {
@@ -954,14 +1203,20 @@ function renderInspector(n) {
     set('iMeta', desc.join(' · '));
     const kids = n.children.slice(0, 24);
     const more = n.children.length - kids.length;
-    // Explainers made here, plus any that draw on this topic's Library items.
+    // Lumens made here, plus any that draw on what is tagged on this topic.
     const libsHere = n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)) : n.libs;
     const exps = n.kind === 'area' ? G.nodes.filter(x => x.kind === 'ex' && x.areas.has(n.area)) : [...new Set([...n.exps, ...n.libs.flatMap(l => [...l.exps, ...l.usedBy])])];
     iBody.innerHTML = `
       <div class="seg" role="radiogroup" aria-label="Status">${STATUS.map((s, i) => `<button type="button" role="radio" aria-checked="${n.status === i}" data-status="${i}"><i class="dot s${i}"></i>${s}</button>`).join('')}</div>
+      <div class="acts">
+        <button type="button" class="chipbtn${n.focus ? ' on' : ''}" data-act="focus" aria-pressed="${!!n.focus}">${n.focus ? '◉ In My Focus' : '○ Add to My Focus'}</button>
+        <button type="button" class="chipbtn" data-act="explain">Explain…</button>
+        <button type="button" class="chipbtn" data-act="plan">Plan a course</button>
+        <button type="button" class="chipbtn ask" data-act="ask">✦ Ask Loci</button>
+      </div>
       ${kids.length ? `<section><h3>Sub-topics (${n.children.length})</h3><ul>${kids.map(c => item(c)).join('')}</ul>${more > 0 ? `<p class="empty">+ ${more} more in List</p>` : ''}</section>` : ''}
-      ${libsHere.length ? `<section><h3>In your Library (${libsHere.length})</h3><ul>${libsHere.map(l => item(l, l.tagged.length > 1 ? `<span class="why">Also on ${plural(l.tagged.length - 1, 'other topic')}</span>` : '')).join('')}</ul></section>` : ''}
-      ${exps.length ? `<section><h3>Explainers (${exps.length})</h3><ul>${exps.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this topic' : n.kind === 'area' ? 'In this area' : 'Uses items tagged here'}</span>`)).join('')}</ul></section>` : ''}
+      ${libsHere.length ? `<section><h3>In your Commonplace (${libsHere.length})</h3><ul>${libsHere.map(l => item(l, l.tagged.length > 1 ? `<span class="why">Also on ${plural(l.tagged.length - 1, 'other topic')}</span>` : '')).join('')}</ul></section>` : ''}
+      ${exps.length ? `<section><h3>Lumens (${exps.length})</h3><ul>${exps.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this topic' : n.kind === 'area' ? 'In this area' : 'Uses items tagged here'}</span>`)).join('')}</ul></section>` : ''}
       <section><h3>Related (${n.rels.length})</h3>${n.rels.length ? `<ul>${n.rels.slice(0, 6).map(r => item(r.other, `<span class="why">${esc(r.why)}</span>`)).join('')}</ul>` : '<p class="empty">Not connected to other branches yet.</p>'}</section>`;
   }
   iBody.scrollTop = 0;
@@ -970,11 +1225,21 @@ document.getElementById('iBody').addEventListener('click', e => {
   const go = e.target.closest('[data-go]');
   if (go) { setFocus(G.byId.get(go.dataset.go)); return; }
   if (e.target.closest('#play')) { playPreview(); return; }
+  const act = e.target.closest('[data-act]');
+  if (act && focus) {
+    const a = act.dataset.act;
+    if (a === 'focus') { focus.focus = !focus.focus; Sound.play(focus.focus ? 'bloom' : 'note', .7); renderInspector(focus); refreshViews(); }
+    else if (a === 'ask') openAsk({ scope: focus });
+    else if (a === 'explain') openAsk({ scope: focus, say: `Explain ${focus.name}` });
+    else if (a === 'plan') openAsk({ scope: focus, say: `Plan a course on ${focus.name}` });
+    return;
+  }
   const st = e.target.closest('[data-status]');
-  if (st && focus) { const was = focus.status; focus.status = +st.dataset.status; if (focus.status === 2 && was !== 2) Sound.play('learned'); else Sound.play('note', .7); renderInspector(focus); updateSummary(); }
+  if (st && focus) { const was = focus.status; focus.status = +st.dataset.status; if (focus.status === 2 && was !== 2) Sound.play('learned'); else Sound.play('note', .7); renderInspector(focus); updateSummary(); refreshViews(); }
 });
 document.getElementById('iClose').addEventListener('click', () => setFocus(null));
 document.getElementById('iMap').addEventListener('click', () => {
+  if (focus && (focus.kind === 'area' || focus.kind === 'topic')) return setView(view === 'map' ? 'palace' : 'map');
   if (focus && focus.kind === 'ex') return playPreview();
   if (focus && focus.kind === 'group') return setFocus(focus.areaNode);
   const t = document.getElementById('iNote').textContent;
@@ -1001,7 +1266,7 @@ function updateSummary() {
   const exs = G.nodes.filter(n => n.kind === 'ex' && !n.isCourse).length;
   const courses = G.nodes.filter(n => n.isCourse).length;
   const rel = G.links.filter(l => l.type === 'rl').length;
-  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned` + (libs ? ` · ${libs} Library items · ${exs} explainers · ${courses} courses` : ` · ${rel.toLocaleString()} related links`);
+  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned` + (libs ? ` · ${libs} in Commonplace · ${exs} Lumens · ${courses} courses` : ` · ${rel.toLocaleString()} related links`);
   document.getElementById('summary').textContent = t;
   document.getElementById('summary2').textContent = t;
   canvas.setAttribute('aria-label', `Your whole topic graph in 3D: ${t}. Use the search box or the List view to move by keyboard.`);
@@ -1051,7 +1316,7 @@ function drawFrame(now, dt) {
     project(n, P[i]);
     // Library items and explainers live at area level: they grow in when an area (or anything in it) is open.
     const side = n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' || n.kind === 'note';
-    n.sv += ((side ? (scope.has(n) ? 1 : 0) : 1) - n.sv) * kSv;
+    n.sv += ((n.gone ? 0 : side ? (scope.has(n) ? 1 : 0) : 1) - n.sv) * kSv;
     n.rv = Math.min(reveal(n, now), n.sv);
     if (n.rv < .01) P[i].vis = false;
     // Emphasis eases between 1 (full colour) and 0 (greyed out). Hover greys the rest only lightly.
@@ -1206,7 +1471,11 @@ function drawFrame(now, dt) {
       ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(1, r * .35); ctx.strokeStyle = ctx.fillStyle; ctx.fill(); ctx.stroke();
       if (n.isCourse) { ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x + r * .1, p.y, r * 1.75, 0, 6.283); ctx.stroke(); }
     } else {
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
+      if (n.ghost) {
+        // A suggestion from Loci: a dashed, hollow topic until you keep it.
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fillStyle = rgb(lerpA(C['accent-soft'] || C.paper, bg, depthFade)); ctx.fill();
+        ctx.setLineDash([2, 2]); ctx.strokeStyle = rgb(lerpA(C.accent, bg, depthFade + .2), n.rv); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+      } else { ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill(); }
       // Hollow Not-started marks fill in grey when greyed out, so they read like the rest of the background.
       if (n.status === 0 && n.kind !== 'area') {
         const edge = n.status === 0 ? C['ink-3'] : C['status-3'];
@@ -1216,16 +1485,20 @@ function drawFrame(now, dt) {
         ctx.stroke();
       }
     }
-    if (n.kind === 'area' && r > 4 && n.share !== undefined) {
-      // Progress ring: a faint track and an arc for the share learned, starting at twelve o'clock.
-      const rr = r + 3.5, a0 = -Math.PI / 2;
-      ctx.lineWidth = 1.8; ctx.lineCap = 'round';
-      ctx.strokeStyle = rgb(lerpA(C.line, bg, .2 + (1 - n.em) * .6), n.rv);
-      ctx.beginPath(); ctx.arc(p.x, p.y, rr, 0, 6.283); ctx.stroke();
-      if (n.share > 0) {
-        ctx.strokeStyle = rgb(lerpA(C['status-2'], bg, depthFade + (1 - n.em) * .6), n.rv);
-        ctx.beginPath(); ctx.arc(p.x, p.y, rr, a0, a0 + n.share * Math.PI * 2); ctx.stroke();
-      }
+    if (n.kind === 'area' && r > 4) {
+      // Coverage ring, as on the Map: one arc per sub-topic, in its status colour, starting at twelve o'clock.
+      const st = coverage(n), rr = r + 4, gap = .07, step = Math.PI * 2 / Math.max(1, st.length);
+      ctx.lineWidth = 2.2; ctx.lineCap = 'butt';
+      st.forEach((v, k) => {
+        const col = v === 2 ? C['status-2'] : v === 1 ? C['status-1'] : C.line;
+        ctx.strokeStyle = rgb(lerpA(col, bg, depthFade * .6 + (1 - n.em) * .6), n.rv);
+        ctx.beginPath(); ctx.arc(p.x, p.y, rr, -Math.PI / 2 + k * step + gap / 2, -Math.PI / 2 + (k + 1) * step - gap / 2); ctx.stroke();
+      });
+      ctx.lineCap = 'round';
+    }
+    if (n.focus && n.rv > .5) {
+      ctx.setLineDash([2, 3]); ctx.lineWidth = 1.1; ctx.strokeStyle = rgb(lerpA(C.accent, bg, depthFade + (1 - n.em) * .6), n.rv);
+      ctx.beginPath(); ctx.arc(p.x, p.y, r + (n.kind === 'area' ? 8 : 4), 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
     }
     if (isF) {
       ctx.strokeStyle = rgb(C.accent, ringT); ctx.lineWidth = 1.6;
@@ -1281,13 +1554,13 @@ function drawLabels(order, focusing, bg, dt) {
     const n = p.n, isArea = n.kind === 'area';
     const near = Math.max(.88, Math.min(1.14, 1.16 - p.depth * .4));
     let size, font, text, ls = '0px';
-    if (pri === 5) { size = 17 * LS; font = `500 ${size}px ${READ_FONT}`; text = n.name; }
+    if (pri === 5) { size = 17 * LS; font = `500 ${size}px ${READ_FONT}`; text = n.name + (n.focus ? ' ◉' : ''); }
     else if (isArea) {
       // Near areas read clearly; areas at the back shrink and soften.
       size = Math.max(small ? 8 : 8.5, (11.8 - p.depth * 2.8) * LS);
       font = `${pri >= 4 || p.depth < .3 ? 600 : 500} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name.toUpperCase(); ls = '0.1em';
     }
-    else { size = Math.max(small ? 10 : 11, (pri >= 3 ? 12.5 : 12) * near * LS); font = `${pri === 4 ? 500 : 400} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name; }
+    else { size = Math.max(small ? 10 : 11, (pri >= 3 ? 12.5 : 12) * near * LS); font = `${pri === 4 ? 500 : 400} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name + (n.focus ? ' ◉' : '') + (n.ghost ? ' (suggested)' : ''); }
     const maxLen = small ? 24 : 34;
     if (text.length > maxLen && pri < 4) text = text.slice(0, maxLen - 2).trimEnd() + '…';
     ctx.font = font; if (hasLS) ctx.letterSpacing = ls;
@@ -1403,8 +1676,8 @@ function loop(now) {
   }
   if (!flight || flight.yaw === undefined) cam.yaw += (goal.yaw - cam.yaw) * kTurn;
   if (!flight || flight.pitch === undefined) cam.pitch += (goal.pitch - cam.pitch) * kTurn;
-  drawFrame(now, dt);
-  placeCard();
+  if (view === 'palace') { drawFrame(now, dt); placeCard(); }
+  else if (view === 'map') mapTick(now);
   frames++;
   if (now - fpsT > 1000) { if (G.nodes.length > 500) document.getElementById('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now; }
   requestAnimationFrame(loop);
@@ -1541,7 +1814,7 @@ function renderResults() {
 q.addEventListener('input', () => {
   const s = q.value.trim().toLowerCase(); sel = 0;
   if (!s) { hits = []; return renderResults(); }
-  const pool = G.nodes.filter(n => n.kind !== 'group' && n.kind !== 'note' && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
+  const pool = G.nodes.filter(n => n.kind !== 'group' && n.kind !== 'note' && !n.gone && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex'));
   hits = pool.filter(n => n.name.toLowerCase().startsWith(s)).concat(pool.filter(n => !n.name.toLowerCase().startsWith(s) && n.name.toLowerCase().includes(s))).slice(0, 8);
   renderResults();
 });
@@ -1554,6 +1827,568 @@ q.addEventListener('keydown', e => {
 results.addEventListener('mousedown', e => { const li = e.target.closest('[data-go]'); if (li) { e.preventDefault(); choose(G.byId.get(li.dataset.go)); } });
 q.addEventListener('blur', () => setTimeout(() => { hits = []; renderResults(); }, 120));
 function choose(n) { q.value = ''; hits = []; renderResults(); q.blur(); setFocus(n); interacted(); }
+
+/* ---------- Views: Palace, Map, List and Overview share one selection, one panel and one trail ---------- */
+let view = 'palace';
+const viewsEl = document.getElementById('views');
+const trunc = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
+const live = n => !n.gone;
+const kidsOf = n => n.children.filter(live);
+function setView(v) {
+  if (v === view) return;
+  view = v; stage.dataset.view = v;
+  viewsEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
+  if (v === 'palace') { resize(); const c = viewCentre(); goal.cx = cam.cx = c[0]; goal.cy = cam.cy = c[1]; }
+  if (v === 'map') { mapEls.forEach(e => e.g.remove()); mapEls.clear(); mapLinks.forEach(l => l.remove()); mapLinks.clear(); }
+  refreshViews();
+  if (focus && focus.kind !== 'group') renderInspector(focus); // the panel's main action depends on the view
+  Sound.play('tab');
+}
+// The stage never scrolls; panels slide over it. (Focusing a control inside a sliding panel would otherwise nudge it.)
+stage.addEventListener('scroll', () => { stage.scrollLeft = 0; stage.scrollTop = 0; });
+viewsEl.addEventListener('click', e => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
+document.querySelector('.rail').addEventListener('click', e => {
+  const b = e.target.closest('[data-dest]'); if (!b) return;
+  const d = b.dataset.dest;
+  flash(d === 'Capture' ? 'In the app, Capture saves something to your Commonplace.' : `In the app this opens ${d}.`);
+});
+function refreshViews() {
+  if (!G) return;
+  // The Map centres on topics and areas; opening something from the Commonplace or Learn keeps the Map where it is.
+  if (!focus) mapCentre = null;
+  else if (focus.kind === 'area' || focus.kind === 'topic') mapCentre = focus;
+  else if (focus.kind === 'group') mapCentre = focus.areaNode;
+  else if (!mapCentre) mapCentre = focus.kind === 'note' ? focus.about.tagged[0] : focus.kind === 'lib' ? focus.tagged[0] : focus.anchorNode.kind === 'lib' ? focus.anchorNode.tagged[0] : focus.anchorNode;
+  if (view === 'map') renderMap();
+  else if (view === 'list') renderList();
+  else if (view === 'overview') renderOverview();
+}
+/* One right panel at a time: Ask Loci when it is open, otherwise the details of what is open. */
+function syncPanels() {
+  const showInsp = !!focus && focus.kind !== 'group' && !askOpen;
+  insp.classList.toggle('closed', !showInsp); insp.setAttribute('aria-hidden', String(!showInsp));
+  const w = narrow() ? 0 : askOpen ? askWidth() + 12 : showInsp ? 354 : 0;
+  stage.classList.toggle('panel-open', w > 0); stage.style.setProperty('--pr', w + 'px');
+  const c = viewCentre(); goal.cx = c[0]; goal.cy = c[1];
+}
+/* Coverage: one arc per direct sub-topic, coloured by its status, as on the app's Map. Shared by Map and Palace. */
+function coverage(n) { return kidsOf(n).filter(k => !k.ghost).map(k => k.status); }
+
+/* ---------- Map: the radial 2D map (geometry from src/features/topics/layout.ts), in Loci's marks ---------- */
+const svgNS = 'http://www.w3.org/2000/svg';
+const mapSvg = document.getElementById('mapView');
+mapSvg.setAttribute('viewBox', '0 0 820 560'); mapSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+mapSvg.innerHTML = '<g id="mLinks"></g><g id="mNodes"></g>';
+const mLinksG = mapSvg.querySelector('#mLinks'), mNodesG = mapSvg.querySelector('#mNodes');
+let mapCentre = null, mapAt = 0;
+const mapEls = new Map(), mapLinks = new Map();
+const D2R = Math.PI / 180;
+function arc(cx, cy, r, a0, a1) {
+  const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+function ringSVG(n, r) {
+  const st = coverage(n); if (!st.length) return '';
+  const R = r + 4.5, gap = .05, step = Math.PI * 2 / st.length;
+  return st.map((s, i) => `<path class="cov c${s}" d="${arc(0, 0, R, -Math.PI / 2 + i * step + gap / 2, -Math.PI / 2 + (i + 1) * step - gap / 2)}"/>`).join('');
+}
+function markSVG(it) {
+  const n = it.node, r = it.r;
+  if (it.kind === 'card') return '';
+  let cls = 'nd ';
+  if (n.kind === 'area') cls += 'area';
+  else if (n.ghost) cls += 'ghost';
+  else cls += 's' + n.status;
+  let extra = '';
+  if (n.kind === 'area') extra += ringSVG(n, r);
+  if (n.focus) extra += `<circle class="myfocus" r="${r + 4}"/>`;
+  if (focus === n) extra += `<circle class="selring" r="${r + (n.kind === 'area' && coverage(n).length ? 9 : 5)}"/>`;
+  return { cls, extra };
+}
+function labelSVG(it) {
+  if (!it.label) return '';
+  const { dx = 0, dy = 0, anchor = 'middle', cls = 'kl' } = it.lp || {};
+  return `<text class="${cls}" x="${dx}" y="${dy}" text-anchor="${anchor}">${esc(it.label)}${it.node && it.node.focus && it.kind !== 'centre' ? ' ◉' : ''}</text>`;
+}
+function cardSVG(it) {
+  const n = it.node, isLib = n.kind === 'lib';
+  const kind = isLib ? n.libType : n.isCourse ? `Course · ${n.parts} parts` : `Lumen · ${n.mins} min`;
+  const thumb = isLib
+    ? `<rect class="thumb" x="4" y="4" width="22" height="22" rx="3"/><text class="tglyph" x="15" y="19" text-anchor="middle">${esc(n.libType[0].toUpperCase())}</text>`
+    : `<rect class="poster" x="4" y="4" width="39" height="22" rx="3"/><path class="pplay" d="M20 10.5v9l7-4.5z"/>`;
+  const tx = isLib ? 33 : 50, w = 170;
+  return `<rect class="card${focus === n ? ' on' : ''}" width="${w}" height="30" rx="4"/>${thumb}<text class="ct" x="${tx}" y="13">${esc(trunc(n.name, isLib ? 22 : 19))}</text><text class="ck" x="${tx}" y="24">${esc(kind)}</text>`;
+}
+function frameFor(c) {
+  const items = [], links = [];
+  const CX = 410, CY = 290;
+  if (!c) {
+    const areas = G.areaNodes || G.nodes.filter(n => n.kind === 'area');
+    const N = areas.length, R0 = Math.min(225, Math.max(200, 165 + 2.5 * N));
+    areas.forEach((a, i) => {
+      const ang = (-90 + i * 360 / N) * D2R, x = CX + R0 * Math.cos(ang), y = CY + R0 * Math.sin(ang);
+      const kids = kidsOf(a);
+      items.push({ key: 'n' + a.id, kind: 'node', node: a, x, y, r: 10 });
+      const k = kids.length, spread = Math.min(200, k * 26) * D2R;
+      kids.forEach((t, j) => {
+        const aa = ang + (k === 1 ? 0 : -spread / 2 + spread * j / (k - 1));
+        items.push({ key: 'n' + t.id, kind: 'node', node: t, x: x + 34 * Math.cos(aa), y: y + 34 * Math.sin(aa), r: 4.2 });
+        links.push({ a: 'n' + a.id, b: 'n' + t.id, cls: 'lk' });
+      });
+      const d = R0 + (k ? 34 + 16 : 22), lx = CX + d * Math.cos(ang), ly = CY + d * Math.sin(ang), cos = Math.cos(ang), sin = Math.sin(ang);
+      const anchor = cos > .2 ? 'start' : cos < -.2 ? 'end' : 'middle';
+      const tier = N > 12 && i % 2 && anchor === 'middle' ? 14 : 0;
+      items.push({ key: 'la' + a.id, kind: 'text', x: lx, y: ly + (anchor === 'middle' ? (sin < 0 ? -2 - tier : 11 + tier) : 4), label: trunc(a.name.toUpperCase(), 26), lp: { anchor, cls: 'al' }, go: a });
+    });
+    const topics = G.nodes.filter(n => n.kind === 'topic' && live(n) && !n.ghost);
+    items.push({ key: 'c1', kind: 'text', x: CX, y: CY - 6, label: `${N} areas, ${topics.length} topics`, lp: { cls: 'ctrl2' } });
+    items.push({ key: 'c2', kind: 'text', x: CX, y: CY + 16, label: `${topics.filter(t => t.status === 2).length} marked Learned`, lp: { cls: 'ctrs' } });
+    return { items, links };
+  }
+  const cx = c.kind === 'area' ? 410 : 380, cy = 290;
+  items.push({ key: 'n' + c.id, kind: 'centre', node: c, x: cx, y: cy, r: 14 });
+  items.push({ key: 'cl', kind: 'text', x: cx, y: cy + 40, label: trunc(c.name, 30), lp: { cls: 'ctrl' } });
+  items.push({ key: 'cs', kind: 'text', x: cx, y: cy + 58, label: c.parent ? `↑ ${trunc(c.parent.name, 28)}` : 'Area', lp: { cls: 'ctrs' + (c.parent ? ' up' : '') }, go: c.parent || null });
+  const kids = kidsOf(c), shown = kids.slice(0, 24), n = shown.length;
+  const longest = Math.max(0, ...shown.map(k => k.name.length));
+  const R = Math.min(155, Math.max(92, 78 + 5 * n + (longest > 18 ? 15 : 0)));
+  const top = Math.ceil(n / 2);
+  shown.forEach((k, j) => {
+    const onTop = j < top, m = onTop ? top : n - top, idx = onTop ? j : j - top;
+    const spread = (m <= 2 ? 75 : 115) * D2R, mid = (onTop ? -90 : 90) * D2R;
+    const ang = m === 1 ? mid : mid - spread / 2 + spread * idx / (m - 1);
+    const x = Math.max(70, Math.min(cx + 280, cx + R * Math.cos(ang))), y = Math.max(50, Math.min(500, cy + R * Math.sin(ang)));
+    const lift = m > 3 && idx % 2 ? 14 : 0; // neighbours on a crowded arc take turns, so names do not collide
+    items.push({ key: 'n' + k.id, kind: 'node', node: k, x, y, r: k.level === 2 ? 6.5 : 5.2, label: trunc(k.name, 22), lp: { dy: onTop ? -12 - lift : 18 + lift } });
+    links.push({ a: 'n' + c.id, b: 'n' + k.id, cls: k.ghost ? 'lk ghostl' : 'lk' });
+  });
+  if (!n) items.push({ key: 'leaf', kind: 'text', x: cx, y: cy + 84, label: 'No sub-topics. The learning lives here.', lp: { cls: 'note' } });
+  if (kids.length > 24) items.push({ key: 'more', kind: 'text', x: cx, y: cy + 250, label: `+ ${kids.length - 24} more sub-topics in List →`, lp: { cls: 'more' }, goView: 'list' });
+  const rels = c.rels.filter(r => live(r.other)).slice(0, 6);
+  if (rels.length) {
+    const y0 = cy - (rels.length - 1) * 22;
+    items.push({ key: 'rh', kind: 'text', x: cx - 190, y: y0 - 28, label: 'RELATED TO', lp: { cls: 'lh' } });
+    rels.forEach((r, j) => {
+      items.push({ key: 'n' + r.other.id, kind: 'node', node: r.other, x: cx - 190, y: y0 + j * 44, r: 5.5, label: trunc(r.other.name, 24), lp: { dx: -11, dy: 4, anchor: 'end' } });
+      links.push({ a: 'n' + c.id, b: 'n' + r.other.id, cls: 'rl' });
+    });
+  }
+  // Lanes: what you gathered (Commonplace) and your Lumens, beside the centre.
+  const group = t => c.kind === 'area' && c.groups ? (c.groups.find(g => g.groupType === t) || { members: [] }).members : null;
+  const libs = (group('lib') || c.libs.slice().sort((a, b) => b.rec - a.rec)).filter(() => showLib);
+  const lums = (group('ex') || [...new Set([...c.exps, ...c.libs.flatMap(l => [...l.exps, ...l.usedBy])])].sort((a, b) => b.rec - a.rec)).filter(() => showEx);
+  const L = Math.min(7, libs.length), M = Math.min(3, lums.length);
+  const hL = L ? 22 + L * 34 + (libs.length > 7 ? 18 : 0) : 0, hM = M ? 34 + M * 34 + 18 : 0;
+  let y = Math.max(36, cy - (hL + hM) / 2);
+  const lx = cx + 190;
+  if (L) {
+    items.push({ key: 'hl', kind: 'text', x: lx, y: y + 8, label: libs.length > 7 ? `IN YOUR COMMONPLACE (7 OF ${libs.length})` : `IN YOUR COMMONPLACE (${libs.length})`, lp: { anchor: 'start', cls: 'lh' } });
+    y += 22;
+    libs.slice(0, 7).forEach((it, j) => { items.push({ key: 'c' + it.id, kind: 'card', node: it, x: lx, y: y + j * 34 }); links.push({ a: 'n' + c.id, b: 'c' + it.id, cls: 'lk faint' }); });
+    y += L * 34;
+    if (libs.length > 7) { items.push({ key: 'ml', kind: 'text', x: lx, y: y + 6, label: `+ ${libs.length - 7} more in Commonplace →`, lp: { anchor: 'start', cls: 'more' }, msg: `In the app this opens your Commonplace filtered to ${c.name}.` }); y += 18; }
+  }
+  if (M) {
+    y += 16;
+    items.push({ key: 'hx', kind: 'text', x: lx, y: y + 8, label: lums.length > 3 ? `LUMENS (3 OF ${lums.length})` : `LUMENS (${lums.length})`, lp: { anchor: 'start', cls: 'lh' } });
+    y += 22;
+    lums.slice(0, 3).forEach((it, j) => { items.push({ key: 'c' + it.id, kind: 'card', node: it, x: lx, y: y + j * 34 }); links.push({ a: 'n' + c.id, b: 'c' + it.id, cls: 'lk faint' }); });
+    y += M * 34;
+    items.push({ key: 'mx', kind: 'text', x: lx, y: y + 6, label: `All ${lums.length} in Learn →`, lp: { anchor: 'start', cls: 'more' }, msg: `In the app this opens Learn filtered to ${c.name}.` });
+  }
+  return { items, links };
+}
+function renderMap() {
+  const now = performance.now(); mapAt = now;
+  const { items, links } = frameFor(mapCentre);
+  const seen = new Set();
+  const origin = mapCentre && mapEls.get('n' + mapCentre.id);
+  items.forEach((it, i) => {
+    seen.add(it.key);
+    let e = mapEls.get(it.key);
+    if (!e) {
+      const g = document.createElementNS(svgNS, 'g');
+      g.dataset.key = it.key;
+      mNodesG.appendChild(g);
+      const ox = origin ? origin.x : it.x, oy = origin ? origin.y : it.y;
+      e = { g, x: ox, y: oy, fx: ox, fy: oy, s: 0, born: now + (reduced ? 0 : 90 + Math.min(i, 40) * 14) };
+      mapEls.set(it.key, e);
+    } else { e.fx = e.x; e.fy = e.y; e.leaving = false; e.g.style.opacity = ''; }
+    e.tx = it.x; e.ty = it.y; e.t0 = now; e.it = it;
+    if (it.kind === 'card') { e.g.setAttribute('class', 'mcard'); e.g.innerHTML = cardSVG(it); }
+    else if (it.kind === 'text') { e.g.setAttribute('class', 'mtext' + (it.go || it.goView || it.msg ? ' act' : '')); e.g.innerHTML = labelSVG(it); }
+    else {
+      const m = markSVG(it);
+      e.g.setAttribute('class', 'mnode' + (it.kind === 'centre' ? ' centre' : ''));
+      let c = e.g.querySelector('circle.m');
+      const extra = `<g class="ex">${m.extra}${labelSVG(it)}</g>`;
+      if (!c) { e.g.innerHTML = `<circle class="m"></circle>${extra}`; c = e.g.querySelector('circle.m'); }
+      else e.g.querySelector('g.ex').outerHTML = extra;
+      c.setAttribute('class', 'm ' + m.cls); c.style.r = it.r + 'px';
+    }
+  });
+  mapEls.forEach((e, k) => { if (!seen.has(k) && !e.leaving) { e.leaving = true; e.leaveAt = now; } });
+  const lseen = new Set();
+  links.forEach(l => {
+    const k = l.a + '|' + l.b; lseen.add(k);
+    let p = mapLinks.get(k);
+    if (!p) { p = document.createElementNS(svgNS, 'path'); mLinksG.appendChild(p); mapLinks.set(k, p); p.style.opacity = 0; }
+    p.setAttribute('class', l.cls); p.dataset.a = l.a; p.dataset.b = l.b;
+  });
+  mapLinks.forEach((p, k) => { if (!lseen.has(k)) { p.remove(); mapLinks.delete(k); } });
+}
+const easeOutBack = t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+function mapTick(now) {
+  mapEls.forEach((e, k) => {
+    if (e.leaving) {
+      const t = reduced ? 1 : clamp01((now - e.leaveAt) / 260);
+      e.g.style.opacity = String(1 - t);
+      if (t >= 1) { e.g.remove(); mapEls.delete(k); }
+      return;
+    }
+    const t = reduced ? 1 : ease.out(clamp01((now - e.t0) / 420));
+    e.x = e.fx + (e.tx - e.fx) * t; e.y = e.fy + (e.ty - e.fy) * t;
+    const b = reduced ? 1 : clamp01((now - e.born) / 460);
+    e.s = b >= 1 ? 1 : Math.max(0, easeOutBack(b));
+    e.g.setAttribute('transform', `translate(${e.x.toFixed(1)} ${e.y.toFixed(1)})${e.s < 1 ? ` scale(${e.s.toFixed(3)})` : ''}`);
+  });
+  mapLinks.forEach(p => {
+    const a = mapEls.get(p.dataset.a), b = mapEls.get(p.dataset.b);
+    if (!a || !b) return;
+    const bx = b.it && b.it.kind === 'card' ? b.x : b.x, by = b.it && b.it.kind === 'card' ? b.y + 15 : b.y;
+    p.setAttribute('d', `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`);
+    p.style.opacity = String(Math.min(a.s, b.s, a.leaving ? 0 : 1, b.leaving ? 0 : 1));
+  });
+}
+mapSvg.addEventListener('click', e => {
+  const g = e.target.closest('g[data-key]'); if (!g) { if (e.target === mapSvg) setFocus(null); return; }
+  const el = mapEls.get(g.dataset.key); if (!el || !el.it) return;
+  const it = el.it;
+  if (it.goView) return setView(it.goView);
+  if (it.msg) return flash(it.msg);
+  if (it.go !== undefined) return setFocus(it.go);
+  if (it.node) setFocus(it.node === focus && it.kind === 'centre' ? focus : it.node);
+});
+
+/* ---------- List: the tree, with the same panel beside it ---------- */
+const listEl = document.getElementById('listView');
+const listOpen = new Set();
+let listQuery = '';
+function renderList() {
+  const areas = (G.areaNodes || G.nodes.filter(n => n.kind === 'area'));
+  const q = listQuery.trim().toLowerCase();
+  const all = G.nodes.filter(n => (n.kind === 'topic' || n.kind === 'area') && live(n));
+  const match = n => n.name.toLowerCase().includes(q);
+  const hasMatch = n => match(n) || kidsOf(n).some(hasMatch);
+  // Open the branch that holds what is open.
+  if (focus && (focus.kind === 'topic' || focus.kind === 'area')) { let p = focus.parent; while (p) { listOpen.add(p.id); p = p.parent; } }
+  const counts = n => { let all = 0, done = 0; const st = [...kidsOf(n)]; while (st.length) { const c = st.pop(); if (c.ghost) continue; all++; if (c.status === 2) done++; kidsOf(c).forEach(k => st.push(k)); } return [done, all]; };
+  const bar = n => { const st = []; const s = [...kidsOf(n)]; while (s.length) { const c = s.pop(); if (!c.ghost) st.push(c.status); kidsOf(c).forEach(k => s.push(k)); } const t = st.length || 1; return `<span class="mini">${[2, 1, 0].map(v => `<i class="b${v}" style="flex:${st.filter(x => x === v).length / t}"></i>`).join('')}</span>`; };
+  const row = n => {
+    if (q && !hasMatch(n)) return '';
+    const kids = kidsOf(n), open = q ? true : listOpen.has(n.id);
+    const libs = n.kind === 'area' ? 0 : n.libs.length, lums = n.kind === 'area' ? 0 : n.exps.length;
+    const right = n.kind === 'area'
+      ? (() => { const [d, a] = counts(n); return `${bar(n)}<span class="lr">${d} of ${a} marked Learned</span>`; })()
+      : n.ghost ? '<span class="sugg">Suggested</span>' : `<span class="st"><i class="dot s${n.status}"></i>${STATUS[n.status]}</span>`;
+    return `<li class="${n.kind}${focus === n ? ' sel' : ''}${n.ghost ? ' ghost' : ''}" data-id="${n.id}">
+      <div class="line">
+        ${kids.length ? `<button type="button" class="chev${open ? ' open' : ''}" data-toggle="${n.id}" aria-listOpen="${open}" aria-label="${open ? 'Collapse' : 'Expand'} ${esc(n.name)}">▸</button>` : '<span class="chev sp"></span>'}
+        <button type="button" class="nm" data-go="${n.id}">${esc(n.name)}${n.focus ? ' <span class="foc" title="In My Focus">◉</span>' : ''}</button>
+        ${kids.length ? `<span class="subc">(${kids.length})</span>` : ''}
+        ${libs ? `<span class="bdg" title="In your Commonplace"><i class="dot lib"></i>${libs}</span>` : ''}${lums ? `<span class="bdg" title="Lumens"><i class="dot ex"></i>${lums}</span>` : ''}
+        <span class="right">${right}</span>
+        <button type="button" class="addsub" data-addsub="${n.id}">＋ Sub-topic</button>
+      </div>
+      ${kids.length && open ? `<ul>${kids.map(row).join('')}</ul>` : ''}
+    </li>`;
+  };
+  const rows = areas.map(row).join('');
+  const matched = q ? all.filter(match).length : all.filter(n => n.kind === 'topic').length;
+  const had = document.activeElement && document.activeElement.id === 'lq';
+  listEl.innerHTML = `<div class="listwrap">
+    <div class="ltool">
+      <input id="lq" class="lq" type="search" placeholder="Find a topic or area in the tree…" value="${esc(listQuery)}" aria-label="Find a topic or area">
+      <span class="lcount">${q ? `${matched} of ${all.length} topics` : `${matched} topics`}</span>
+      <span class="lbtns"><button type="button" data-all="open">Expand All</button><button type="button" data-all="close">Collapse All</button><button type="button" data-all="area">＋ Area</button></span>
+    </div>
+    ${rows ? `<ul class="tree">${rows}</ul>` : `<p class="empty">No topics match “${esc(listQuery)}”.</p>`}
+  </div>`;
+  if (had) { const i = document.getElementById('lq'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+}
+listEl.addEventListener('input', e => { if (e.target.id === 'lq') { listQuery = e.target.value; renderList(); } });
+listEl.addEventListener('click', e => {
+  const t = e.target.closest('[data-toggle]'); if (t) { const id = t.dataset.toggle; listOpen.has(id) ? listOpen.delete(id) : listOpen.add(id); Sound.play('tab', .6); return renderList(); }
+  const g = e.target.closest('[data-go]'); if (g) return setFocus(G.byId.get(g.dataset.go));
+  const a = e.target.closest('[data-all]');
+  if (a) {
+    if (a.dataset.all === 'open') G.nodes.forEach(n => kidsOf(n).length && listOpen.add(n.id));
+    else if (a.dataset.all === 'close') listOpen.clear();
+    else flash('In the app, ＋ Area names a new area here. You can also Ask Loci to suggest some.');
+    return renderList();
+  }
+  const s = e.target.closest('[data-addsub]'); if (s) openAsk({ scope: G.byId.get(s.dataset.addsub), say: `Add sub-topics to ${G.byId.get(s.dataset.addsub).name}` });
+});
+
+/* ---------- Overview: statuses by area as proportion, and what is moving ---------- */
+const overEl = document.getElementById('overView');
+function renderOverview() {
+  const areas = (G.areaNodes || G.nodes.filter(n => n.kind === 'area'));
+  const stats = a => { const st = []; const s = [...kidsOf(a)]; while (s.length) { const c = s.pop(); if (!c.ghost) st.push(c.status); kidsOf(c).forEach(k => s.push(k)); } return st; };
+  const rows = areas.map(a => {
+    const st = stats(a), t = st.length || 1, d = st.filter(x => x === 2).length;
+    return `<button type="button" class="ovrow${focus === a ? ' sel' : ''}" data-go="${a.id}"><span class="on">${esc(a.name)}</span><span class="obar">${[2, 1, 0].map(v => { const k = st.filter(x => x === v).length; return k ? `<i class="b${v}" style="flex:${k / t}" title="${k} ${STATUS[v]}"></i>` : ''; }).join('')}</span><span class="oc">${d} of ${st.length} marked Learned</span></button>`;
+  }).join('');
+  const topics = G.nodes.filter(n => n.kind === 'topic' && live(n) && !n.ghost);
+  const focusList = G.nodes.filter(n => n.focus && live(n));
+  const latestLib = G.nodes.filter(n => n.kind === 'lib').sort((a, b) => b.rec - a.rec).slice(0, 4);
+  const latestEx = G.nodes.filter(n => n.kind === 'ex').sort((a, b) => b.rec - a.rec).slice(0, 3);
+  overEl.innerHTML = `<div class="ovwrap">
+    <section class="ovl">
+      <h2>My statuses by area</h2>
+      <div class="ovrows">${rows}</div>
+      <p class="cap">Each bar is one area, divided by the status of its topics. Hollow parts are topics you have not started. The Palace and the Map show the same thing as shape; this shows it as proportion.</p>
+    </section>
+    <section class="ovr">
+      <h2>Learning activity</h2>
+      <div class="stat"><b>${topics.filter(t => t.status === 2).length}</b><span>Topics you marked Learned</span></div>
+      <div class="stat"><b>${topics.filter(t => t.status === 1).length}</b><span>Topics you are learning</span></div>
+      <h3>My Focus (${focusList.length})</h3>
+      ${focusList.length ? `<ul>${focusList.map(n => item(n, where(n))).join('')}</ul>` : '<p class="empty">Add topics to My Focus from their panel.</p>'}
+      <h3>Recently gathered</h3>
+      <ul>${latestLib.map(n => item(n)).join('')}</ul>
+      <h3>Latest Lumens</h3>
+      <ul>${latestEx.map(n => item(n)).join('')}</ul>
+      <p class="cap">Lessons and study time appear here once courses are under way.</p>
+    </section>
+  </div>`;
+}
+overEl.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) setFocus(G.byId.get(g.dataset.go)); });
+
+/* ---------- Ask Loci: ask your mind palace. It answers from what is in it and helps you add to it. ---------- */
+const askEl = document.getElementById('ask'), askBody = document.getElementById('askBody'), askInput = document.getElementById('askInput');
+const askBtn = document.getElementById('askBtn');
+let askOpen = false, askTab = 'palace';
+const threads = new Map();
+const askWidth = () => Math.max(360, Math.min(420, W * .32));
+const areaOf = n => !n ? null : n.kind === 'area' ? n : n.kind === 'topic' ? (() => { let p = n; while (p.parent) p = p.parent; return p; })() : n.kind === 'group' ? n.areaNode : (G.areaNodes ? G.areaNodes[n.area] : null);
+function askScope() { if (askTab === 'palace' || !focus) return null; return askTab === 'area' ? areaOf(focus) : (focus.kind === 'topic' ? focus : areaOf(focus)); }
+const threadKey = () => { const s = askScope(); return s ? s.id : 'palace'; };
+function openAsk(opts = {}) {
+  const s = opts.scope;
+  askTab = !s ? (focus ? (focus.kind === 'topic' ? 'topic' : 'area') : 'palace') : s.kind === 'topic' ? 'topic' : s.kind === 'area' ? 'area' : 'palace';
+  if (s && s !== focus && (s.kind === 'topic' || s.kind === 'area')) setFocus(s);
+  askOpen = true; askEl.classList.remove('closed'); askEl.setAttribute('aria-hidden', 'false'); askBtn.setAttribute('aria-expanded', 'true');
+  syncPanels(); renderAsk(); Sound.play('tab');
+  if (opts.say) send(opts.say); else if (!narrow()) askInput.focus({ preventScroll: true });
+  stage.scrollLeft = 0;
+}
+function closeAsk() { askOpen = false; askEl.classList.add('closed'); askEl.setAttribute('aria-hidden', 'true'); askBtn.setAttribute('aria-expanded', 'false'); syncPanels(); }
+askBtn.addEventListener('click', () => (askOpen ? closeAsk() : openAsk({ scope: focus && (focus.kind === 'topic' || focus.kind === 'area') ? focus : null })));
+document.getElementById('askClose').addEventListener('click', closeAsk);
+document.getElementById('askTabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) { askTab = b.dataset.tab; renderAsk(); Sound.play('tab', .6); } });
+
+const greet = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning.' : h < 18 ? 'Good afternoon.' : 'Good evening.'; };
+function chipsFor(s) {
+  if (!s) return ['What should I learn next?', 'What do I already know about courtyards?', 'Tidy my Commonplace'];
+  if (s.kind === 'area') return [`What's missing in ${s.name}?`, `What should I learn first in ${s.name}?`, `Explain ${s.name}`];
+  return [`Add sub-topics to ${s.name}`, `Explain ${s.name}`, `Plan a course on ${s.name}`];
+}
+function renderAsk() {
+  const s = askScope(), a = focus ? areaOf(focus) : null;
+  document.getElementById('askKicker').textContent = s ? (s.kind === 'area' ? 'Area · your room in the palace' : `Topic · ${pathOf(s).join(' › ')}`) : 'Loci · your whole palace';
+  document.getElementById('askTitle').textContent = s ? s.name : 'Ask Loci';
+  const tabs = [['palace', 'Whole palace']];
+  if (a) tabs.push(['area', `${a.name}`]);
+  if (focus && focus.kind === 'topic') tabs.push(['topic', 'This topic']);
+  if (!tabs.some(t => t[0] === askTab)) askTab = 'palace';
+  document.getElementById('askTabs').innerHTML = tabs.map(([k, l]) => `<button type="button" data-tab="${k}" aria-selected="${askTab === k}">${esc(l)}</button>`).join('');
+  askInput.placeholder = s ? `Ask Loci about ${s.name}…` : 'Ask Loci about anything you know…';
+  document.getElementById('askChips').innerHTML = chipsFor(s).map(c => `<button type="button" data-say="${esc(c)}">${esc(c)}</button>`).join('');
+  const msgs = threads.get(threadKey()) || [];
+  askBody.innerHTML = msgs.length ? msgs.map(msgHTML).join('') : homeHTML(s);
+  askBody.scrollTop = askBody.scrollHeight;
+}
+function homeHTML(s) {
+  const topics = G.nodes.filter(n => n.kind === 'topic' && live(n) && !n.ghost && (!s || areaOf(n) === areaOf(s)));
+  const done = topics.filter(t => t.status === 2).length, doing = topics.filter(t => t.status === 1).length;
+  const share = topics.length ? done / topics.length : 0, C = 2 * Math.PI * 26;
+  const areasN = new Set(topics.filter(t => t.status === 1).map(t => t.area)).size;
+  const waiting = [...new Set(G.nodes.filter(n => n.ghost && live(n)).map(n => n.parent))];
+  const fl = G.nodes.filter(n => n.focus && live(n));
+  return `<div class="home">
+    <h3 class="greet">${greet()}</h3>
+    <div class="prog"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="trk" cx="32" cy="32" r="26"/><circle class="arcp" cx="32" cy="32" r="26" stroke-dasharray="${(C * share).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 32 32)"/></svg>
+      <div><b>${done} of ${topics.length} topics learned</b><span>${doing} in progress${s ? '' : ` across ${areasN} area${areasN === 1 ? '' : 's'}`}</span></div></div>
+    ${waiting.length ? `<h4>Waiting for you</h4>${waiting.map(p => `<button type="button" class="wait" data-go="${p.id}"><span>${kidsOf(p).filter(k => k.ghost).length} suggestions for <b>${esc(p.name)}</b><small>Suggested by Loci</small></span><em>Needs your OK</em></button>`).join('')}` : ''}
+    <h4>My Focus (${fl.length})</h4>
+    <div class="fchips">${fl.map(n => `<button type="button" data-go="${n.id}"><i class="dot s${n.status}"></i>${esc(n.name)}</button>`).join('')}</div>
+  </div>`;
+}
+function msgHTML(m) {
+  if (m.who === 'me') return `<p class="me">${esc(m.text)}</p>`;
+  if (m.thinking) return `<div class="it"><p class="who">✦ Loci</p><p class="thinking"><i></i><i></i><i></i> Thinking</p></div>`;
+  return `<div class="it"><p class="who">✦ Loci</p><div class="say">${m.html}</div>${m.card ? cardHTML(m.card) : ''}</div>`;
+}
+const chip = n => `<button type="button" class="ochip" data-go="${n.id}"><i class="dot ${dotOf(n)}"></i>${esc(n.kind === 'note' ? (n.shape === 'quote' ? n.title : trunc(n.text, 40)) : n.name)}</button>`;
+function cardHTML(c) {
+  if (c.type === 'proposal') {
+    const live_ = c.nodes.filter(n => !n.gone);
+    if (c.state === 'done') return `<div class="acard"><p class="ck">${c.kept ? `Kept ${c.kept} in ${esc(c.target.name)}` : 'Dismissed. Nothing was added.'}</p></div>`;
+    const checked = live_.filter(n => n.keep !== false).length;
+    return `<div class="acard" data-card="${c.id}"><p class="ck">${live_.length} sub-topics for ${esc(c.target.name)} <span class="tag">Adds</span></p>
+      <ul class="props">${live_.map(n => `<li><label><input type="checkbox" data-keep="${n.id}" ${n.keep !== false ? 'checked' : ''}><i class="gdot"></i>${esc(n.name)}</label></li>`).join('')}</ul>
+      <div class="cacts"><button type="button" class="primary" data-prop="keep">${checked === live_.length ? 'Keep all' : `Keep ${checked}`}</button><button type="button" data-prop="dismiss">Dismiss all</button></div>
+      <p class="cnote">They wait in your Loci as dashed topics until you choose.</p></div>`;
+  }
+  if (c.type === 'lumen') {
+    const k = `<p class="ck">Short Lumen · ${esc(c.target.name)}</p>`;
+    if (c.state === 'offer') return `<div class="acard" data-card="${c.id}">${k}<p class="req">${esc(c.request)}</p><div class="cacts"><button type="button" class="primary" data-lumen="make">Make it</button><button type="button" data-lumen="no">Not now</button></div></div>`;
+    if (c.state === 'making') return `<div class="acard">${k}<p class="req">Making the Lumen… you can keep working.</p><div class="mkbar"><i></i></div></div>`;
+    if (c.state === 'ready') return `<div class="acard" data-card="${c.id}">${k}<div class="cacts"><button type="button" class="primary" data-go="${c.made.id}">▶ Play</button></div><p class="cnote">Saved in this topic's journal and in Learn.</p></div>`;
+    return `<div class="acard">${k}<p class="cnote">Not made. Nothing was spent.</p></div>`;
+  }
+  if (c.type === 'course') {
+    const k = `<p class="ck">Course plan · ${esc(c.target.name)}</p>`;
+    if (c.state === 'offer') return `<div class="acard" data-card="${c.id}">${k}<ol class="parts">${c.parts.map((p, i) => `<li><span>Part ${i}</span>${esc(p)}</li>`).join('')}</ol><p class="cnote">Part 0 + ${c.parts.length - 1} parts · each part is made when you open it</p><div class="cacts"><button type="button" class="primary" data-course="start">Start the course</button><button type="button" data-course="no">Not now</button></div><p class="cnote">Starting makes Part 0 now. Nothing is spent until then.</p></div>`;
+    if (c.state === 'started') return `<div class="acard">${k}<p class="req">Part 0 is ready.</p><div class="cacts"><button type="button" class="primary" data-go="${c.made.id}">Open the course</button></div></div>`;
+    return `<div class="acard">${k}<p class="cnote">Not started. Nothing is spent until you start.</p></div>`;
+  }
+  return '';
+}
+askBody.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]'); if (go) { const n = G.byId.get(go.dataset.go); if (n) setFocus(n); renderAsk(); return; }
+  const card = e.target.closest('[data-card]'); if (!card) return;
+  const c = cards.get(card.dataset.card);
+  const keep = e.target.closest('[data-keep]'); if (keep) { G.byId.get(keep.dataset.keep).keep = keep.checked; renderAsk(); return; }
+  const p = e.target.closest('[data-prop]');
+  if (p) {
+    let kept = 0;
+    c.nodes.forEach(n => { if (n.gone) return; if (p.dataset.prop === 'keep' && n.keep !== false) { n.ghost = false; kept++; } else removeTopic(n); });
+    c.state = 'done'; c.kept = kept; Sound.play(kept ? 'bloom' : 'note', kept ? 1 : .6);
+    updateSummary(); refreshViews(); if (focus) renderInspector(focus); renderAsk(); return;
+  }
+  const l = e.target.closest('[data-lumen]');
+  if (l) {
+    if (l.dataset.lumen === 'no') { c.state = 'no'; renderAsk(); return; }
+    c.state = 'making'; renderAsk();
+    setTimeout(() => { c.made = addLumen(c.target, `${c.target.name}, in four minutes`, 4, false); c.state = 'ready'; Sound.play('ex'); refreshViews(); renderAsk(); }, reduced ? 200 : 2200);
+    return;
+  }
+  const co = e.target.closest('[data-course]');
+  if (co) {
+    if (co.dataset.course === 'no') { c.state = 'no'; renderAsk(); return; }
+    c.made = addLumen(c.target, `${c.target.name}: a course`, c.parts.length * 4, c.parts.length); c.state = 'started'; Sound.play('bloom'); refreshViews(); renderAsk();
+  }
+});
+document.getElementById('askChips').addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) send(b.dataset.say); });
+document.getElementById('askForm').addEventListener('submit', e => { e.preventDefault(); const t = askInput.value.trim(); if (t) { askInput.value = ''; send(t); } });
+askInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('askForm').requestSubmit(); } });
+
+const cards = new Map(); let cardSeq = 0;
+function send(text) {
+  const key = threadKey(), scope = askScope();
+  const t = threads.get(key) || []; threads.set(key, t);
+  t.push({ who: 'me', text });
+  const pending = { who: 'loci', thinking: true }; t.push(pending);
+  renderAsk();
+  setTimeout(() => { Object.assign(pending, respond(text, scope), { thinking: false }); Sound.play('note', .5); renderAsk(); }, reduced ? 120 : 750);
+}
+/* The prototype's replies are scripted from the sample palace; in the app the assistant answers from the learner's data. */
+const SUGGEST = {
+  'Climate-responsive design': ['Courtyard houses', 'Wind catchers', 'Thermal mass'],
+  'Daylight & shading': ['Mashrabiya screens', 'Light shelves', 'Solar geometry'],
+  'Facade systems': ['Double-skin facades', 'Kinetic facades'],
+  'Islamic architecture': ['Muqarnas', 'Courtyard mosques'],
+  'Passive design': ['Night cooling', 'Stack ventilation', 'Earth coupling'],
+  'History & Theory': ['Byzantine architecture', 'Architecture of the Mughals']
+};
+function named(text) {
+  const l = text.toLowerCase();
+  return G.nodes.filter(n => (n.kind === 'topic' || n.kind === 'area') && live(n) && l.includes(n.name.toLowerCase())).sort((a, b) => b.name.length - a.name.length)[0] || null;
+}
+function respond(text, scope) {
+  const l = text.toLowerCase(), target = named(text) || scope;
+  const id = 'c' + (++cardSeq);
+  if (/explain/.test(l)) {
+    if (!target) return { html: '<p>Which topic should the Lumen be about? Open one, or name it.</p>' };
+    const c = { id, type: 'lumen', target, state: 'offer', request: `A short Lumen on ${target.name}, drawing on what is in your Commonplace.` }; cards.set(id, c);
+    return { html: `<p>I can make a short Lumen on <b>${esc(target.name)}</b>, drawing on ${plural(target.libs.length || 0, 'thing')} you gathered there.</p>`, card: c };
+  }
+  if (/plan|course/.test(l)) {
+    if (!target) return { html: '<p>Which topic should the course cover? Open one, or name it.</p>' };
+    const kids = kidsOf(target).filter(k => !k.ghost).slice(0, 4).map(k => k.name);
+    const parts = ['Overview', ...(kids.length ? kids : ['Key ideas', 'Precedents', 'Practice'])];
+    const c = { id, type: 'course', target, state: 'offer', parts }; cards.set(id, c);
+    return { html: `<p>Here is a plan for <b>${esc(target.name)}</b>, built from its sub-topics.</p>`, card: c };
+  }
+  if (/add|missing|sub-topic|suggest/.test(l)) {
+    if (!target) return { html: '<p>Open an area or topic first, or name it, and I will suggest what is missing.</p>' };
+    const have = new Set(kidsOf(target).map(k => k.name.toLowerCase()));
+    const names = (SUGGEST[target.name] || (target.kind === 'area' ? ['Key precedents', 'Core methods', 'Current debates'] : ['Key precedents', 'Methods and tools', 'Common mistakes'])).filter(n => !have.has(n.toLowerCase()));
+    if (!names.length) return { html: `<p><b>${esc(target.name)}</b> already covers what I would suggest.</p>` };
+    const nodes = names.map(nm => addTopic(target, nm));
+    const c = { id, type: 'proposal', target, nodes, state: 'open' }; cards.set(id, c);
+    refreshViews();
+    return { html: `<p>${target.kind === 'area' ? 'This area' : 'This topic'} could use ${plural(names.length, 'more sub-topic')}. They are on your map now as dashed topics.</p>`, card: c };
+  }
+  if (/next|first/.test(l)) {
+    const pool = G.nodes.filter(n => n.kind === 'topic' && live(n) && !n.ghost && n.status !== 2 && (!target || areaOf(n) === areaOf(target)));
+    const score = n => (n.focus ? 3 : 0) + (n.status === 1 ? 2 : 0) + n.libs.length * .5;
+    const top = pool.sort((a, b) => score(b) - score(a)).slice(0, 3);
+    if (!top.length) return { html: '<p>Everything here is marked Learned. Time for a new area?</p>' };
+    const t0 = top[0], why = [t0.focus && 'it is in My Focus', t0.status === 1 && 'you are already learning it', t0.libs.length && `${plural(t0.libs.length, 'thing')} in your Commonplace ${t0.libs.length === 1 ? 'is' : 'are'} tagged on it`].filter(Boolean);
+    return { html: `<p>Start with <b>${esc(t0.name)}</b>${why.length ? `: ${why.join(', ')}` : ''}.</p><div class="ochips">${top.map(chip).join('')}</div>` };
+  }
+  if (/tidy|organi[sz]e/.test(l)) {
+    const lone = G.nodes.filter(n => n.kind === 'lib' && n.tagged.length === 1).slice(0, 4);
+    return { html: `<p>${plural(lone.length, 'thing')} in your Commonplace ${lone.length === 1 ? 'sits' : 'sit'} on only one topic. Tagging them more widely makes them easier to find from other rooms.</p><div class="ochips">${lone.map(chip).join('')}</div>` };
+  }
+  if (/know|about|what do i/.test(l)) {
+    const m = l.match(/about ([a-z &,'-]+)/), term = (m ? m[1] : l).replace(/[?.!]/g, '').trim().replace(/s$/, '');
+    const hit = s => s && s.toLowerCase().includes(term);
+    const found = G.nodes.filter(n => live(n) && !n.ghost && (hit(n.name) || (n.kind === 'note' && hit(n.text))) && n.kind !== 'group');
+    if (!found.length) return { html: `<p>Nothing in your Loci mentions “${esc(term)}” yet. Capture something on it, or ask me to add it as a topic.</p>` };
+    const topics = [...new Set(found.flatMap(n => n.kind === 'note' ? n.about.tagged.concat(n.tagged) : n.kind === 'lib' ? n.tagged : n.kind === 'ex' ? [n.anchorNode] : [n]))].filter(n => n.kind === 'topic' || n.kind === 'area').slice(0, 3);
+    return { html: `<p>“${esc(term)}” shows up in ${plural(found.length, 'place')} in your Loci${topics.length ? `, mostly around ${topics.map(t => `<b>${esc(t.name)}</b>`).join(', ')}` : ''}.</p><div class="ochips">${found.slice(0, 6).map(chip).join('')}</div>` };
+  }
+  return { html: `<p>In the app I answer from everything in your Loci. In this prototype, try one of these:</p><div class="ochips">${chipsFor(scope).map(c => `<button type="button" class="ochip" data-say="${esc(c)}">${esc(c)}</button>`).join('')}</div>` };
+}
+askBody.addEventListener('click', e => { const b = e.target.closest('.ochip[data-say]'); if (b) send(b.dataset.say); });
+
+/* Changing the palace: new topics, removed suggestions, new Lumens. */
+function prepNode(n) {
+  Object.assign(n, { em: 1, hv: 0, la: 0, rv: 0, pl: 0, hl: 0, pt: null, sv: 1, xp: 0, og: null, delay: performance.now() - introAt });
+}
+function addTopic(parent, name) {
+  const n = addNode(G, { name, kind: 'topic', level: parent.level + 1, status: 0, area: parent.area, parent, ghost: true });
+  addLink(G, parent, n, 'lk');
+  const len = Math.hypot(parent.x, parent.y, parent.z) || 1;
+  n.x = parent.x + parent.x / len * 30 + (Math.random() - .5) * 30; n.y = parent.y + parent.y / len * 30 + (Math.random() - .5) * 30; n.z = parent.z + parent.z / len * 30 + (Math.random() - .5) * 30;
+  prepNode(n); G.sim.push(n); alpha = Math.max(alpha, .2);
+  return n;
+}
+function removeTopic(n) {
+  n.gone = true;
+  if (n.parent) n.parent.children = n.parent.children.filter(k => k !== n);
+  G.links = G.links.filter(l => l.a !== n && l.b !== n);
+  G.sim = G.sim.filter(k => k !== n);
+  if (focus === n) setFocus(n.parent);
+}
+function addLumen(target, title, mins, parts) {
+  const rec = Math.max(...G.nodes.filter(n => n.kind === 'ex').map(n => n.rec)) + 1;
+  const ex = addNode(G, { name: title, kind: 'ex', level: 5, mins, anchorKind: 'topic', status: 0, area: target.area, parent: null, anchor: target, rec, parts: parts || 0, isCourse: !!parts });
+  if (parts) ex.r = 6.6;
+  addLink(G, target, ex, 'ex');
+  target.libs.slice(0, 2).forEach(src => addLink(G, src, ex, 'src'));
+  ex.areas.add(target.area); target.libs.slice(0, 2).forEach(src => src.areas.forEach(a => ex.areas.add(a)));
+  ex.x = target.x + 18; ex.y = target.y - 12; ex.z = target.z;
+  prepNode(ex); ex.sv = 0; G.sim.push(ex);
+  const area = G.areaNodes && G.areaNodes[target.area];
+  if (area && area.groups) { let gr = area.groups.find(g => g.groupType === 'ex'); if (gr) { gr.members.unshift(ex); gr.latest = gr.members.slice(0, 4); gr.name = `${gr.members.length} in Learn`; } }
+  updateSummary();
+  return ex;
+}
 
 /* ---------- Boot ---------- */
 function load(g) {
