@@ -902,8 +902,8 @@ function drawLabels(order, focusing, bg, dt) {
       if (n === focus) pri = 5; else if (n === hover) pri = 4;
       else if (!focusing && hoverArea && hoverSet.has(n) && n.parent === hoverArea) pri = 3;
       else if (focusing && neigh.has(n)) pri = 3;
-      else if (n.kind === 'area' && p.depth < (focusing ? (small ? .3 : .5) : (small ? .6 : .92))) pri = focusing ? 1 : 2;
-      else if (!focusing && !big && !small && n.level === 2 && p.depth < .28 && p.sr > 7) pri = 0;
+      // Overview: area names only, all of them, fading with depth. Topic names wait for a hover or a focus.
+      else if (n.kind === 'area' && (!focusing || p.depth < (small ? .3 : .5))) pri = focusing ? 1 : 2;
     }
     if (pri >= 0 || n.la > .02) cands.push([pri, p]);
   }
