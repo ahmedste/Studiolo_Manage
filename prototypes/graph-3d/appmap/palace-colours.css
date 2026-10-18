@@ -1,0 +1,12 @@
+/* Loci: the Palace's colours on the app's Map. Only colour changes here; shapes, sizes and motion stay the app's.
+   Areas are the solid deep-blue landmarks they are in the Palace, ringed by their sub-topics' coverage; the centre
+   reads as the same landmark; suggestions from Loci are hollow and dashed in the accent, as they are in the Palace. */
+.loci-appmap, .graph-xpeek { --ghost: var(--accent); --ghost-soft: var(--accent-soft); --ghost-ink: var(--accent); }
+.loci-appmap .pn { fill: var(--status-3); stroke: var(--paper); stroke-width: 1.5; }
+.loci-appmap .graph-node:focus-visible .pn { stroke: var(--accent); }
+.loci-appmap .ctr { fill: var(--status-3); }
+.loci-appmap .lk { stroke: color-mix(in srgb, var(--ink-3) 55%, transparent); }
+.loci-appmap .lk.gfocus { stroke: var(--ink-3); }
+.loci-appmap .lk.ghostl { stroke: var(--accent); stroke-opacity: .6; }
+.loci-appmap .nd.gh { fill: var(--accent-soft); stroke-dasharray: 2 2; stroke-width: 1.2; }
+.loci-appmap .graph-svg { background: var(--paper); }

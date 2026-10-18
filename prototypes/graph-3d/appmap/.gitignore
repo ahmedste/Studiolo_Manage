@@ -1,0 +1,6 @@
+src/
+node_modules/
+appmap.js
+appmap.base.css
+appmap.css
+meta.json
