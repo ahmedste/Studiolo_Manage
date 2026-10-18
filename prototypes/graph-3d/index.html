@@ -145,6 +145,7 @@ canvas#g.over { cursor: pointer; }
 .legend summary::after { content: ""; width: 6px; height: 6px; border-right: 1.5px solid var(--ink-2); border-bottom: 1.5px solid var(--ink-2); transform: rotate(-135deg); margin-left: auto; margin-top: 3px; }
 .legend:not([open]) summary::after { transform: rotate(45deg); margin-top: -3px; }
 .legend[open] summary { margin-bottom: 2px; }
+.legend-note { margin: 0; font-size: 11.5px; color: var(--ink-2); max-width: 34ch; }
 .legend-summary { display: none; margin: 0; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -220,6 +221,7 @@ canvas#g.over { cursor: pointer; }
         <label><input type="checkbox" id="optEx" checked>Explainers</label>
         <label><input type="checkbox" id="optRotate" checked>Slow turn</label>
       </div>
+      <p class="legend-note">Library items and explainers appear when you open an area.</p>
       <div class="row">
         <button type="button" class="linkbtn" id="optScale">Try 2,000 topics</button>
         <span class="fps" id="fps"></span>
@@ -326,6 +328,7 @@ function addNode(g, o) {
   const n = Object.assign({ id: 'n' + g.nodes.length, children: [], rels: [], libs: [], tagged: [], exps: [], usedBy: [], sources: [], x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 }, o);
   n.r = n.kind === 'lib' ? KIND_R.lib : n.kind === 'ex' ? KIND_R.ex : KIND_R[Math.min(n.level, 4)];
   n.w = n.kind === 'area' ? 2.2 : n.kind === 'lib' || n.kind === 'ex' ? .6 : 1;
+  n.idx = g.nodes.length; n.ox = n.oy = n.oz = 0; n.pl = 0; n.hl = 0; n.sv = 1; n.areas = new Set();
   g.nodes.push(n); g.byId.set(n.id, n);
   if (n.parent) n.parent.children.push(n);
   return n;
@@ -363,12 +366,14 @@ function buildSample() {
     const ln = itemByName[name] = addNode(g, { name, kind: 'lib', level: 4, libType: type, status: 0, area: hosts[0].area, parent: null, anchor: hosts[0] });
     hosts.forEach(h => addLink(g, h, ln, 'lib'));
     ln.r = 4 + Math.min(4, hosts.length) * .55; // an item tagged in more places reads a little larger
+    hosts.forEach(h => ln.areas.add(h.area));
   });
   EXPLAINERS.forEach(([title, mins, [kind, anchorName], sources]) => {
     const anchor = need(kind === 'topic' ? byName : itemByName, anchorName);
     const ex = addNode(g, { name: title, kind: 'ex', level: 5, mins, anchorKind: kind, status: 0, area: anchor.area, parent: null, anchor });
     addLink(g, anchor, ex, 'ex');
     sources.forEach(sn => addLink(g, need(itemByName, sn), ex, 'src'));
+    (anchor.kind === 'lib' ? [...anchor.areas] : [anchor.area]).concat(ex.sources.flatMap(x => [...x.areas])).forEach(a => ex.areas.add(a));
   });
   g.label = 'Prototype · sample graph';
   return g;
@@ -493,6 +498,7 @@ const cam = { yaw: .7, pitch: -.32, dist: 900, tx: 0, ty: 0, tz: 0, cx: 0, cy: 0
 const goal = { ...cam };
 let R0 = 300, overviewDist = 900;
 let focus = null, hover = null, neigh = new Set(), focusLinks = [];
+let hoverArea = null, hoverSet = new Set(), hoverLinks = [], hoverAt = 0, scope = new Set();
 let showLib = true, showEx = true, autoRotate = !reduced, lastInteract = -1e9;
 let vel = { yaw: 0, pitch: 0 };
 
@@ -516,7 +522,7 @@ function viewCentre() {
 
 const P = []; // projected nodes, reused per frame
 function project(n, out) {
-  const x = n.x - cam.tx, y = n.y - cam.ty, z = n.z - cam.tz;
+  const x = n.x + n.ox - cam.tx, y = n.y + n.oy - cam.ty, z = n.z + n.oz - cam.tz;
   const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw), cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
   const x1 = x * cy - z * sy, z1 = x * sy + z * cy;
   const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
@@ -525,7 +531,7 @@ function project(n, out) {
   const s = F / Math.max(zz, 1);
   out.n = n; out.zz = zz; out.s = s; out.x = cam.cx + x1 * s; out.y = cam.cy + y2 * s; out.sr = n.r * s;
   out.depth = Math.max(0, Math.min(1, (zz - (cam.dist - R0)) / (2 * R0)));
-  out.vis = zz > 30 && (showLib || n.kind !== 'lib') && (showEx || n.kind !== 'ex');
+  out.vis = zz > 30;
   return out;
 }
 
@@ -570,12 +576,14 @@ function setFocus(n) {
     if (n.kind === 'lib' && !showLib) { showLib = true; optLib.checked = true; }
     if (n.kind === 'ex' && !showEx) { showEx = true; optEx.checked = true; }
     neigh = neighboursOf(n);
+    hoverArea = null; hoverSet = new Set(); hoverLinks = [];
     focusLinks = G.links.filter(l => l.a === n || l.b === n);
     renderInspector(n);
     insp.classList.remove('closed'); insp.setAttribute('aria-hidden', 'false');
     setHash(n.id);
     document.getElementById('live').textContent = `${n.name}, ${KIND_LABEL(n) || STATUS[n.status]}. ${neigh.size} connected.`;
   }
+  computeScope();
   const c = viewCentre();
   if (!n) userZoomed = false;
   const to = n
@@ -584,6 +592,31 @@ function setFocus(n) {
   // Topic to topic arcs out and back in; entering or leaving a topic is a straight dolly.
   flyTo(to, { hop: n && prev ? undefined : 0 });
   lastInteract = performance.now();
+}
+/* Which Library items and explainers are on stage: those in the open area, plus whatever the focus touches. */
+function computeScope() {
+  scope = new Set();
+  if (!focus) return;
+  const A = focus.kind === 'lib' || focus.kind === 'ex' ? null : focus.area;
+  for (const n of G.nodes) {
+    if (n.kind !== 'lib' && n.kind !== 'ex') continue;
+    if (n.kind === 'lib' ? !showLib : !showEx) continue;
+    if (n === focus || neigh.has(n) || (A !== null && n.areas.has(A))) scope.add(n);
+  }
+}
+function setHover(h) {
+  if (h === hover) return;
+  hover = h; canvas.classList.toggle('over', !!h);
+  const ha = !focus && h && h.kind === 'area' ? h : null;
+  if (ha === hoverArea) return;
+  hoverArea = ha; hoverSet = new Set(); hoverLinks = [];
+  if (!ha) return;
+  hoverAt = performance.now();
+  const stack = [...ha.children];
+  while (stack.length) { const c = stack.pop(); hoverSet.add(c); c.children.forEach(k => stack.push(k)); }
+  ha.rels.forEach(r => hoverSet.add(r.other));
+  hoverSet.forEach(n => (n.pt = ha));
+  hoverLinks = G.links.filter(l => (l.a === ha || l.b === ha) && l.type !== 'lib');
 }
 function setHash(id) { try { history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); } catch (e) {} }
 
@@ -603,6 +636,7 @@ const ACTIONS = {
   lib: ['Open in Library', 'In the app this opens the item in Library.'],
   ex: ['Play explainer', 'In the app this opens the player.']
 };
+const libsHereCount = n => (n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)).length : n.libs.length);
 function renderInspector(n) {
   const iBody = document.getElementById('iBody');
   const set = (id, t) => (document.getElementById(id).textContent = t);
@@ -637,17 +671,18 @@ function renderInspector(n) {
     set('iEyebrow', p.length ? p.join(' › ') : 'Area');
     const desc = [n.kind === 'area' ? 'Area' : n.level === 2 ? 'Topic' : 'Sub-topic', plural(n.children.length, 'sub-topic')];
     if (n.rels.length) desc.push(`${n.rels.length} related`);
-    if (n.libs.length) desc.push(plural(n.libs.length, 'item'));
+    if (libsHereCount(n)) desc.push(plural(libsHereCount(n), 'item'));
     set('iMeta', desc.join(' · '));
     const kids = n.children.slice(0, 24);
     const more = n.children.length - kids.length;
     // Explainers made here, plus any that draw on this topic's Library items.
-    const exps = [...new Set([...n.exps, ...n.libs.flatMap(l => [...l.exps, ...l.usedBy])])];
+    const libsHere = n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)) : n.libs;
+    const exps = n.kind === 'area' ? G.nodes.filter(x => x.kind === 'ex' && x.areas.has(n.area)) : [...new Set([...n.exps, ...n.libs.flatMap(l => [...l.exps, ...l.usedBy])])];
     iBody.innerHTML = `
       <div class="seg" role="radiogroup" aria-label="Status">${STATUS.map((s, i) => `<button type="button" role="radio" aria-checked="${n.status === i}" data-status="${i}"><i class="dot s${i}"></i>${s}</button>`).join('')}</div>
       ${kids.length ? `<section><h3>Sub-topics (${n.children.length})</h3><ul>${kids.map(c => item(c)).join('')}</ul>${more > 0 ? `<p class="empty">+ ${more} more in List</p>` : ''}</section>` : ''}
-      ${n.libs.length ? `<section><h3>In your Library (${n.libs.length})</h3><ul>${n.libs.map(l => item(l, l.tagged.length > 1 ? `<span class="why">Also on ${plural(l.tagged.length - 1, 'other topic')}</span>` : '')).join('')}</ul></section>` : ''}
-      ${exps.length ? `<section><h3>Explainers (${exps.length})</h3><ul>${exps.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this topic' : 'Uses items tagged here'}</span>`)).join('')}</ul></section>` : ''}
+      ${libsHere.length ? `<section><h3>In your Library (${libsHere.length})</h3><ul>${libsHere.map(l => item(l, l.tagged.length > 1 ? `<span class="why">Also on ${plural(l.tagged.length - 1, 'other topic')}</span>` : '')).join('')}</ul></section>` : ''}
+      ${exps.length ? `<section><h3>Explainers (${exps.length})</h3><ul>${exps.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this topic' : n.kind === 'area' ? 'In this area' : 'Uses items tagged here'}</span>`)).join('')}</ul></section>` : ''}
       <section><h3>Related (${n.rels.length})</h3>${n.rels.length ? `<ul>${n.rels.slice(0, 6).map(r => item(r.other, `<span class="why">${esc(r.why)}</span>`)).join('')}</ul>` : '<p class="empty">Not connected to other branches yet.</p>'}</section>`;
   }
   iBody.scrollTop = 0;
@@ -712,41 +747,58 @@ function drawFrame(now, dt) {
   const N = G.nodes;
   while (P.length < N.length) P.push({});
   const kEm = reduced ? 1 : 1 - Math.exp(-dt * 7), kHv = reduced ? 1 : 1 - Math.exp(-dt * 16);
+  const kPl = reduced ? 1 : 1 - Math.exp(-dt * 4.5), kSv = reduced ? 1 : 1 - Math.exp(-dt * 6);
+  const ha = hoverArea;
   for (let i = 0; i < N.length; i++) {
     const n = N[i];
+    // Hovering an area draws its topics in toward it; they ease back when the pointer leaves.
+    const inHover = ha && hoverSet.has(n);
+    n.pl += ((inHover ? (n.parent === ha ? .38 : .26) : 0) - n.pl) * kPl;
+    if (n.pt && n.pl > .001) { n.ox = (n.pt.x - n.x) * n.pl; n.oy = (n.pt.y - n.y) * n.pl; n.oz = (n.pt.z - n.z) * n.pl; }
+    else { n.ox = n.oy = n.oz = 0; }
     project(n, P[i]);
-    n.rv = reveal(n, now);
-    // Emphasis eases between 1 (full colour) and 0 (greyed out) when the focus changes.
-    const target = !focus || n === focus || neigh.has(n) ? 1 : 0;
+    // Library items and explainers live at area level: they grow in when an area (or anything in it) is open.
+    const side = n.kind === 'lib' || n.kind === 'ex';
+    n.sv += ((side ? (scope.has(n) ? 1 : 0) : 1) - n.sv) * kSv;
+    n.rv = Math.min(reveal(n, now), n.sv);
+    if (n.rv < .01) P[i].vis = false;
+    // Emphasis eases between 1 (full colour) and 0 (greyed out). Hover greys the rest only lightly.
+    const target = focus ? (n === focus || neigh.has(n) || scope.has(n) ? 1 : 0)
+      : ha ? (n === ha || inHover ? 1 : .3) : 1;
     n.em += (target - n.em) * kEm;
+    n.hl += ((ha && (n === ha || inHover) ? 1 : 0) - n.hl) * kEm;
     n.hv += ((n === hover ? 1 : 0) - n.hv) * kHv;
   }
   const proj = new Map(); for (let i = 0; i < N.length; i++) proj.set(N[i], P[i]);
   const bg = C.paper, focusing = !!focus;
   const ringT = reduced ? 1 : ease.out(clamp01((now - focusAt) / 600));
 
-  // Links, batched by type, depth and emphasis. Tree links grow out of their parent during the entry.
+  // Links, batched by type, depth, emphasis and hover. Tree links grow out of their parent during the entry.
   const B = 3, E = 3, buckets = {};
+  const star = focusing ? focus : ha;
   for (const l of G.links) {
-    if (focusing && (l.a === focus || l.b === focus)) continue;
+    if (star && (l.a === star || l.b === star)) continue;
     const pa = proj.get(l.a), pb = proj.get(l.b);
     if (!pa.vis || !pb.vis) continue;
-    const grow = l.type === 'rl' ? (l.a.rv > .98 && l.b.rv > .98 ? 1 : 0) : l.b.rv;
+    const grow = l.type === 'rl' ? (l.a.rv > .98 && l.b.rv > .98 ? 1 : 0) : Math.min(l.a.rv, l.b.rv) < .02 ? 0 : l.b.rv;
     if (grow <= 0) continue;
     const d = Math.min(B - 1, ((pa.depth + pb.depth) / 2 * B) | 0);
     const e = Math.round(Math.min(l.a.em, l.b.em) * (E - 1));
-    const key = l.type + d + e;
-    (buckets[key] || (buckets[key] = { type: l.type, d, e, pts: [] })).pts.push(pa.x, pa.y, pa.x + (pb.x - pa.x) * grow, pa.y + (pb.y - pa.y) * grow);
+    const h = Math.round(Math.min(l.a.hl, l.b.hl) * 2);
+    const key = l.type + d + e + h;
+    (buckets[key] || (buckets[key] = { type: l.type, d, e, h, pts: [] })).pts.push(pa.x, pa.y, pa.x + (pb.x - pa.x) * grow, pa.y + (pb.y - pa.y) * grow);
   }
   ctx.lineCap = 'round';
   const big = N.length > 500;
   for (const k of Object.keys(buckets).sort()) {
-    const { type, d, e, pts } = buckets[k];
+    const { type, d, e, h, pts } = buckets[k];
     const em = e / (E - 1);
     const blue = type === 'rl' || type === 'ex' || type === 'src';
     const base = blue ? C.accent : C['ink-3'];
     let t = blue ? (big ? .8 : .35) + d / B * (big ? .15 : .45) : .45 + d / B * .4;
-    t = t + (.9 - t) * (1 - em);
+    if (!focusing) t = Math.max(t, (blue ? .6 : .74) + d / B * .16); // overview: present, but very light
+    t = t + (.92 - t) * (1 - em);
+    t = t - (t - .4) * (h / 2); // hovered area: a step stronger
     ctx.strokeStyle = rgb(lerpA(base, bg, t));
     ctx.lineWidth = type === 'rl' ? 1 : type === 'ex' ? .9 : .8;
     ctx.setLineDash(type === 'rl' ? [3, 4] : type === 'lib' || type === 'src' ? [1, 3] : []);
@@ -756,19 +808,21 @@ function drawFrame(now, dt) {
   }
   ctx.setLineDash([]);
 
-  // Focus links draw outward from the centre, then carry dots flowing back into it.
-  if (focusing) {
-    const pf = proj.get(focus);
-    focusLinks.forEach((l, i) => {
-      const other = l.a === focus ? l.b : l.a, po = proj.get(other);
-      if (!po.vis) return;
+  // The star: links into the focus (or the hovered area) curve in, draw outward, then carry dots flowing to the centre.
+  if (star) {
+    const ps = proj.get(star);
+    const links = focusing ? focusLinks : hoverLinks;
+    const t0 = focusing ? focusAt : hoverAt, soft = focusing ? 0 : .12;
+    links.forEach((l, i) => {
+      const other = l.a === star ? l.b : l.a, po = proj.get(other);
+      if (!po.vis || other.rv < .02) return;
       const bend = (i % 2 ? 1 : -1) * .12;
-      const [qx, qy] = quad(po.x, po.y, pf.x, pf.y, bend);
-      const local = reduced ? 1 : ease.out(clamp01((now - focusAt - i * 35) / 520));
+      const [qx, qy] = quad(po.x, po.y, ps.x, ps.y, bend);
+      const local = reduced ? 1 : ease.out(clamp01((now - t0 - i * 30) / 520));
       if (local <= 0) return;
-      const at = t => { const u = 1 - t; return [u * u * po.x + 2 * u * t * qx + t * t * pf.x, u * u * po.y + 2 * u * t * qy + t * t * pf.y]; };
+      const at = t => { const u = 1 - t; return [u * u * po.x + 2 * u * t * qx + t * t * ps.x, u * u * po.y + 2 * u * t * qy + t * t * ps.y]; };
       const blue = l.type === 'rl' || l.type === 'ex' || l.type === 'src';
-      ctx.strokeStyle = blue ? rgb(lerpA(C.accent, bg, .3)) : rgb(lerpA(C['ink-2'], bg, .4));
+      ctx.strokeStyle = blue ? rgb(lerpA(C.accent, bg, .3 + soft)) : rgb(lerpA(C['ink-2'], bg, .4 + soft));
       ctx.lineWidth = blue ? 1.3 : 1;
       ctx.setLineDash(l.type === 'rl' ? [4, 4] : l.type === 'src' ? [2, 3] : []);
       ctx.beginPath();
@@ -777,12 +831,12 @@ function drawFrame(now, dt) {
       ctx.stroke();
       ctx.setLineDash([]);
       if (!reduced && local >= 1) {
-        ctx.fillStyle = blue ? rgb(lerpA(C.accent, bg, .1)) : rgb(lerpA(C['ink-2'], bg, .05));
+        ctx.fillStyle = blue ? rgb(lerpA(C.accent, bg, .1 + soft)) : rgb(lerpA(C['ink-2'], bg, .05 + soft));
         for (let k = 0; k < 3; k++) {
           const t = ((now / 2400) + k / 3 + i * .137) % 1;
           const [x, y] = at(t);
           ctx.globalAlpha = Math.sin(t * Math.PI);
-          ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 6.283); ctx.fill();
+          ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 6.283); ctx.fill();
         }
         ctx.globalAlpha = 1;
       }
@@ -846,6 +900,7 @@ function drawLabels(order, focusing, bg, dt) {
     let pri = -1;
     if (n.rv > .75) {
       if (n === focus) pri = 5; else if (n === hover) pri = 4;
+      else if (!focusing && hoverArea && hoverSet.has(n) && n.parent === hoverArea) pri = 3;
       else if (focusing && neigh.has(n)) pri = 3;
       else if (n.kind === 'area' && p.depth < (focusing ? (small ? .3 : .5) : (small ? .6 : .92))) pri = focusing ? 1 : 2;
       else if (!focusing && !big && !small && n.level === 2 && p.depth < .28 && p.sr > 7) pri = 0;
@@ -861,9 +916,9 @@ function drawLabels(order, focusing, bg, dt) {
     const n = p.n, isArea = n.kind === 'area';
     const near = Math.max(.88, Math.min(1.14, 1.16 - p.depth * .4));
     let size, font, text, ls = '0px';
-    if (pri === 5) { size = 19 * LS; font = `500 ${size}px ${READ_FONT}`; text = n.name; }
-    else if (isArea) { size = Math.max(small ? 9.5 : 11, 11.5 * near * LS); font = `650 ${size.toFixed(1)}px ${UI_FONT}`; text = n.name.toUpperCase(); ls = '0.08em'; }
-    else { size = Math.max(small ? 10.5 : 11.5, (pri >= 3 ? 13.5 : 12.5) * near * LS); font = `${pri === 4 ? 600 : 500} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name; }
+    if (pri === 5) { size = 17 * LS; font = `500 ${size}px ${READ_FONT}`; text = n.name; }
+    else if (isArea) { size = Math.max(small ? 9 : 10, 10.5 * near * LS); font = `${pri >= 4 ? 600 : 500} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name.toUpperCase(); ls = '0.1em'; }
+    else { size = Math.max(small ? 10 : 11, (pri >= 3 ? 12.5 : 12) * near * LS); font = `${pri === 4 ? 500 : 400} ${size.toFixed(1)}px ${UI_FONT}`; text = n.name; }
     const maxLen = small ? 24 : 34;
     if (text.length > maxLen && pri < 4) text = text.slice(0, maxLen - 2).trimEnd() + '…';
     ctx.font = font; if (hasLS) ctx.letterSpacing = ls;
@@ -881,11 +936,12 @@ function drawLabels(order, focusing, bg, dt) {
     n.la += ((want ? 1 : 0) - n.la) * kLa;
     if (n.la < .02) continue;
     if (want) placed.push(box);
-    const tone = pri === 5 ? C.ink : pri >= 3 ? lerpA(C.ink, C['ink-2'], .25) : isArea ? C['ink-2'] : C['ink-3'];
-    let fade = pri >= 3 ? 0 : isArea ? (focusing ? .45 : .05) + p.depth * .4 : .2 + p.depth * .4;
+    // Quiet type: only the focus is near-ink; everything else sits in the muted inks and fades with depth.
+    const tone = pri === 5 ? lerpA(C.ink, C['ink-2'], .15) : pri >= 3 ? C['ink-2'] : isArea ? C['ink-2'] : C['ink-3'];
+    let fade = pri === 5 ? 0 : pri >= 3 ? .12 : isArea ? (focusing ? .5 : .25) + p.depth * .4 : .3 + p.depth * .4;
     const a = n.la * clamp01((n.rv - .75) / .25);
     // A soft paper backing keeps text off the lines without a hard box.
-    ctx.fillStyle = rgb(bg, .72 * a);
+    ctx.fillStyle = rgb(bg, .55 * a);
     roundRect(box[0], box[1], box[2], box[3], 5); ctx.fill();
     ctx.fillStyle = rgb(lerpA(tone, bg, fade), a);
     ctx.fillText(text, p.x, cy + (pri === 5 ? 1 : .5));
@@ -923,7 +979,7 @@ function loop(now) {
     if (focus) { const f = focusFrame(focus); goal.tx = f.tx; goal.ty = f.ty; goal.tz = f.tz; }
     else if (!userZoomed) goal.dist = overviewDist;
   }
-  const idle = !dragging && !flight && now - lastInteract > 2500;
+  const idle = !dragging && !flight && !hoverArea && now - lastInteract > 2500;
   if (autoRotate && idle) goal.yaw += (focus ? .035 : .07) * dt;
   if (!dragging && (Math.abs(vel.yaw) > 1e-4 || Math.abs(vel.pitch) > 1e-4)) {
     goal.yaw += vel.yaw; goal.pitch = clampPitch(goal.pitch + vel.pitch);
@@ -976,7 +1032,12 @@ canvas.addEventListener('pointerdown', e => {
 canvas.addEventListener('pointermove', e => {
   const [x, y] = local(e);
   if (!pointers.has(e.pointerId)) {
-    if (e.pointerType === 'mouse') { hover = pick(x, y); canvas.classList.toggle('over', !!hover); }
+    if (e.pointerType === 'mouse') {
+      let h = pick(x, y);
+      // Stay on a hovered area while its topics move in around it.
+      if (hover && hoverArea === hover && h !== hover) { const ph = P[hover.idx]; if (ph && Math.hypot(ph.x - x, ph.y - y) < Math.max(ph.sr, 6) + 26) h = hover; }
+      setHover(h);
+    }
     return;
   }
   const prev = pointers.get(e.pointerId);
@@ -984,7 +1045,7 @@ canvas.addEventListener('pointermove', e => {
   if (pointers.size === 1 && drag) {
     const dx = x - prev.x, dy = y - prev.y;
     drag.moved += Math.abs(dx) + Math.abs(dy);
-    if (drag.moved > 5) { dragging = true; canvas.classList.add('dragging'); hover = null; }
+    if (drag.moved > 5) { dragging = true; canvas.classList.add('dragging'); setHover(null); }
     if (dragging) {
       goal.yaw += dx * .006; goal.pitch = clampPitch(goal.pitch + dy * .006);
       vel = { yaw: dx * .006 * .5, pitch: dy * .006 * .5 };
@@ -1011,7 +1072,7 @@ function endPointer(e) {
 }
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
-canvas.addEventListener('pointerleave', () => { if (!pointers.size) { hover = null; canvas.classList.remove('over'); } });
+canvas.addEventListener('pointerleave', () => { if (!pointers.size) setHover(null); });
 canvas.addEventListener('wheel', e => { e.preventDefault(); zoomBy(Math.exp(e.deltaY * .0012)); interacted(); }, { passive: false });
 function zoomBy(f) { userZoomed = true; goal.dist = Math.max(120, Math.min(overviewDist * 2.2, goal.dist * f)); }
 canvas.addEventListener('keydown', e => {
@@ -1031,9 +1092,9 @@ document.getElementById('zOut').addEventListener('click', () => { zoomBy(1.25); 
 document.getElementById('zReset').addEventListener('click', () => { userZoomed = false; setFocus(null); goal.pitch = -.32; interacted(); });
 
 const optLib = document.getElementById('optLib');
-optLib.addEventListener('change', () => { showLib = optLib.checked; if (!showLib && focus && focus.kind === 'lib') setFocus(null); });
+optLib.addEventListener('change', () => { showLib = optLib.checked; if (!showLib && focus && focus.kind === 'lib') setFocus(null); else computeScope(); });
 const optEx = document.getElementById('optEx');
-optEx.addEventListener('change', () => { showEx = optEx.checked; if (!showEx && focus && focus.kind === 'ex') setFocus(null); });
+optEx.addEventListener('change', () => { showEx = optEx.checked; if (!showEx && focus && focus.kind === 'ex') setFocus(null); else computeScope(); });
 const optRotate = document.getElementById('optRotate');
 optRotate.checked = autoRotate;
 optRotate.addEventListener('change', () => { autoRotate = optRotate.checked; });
@@ -1073,6 +1134,7 @@ function choose(n) { q.value = ''; hits = []; renderResults(); q.blur(); setFocu
 /* ---------- Boot ---------- */
 function load(g) {
   G = g; focus = null; hover = null; neigh = new Set(); focusLinks = []; userZoomed = false; flight = null;
+  hoverArea = null; hoverSet = new Set(); hoverLinks = []; scope = new Set();
   insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
   initPositions(G);
   alpha = 1;
@@ -1084,7 +1146,8 @@ function load(g) {
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const big = G.nodes.length > 500;
   G.nodes.forEach(n => {
-    n.em = 1; n.hv = 0; n.la = 0; n.rv = 0;
+    n.em = 1; n.hv = 0; n.la = 0; n.rv = 0; n.pl = 0; n.hl = 0; n.pt = null;
+    n.sv = n.kind === 'lib' || n.kind === 'ex' ? 0 : 1;
     const lvl = n.kind === 'ex' ? 5 : n.kind === 'lib' ? 4 : n.level;
     n.delay = big ? (lvl - 1) * 260 + rnd() * 600
       : n.kind === 'area' ? 150 + n.area * 45
