@@ -77,6 +77,26 @@ canvas#g.over { cursor: pointer; }
 .dot.s2 { background: var(--status-2); }
 .dot.lib { border-radius: 2px; background: var(--ink-3); }
 .dot.ex { border-radius: 0; background: var(--accent); clip-path: polygon(12% 0, 100% 50%, 12% 100%); }
+.dot.ex.course { outline: 1.5px solid var(--accent); outline-offset: 2px; clip-path: none; border-radius: 50%; background: radial-gradient(circle, var(--accent) 45%, transparent 47%); }
+.lvl { display: inline-block; border-radius: 50%; background: var(--ink-2); flex-shrink: 0; }
+.lvl.l1 { width: 12px; height: 12px; background: var(--status-3); }
+.lvl.l2 { width: 8px; height: 8px; background: var(--status-2); }
+.lvl.l3 { width: 5px; height: 5px; background: var(--status-2); opacity: .75; }
+.gcard { top: 0; left: 0; width: 290px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-float); opacity: 0; scale: .96; transition: opacity .25s var(--ease), scale .3s var(--ease); transform-origin: left center; }
+.gcard.open { opacity: 1; scale: 1; }
+.gcard header { padding: 12px 14px 8px; position: relative; }
+.gcard .eyebrow { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 26px 2px 0; font-weight: 600; }
+.gcard h2 { margin: 0; font-family: var(--read); font-weight: 500; font-size: 18px; }
+.gcard .close { position: absolute; top: 8px; right: 8px; border: 0; background: none; width: 26px; height: 26px; border-radius: 7px; cursor: pointer; color: var(--ink-2); font-size: 16px; }
+.gcard .close:hover { background: var(--board); }
+.gcard ul { list-style: none; margin: 0; padding: 0 6px; }
+.gcard li button { width: 100%; border: 0; background: none; text-align: left; display: flex; gap: 10px; align-items: flex-start; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+.gcard li button:hover { background: var(--board); }
+.gcard li .dot { margin-top: 5px; }
+.gcard li b { display: block; font-weight: 500; font-size: 13px; line-height: 1.3; }
+.gcard li small { display: block; color: var(--ink-2); font-size: 11.5px; margin-top: 1px; }
+.gcard footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 14px 12px; border-top: 1px solid var(--line); margin-top: 6px; }
+.gcard footer small { color: var(--ink-2); font-size: 11.5px; }
 .preview { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
 .glyph { width: 38px; height: 38px; border-radius: 7px; background: var(--board); display: grid; place-items: center; font-weight: 650; color: var(--ink-2); flex-shrink: 0; }
 .preview strong { display: block; font-family: var(--read); font-weight: 500; font-size: 16.5px; line-height: 1.25; }
@@ -166,13 +186,14 @@ canvas#g.over { cursor: pointer; }
   .insp .body { padding: 12px 16px 14px; gap: 14px; }
   .insp footer { padding: 10px 16px; }
   .insp footer small { display: none; }
+  .gcard { top: auto; bottom: 0; left: 0; right: 0; width: auto; transform: none !important; border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); transform-origin: center bottom; }
   .insp { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 52%; border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
   .insp.closed { transform: translateY(calc(100% + 24px)); }
   .insp h2 { font-size: 20px; }
   .hint { top: auto; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); font-size: 11.5px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .insp, .zoom, .hint, .bar i, .play { transition: none; }
+  .insp, .zoom, .hint, .bar i, .play, .gcard { transition: none; }
 }
 </style>
 
@@ -208,6 +229,11 @@ canvas#g.over { cursor: pointer; }
     <details class="float legend" id="legend" open>
       <summary>Key and options</summary>
       <p class="legend-summary" id="summary2"></p>
+      <div class="row">
+        <span><i class="lvl l1"></i>Area</span>
+        <span><i class="lvl l2"></i>Topic</span>
+        <span><i class="lvl l3"></i>Sub-topic</span>
+      </div>
       <div class="row">
         <span><i class="dot s0"></i>Not started</span>
         <span><i class="dot s1"></i>Learning</span>
@@ -247,6 +273,16 @@ canvas#g.over { cursor: pointer; }
         <small id="iNote">In the app this opens the radial Map on this topic.</small>
       </footer>
     </aside>
+
+    <section class="float gcard" id="gcard" hidden aria-label="Group">
+      <header>
+        <p class="eyebrow" id="gEyebrow"></p>
+        <h2 id="gTitle"></h2>
+        <button type="button" class="close" id="gClose" aria-label="Fold the group">×</button>
+      </header>
+      <ul id="gList"></ul>
+      <footer><button type="button" class="linkbtn" id="gAll"></button><small id="gNote"></small></footer>
+    </section>
 
     <p class="sr" id="live" aria-live="polite"></p>
   </main>
@@ -316,10 +352,13 @@ const EXPLAINERS = [
  ['Thresholds in Bait Ur Rouf', 3, ['item','Bait Ur Rouf Mosque'], ['The eye never quite finds the end of the field','What I took from Sultan Hassan']],
  ['Fathy’s climate lessons', 6, ['item','Fathy, Natural Energy and Vernacular Architecture'], ['Hassan Fathy']],
  ['Streets that hold people', 4, ['topic','Streets & public realm'], ['Gehl, Life Between Buildings']],
- ['Carbon starts with the material', 3, ['topic','Embodied carbon'], ['Embodied carbon calculator notes']]
+ ['Carbon starts with the material', 3, ['topic','Embodied carbon'], ['Embodied carbon calculator notes']],
+ /* Courses (explainer_series): an ordered set of parts, anchored like an explainer. The fifth value is the part count. */
+ ['Form, ritual, geometry', 22, ['topic','Islamic architecture'], ['Great Mosque of Kairouan','Hillenbrand, Islamic Architecture','What I took from Sultan Hassan','Sultan Hassan walkthrough'], 5],
+ ['Building for the Gulf climate', 16, ['topic','Climate-responsive design'], ['Fathy, Natural Energy and Vernacular Architecture','Hassan Fathy','Bait Ur Rouf Mosque'], 4]
 ];
 const STATUS = ['Not started', 'Learning', 'Learned'];
-const KIND_R = { 1: 13, 2: 8.5, 3: 6, 4: 6, lib: 4.2, ex: 5.6 };
+const KIND_R = { 1: 15, 2: 7.5, 3: 4.2, 4: 3.6, lib: 4.2, ex: 5.6 };
 
 /* ---------- Graph model ---------- */
 let G = null;
@@ -368,9 +407,12 @@ function buildSample() {
     ln.r = 4 + Math.min(4, hosts.length) * .55; // an item tagged in more places reads a little larger
     hosts.forEach(h => ln.areas.add(h.area));
   });
-  EXPLAINERS.forEach(([title, mins, [kind, anchorName], sources]) => {
+  // Order in the sample lists stands for recency: later entries were added more recently.
+  Object.values(itemByName).forEach((n, i) => (n.rec = i));
+  EXPLAINERS.forEach(([title, mins, [kind, anchorName], sources, parts], i) => {
     const anchor = need(kind === 'topic' ? byName : itemByName, anchorName);
-    const ex = addNode(g, { name: title, kind: 'ex', level: 5, mins, anchorKind: kind, status: 0, area: anchor.area, parent: null, anchor });
+    const ex = addNode(g, { name: title, kind: 'ex', level: 5, mins, anchorKind: kind, status: 0, area: anchor.area, parent: null, anchor, rec: i, parts: parts || 0, isCourse: !!parts });
+    if (parts) ex.r = 6.6;
     addLink(g, anchor, ex, 'ex');
     sources.forEach(sn => addLink(g, need(itemByName, sn), ex, 'src'));
     (anchor.kind === 'lib' ? [...anchor.areas] : [anchor.area]).concat(ex.sources.flatMap(x => [...x.areas])).forEach(a => ex.areas.add(a));
@@ -382,8 +424,10 @@ function buildSample() {
       const members = g.nodes.filter(x => x.kind === kind && x.areas.has(i));
       if (!members.length) continue;
       const k = members.length;
-      const gr = addNode(g, { name: kind === 'lib' ? `${k} Library item${k === 1 ? '' : 's'}` : `${k} explainer${k === 1 ? '' : 's'}`, kind: 'group', groupType: kind, level: 4, status: 0, area: i, parent: null, members, areaNode: area, fixed: true });
+      members.sort((a, b) => b.rec - a.rec);
+      const gr = addNode(g, { name: kind === 'lib' ? `${k} Library item${k === 1 ? '' : 's'}` : `${k} in Learn`, kind: 'group', groupType: kind, level: 4, status: 0, area: i, parent: null, members, areaNode: area, fixed: true });
       gr.r = 6.5 + Math.sqrt(k) * 2;
+      gr.latest = members.slice(0, 4);
       addLink(g, area, gr, 'grp');
       (area.groups || (area.groups = [])).push(gr);
     }
@@ -503,7 +547,7 @@ function makeGrain() {
   x.putImageData(im, 0, 0);
   document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`;
 }
-function fillOf(n) { return n.kind === 'group' ? (n.groupType === 'ex' ? C.accent : C['ink-2']) : n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
+function fillOf(n) { return n.kind === 'area' ? C['status-3'] : n.kind === 'group' ? (n.groupType === 'ex' ? C.accent : C['ink-2']) : n.kind === 'ex' ? C.accent : n.kind === 'lib' ? C['ink-3'] : n.status === 2 ? C['status-2'] : n.status === 1 ? C['status-1'] : C.paper; }
 
 /* ---------- Canvas, camera ---------- */
 const canvas = document.getElementById('g'), ctx = canvas.getContext('2d');
@@ -530,9 +574,10 @@ new ResizeObserver(resize).observe(stage);
 
 function narrow() { return W <= 720; }
 function viewCentre() {
-  const open = !!focus;
-  if (!open) return [W / 2, H / 2];
-  if (narrow()) return [W / 2, (H - Math.min(H * .52, insp.offsetHeight || H * .45)) / 2 + 10];
+  if (!focus) return [W / 2, H / 2];
+  // Phones: keep the focus above whichever sheet is open (the group card or the details panel).
+  if (narrow()) { const sheet = focus.kind === 'group' ? gcard : insp; return [W / 2, (H - Math.min(H * .52, sheet.offsetHeight || H * .45)) / 2 + 10]; }
+  if (focus.kind === 'group') return [W / 2, H / 2];
   return [(W - 354) / 2, H / 2];
 }
 
@@ -545,7 +590,7 @@ function project(n, out) {
   const zz = z2 + cam.dist;
   const F = Math.min(W, H) * 1.05;
   const s = F / Math.max(zz, 1);
-  out.n = n; out.zz = zz; out.s = s; out.x = cam.cx + x1 * s; out.y = cam.cy + y2 * s; out.sr = n.r * s;
+  out.n = n; out.zz = zz; out.s = s; out.x = cam.cx + x1 * s; out.y = cam.cy + y2 * s; out.sr = n.r * (F / cam.dist) * Math.pow(cam.dist / Math.max(zz, 1), .45); // depth changes size only gently, so level reads first
   out.depth = Math.max(0, Math.min(1, (zz - (cam.dist - R0)) / (2 * R0)));
   out.vis = zz > 30;
   return out;
@@ -569,7 +614,7 @@ function neighboursOf(n) {
   // A group lights its members and every topic they link to, in any area.
   if (n.kind === 'group') {
     s.add(n.areaNode);
-    n.members.forEach(m => {
+    n.latest.forEach(m => {
       s.add(m);
       if (m.kind === 'lib') m.tagged.forEach(t => s.add(t));
       else if (m.anchorNode.kind !== 'lib') s.add(m.anchorNode);
@@ -597,15 +642,15 @@ function setFocus(n) {
   if (!n) {
     neigh = new Set(); focusLinks = [];
     insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true');
-    setHash('');
+    setHash(''); closeCard();
   } else {
     if (n.kind === 'lib' && !showLib) { showLib = true; optLib.checked = true; }
     if (n.kind === 'ex' && !showEx) { showEx = true; optEx.checked = true; }
     neigh = neighboursOf(n);
     hoverArea = null; hoverSet = new Set(); hoverLinks = [];
     focusLinks = G.links.filter(l => l.a === n || l.b === n);
-    renderInspector(n);
-    insp.classList.remove('closed'); insp.setAttribute('aria-hidden', 'false');
+    if (n.kind === 'group') { insp.classList.add('closed'); insp.setAttribute('aria-hidden', 'true'); openCard(n); }
+    else { closeCard(); renderInspector(n); insp.classList.remove('closed'); insp.setAttribute('aria-hidden', 'false'); }
     setHash(n.id);
     document.getElementById('live').textContent = `${n.name}, ${KIND_LABEL(n) || STATUS[n.status]}. ${neigh.size} connected.`;
   }
@@ -632,9 +677,43 @@ function computeScope() {
   groups.forEach(gr => { if (on(gr)) scope.add(gr); });
   const groupFor = n => groups.find(gr => gr.groupType === n.kind && gr.members.includes(n)) || null;
   const add = (n, og) => { if ((n.kind === 'lib' || n.kind === 'ex') && on(n)) { if (!scope.has(n) && n.sv < .05) n.og = og; scope.add(n); } };
-  if (expanded) expanded.members.forEach(m => add(m, expanded));
+  if (expanded) expanded.latest.forEach(m => add(m, expanded));
   if (focus.kind === 'lib' || focus.kind === 'ex') { add(focus, groupFor(focus)); neigh.forEach(x => add(x, groupFor(x))); }
 }
+/* The group card: the latest four, and a way to see them all where they live (Learn or Library). */
+const gcard = document.getElementById('gcard');
+function openCard(gr) {
+  const isLib = gr.groupType === 'lib';
+  const k = gr.members.length;
+  document.getElementById('gEyebrow').textContent = gr.areaNode.name;
+  document.getElementById('gTitle').textContent = isLib ? 'Library' : 'Explainers and courses';
+  document.getElementById('gList').innerHTML = gr.latest.map(m => {
+    const meta = m.kind === 'lib' ? `${cap(m.libType)} · on ${plural(m.tagged.length, 'topic')}` : m.isCourse ? `Course · ${m.parts} parts` : `Explainer · ${m.mins} min`;
+    return `<li><button type="button" data-go="${m.id}"><i class="dot ${m.kind === 'lib' ? 'lib' : 'ex'}${m.isCourse ? ' course' : ''}"></i><span><b>${esc(m.name)}</b><small>${esc(meta)}</small></span></button></li>`;
+  }).join('');
+  const all = document.getElementById('gAll');
+  all.textContent = isLib ? `See all ${k} in Library →` : `See all ${k} in Learn →`;
+  all.dataset.msg = isLib ? `In the app this opens Library filtered to ${gr.areaNode.name}.` : `In the app this opens Learn filtered to ${gr.areaNode.name}, explainers and courses.`;
+  document.getElementById('gNote').textContent = k > 4 ? `Latest 4 of ${k}` : `${plural(k, isLib ? 'item' : 'entry')}`;
+  gcard.hidden = false;
+  requestAnimationFrame(() => gcard.classList.add('open'));
+}
+function closeCard() { gcard.classList.remove('open'); gcard.hidden = true; }
+function placeCard() {
+  if (gcard.hidden || !focus || focus.kind !== 'group' || narrow()) return;
+  const p = P[focus.idx]; if (!p) return;
+  const w = gcard.offsetWidth, h = gcard.offsetHeight;
+  let x = p.x + p.sr + 22;
+  if (x + w > W - 12) x = p.x - p.sr - 22 - w;
+  const y = Math.max(12, Math.min(H - h - 12, p.y - 28));
+  gcard.style.transform = `translate(${Math.round(Math.max(12, x))}px, ${Math.round(y)}px)`;
+}
+gcard.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go) return setFocus(G.byId.get(go.dataset.go));
+  if (e.target.closest('#gAll')) { const m = e.target.closest('#gAll').dataset.msg; document.getElementById('live').textContent = m; flash(m); }
+  if (e.target.closest('#gClose')) setFocus(focus.areaNode);
+});
 function placeGroup(gr) {
   const a = gr.areaNode, len = Math.hypot(a.x, a.y, a.z) || 1;
   const dx = a.x / len, dy = a.y / len, dz = a.z / len;
@@ -673,14 +752,15 @@ const ACTIONS = {
   topic: ['Open in Map', 'In the app this opens the radial Map on this topic.'],
   lib: ['Open in Library', 'In the app this opens the item in Library.'],
   group: ['Fold back', 'Folds the group back beside its area.'],
-  ex: ['Play explainer', 'In the app this opens the player.']
+  ex: ['Play explainer', 'In the app this opens the player.'],
+  course: ['Open course', 'In the app this opens the course.']
 };
 const libsHereCount = n => (n.kind === 'area' ? G.nodes.filter(x => x.kind === 'lib' && x.areas.has(n.area)).length : n.libs.length);
 function renderInspector(n) {
   const iBody = document.getElementById('iBody');
   const set = (id, t) => (document.getElementById(id).textContent = t);
   set('iName', n.name);
-  const [act, note] = ACTIONS[n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? n.kind : 'topic'];
+  const [act, note] = ACTIONS[n.isCourse ? 'course' : n.kind === 'lib' || n.kind === 'ex' || n.kind === 'group' ? n.kind : 'topic'];
   set('iMap', act); set('iNote', note);
   if (n.kind === 'group') {
     const isLib = n.groupType === 'lib';
@@ -701,7 +781,7 @@ function renderInspector(n) {
       <section><h3>Explainers that use it (${uses.length})</h3>${uses.length ? `<ul>${uses.map(x => item(x, `<span class="why">${x.anchorNode === n ? 'Made from this item' : 'Draws on this item'}</span>`)).join('')}</ul>` : '<p class="empty">No explainer draws on this yet.</p>'}</section>`;
   } else if (n.kind === 'ex') {
     const touches = [...new Set(n.sources.flatMap(src => src.tagged).concat(n.anchorKind === 'topic' ? [n.anchorNode] : []))];
-    set('iEyebrow', `Explainer · ${n.mins} min`);
+    set('iEyebrow', n.isCourse ? `Course · ${n.parts} parts · ${n.mins} min` : `Explainer · ${n.mins} min`);
     set('iMeta', `Made from ${n.anchorKind === 'topic' ? 'a topic' : 'a Library item'} · draws on ${plural(n.sources.length, 'item')}`);
     iBody.innerHTML = `
       <div class="poster" id="poster">
@@ -760,9 +840,10 @@ function updateSummary() {
   const areas = G.nodes.filter(n => n.kind === 'area').length;
   const learned = topics.filter(n => n.status === 2).length;
   const libs = G.nodes.filter(n => n.kind === 'lib').length;
-  const exs = G.nodes.filter(n => n.kind === 'ex').length;
+  const exs = G.nodes.filter(n => n.kind === 'ex' && !n.isCourse).length;
+  const courses = G.nodes.filter(n => n.isCourse).length;
   const rel = G.links.filter(l => l.type === 'rl').length;
-  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned` + (libs ? ` · ${libs} Library items · ${exs} explainers` : ` · ${rel.toLocaleString()} related links`);
+  const t = `${areas} areas · ${topics.length.toLocaleString()} topics · ${learned.toLocaleString()} learned` + (libs ? ` · ${libs} Library items · ${exs} explainers · ${courses} courses` : ` · ${rel.toLocaleString()} related links`);
   document.getElementById('summary').textContent = t;
   document.getElementById('summary2').textContent = t;
   canvas.setAttribute('aria-label', `Your whole topic graph in 3D: ${t}. Use the search box or the List view to move by keyboard.`);
@@ -828,7 +909,7 @@ function drawFrame(now, dt) {
   // Links, batched by type, depth, emphasis and hover. Tree links grow out of their parent during the entry.
   const B = 3, E = 3, buckets = {};
   const star = focusing ? focus : ha;
-  const flowing = focusing && focus.kind === 'group' ? new Set(focus.members) : null;
+  const flowing = focusing && focus.kind === 'group' ? new Set(focus.latest) : null;
   for (const l of G.links) {
     if (star && (l.a === star || l.b === star)) continue;
     if (flowing && (l.type === 'lib' || l.type === 'ex') && (flowing.has(l.a) || flowing.has(l.b))) continue;
@@ -900,7 +981,7 @@ function drawFrame(now, dt) {
   // An opened group: each member sends arrowed, flowing lines to the topics it is tagged on or made from.
   if (flowing) {
     let i = 0;
-    for (const m of focus.members) {
+    for (const m of focus.latest) {
       const pm = proj.get(m);
       if (!pm.vis || m.rv < .2) continue;
       for (const t of m.kind === 'lib' ? m.tagged : [m.anchorNode]) {
@@ -918,8 +999,9 @@ function drawFrame(now, dt) {
     const n = p.n, isF = n === focus;
     const sc = reduced ? 1 : ease.back(n.rv);
     // Marks close to the camera stop growing, and greyed ones stop sooner, so the focus keeps the stage.
-    const r = Math.max(Math.min(p.sr, 13 + 15 * n.em) * sc * (1 + .18 * n.hv), n.kind === 'lib' ? 1.6 : 1.8);
-    const depthFade = p.depth * .55;
+    const minR = n.kind === 'area' ? 5.5 : n.level === 2 ? 2.8 : 1.6;
+    const r = Math.max(Math.min(p.sr, 13 + 15 * n.em) * sc * (1 + .18 * n.hv), minR * sc);
+    const depthFade = p.depth * (n.kind === 'area' ? .3 : n.level === 3 ? .65 : .5);
     const grey = lerpA(grey0, bg, p.depth * .45);
     let col = lerpA(grey, lerpA(fillOf(n), bg, depthFade), n.em);
     if (n.rv < 1) col = lerpA(bg, col, n.rv);
@@ -943,10 +1025,11 @@ function drawFrame(now, dt) {
       // An explainer is a play mark: it is something you watch.
       ctx.beginPath(); ctx.moveTo(p.x - r * .75, p.y - r); ctx.lineTo(p.x + r * 1.05, p.y); ctx.lineTo(p.x - r * .75, p.y + r); ctx.closePath();
       ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(1, r * .35); ctx.strokeStyle = ctx.fillStyle; ctx.fill(); ctx.stroke();
+      if (n.isCourse) { ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x + r * .1, p.y, r * 1.75, 0, 6.283); ctx.stroke(); }
     } else {
       ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill();
       // Hollow Not-started marks fill in grey when greyed out, so they read like the rest of the background.
-      if (n.status === 0 || n.kind === 'area') {
+      if (n.status === 0 && n.kind !== 'area') {
         const edge = n.status === 0 ? C['ink-3'] : C['status-3'];
         const sAlpha = n.status === 0 ? 1 : .45;
         ctx.strokeStyle = rgb(lerpA(edge, bg, depthFade + (1 - depthFade) * (1 - n.em * sAlpha) * .9), n.rv);
@@ -1117,6 +1200,7 @@ function loop(now) {
   if (!flight || flight.yaw === undefined) cam.yaw += (goal.yaw - cam.yaw) * kTurn;
   if (!flight || flight.pitch === undefined) cam.pitch += (goal.pitch - cam.pitch) * kTurn;
   drawFrame(now, dt);
+  placeCard();
   frames++;
   if (now - fpsT > 1000) { if (G.nodes.length > 500) document.getElementById('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps`; frames = 0; fpsT = now; }
   requestAnimationFrame(loop);
