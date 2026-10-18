@@ -1057,7 +1057,7 @@ function drawLabels(order, focusing, bg, dt) {
   const big = G.nodes.length > 500;
   const small = W < 560; // phones: smaller type, fewer labels, shorter names
   const LS = small ? .8 : 1;
-  const kIn = reduced ? 1 : 1 - Math.exp(-dt * 7), kOut = reduced ? 1 : 1 - Math.exp(-dt * 18); // labels leave faster than they arrive
+  const kIn = reduced ? 1 : 1 - Math.exp(-dt * 5), kOut = reduced ? 1 : 1 - Math.exp(-dt * 7); // gentle cross-fades, never a snap
   const cands = [];
   for (const p of order) {
     const n = p.n;
@@ -1081,7 +1081,10 @@ function drawLabels(order, focusing, bg, dt) {
   const dots = [];
   for (const p of order) if (p.n.kind === 'area' && p.n.rv > .5) { const r = Math.max(p.sr, 5.5) + 2; dots.push([p.x - r, p.y - r, r * 2, r * 2, p.n]); }
   let self = null;
-  const hit = b => placed.some(q => over(b, q)) || dots.some(q => q[4] !== self && over(b, q));
+  // How much of box b is covered by others (0..1). A name already showing tolerates a little overlap before it gives way,
+  // so names do not blink on and off at the edge of a collision while the graph turns.
+  const cover = (b, q) => Math.max(0, Math.min(b[0] + b[2], q[0] + q[2]) - Math.max(b[0], q[0])) * Math.max(0, Math.min(b[1] + b[3], q[1] + q[3]) - Math.max(b[1], q[1])) / (b[2] * b[3]);
+  const hit = (b, tol = 0) => placed.some(q => cover(b, q) > tol) || dots.some(q => q[4] !== self && cover(b, q) > tol + .02);
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const hasLS = 'letterSpacing' in ctx;
   for (const [pri, p] of cands) {
@@ -1105,14 +1108,12 @@ function drawLabels(order, focusing, bg, dt) {
     let cy = p.y + r + gap + size / 2;
     self = n;
     let box = [p.x - w / 2 - 9, cy - size / 2 - 4, w + 18, size + 8]; // generous spacing so names never touch
+    // Each name keeps one place under its mark; it never jumps above. On a collision it fades instead of moving.
     let want = pri >= 0;
-    if (want && hit(box)) {
-      cy = p.y - r - gap - size / 2; box[1] = cy - size / 2 - 4;
-      if (hit(box) && pri < 4) want = false;
-    }
+    if (want && pri < 4 && hit(box, n.la > .5 ? .3 : 0)) want = false;
     n.la += ((want ? 1 : 0) - n.la) * (want ? kIn : kOut);
     if (n.la < .02) continue;
-    if (!want && hit(box)) continue; // a name on its way out never sits over one that is showing
+    if (!want && hit(box)) { n.la *= .85; if (n.la < .02) continue; } // a name on its way out over another fades quicker, but still fades
     if (want) placed.push(box);
     // Quiet type: only the focus is near-ink; everything else sits in the muted inks and fades with depth.
     const tone = pri === 5 ? lerpA(C.ink, C['ink-2'], .15) : pri >= 3 ? C['ink-2'] : isArea ? C['ink-2'] : C['ink-3'];
