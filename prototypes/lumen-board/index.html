@@ -6,17 +6,15 @@
 <style>
 /* Layout: a studio desk. The board is the hero on the left; the script and controls sit beside it like notes. */
 :root {
-  --bg: #eef0ed;
+  --bg: #f3f3ef;
   --panel: #fbfbf9;
   --ink: #22303a;
   --muted: #5d6c77;
-  --rule: #d6d9d2;
+  --rule: #dbdbd3;
   --accent: #1e3e9e;
   --accent-soft: #dfe5f6;
   --warn: #9a3b2e;
   --ok: #2f6b4a;
-  --frame-a: #c9ced2;
-  --frame-b: #9aa2a8;
   --f-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-read: "Newsreader", Georgia, "Times New Roman", serif;
   --f-hand: "Architects Daughter", "Comic Sans MS", cursive;
@@ -24,15 +22,13 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #11181d; --panel: #1b252c; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #2f3b44;
-    --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2;
-    --frame-a: #59636b; --frame-b: #394249; color-scheme: dark;
+    --bg: #131a20; --panel: #1d272f; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #313d47;
+    --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #11181d; --panel: #1b252c; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #2f3b44;
-  --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2;
-  --frame-a: #59636b; --frame-b: #394249; color-scheme: dark;
+  --bg: #131a20; --panel: #1d272f; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #313d47;
+  --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -51,17 +47,15 @@ header p { margin: 0; color: var(--muted); max-width: 70ch; }
 .desk { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
 @media (max-width: 1000px) { .desk { grid-template-columns: minmax(0, 1fr); } }
 
-/* The board: an aluminium-framed whiteboard */
+/* The stage: Studiolo's 16:9 video surface, in the app's light or dark theme */
 .stage {
-  position: relative; container-type: inline-size;
-  border-radius: 10px; padding: 10px;
-  background: linear-gradient(145deg, var(--frame-a), var(--frame-b));
-  box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 10px 30px -18px rgba(0,0,0,.45);
+  position: relative; container-type: inline-size; overflow: hidden;
+  border-radius: 12px; border: 1px solid var(--board-rule, var(--rule)); background: var(--board-bg, #fbfbf9);
 }
-.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 4px; background: var(--board-bg, #f6f7f5); max-width: 100%; }
+.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--board-bg, #fbfbf9); max-width: 100%; }
 .mark { position: absolute; top: 4.2%; right: 3.4%; font: 500 clamp(9px, 1.15cqw, 13px)/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted, #8b949b); pointer-events: none; }
 .caption {
-  position: absolute; left: 10px; right: 10px; bottom: 10px; height: calc((100% - 20px) * 120 / 720);
+  position: absolute; left: 0; right: 0; bottom: 0; height: calc(100% * 120 / 720);
   display: flex; align-items: center; justify-content: center; padding: 0 6%;
   font: 400 clamp(12px, 2.05cqw, 23px)/1.35 var(--f-read); color: var(--board-muted, #7d878e);
   text-align: center; text-wrap: balance; pointer-events: none;
@@ -129,7 +123,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
   <header>
     <h1>Lumen Board</h1>
     <span class="chip">Prototype · board slides</span>
-    <p>The idea is sketched on a whiteboard while the voice explains it. A small dot of ink does the drawing: each mark appears as the narration reaches the word that names it, and the dot comes back to point when the voice returns to something already on the board.</p>
+    <p>The idea is sketched on the stage while the voice explains it. A small dot of ink does the drawing: each mark appears as the narration reaches the word that names it, and the dot comes back to point when the voice returns to something already on the board.</p>
   </header>
 
   <div class="desk">
@@ -150,10 +144,10 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
         </div>
       </div>
       <div class="controls opts">
-        <label>Board <select id="style">
-          <option value="whiteboard">Whiteboard</option>
-          <option value="chalk">Chalkboard</option>
-          <option value="paper">Studiolo paper</option>
+        <label>Theme <select id="theme">
+          <option value="auto">Match app</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
         </select></label>
         <label>Speed <select id="speed">
           <option value="0.75">0.75×</option>
@@ -205,6 +199,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
           <tbody>
             <tr><td>box</td><td><code>app box x y w h "App"</code></td></tr>
             <tr><td>circle, ellipse</td><td><code>sun circle cx cy r</code> · <code>ellipse cx cy rx ry</code></td></tr>
+            <tr><td>poly</td><td><code>roof poly x,y x,y x,y …</code> (closed, convex)</td></tr>
             <tr><td>diamond</td><td><code>ok diamond cx cy w h "Valid?"</code></td></tr>
             <tr><td>cyl (store)</td><td><code>db cyl x y w h "Database"</code></td></tr>
             <tr><td>person</td><td><code>you person x y "You"</code></td></tr>
@@ -402,7 +397,7 @@ const SIZES = { small: 24, normal: 30, big: 42, title: 52 };
 const FLAGS = new Set(["hatch", "dash", "arrow", "center", "left", "right"]);
 const SHAPES = {
   box: { n: 4 }, circle: { n: 3 }, ellipse: { n: 4 }, diamond: { n: 4 }, cyl: { n: 4 }, person: { n: 2 }, text: { n: 2, label: true },
-  arrow: { ends: 2 }, line: { ends: 2 }, curve: { points: 2 }, underline: { target: true }, ring: { target: true }, highlight: { target: true },
+  poly: { points: 3 }, arrow: { ends: 2 }, line: { ends: 2 }, curve: { points: 2 }, underline: { target: true }, ring: { target: true }, highlight: { target: true },
   cross: { target: true }, tick: { tick: true }, axes: { n: 4 }, ground: { n: 3 },
 };
 const KEYWORDS = new Set([...Object.keys(ROLE), ...Object.keys(SIZES), ...FLAGS, "bend", "size"]);
@@ -482,7 +477,7 @@ function parseMarkLine(line, ln, ids, problems, boardId) {
   if (S.n && spec.nums.length !== S.n && !(S.n && shape === "tick")) return fail(`${id}: a ${shape} takes ${S.n} numbers, got ${spec.nums.length}.`);
   if (S.label && !spec.labels.length) return fail(`${id}: text needs its words in quotes.`);
   if (S.ends && (spec.ends.length !== 2)) return fail(`${id}: an ${shape} needs two ends, each an earlier mark's id or a point like 400,300.`);
-  if (S.points && (spec.ends.length < 2 || spec.ends.some((e) => !e.pt))) return fail(`${id}: a curve needs at least two points like 100,400 300,250.`);
+  if (S.points && (spec.ends.length < S.points || spec.ends.some((e) => !e.pt))) return fail(`${id}: a ${shape} needs at least ${S.points} points like 100,400 300,250.`);
   if (S.target && (spec.ends.length !== 1 || !spec.ends[0].ref)) return fail(`${id}: ${shape} needs exactly one earlier mark to mark up.`);
   if (S.tick && !(spec.nums.length === 2 || (spec.ends.length === 1 && spec.ends[0].ref))) return fail(`${id}: tick takes x y or an earlier mark.`);
   return spec;
@@ -506,7 +501,8 @@ function buildBoard(b, problems) {
   for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++) {
     const [a, c] = [solid[i].box, solid[j].box];
     const ox = Math.min(a[0] + a[2], c[0] + c[2]) - Math.max(a[0], c[0]), oy = Math.min(a[1] + a[3], c[1] + c[3]) - Math.max(a[1], c[1]);
-    if (ox > 8 && oy > 8) problems.push({ err: false, line: b.specs.find((s) => s.id === solid[j].id).line, msg: `${solid[j].id} overlaps ${solid[i].id}.` });
+    const inside = (p, q) => p[0] >= q[0] - 2 && p[1] >= q[1] - 2 && p[0] + p[2] <= q[0] + q[2] + 2 && p[1] + p[3] <= q[1] + q[3] + 2;
+    if (ox > 8 && oy > 8 && !inside(a, c) && !inside(c, a)) problems.push({ err: false, line: b.specs.find((s) => s.id === solid[j].id).line, msg: `${solid[j].id} overlaps ${solid[i].id}.` });
   }
   b.marks = marks; b.byId = byId;
 }
@@ -547,6 +543,13 @@ function buildMark(spec, byId, R) {
     const [cx, cy, rx, ry = rx] = n;
     add(wobEllipse(cx, cy, rx, ry, R)); hatch(ellPoly(cx, cy, rx, ry)); inside(cx, cy, rx * 1.6 - 16);
     Object.assign(m, { box: [cx - rx, cy - ry, rx * 2, ry * 2], outline: { kind: "ellipse", cx, cy, rx, ry } });
+  } else if (shape === "poly") {
+    const P = spec.ends.map((e) => e.pt), pts = [];
+    P.forEach((a, i) => { const seg = wobLine(a, P[(i + 1) % P.length], R, { pre: i ? 0 : 1 }); pts.push(...(i ? seg.slice(1) : seg)); });
+    add(pts); hatch(P);
+    const xs = P.map((p) => p[0]), ys = P.map((p) => p[1]), box = [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)];
+    inside(xs.reduce((a, v) => a + v, 0) / P.length, ys.reduce((a, v) => a + v, 0) / P.length, box[2] * 0.5);
+    Object.assign(m, { box, outline: { kind: "rect", box } });
   } else if (shape === "diamond") {
     const [cx, cy, w, h] = n, T = [cx, cy - h / 2], Rr = [cx + w / 2, cy], B = [cx, cy + h / 2], L = [cx - w / 2, cy];
     add([...wobLine(T, Rr, R, { over: 2 }), ...wobLine(Rr, B, R, { pre: 0 })]);
@@ -790,7 +793,7 @@ function penAt(b, t) {
     if (t <= e.t1) {
       if (e.type === "point") {
         const k = (t - e.t0) / 900, tap = Math.sin(clamp(k * 2.2, 0, 1) * Math.PI) * 0.45;
-        return { pos: [e.endPos[0] + Math.sin(k * 9) * 2, e.endPos[1] + Math.cos(k * 7) * 2], lift: 0.55 - tap, role: e.m.strokes[0].role, point: k };
+        return { pos: [e.endPos[0] + Math.sin(k * 9) * 2, e.endPos[1] + Math.cos(k * 7) * 2], lift: 0.55 - tap, role: e.m.strokes[0].role };
       }
       return tipAt(e.m, (t - e.t0) / (e.t1 - e.t0));
     }
@@ -810,9 +813,8 @@ function tipAt(m, p) {
 
 // ---------------------------------------------------------------- drawing
 const STYLES = {
-  whiteboard: { bg: "#f6f7f5", sheen: "rgba(255,255,255,.75)", ghost: 0.045, blend: "multiply", roles: { ink: "#1d2329", emphasis: "#1f4fb8", second: "#6b3fa0", third: "#1d7a49", fourth: "#c2392b", neutral: "#7b858d", marker: "#ffd23f" }, captionInk: "#22303a", captionMuted: "#8b949b" },
-  chalk: { bg: "#22322b", sheen: "rgba(255,255,255,.035)", ghost: 0.07, blend: "screen", roles: { ink: "#eef0ea", emphasis: "#9cc7ff", second: "#d8b9ff", third: "#a9e4a0", fourth: "#ffa08e", neutral: "#a3ada6", marker: "#fff0a0" }, captionInk: "#eef0ea", captionMuted: "#93a39a" },
-  paper: { bg: "#fbfbf9", sheen: "rgba(255,255,255,0)", ghost: 0.04, blend: "multiply", roles: { ink: "#22303a", emphasis: "#1e3e9e", second: "#6e86d0", third: "#2f6b4a", fourth: "#9a3b2e", neutral: "#5d6c77", marker: "#e8c27a" }, captionInk: "#22303a", captionMuted: "#98a3ab" },
+  light: { bg: "#fbfbf9", ghost: 0.045, blend: "multiply", hlAlpha: 0.5, roles: { ink: "#22303a", emphasis: "#1e3e9e", second: "#6e86d0", third: "#2f6b4a", fourth: "#9a3b2e", neutral: "#5d6c77", marker: "#e8c27a" }, captionInk: "#22303a", captionMuted: "#98a3ab", rule: "#dbdbd3" },
+  dark: { bg: "#1d272f", ghost: 0.06, blend: "screen", hlAlpha: 0.3, roles: { ink: "#e2e5e0", emphasis: "#9db0f3", second: "#7189d8", third: "#84c9a2", fourth: "#ec9c8d", neutral: "#9ba7b0", marker: "#e8c27a" }, captionInk: "#e2e5e0", captionMuted: "#6b7984", rule: "#313d47" },
 };
 let getStroke = null;
 import("https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs")
@@ -832,10 +834,10 @@ function outlinePath(pts, w, complete) {
 }
 function inkStroke(ctx, s, pts, complete, key, style) {
   const color = style.roles[s.role] || style.roles.ink;
-  ctx.globalAlpha = s.alpha * (style === STYLES.chalk ? 0.93 : 1);
+  ctx.globalAlpha = s.alpha;
   if (s.kind === "hl") {
     ctx.save(); ctx.globalCompositeOperation = style.blend; ctx.strokeStyle = color; ctx.lineWidth = s.w; ctx.lineCap = "butt"; ctx.lineJoin = "round";
-    ctx.globalAlpha = style === STYLES.chalk ? 0.28 : 0.55;
+    ctx.globalAlpha = style.hlAlpha;
     ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); ctx.restore();
     return;
   }
@@ -861,9 +863,6 @@ function drawMark(ctx, b, m, p, style) {
 }
 function drawBackground(ctx, style) {
   ctx.fillStyle = style.bg; ctx.fillRect(0, 0, W, H);
-  const g = ctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(0.42, style.sheen); g.addColorStop(0.58, "rgba(255,255,255,0)");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 }
 function drawBoardAt(ctx, b, t, style, reduced) {
   for (const m of b.marks) {
@@ -874,24 +873,14 @@ function drawBoardAt(ctx, b, t, style, reduced) {
 }
 function drawDot(ctx, dot, style) {
   if (!dot) return;
-  // No pen or hand: a small dot of ink does the drawing. It glows while it draws, shrinks and dims while it moves
-  // between marks, pulses when it points back at a mark, and fades out once the board is quiet.
+  // No pen or hand: a small plain dot of ink marks where the drawing is happening. It is smaller and fainter while it
+  // moves between marks, and fades out once the board is quiet.
   const fade = dot.idle ? clamp(1 - (dot.idle - 500) / 700, 0, 1) : 1;
   if (fade <= 0) return;
-  const [x, y] = dot.pos, on = 1 - clamp(dot.lift, 0, 1), color = style.roles[dot.role || "ink"] || style.roles.ink;
+  const [x, y] = dot.pos, on = 1 - clamp(dot.lift, 0, 1);
   ctx.save();
-  if (dot.point !== undefined) {
-    for (const k of [(dot.point * 2) % 1, (dot.point * 2 + 0.5) % 1]) {
-      ctx.globalAlpha = (1 - k) * 0.45 * fade; ctx.strokeStyle = color; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(x, y, 7 + k * 26, 0, Math.PI * 2); ctx.stroke();
-    }
-  }
-  const halo = ctx.createRadialGradient(x, y, 0, x, y, 22);
-  halo.addColorStop(0, color); halo.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.globalAlpha = (0.12 + on * 0.2) * fade; ctx.fillStyle = halo;
-  ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
-  ctx.globalAlpha = (0.5 + on * 0.5) * fade; ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(x, y, 3.6 + on * 3.4, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = (0.4 + on * 0.45) * fade; ctx.fillStyle = style.roles[dot.role || "ink"] || style.roles.ink;
+  ctx.beginPath(); ctx.arc(x, y, 2.6 + on * 1.4, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
 
@@ -899,11 +888,18 @@ function drawDot(ctx, dot, style) {
 const canvas = document.getElementById("board"), ctx = canvas.getContext("2d");
 const $ = (id) => document.getElementById(id);
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let TL = null, clock = 0, playing = false, styleName = "whiteboard", needDraw = true, showDot = true, scale = 1;
+let TL = null, clock = 0, playing = false, themePick = "auto", needDraw = true, showDot = true, scale = 1;
 const finals = new Map();
+const darkQuery = matchMedia("(prefers-color-scheme: dark)");
+/** The stage follows the app's theme (an explicit data-theme wins over the system setting) unless the viewer picks one. */
+function themeName() {
+  if (themePick !== "auto") return themePick;
+  const t = document.documentElement.getAttribute("data-theme");
+  return t === "dark" || t === "light" ? t : darkQuery.matches ? "dark" : "light";
+}
 
 function finalFrame(b, style) {
-  const key = `${b.id}:${styleName}:${b.endMs}`;
+  const key = `${b.id}:${themeName()}:${b.endMs}`;
   if (finals.has(key)) return finals.get(key);
   const off = document.createElement("canvas"); off.width = W; off.height = H;
   const o = off.getContext("2d");
@@ -915,7 +911,7 @@ function finalFrame(b, style) {
 function boardIndexAt(t) { if (!TL || !TL.boards.length) return -1; let k = 0; TL.boards.forEach((b, i) => { if (t >= b.startMs) k = i; }); return k; }
 
 function render() {
-  const style = STYLES[styleName];
+  const style = STYLES[themeName()];
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   drawBackground(ctx, style);
   if (!TL || !TL.boards.length) return;
@@ -960,7 +956,7 @@ function updateChrome() {
   $("scrub").value = String(Math.round(clock));
   updateCaption();
   const b = TL && TL.boards[boardIndexAt(clock)];
-  const style = STYLES[styleName];
+  const style = STYLES[themeName()];
   $("legend").replaceChildren(...(b ? b.legend : []).map((l) => {
     const span = document.createElement("span"), sw = document.createElement("i");
     sw.style.background = style.roles[l.role]; span.append(sw, l.meaning); return span;
@@ -1035,8 +1031,6 @@ function load(src, { autoplay = false } = {}) {
   const tl = buildTimeline(parsed);
   finals.clear(); pathCache.clear();
   TL = tl.boards.length && tl.boards.some((b) => b.marks.length) ? tl : null;
-  const hdrStyle = tl.boards[0]?.header.style;
-  if (hdrStyle && STYLES[hdrStyle]) { styleName = hdrStyle; $("style").value = hdrStyle; applyStyleVars(); }
   $("scrub").max = String(Math.round(TL ? TL.total : 0));
   $("ticks").replaceChildren(...(TL ? TL.boards.slice(1) : []).map((b) => { const s = document.createElement("span"); s.style.left = `${(b.startMs / TL.total) * 100}%`; return s; }));
   showProblems(tl.problems, tl);
@@ -1053,14 +1047,111 @@ function showProblems(problems, tl) {
   $("scriptStat").textContent = `${tl.boards.length} board${tl.boards.length === 1 ? "" : "s"} · ${marks} marks · ${fmt(tl.total)}`;
 }
 function applyStyleVars() {
-  const s = STYLES[styleName], box = $("stageBox");
-  box.style.setProperty("--board-bg", s.bg); box.style.setProperty("--board-ink", s.captionInk);
+  const s = STYLES[themeName()], box = $("stageBox");
+  box.style.setProperty("--board-bg", s.bg); box.style.setProperty("--board-ink", s.captionInk); box.style.setProperty("--board-rule", s.rule);
   box.style.setProperty("--board-muted", s.captionMuted); box.style.setProperty("--board-accent", s.roles.emphasis);
   requestDraw();
 }
 
 // ---------------------------------------------------------------- examples
 const EXAMPLES = [
+  { title: "Reading a building", line: "Architecture · a section, then how air moves through it (2 boards)", src: `<item id="b1" type="board" title="Reading a building section">
+roles: emphasis = structure; fourth = weather; third = insulation
+---
+ground ground 90 470 1190
+found  box 330 470 64 72 emphasis hatch
+found2 box 886 470 64 72 emphasis hatch
+slab   box 330 446 620 24 emphasis hatch
+lwall  box 340 250 34 196 emphasis
+rwall  box 906 250 34 196 emphasis
+roof   poly 300,252 640,92 980,252 emphasis
+wx     arrow 140,120 330,200 fourth "rain, wind, sun"
+insul  curve 388,266 400,292 388,318 400,344 388,370 400,396 388,422 third
+ins    text 418 344 "insulation" small third
+</item>
+<say>A section is a building cut open, like slicing a cake. Start with the [[b1.ground]]ground line, and what sits below it: the [[b1.found]]foundations.</say>
+<say>On them rests the ground floor [[b1.slab]]slab, and the [[b1.lwall]]walls rise from it.</say>
+<say>The [[b1.roof]]roof closes the top. Its first job is to keep the [[b1.wx]]weather out.</say>
+<say>Just inside the wall, a layer of [[b1.insul]]insulation keeps the heat in. Read any section from the bottom up: [[b1.found]]foundations, then [[b1.lwall]]structure, then the [[b1.roof]]skin.</say>
+<item id="b2" type="board" title="Why warm air leaves at the top">
+roles: emphasis = cool air; fourth = warm air
+---
+ground ground 90 520 1190
+shell  poly 340,520 340,262 640,112 940,262 940,520
+low    box 330 420 22 60 emphasis
+cool   arrow 150,450 318,450 emphasis "cool air in"
+warm   text 560 470 "warmed: lighter" small fourth
+rise   curve 390,450 520,420 610,330 690,230 790,196 fourth dash arrow
+vent   box 838 188 30 34 fourth
+out    arrow 878,190 1060,120 fourth "out at the top"
+</item>
+<say>Now watch the air moving through the same house. [[b2.cool]]Cool air slips in low, through an [[b2.low]]opening near the floor.</say>
+<say>Inside, it is [[b2.warm]]warmed by people and sunlight, becomes lighter, and [[b2.rise]]rises towards the roof.</say>
+<say>It escapes through a [[b2.vent]]vent up high and [[b2.out]]flows out at the top, pulling fresh air in behind it. That is the stack effect: ventilation without a fan.</say>` },
+
+  { title: "Who is bound to whom", line: "Contracts · the parties on a building project and the missing link", src: `<item id="c1" type="board" title="Who is bound to whom on a building project">
+roles: ink = a contract; fourth = no contract; third = a warranty that bridges the gap
+---
+client  box 520 80 240 84 emphasis "Client"
+arch    box 990 80 200 84 ink "Architect"
+appoint arrow client arch ink "appointment"
+main    box 520 266 240 84 ink "Main contractor"
+build   arrow client main ink bend -0.04 "building contract"
+sub     box 520 452 240 84 ink "Subcontractor"
+subk    arrow main sub ink bend -0.04 "subcontract"
+gap     curve 516,130 340,230 340,400 516,500 fourth dash
+nolink  text 96 315 "no contract" fourth small
+cw      curve 764,494 900,420 900,250 772,150 third dash arrow
+cwl     text 924 335 "collateral warranty" small third
+</item>
+<say>On a typical project, the [[c1.client]]client, the one paying, sits at the top. They hire an [[c1.arch]]architect under an [[c1.appoint]]appointment. That is one contract.</say>
+<say>Separately, the client signs with a [[c1.main]]main contractor: the [[c1.build]]building contract. That is a second contract.</say>
+<say>The main contractor hands part of the work to a [[c1.sub]]subcontractor, under a [[c1.subk]]subcontract of its own.</say>
+<say>Now notice what is missing. There is [[c1.gap]]no contract between the client and the subcontractor, so if the work is poor, the client [[c1.nolink]]can't sue them directly.</say>
+<say>That gap is why clients ask for a [[c1.cw]]collateral warranty: a direct promise from the subcontractor that [[c1.cwl]]bridges it.</say>` },
+
+  { title: "Where the eye goes", line: "Graphic design · rule of thirds, then visual hierarchy (2 boards)", src: `<item id="g1" type="board" title="The rule of thirds">
+roles: fourth = the weak choice; emphasis = the stronger one
+---
+frame  box 300 86 680 450 ink
+mid    circle 640 311 38 fourth
+dull   text 1000 311 "feels static" small fourth
+v1     line 527,86 527,536 neutral dash
+v2     line 753,86 753,536 neutral dash
+h1     line 300,236 980,236 neutral dash
+h2     line 300,386 980,386 neutral dash
+moved  circle 753 236 38 emphasis hatch
+spot   ring moved third
+x1     cross mid fourth
+</item>
+<say>Here is a [[g1.frame]]photograph, with the subject placed [[g1.mid]]dead centre. It's balanced, but it [[g1.dull]]feels static.</say>
+<say>Now divide the frame into thirds: [[g1.v1]]two lines down, and [[g1.h1]]two across.</say>
+<say>Put the subject on one of the [[g1.moved]]crossings instead. The eye lands there first, and the empty space gives it [[g1.spot]]room to breathe.</say>
+<say>So the [[g1.x1]]centred version loses. Off centre, the picture starts to tell a story.</say>
+<item id="g2" type="board" title="Visual hierarchy: what you read first">
+roles: emphasis = reading order; fourth = colour and contrast
+---
+poster   box 430 76 420 510 ink
+head     text 470 142 "OPEN STUDIO" size 38
+n1       circle 386 142 22 emphasis "1"
+sz       text 880 142 "size" emphasis
+img      box 470 196 340 170 neutral hatch
+n2       circle 386 281 22 emphasis "2"
+button   box 470 494 170 54 fourth hatch "Book now"
+n3       circle 386 521 22 emphasis "3"
+contrast text 880 521 "colour + contrast" small fourth
+l1       line 470,400 800,400 neutral
+l2       line 470,426 770,426 neutral
+l3       line 470,452 720,452 neutral
+n4       circle 386 426 22 emphasis "4"
+last     text 880 426 "small, grey: last" small neutral
+</item>
+<say>A [[g2.poster]]poster has a few seconds to work, so the designer decides what you see first.</say>
+<say>The [[g2.head]]headline is read first, [[g2.n1]]number one, because of its [[g2.sz]]size.</say>
+<say>Next the eye drops to the [[g2.img]]image, [[g2.n2]]number two.</say>
+<say>Then the [[g2.button]]button, [[g2.n3]]three. It is small, but [[g2.contrast]]colour and contrast pull the eye to it.</say>
+<say>The [[g2.l1]]body text, small and grey, is read [[g2.n4]]last. That planned order is visual hierarchy.</say>` },
+
   { title: "Why a cache makes reads fast", line: "Software · boxes, arrows, a ring and a note", src: `<item id="b1" type="board" title="Why a cache makes reads fast">
 roles: fourth = the slow trip; third = the fast trip
 ---
@@ -1080,30 +1171,6 @@ win    underline fast third
 <say>If the record isn't there, it is fetched once and [[b1.fill]]copied into the cache. Every later read is a [[b1.hit]]hit, served from memory in about [[b1.fast]]one millisecond.</say>
 <say>That is the whole trick: pay for the [[b1.slow]]slow trip once, then [[b1.win]]reuse the answer.</say>` },
 
-  { title: "How a load finds the ground", line: "Architecture · a section, a load path, a footing", src: `<item id="b1" type="board" title="How a load finds the ground">
-roles: fourth = load; emphasis = structure
----
-snow   text 474 98 "snow + people" fourth
-l1     arrow 480,128 480,196 fourth
-l2     arrow 640,128 640,196 fourth
-l3     arrow 800,128 800,196 fourth
-slab   box 360 210 560 26 emphasis hatch
-lwall  box 404 236 34 276 emphasis hatch
-rwall  box 842 236 34 276 emphasis hatch
-ground ground 120 490 1160
-lfoot  box 366 512 110 28 emphasis hatch
-rfoot  box 804 512 110 28 emphasis hatch
-path   curve 600,262 520,262 470,300 460,380 460,500 dash fourth arrow
-spread arrow 421,548 376,594 fourth
-spread2 arrow 421,548 466,594 fourth
-wide   ring lfoot neutral
-less   text 500 580 "wider footing, less pressure" small neutral
-</item>
-<say>Start at the top. The roof carries [[b1.snow]]snow and people, pressing [[b1.l1]]straight down.</say>
-<say>The [[b1.slab]]slab collects that weight and hands it sideways to the [[b1.lwall]]walls on either side.</say>
-<say>Each wall carries it down to the [[b1.ground]]ground, and the load [[b1.path]]travels down through the wall, into the [[b1.lfoot]]footing.</say>
-<say>The footing's job is to [[b1.spread]]spread the load over more soil, so [[b1.wide]]a wider footing means [[b1.less]]less pressure on the ground below.</say>` },
-
   { title: "Why compound growth bends upward", line: "Finance · axes, two curves, a highlight", src: `<item id="b1" type="board" title="Why compound growth bends upward">
 roles: neutral = simple interest; emphasis = compound interest
 ---
@@ -1121,23 +1188,6 @@ mark   highlight rule
 <say>With [[b1.comp]]compound interest, each year's interest is added to the pile, and next year you earn on the bigger pile, so the curve bends upward.</say>
 <say>After enough years the difference is large, and all of it is [[b1.gap]]interest earned on [[b1.extra]]earlier interest.</say>
 <say>That is the rule: [[b1.mark]]growth equals the rate times what you already have. The pile grows, so the growth grows, and the curve [[b1.comp]]keeps steepening.</say>` },
-
-  { title: "Two boards: request, then response", line: "Web · two boards with an eraser wipe", src: `<item id="b1" type="board" title="A request leaves the browser">
----
-you    person 170 250 "You"
-web    box 360 270 220 120 ink "Browser"
-srv    box 900 270 220 120 emphasis "Server"
-ask    arrow web srv emphasis bend -0.15 "GET /page"
-</item>
-<say>[[b1.you]]You click a link. The [[b1.web]]browser turns that click into a request, and sends it to a [[b1.srv]]server: [[b1.ask]]give me this page.</say>
-<item id="b2" type="board" title="The response comes back">
----
-srv    box 900 270 220 120 emphasis "Server"
-html   box 360 270 220 120 third hatch "HTML"
-back   arrow srv html third bend -0.15 "200 OK"
-done   tick html third
-</item>
-<say>The [[b2.srv]]server answers with a [[b2.back]]response: a status code and the page itself, as [[b2.html]]HTML. The browser draws it, and [[b2.done]]you see the page.</say>` },
 ];
 
 function renderExamples() {
@@ -1164,12 +1214,13 @@ roles: fourth = what red means here; emphasis = what blue means here
 <say>…</say>   (3 to 5 say blocks, after the item)
 
 A mark line is: id shape numbers [colour] [options] ["label"]
-The stage is 1280 by 720, x to the right, y downwards. Every mark stays inside x 64..1216 and y 64..600 (below 600 is the caption band). Plan the layout first: flow left to right or top to bottom, keep 40 px between shapes, keep labels short (1 to 4 words), and use 8 to 14 marks.
+The stage is 1280 by 720, x to the right, y downwards. Every mark stays inside x 64..1216 and y 64..600 (below 600 is the caption band). Plan the layout first: flow left to right or top to bottom, keep 40 px between shapes (a frame may contain other marks), keep labels short (1 to 4 words), and use 8 to 14 marks.
 
 SHAPES
 box x y w h "Label"            (x y = top-left corner; the label is written inside)
 circle cx cy r "Label" · ellipse cx cy rx ry "Label" · diamond cx cy w h "Label"
 cyl x y w h "Label"            (a store or database drum)
+poly x,y x,y x,y …             (a closed convex outline: a roof, a wedge, a building outline)
 person x y "Label"             (stick figure, x y = top of head, about 70 wide and 170 tall)
 text x y "words" [small|big|title]   (x = left edge, y = middle of the line; normal size is 30 px tall and about 18 px per character, small 24 px and 14 px per character)
 arrow A B [bend n] "label"     (A and B are earlier mark ids or points like 400,300; bend -0.3..0.3 curves it)
@@ -1226,7 +1277,9 @@ sampleReady.then((sample) => {
 // ---------------------------------------------------------------- wiring
 $("play").onclick = () => setPlaying(!playing);
 $("scrub").oninput = (e) => seek(+e.target.value);
-$("style").onchange = (e) => { styleName = e.target.value; applyStyleVars(); };
+$("theme").onchange = (e) => { themePick = e.target.value; applyStyleVars(); };
+darkQuery.addEventListener("change", applyStyleVars);
+new MutationObserver(applyStyleVars).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 $("dot").onchange = (e) => { showDot = e.target.checked; requestDraw(); };
 $("speed").onchange = () => voiceStop();
 $("voice").onchange = (e) => { voice.active = e.target.checked && "speechSynthesis" in window; voiceStop(); };
