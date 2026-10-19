@@ -62,6 +62,12 @@ The two views are the same records, the same quick view, the same Select, area a
 - **What changes in the toolbar:** the count line reads "65 entries · newest first" on the wall and "9 shelves · in your order" on shelves. The chip row becomes the bay links (Sources, Notes, Photos, Objects, Not on a shelf) plus **Each shelf shows: A rotating mix ▾**. The capture card leaves the grid. Capture stays on `C`, the rail, and each shelf's **+**.
 - **Phone:** the same switch as two icon buttons in the header. Shelves show one bay at a time, and each shelf scrolls sideways.
 
+### Moving along a shelf, and opening one
+
+- **Each shelf is a carousel.** It holds the whole collection, in shelf order (the rotating front first, §4.1). When it is wider than the screen it scrolls sideways: round **‹ ›** buttons at its ends, edges that fade where more is hidden, snap to items, trackpad and touch swipe, and a quiet position line under the board ("5–8 of 14"). A shelf that fits shows no buttons. The carousel remembers where it was until its order changes (a new sort, a new day, a search).
+- **Open shelf** stacks the same collection on more boards of the same bookcase, in place: up to three rows (two for People), each with its own board. The items that were out of sight slide in from the carousel's edge. The footer reads "Showing 31 of 48"; when more remain, the last row ends with **+ N more. See all on the wall** and the footer has **See all on the wall →**, which opens the Wall filtered to that collection. **Close shelf** folds it back into one row. Several shelves can be open at once.
+- Rows fit what is on them: books stand as spines (about 15–20 per row), videos and buildings 4–5, cards 5–6, photos by their proportions.
+
 ## 3. The switch animation: re-shelving
 
 The cards don't fade out and get replaced. **Each card flies to its own shelf and turns into its shelf shape on the way.** That one motion explains the whole idea: the wall and the shelves are the same things, just arranged differently.
@@ -133,6 +139,10 @@ The area picker becomes walking into another room: Architecture, Parenting, Fait
 
 Today could show one buried item a day, "From your shelves: *S,M,L,XL*, never opened". It's the smallest way to bring the rediscovery job outside the Library. mymind (Serendipity) and Readwise (Daily Review) both build habits on resurfacing.
 
+### On the desk, defined
+
+The desk shows what is in progress, from states Studiolo already records: **Reading** (a Source's reading state, To read / Reading / Read) and **Watching** (a video's watch status, To watch / Watching / Watched, Phase 2G G3). An item leaves the desk when it becomes Read or Watched, and stays on its shelf throughout. **Writing** is not a state yet: the prototype shows a Long note there. Either define it (a Long note edited in the last 7 days) or leave writing off the desk; this is an owner decision.
+
 ### 4.9 AI on a shelf (AI phase)
 
 What this shelf says. Gaps ("9 of these 14 books have no notes"). **Explain this shelf** or make a course from it. The "I want to learn…" notes in the Craft page could form a shelf of their own that the copilot reads.
@@ -193,3 +203,4 @@ Later: threads (§4.4), rooms (§4.7), One from the shelves on Today (§4.8), AI
 5. **Since-marks.** Helpful nudge or nagging? Six months as the threshold?
 6. **The desk.** On Shelves only, or also on the wall?
 7. **Threads** (§4.4): worth pulling into the first version? It is the most Studiolo-specific feature, and the data already exists.
+8. **Writing on the desk.** Add Writing (a Long note edited in the last 7 days), or keep the desk to Reading and Watching?

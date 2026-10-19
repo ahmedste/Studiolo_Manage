@@ -178,7 +178,23 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
 .linkb { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--accent); padding: 4px 0; display: inline-flex; align-items: center; gap: 4px; }
 .linkb:hover { color: var(--ink); }
 .sbody { flex: 999 1 520px; min-width: 0; }
-.srow { display: flex; align-items: flex-end; gap: 6px; min-height: 206px; padding: 34px 4px 0; overflow-x: auto; overflow-y: hidden; border-bottom: 2px solid var(--shelf); scrollbar-width: thin; }
+.srow { position: relative; border-bottom: 2px solid var(--shelf); }
+.track { display: flex; align-items: flex-end; gap: 6px; min-height: 206px; padding: 34px 4px 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scroll-padding-inline: 4px; overscroll-behavior-x: contain; scrollbar-width: none; }
+.track::-webkit-scrollbar { display: none; }
+.track > * { scroll-snap-align: start; }
+.track.wrapped { overflow: visible; scroll-snap-type: none; }
+.sbody { position: relative; }
+.sbody[data-left] .track { -webkit-mask-image: linear-gradient(to right, transparent, #000 64px); mask-image: linear-gradient(to right, transparent, #000 64px); }
+.sbody[data-right] .track { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 64px), transparent); }
+.sbody[data-left][data-right] .track { -webkit-mask-image: linear-gradient(to right, transparent, #000 64px, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to right, transparent, #000 64px, #000 calc(100% - 64px), transparent); }
+.cbtn { position: absolute; top: 116px; z-index: 3; width: 40px; height: 40px; margin-top: -20px; border-radius: 50%; background: var(--panel); box-shadow: 0 0 0 1px var(--line), var(--shadow-pic); display: grid; place-items: center; color: var(--ink); opacity: 0; pointer-events: none; transition: opacity 130ms var(--ease); }
+.cbtn.prev { left: -10px; } .cbtn.next { right: -10px; }
+.cbtn:hover { color: var(--accent); }
+.sbody[data-left] .cbtn.prev, .sbody[data-right] .cbtn.next { opacity: 1; pointer-events: auto; }
+.sfoot { display: flex; justify-content: flex-end; align-items: center; gap: 12px; min-height: 22px; padding-top: 6px; font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sfoot button { color: var(--accent); font-size: 12px; font-weight: 500; padding: 4px 0; }
+.board + .srow { margin-top: 6px; }
+.board + .srow .track { min-height: 0; padding-top: 30px; }
 .board { height: 9px; background: var(--board); border-bottom: 1px solid var(--line); border-radius: 0 0 3px 3px; transform-origin: left center; }
 .slot { position: relative; flex: none; display: flex; flex-direction: column; justify-content: flex-end; transition: opacity 220ms var(--ease); }
 .slot.dim { opacity: 0.2; }
@@ -289,7 +305,7 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
   .slabel .sk, .slabel h3, .slabel .sm { grid-column: 1; }
   .slabel h3 { font-size: 19px; margin: 2px 0; }
   .slabel .linkb { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
-  .srow { min-height: 190px; }
+  .track { min-height: 190px; }
   .desk-h, .loose-h { flex-basis: 100%; }
   .tabbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; z-index: 34; left: 0; right: 0; bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(0px, env(safe-area-inset-left, 0px)); padding-right: max(0px, env(safe-area-inset-right, 0px)); background: var(--panel); border-top: 1px solid var(--line); }
   .tabbar button { height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: var(--ink-2); }
@@ -504,7 +520,7 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     sort: store.get("sort", "mix"),
     day: store.get("day", 0),
     slow: store.get("slow", false),
-    chip: null, query: "", thread: null, wallScroll: 0
+    chip: null, query: "", thread: null, wallScroll: 0, open: {}, scrollX: {}, sig: {}
   };
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var K = function () { return state.slow ? 4 : 1; };
@@ -575,12 +591,42 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     if (c === "video") return '<button class="sh sv' + cls + '"' + a + lbl + '>' + pic(it) + '<span class="vt">' + esc(it.title) + '</span></button>';
     if (c === "quote" || c === "note") {
       var q = it.k === "quote";
-      return '<button class="sh ic' + (q ? " qq" : "") + (ii === 4 ? " lean" : "") + cls + '"' + a + lbl + '><span class="it1">' + esc(q ? "“" + it.title + "”" : it.title) + '</span><span class="ib1">' + esc(it.by) + '</span></button>';
+      return '<button class="sh ic' + (q ? " qq" : "") + "" + cls + '"' + a + lbl + '><span class="it1">' + esc(q ? "“" + it.title + "”" : it.title) + '</span><span class="ib1">' + esc(it.by) + '</span></button>';
     }
-    if (c === "photo") { var w = it.ratio > 1 ? 112 : 158, h = Math.round(w * (it.ratio || 0.7)); if (h > 150) { h = 150; w = Math.round(150 / it.ratio); } return '<button class="sh pr' + cls + '"' + a + lbl + '>' + pic(it, ' style="width:' + w + 'px;height:' + h + 'px"') + '<span class="pl">' + esc(it.title) + '</span></button>'; }
+    if (c === "photo") { var pd = photoDims(it), w = pd.w, h = pd.h; return '<button class="sh pr' + cls + '"' + a + lbl + '>' + pic(it, ' style="width:' + w + 'px;height:' + h + 'px"') + '<span class="pl">' + esc(it.title) + '</span></button>'; }
     if (c === "person") return '<button class="sh pt' + cls + '"' + a + lbl + '><span class="pk">' + esc(it.by.split("·").slice(-1)[0].trim()) + '</span><span class="pnm">' + esc(it.title) + '</span></button>';
     if (c === "thing") return '<button class="sh pc' + cls + '"' + a + lbl + '>' + pic(it) + '<span class="pct">' + esc(it.title) + '</span><span class="pcb">' + esc(it.by) + '</span></button>';
     return "";
+  }
+
+  function photoDims(it) { var w = it.ratio > 1 ? 112 : 158, h = Math.round(w * (it.ratio || 0.7)); if (h > 150) { h = 150; w = Math.round(150 / it.ratio); } return { w: w, h: h }; }
+  function faceWidth(it, col, faceOut) {
+    switch (col.shape) {
+      case "book": return faceOut ? 122 : spineDims(it).w;
+      case "pdf": return spineDims(it).w + 6;
+      case "video": return 196;
+      case "quote": case "note": return 154;
+      case "photo": return photoDims(it).w + 14;
+      case "person": return 126;
+      case "thing": return 168;
+    }
+    return 120;
+  }
+  // Open shelf: the collection laid out over a few stacked rows of the same bookcase.
+  function stackRows(list, col, width, faceOutFirst) {
+    var maxRows = col.shape === "person" ? 2 : 3, tail = 170, rows = [[]], widths = [0];
+    for (var i = 0; i < list.length; i++) {
+      var w = faceWidth(list[i], col, faceOutFirst && i === 0) + 6, r = rows.length - 1;
+      if (widths[r] + w > width - 8 && rows[r].length) {
+        if (rows.length === maxRows) break;
+        rows.push([]); widths.push(0); r++;
+      }
+      rows[r].push(list[i]); widths[r] += w;
+    }
+    var last = rows.length - 1;
+    while (rows[last].length > 1 && widths[last] + tail > width - 8) { var x = rows[last].pop(); widths[last] -= faceWidth(x, col, false) + 6; }
+    var placed = rows.reduce(function (n, r) { return n + r.length; }, 0);
+    return { rows: rows, rest: list.length - placed };
   }
 
   /* ---------- What a shelf shows ---------- */
@@ -604,7 +650,7 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
       pool.slice(0, 2).forEach(take);
       order.forEach(take);
     }
-    return { all: all, shown: picked.slice(0, col.cap), more: Math.max(0, all.length - col.cap) };
+    return { all: all, shown: picked };
   }
 
   /* ---------- Rendering ---------- */
@@ -670,6 +716,9 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
         return '<button class="dcard" data-open="' + it.id + '">' + th + '<span class="db"><span class="dk">' + esc(it.desk) + ' · ' + esc(COL[it.c].name) + '</span><span class="dn" style="display:block">' + esc(it.title) + '</span><span class="prog" style="margin:0"><i style="width:' + (it.pct || 0) + '%"></i></span><span class="dm" style="display:block">' + esc(it.where || "") + '</span></span></button>';
       }).join("") + '</div>';
 
+    var anySb = $("#baysOut .sbody");
+    var shelfWidth = anySb ? anySb.getBoundingClientRect().width : Math.max(280, $("#baysOut").getBoundingClientRect().width - (innerWidth > 700 ? 232 : 0));
+    $$("[data-track]").forEach(function (t) { state.scrollX[t.dataset.track] = t.scrollLeft; });
     var si = 0, out = "";
     BAYS.forEach(function (b) {
       var cols = COLS.filter(function (c) { return c.bay === b.id; });
@@ -680,24 +729,49 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
         var st = f.all.filter(stale).length;
         var anyLit = !lit || f.all.some(function (it) { return lit[it.id]; });
         var meta = (f.all.length === 1 ? "1 item" : f.all.length + " " + col.noun) + (st ? " · " + st + " not opened in 6 months" + (col.shape === "book" || col.shape === "pdf" ? " (dotted)" : "") : "");
-        var faces = f.shown.map(function (it, ii) {
+        var faceOutOn = col.shape === "book" && !lit && (state.sort === "mix" || state.sort === "newest");
+        var slot = function (it, ii) {
           var mark = !lit ? sinceMark(it) : "";
           var dim = lit && !lit[it.id] ? " dim" : "";
-          var faceOut = col.shape === "book" && ii === 0 && !lit && (state.sort === "mix" || state.sort === "newest");
+          var faceOut = faceOutOn && ii === 0;
           var narrow = (col.shape === "book" && !faceOut) || col.shape === "pdf" ? " narrow" : "";
           return '<div class="slot' + dim + narrow + (mark ? " marked" : "") + '"' + (mark ? ' title="' + esc(mark) + '"' : "") + '>' + (mark ? '<span class="since">' + esc(mark) + '</span>' : "") + shelfFace(it, si, ii, faceOut, lit) + '</div>';
-        }).join("");
-        out += '<article class="shelf' + (anyLit ? "" : " faded") + '" data-shelf="' + col.id + '" aria-label="' + esc(col.name) + ' shelf">' +
-          '<div class="slabel"><div class="sk"><i style="background:' + col.tone + '"></i>' + esc(col.kicker) + '</div><h3>' + esc(col.name) + '</h3><div class="sm">' + esc(meta) + '</div><button class="linkb" data-openshelf="' + col.id + '">Open shelf <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>' +
-          '<div class="sbody"><div class="srow">' + faces +
-          (f.more ? '<button class="stub" data-stub="' + col.id + '" data-openshelf="' + col.id + '">+ ' + f.more + ' more on this shelf</button>' : "") +
-          '<button class="add" data-add="' + col.id + '" aria-label="Add to ' + esc(col.name) + '" title="Add to ' + esc(col.name) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' +
-          '</div><div class="board" data-board="' + si + '"></div></div></article>';
+        };
+        var addBtn = '<button class="add" data-add="' + col.id + '" aria-label="Add to ' + esc(col.name) + '" title="Add to ' + esc(col.name) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>';
+        var isOpen = !!state.open[col.id], body;
+        var chev = function (d) { return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="' + d + '"/></svg>'; };
+        if (!isOpen) {
+          body = '<div class="sbody" data-car="' + col.id + '">' +
+            '<button class="cbtn prev" data-car-step="-1" aria-label="Scroll ' + esc(col.name) + ' back">' + chev("M15 6l-6 6 6 6") + '</button>' +
+            '<div class="srow"><div class="track" data-track="' + col.id + '">' + f.shown.map(slot).join("") + addBtn + '</div></div>' +
+            '<div class="board" data-board="' + si + '"></div>' +
+            '<div class="sfoot"><span data-pos></span></div>' +
+            '<button class="cbtn next" data-car-step="1" aria-label="Scroll ' + esc(col.name) + ' on">' + chev("M9 6l6 6-6 6") + '</button></div>';
+        } else {
+          var st2 = stackRows(f.shown, col, shelfWidth, faceOutOn), n0 = 0;
+          body = '<div class="sbody">' + st2.rows.map(function (row, ri) {
+            var html = row.map(function (it) { return slot(it, n0++); }).join("");
+            if (ri === st2.rows.length - 1) html += (st2.rest ? '<button class="stub" data-stub="' + col.id + '" data-openshelf="' + col.id + '">+ ' + st2.rest + ' more. See all on the wall</button>' : "") + addBtn;
+            return '<div class="srow"><div class="track wrapped">' + html + '</div></div><div class="board" data-board="' + si + '"></div>';
+          }).join("") +
+            '<div class="sfoot"><span>Showing ' + (f.all.length - st2.rest) + ' of ' + f.all.length + '</span><button data-openshelf="' + col.id + '">See all on the wall →</button></div></div>';
+        }
+        out += '<article class="shelf' + (anyLit ? "" : " faded") + (isOpen ? " open" : "") + '" data-shelf="' + col.id + '" aria-label="' + esc(col.name) + ' shelf">' +
+          '<div class="slabel"><div class="sk"><i style="background:' + col.tone + '"></i>' + esc(col.kicker) + '</div><h3>' + esc(col.name) + '</h3><div class="sm">' + esc(meta) + '</div>' +
+          '<button class="linkb" data-expand="' + col.id + '" aria-expanded="' + isOpen + '">' + (isOpen ? "Close shelf " + chev("M6 15l6-6 6 6") : "Open shelf " + chev("M6 9l6 6 6-6")) + '</button></div>' + body + '</article>';
         si++;
       });
       out += '</section>';
     });
     $("#baysOut").innerHTML = out;
+    COLS.forEach(function (col) {
+      var t = $('[data-track="' + col.id + '"]'); if (!t) return;
+      var sig = $$("[data-fid]", t).map(function (e) { return e.dataset.fid; }).join(",");
+      if (state.sig[col.id] === sig) t.scrollLeft = state.scrollX[col.id] || 0;
+      state.sig[col.id] = sig;
+      t.addEventListener("scroll", function () { if (!t._raf) t._raf = requestAnimationFrame(function () { t._raf = 0; updateCarousel(t.closest(".sbody")); }); }, { passive: true });
+    });
+    updateCarousels();
 
     var loose = items.filter(function (it) { return !it.c; });
     $("#loose").hidden = loose.length === 0;
@@ -705,6 +779,19 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     $("#loose").innerHTML = '<div class="loose-h"><div class="eyebrow" style="color:var(--ink-2)">Not on a shelf</div><h2 id="looseH">' + loose.length + ' loose ' + (loose.length === 1 ? "item" : "items") + '</h2><p>Saved without a collection. Put each one on a shelf with Shelve…</p></div><div class="loose-list">' +
       loose.map(function (it, i) { return '<div class="lcard">' + wallCard(it, i) + '<button class="btn q" data-shelve="' + it.id + '" aria-haspopup="menu">Shelve…</button></div>'; }).join("") + '</div>';
   }
+
+  function updateCarousel(sb) {
+    var t = $(".track", sb); if (!t) return;
+    var max = t.scrollWidth - t.clientWidth;
+    sb.toggleAttribute("data-left", t.scrollLeft > 4);
+    sb.toggleAttribute("data-right", t.scrollLeft < max - 4);
+    var slots = $$(".slot", t), tb = t.getBoundingClientRect(), first = 0, last = 0;
+    slots.forEach(function (el, i) { var r = el.getBoundingClientRect(), vis = Math.min(r.right, tb.right) - Math.max(r.left, tb.left); if (vis > r.width * 0.6) { if (!first) first = i + 1; last = i + 1; } });
+    var pos = $("[data-pos]", sb);
+    if (pos) pos.textContent = max > 4 && slots.length ? first + "–" + last + " of " + slots.length : "";
+  }
+  function updateCarousels() { $$("[data-car]").forEach(updateCarousel); }
+  window.addEventListener("resize", function () { if (state.view === "shelves") updateCarousels(); });
 
   function renderAll() { renderChrome(); renderWall(); renderShelves(); $("#count").textContent = state.view === "wall" ? state.wallCount + " entries · newest first" : COLS.length + " shelves · in your order"; }
 
@@ -719,7 +806,15 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     $$("[data-fid]").forEach(function (el) {
       if (el.closest("[hidden]")) return;
       var r = el.getBoundingClientRect(); if (!r.width && !r.height) return;
-      m.set(el.dataset.fid, { el: el, r: r });
+      var clipped = false, tr = el.closest(".track");
+      if (tr && !tr.classList.contains("wrapped")) {
+        var tb = tr.getBoundingClientRect();
+        if (r.left >= tb.right - 2 || r.right <= tb.left + 2) {
+          var edge = r.left >= tb.right - 2 ? tb.right - r.width : tb.left;
+          r = { left: edge, top: r.top, width: r.width, height: r.height, right: edge + r.width, bottom: r.bottom }; clipped = true;
+        }
+      }
+      m.set(el.dataset.fid, { el: el, r: r, clipped: clipped });
     });
     return m;
   }
@@ -748,18 +843,19 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     var delayOf = function (el) {
       if (opts.mode === "toShelves") return (+el.dataset.si || 0) * 55 + (+el.dataset.ii || 0) * 35;
       if (opts.mode === "toWall") return (+el.dataset.ii || 0) * 22;
+      if (opts.mode === "expand") return Math.min(+el.dataset.ii || 0, 30) * 14;
       return 0;
     };
     var D = 560 * k;
-    function fly(br, oldNode, ar, newEl, delay) {
+    function fly(br, oldNode, ar, newEl, delay, bc, ac) {
       var dx = ar.left - br.left, dy = ar.top - br.top, sx = ar.width / br.width || 1, sy = ar.height / br.height || 1;
       pending += 2;
       var o = place(oldNode, br); layer.appendChild(o);
-      track(o.animate([{ transform: "none", opacity: 1 }, { opacity: 0, offset: 0.6 }, { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", opacity: 0 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { o.remove(); cleanup(); });
+      track(o.animate([{ transform: "none", opacity: bc ? 0 : 1 }, { opacity: 0, offset: 0.6 }, { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", opacity: 0 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { o.remove(); cleanup(); });
       if (!newEl) { cleanup(); return; }
       var n = place(newEl.cloneNode(true), ar); layer.appendChild(n);
       newEl.style.visibility = "hidden";
-      track(n.animate([{ transform: "translate(" + (-dx) + "px," + (-dy) + "px) scale(" + (1 / sx) + "," + (1 / sy) + ")", opacity: 0 }, { opacity: 0, offset: 0.2 }, { opacity: 1, offset: 0.65 }, { transform: "none", opacity: 1 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { n.remove(); newEl.style.visibility = ""; cleanup(); });
+      track(n.animate([{ transform: "translate(" + (-dx) + "px," + (-dy) + "px) scale(" + (1 / sx) + "," + (1 / sy) + ")", opacity: 0 }, { opacity: 0, offset: 0.2 }, { opacity: ac ? 0 : 1, offset: 0.65 }, { transform: "none", opacity: ac ? 0 : 1 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { n.remove(); newEl.style.visibility = ""; cleanup(); });
     }
     var ids = new Set(); before.forEach(function (_, id) { ids.add(id); }); after.forEach(function (_, id) { ids.add(id); });
     ids.forEach(function (id) {
@@ -767,7 +863,7 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
       var b = before.get(id), a = after.get(id), it = BY[id];
       if (!(b && near(b.r)) && !(a && near(a.r)) && !(opts.origin && opts.origin.id === id)) return;
       budget--;
-      if (b && a) { fly(b.r, clones.get(id).node, a.r, a.el, delayOf(a.el)); return; }
+      if (b && a) { if (b.clipped && a.clipped) return; fly(b.r, clones.get(id).node, a.r, a.el, delayOf(a.el), b.clipped, a.clipped); return; }
       if (b && !a) {
         var st = it && it.c && aStubs.get(it.c);
         if (st && near(st)) fly(b.r, clones.get(id).node, { left: st.left + st.width / 2 - 4, top: st.top + st.height / 2 - 4, width: 8, height: 8 }, null, 0);
@@ -776,17 +872,17 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
       if (!b && a) {
         var from = opts.origin && opts.origin.id === id ? opts.origin.rect : (it && it.c && bStubs.get(it.c));
         if (from && near(from)) { fly({ left: from.left, top: from.top, width: Math.max(8, from.width), height: Math.max(8, from.height) }, a.el.cloneNode(true), a.r, a.el, opts.mode ? delayOf(a.el) : 0); }
-        else track(a.el.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 300 * k, delay: (opts.mode === "toShelves" ? 420 : 160) * k, easing: EASE, fill: "both" }));
+        else track(a.el.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 300 * k, delay: (opts.mode === "toShelves" ? 420 : 160) * k, easing: EASE, fill: "backwards" }));
       }
     });
     if (!pending) layer.remove();
     if (opts.mode === "toShelves") {
-      $$("#shelvesView .board").forEach(function (el) { var s = +el.dataset.board; track(el.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: 420 * k, delay: (260 + s * 60) * k, easing: EASE, fill: "both" })); });
-      $$("#shelvesView .slabel, #shelvesView .stub, #shelvesView .add, #shelvesView .since").forEach(function (el, i) { track(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280 * k, delay: (380 + Math.min(i, 30) * 12) * k, easing: EASE, fill: "both" })); });
-      $$("#shelvesView .row2, #banner, #desk, #loose, #shelvesView .bay-h").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 300 * k, easing: EASE, fill: "both" })); });
+      $$("#shelvesView .board").forEach(function (el) { var s = +el.dataset.board; track(el.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: 420 * k, delay: (260 + s * 60) * k, easing: EASE, fill: "backwards" })); });
+      $$("#shelvesView .slabel, #shelvesView .stub, #shelvesView .add, #shelvesView .since, #shelvesView .sfoot").forEach(function (el, i) { track(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280 * k, delay: (380 + Math.min(i, 30) * 12) * k, easing: EASE, fill: "backwards" })); });
+      $$("#shelvesView .row2, #banner, #desk, #loose, #shelvesView .bay-h").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 300 * k, easing: EASE, fill: "backwards" })); });
     }
     if (opts.mode === "toWall") {
-      $$("#wallView .row2, #capForm").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 380 * k, easing: EASE, fill: "both" })); });
+      $$("#wallView .row2, #capForm").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 380 * k, easing: EASE, fill: "backwards" })); });
     }
   }
 
@@ -894,6 +990,8 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     if (t.dataset.chip !== undefined) { state.chip = t.dataset.chip || null; renderWall(); return; }
     if (t.dataset.openshelf) { var cid = t.dataset.openshelf; setView("wall", function () { state.chip = cid; state.query = ""; state.thread = null; $("#q").value = ""; }); return; }
     if (t.dataset.add) { addDialog(t.dataset.add); return; }
+    if (t.dataset.expand) { var ec = t.dataset.expand; morph(function () { if (state.open[ec]) delete state.open[ec]; else state.open[ec] = 1; renderShelves(); }, { mode: "expand" }); return; }
+    if (t.dataset.carStep) { var tk = $(".track", t.closest(".sbody")); tk.scrollBy({ left: (+t.dataset.carStep) * tk.clientWidth * 0.8, behavior: reduced ? "auto" : "smooth" }); return; }
     if (t.dataset.shelve) { shelveMenu(t); return; }
     if (t.dataset.to) {
       var it = BY[t.dataset.item], to = t.dataset.to; t.closest(".menu").remove();
