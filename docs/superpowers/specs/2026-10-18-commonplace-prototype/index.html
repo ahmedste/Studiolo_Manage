@@ -428,6 +428,7 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
   var TYPE_OF = { book: "sources", video: "sources", pdf: "sources", link: "sources", note: "notes", long: "notes", quote: "notes", photo: "photos", person: "objects", thing: "objects" };
 
   // saved / opened: days ago. opened null = never opened.
+  var MORE_BOOKS = [["The Architecture of the City", "Aldo Rossi", "Urbanism"], ["Space, Time and Architecture", "Sigfried Giedion", "Theory"], ["The Image of the City", "Kevin Lynch", "Urbanism"], ["Collage City", "Colin Rowe and Fred Koetter", "Urbanism"], ["The Mathematics of the Ideal Villa", "Colin Rowe", "Theory"], ["Experiencing Architecture", "Steen Eiler Rasmussen", "Atmosphere"], ["Genius Loci", "Christian Norberg-Schulz", "Theory"], ["The Timeless Way of Building", "Christopher Alexander", "Theory"], ["Notes on the Synthesis of Form", "Christopher Alexander", "Theory"], ["Architecture without Architects", "Bernard Rudofsky", "Vernacular"], ["Modern Architecture: A Critical History", "Kenneth Frampton", "Modernism"], ["Studies in Tectonic Culture", "Kenneth Frampton", "Materials"], ["The Ten Books on Architecture", "Vitruvius", "Theory"], ["The Four Books of Architecture", "Andrea Palladio", "Theory"], ["The Seven Lamps of Architecture", "John Ruskin", "Theory"], ["The Stones of Venice", "John Ruskin", "Materials"], ["Architecture and Disjunction", "Bernard Tschumi", "Theory"], ["Junkspace", "Rem Koolhaas", "Urbanism"], ["Space Is the Machine", "Bill Hillier", "Urbanism"], ["Questions of Perception", "Holl, Pallasmaa, Pérez-Gómez", "Atmosphere"], ["The Thinking Hand", "Juhani Pallasmaa", "Drawing"], ["Parallax", "Steven Holl", "Light"], ["Lessons for Students in Architecture", "Herman Hertzberger", "Planning"], ["Architecture: Form, Space, and Order", "Francis D. K. Ching", "Drawing"], ["Building Construction Illustrated", "Francis D. K. Ching", "Materials"], ["How Buildings Learn", "Stewart Brand", "Theory"], ["The Architecture of Happiness", "Alain de Botton", "Atmosphere"], ["The Modulor", "Le Corbusier", "Theory"], ["The Production of Space", "Henri Lefebvre", "Urbanism"], ["Cities for People", "Jan Gehl", "Urbanism"], ["Life Between Buildings", "Jan Gehl", "Urbanism"], ["The Concise Townscape", "Gordon Cullen", "Urbanism"], ["Ornament and Crime", "Adolf Loos", "Modernism"], ["Architecture in the Age of Divided Representation", "Dalibor Vesely", "Theory"], ["Elements of Architecture", "Rem Koolhaas", "Theory"], ["Bauhaus 1919–1928", "Bayer, Gropius and Gropius", "Modernism"], ["Atlas of Novel Tectonics", "Reiser + Umemoto", "Structure"], ["Yes Is More", "Bjarke Ingels", "Modernism"], ["Architecture as Space", "Bruno Zevi", "Theory"], ["Intentions in Architecture", "Christian Norberg-Schulz", "Theory"], ["Why Buildings Fall Down", "Levy and Salvadori", "Structure"], ["Structures: Or Why Things Don’t Fall Down", "J. E. Gordon", "Structure"], ["Thermal Delight in Architecture", "Lisa Heschong", "Climate"], ["Design with Climate", "Victor Olgyay", "Climate"], ["Natural Energy and Vernacular Architecture", "Hassan Fathy", "Vernacular"], ["Shelter", "Lloyd Kahn", "Vernacular"], ["A Place of My Own", "Michael Pollan", "Materials"], ["Invisible Cities", "Italo Calvino", "Urbanism"], ["Species of Spaces", "Georges Perec", "Theory"], ["The Hidden Dimension", "Edward T. Hall", "Theory"], ["The Social Life of Small Urban Spaces", "William H. Whyte", "Urbanism"], ["Architecture of the Islamic World", "George Michell, ed.", "Islamic architecture"], ["The Alhambra", "Robert Irwin", "Islamic architecture"], ["Light Revealing Architecture", "Marietta Millet", "Light"], ["Peter Zumthor Works", "Peter Zumthor", "Atmosphere"], ["The Architect’s Brain", "Harry Francis Mallgrave", "Theory"], ["Project Japan", "Koolhaas and Obrist", "Modernism"]];
   function seed() { return [
     { id: "b1", c: "theory", k: "book", title: "Thinking Architecture", by: "Peter Zumthor", saved: 3, opened: 1, topic: "Atmosphere", links: ["p1", "b2"] },
     { id: "b14", c: "theory", k: "book", title: "Islamic Architecture: Form, Function and Meaning", by: "Robert Hillenbrand, 1994", saved: 7, opened: 5, topic: "Islamic architecture", links: ["t6", "v5"] },
@@ -442,7 +443,11 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     { id: "b7", c: "theory", k: "book", title: "Learning from Las Vegas", by: "Venturi, Scott Brown, Izenour", saved: 360, opened: 360, topic: "Urbanism" },
     { id: "b6", c: "theory", k: "book", title: "Complexity and Contradiction in Architecture", by: "Robert Venturi", saved: 380, opened: 200, topic: "Theory" },
     { id: "b4", c: "theory", k: "book", title: "Towards a New Architecture", by: "Le Corbusier", saved: 420, opened: 250, topic: "Theory", links: ["q8"] },
-    { id: "b8", c: "theory", k: "book", title: "S,M,L,XL", by: "OMA, Koolhaas and Mau", saved: 500, opened: null, topic: "Urbanism" },
+    { id: "b8", c: "theory", k: "book", title: "S,M,L,XL", by: "OMA, Koolhaas and Mau", saved: 500, opened: null, topic: "Urbanism" }
+  ].concat(MORE_BOOKS.map(function (b, i) {
+    var saved = 70 + i * 23, opened = i % 8 === 1 ? null : (i % 5 === 2 ? Math.min(saved, 190 + (i * 31) % 400) : 8 + (i * 13) % 160);
+    return { id: "x" + i, c: "theory", k: "book", title: b[0], by: b[1], topic: b[2], saved: saved, opened: opened };
+  }), [
 
     { id: "v5", c: "lectures", k: "video", title: "Sultan Hassan: plan, section and the four madrasas", by: "18:42", saved: 2, opened: 2, topic: "Islamic architecture", note: "Saved before lesson 5.", links: ["n5"] },
     { id: "v1", c: "lectures", k: "video", title: "Light and material at Therme Vals", by: "58:02", saved: 5, opened: 0, topic: "Atmosphere", desk: "Watching", pct: 22, where: "Resume at 12:40", links: ["t1", "p1"] },
@@ -502,9 +507,11 @@ kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--li
     { id: "l2", c: null, k: "note", title: "Ask the engineer about cantilever depth.", by: "Note", saved: 1, opened: 1, topic: "Hillside house" },
     { id: "l3", c: null, k: "quote", title: "God is in the details.", by: "Attributed to Mies van der Rohe", saved: 3, opened: 3, topic: "Theory" },
     { id: "l4", c: null, k: "photo", title: "Sketch: canopy junction", by: "Photo", saved: 2, opened: 2, topic: "Hillside house", sky: 0, ratio: 0.8 }
-  ]; }
+  ]); }
 
-  var items = store.get("items", null) || seed();
+  var DATA_V = 2;
+  var items = (store.get("v", 0) === DATA_V && store.get("items", null)) || seed();
+  store.set("v", DATA_V);
   var BY = {};
   function index() { BY = {}; items.forEach(function (it) { BY[it.id] = it; }); }
   index();
