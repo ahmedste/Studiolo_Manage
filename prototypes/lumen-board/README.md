@@ -1,6 +1,6 @@
 # Lumen Board prototype
 
-A pen sketches an idea on a whiteboard in time with the narration. This is a prototype of a `board` slide type for Studiolo Lumen. The investigation and integration plan are in [`proposals/2026-10-19-lumen-board-sketching.md`](../../proposals/2026-10-19-lumen-board-sketching.md).
+An idea is sketched on a whiteboard in time with the narration, drawn by a small moving dot of ink. This is a prototype of a `board` slide type for Studiolo Lumen. The investigation and integration plan are in [`proposals/2026-10-19-lumen-board-sketching.md`](../../proposals/2026-10-19-lumen-board-sketching.md).
 
 ## Run it
 

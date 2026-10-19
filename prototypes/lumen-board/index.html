@@ -129,7 +129,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
   <header>
     <h1>Lumen Board</h1>
     <span class="chip">Prototype · board slides</span>
-    <p>A pen sketches the idea on a whiteboard while the voice explains it. Each mark is drawn when the narration reaches the word that names it, and the pen comes back to point when the voice returns to something already on the board.</p>
+    <p>The idea is sketched on a whiteboard while the voice explains it. A small dot of ink does the drawing: each mark appears as the narration reaches the word that names it, and the dot comes back to point when the voice returns to something already on the board.</p>
   </header>
 
   <div class="desk">
@@ -162,7 +162,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
           <option value="1.5">1.5×</option>
         </select></label>
         <label><input type="checkbox" id="voice"> Read aloud (browser voice)</label>
-        <label><input type="checkbox" id="pen" checked> Show pen</label>
+        <label><input type="checkbox" id="dot" checked> Show drawing dot</label>
       </div>
       <div class="legend" id="legend"></div>
     </section>
@@ -184,7 +184,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
         <ul class="problems" id="problems"></ul>
       </div>
       <div class="pane" id="pane-ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
-        <p class="note">Describe an idea. Claude writes a board in the same format and the pen draws it. This uses your own Claude usage.</p>
+        <p class="note">Describe an idea. Claude writes a board in the same format and it is sketched for you. This uses your own Claude usage.</p>
         <textarea id="idea" aria-label="Idea to sketch">Why does a heat pump use less electricity than an electric heater?</textarea>
         <div class="row">
           <button class="btn primary" id="ask" disabled>Sketch it</button>
@@ -197,7 +197,7 @@ pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overf
 
   <section class="ref" aria-labelledby="refTitle">
     <h2 id="refTitle">How a board is written</h2>
-    <p>A board is one slide. Each line below the three hyphens is one mark: an id, a shape, its numbers on the 1280 × 720 stage, then an optional colour role, options and a label in quotes. Marks stay inside x 64–1216 and y 64–600; the band below is for captions. In the narration, <code>[[b1.cache]]</code> placed before a word makes the pen start drawing <code>cache</code> as that word is spoken. A mark with no ref is drawn straight after the one before it. A second ref to a mark makes the pen go back and point at it.</p>
+    <p>A board is one slide. Each line below the three hyphens is one mark: an id, a shape, its numbers on the 1280 × 720 stage, then an optional colour role, options and a label in quotes. Marks stay inside x 64–1216 and y 64–600; the band below is for captions. In the narration, <code>[[b1.cache]]</code> placed before a word starts drawing <code>cache</code> as that word is spoken. A mark with no ref is drawn straight after the one before it. A second ref to a mark sends the drawing dot back to point at it.</p>
     <div class="cols">
       <div class="tbl">
         <table>
@@ -720,7 +720,7 @@ function buildTimeline(parsed) {
         const w = est.words[wordAtChar(est.words, Math.min(r.c, Math.max(0, text.length - 1)))];
         seg.refs.push({ mark: r.mark, timeMs: clock + (w ? w.startMs : 0) });
       }
-      if (!refs.length) problems.push({ err: false, line: say.line, msg: "This say has no ref, so the pen won't react to it." });
+      if (!refs.length) problems.push({ err: false, line: say.line, msg: "This say has no ref, so nothing on the board reacts to it." });
       segs.push(seg); b.segs.push(seg);
       clock += est.durationMs + SAY_GAP;
     }
@@ -773,28 +773,29 @@ function scheduleBoard(b, t0) {
   return events.length ? Math.max(...events.map((e) => e.t1)) : t0;
 }
 
-// ---------------------------------------------------------------- pen position at time t
-const REST = [26, 30], OFF = [1330, 760];
+// ---------------------------------------------------------------- drawing-dot position at time t
+const REST = [0, 0];
 function restPos(e, t) { const u = ease(clamp((t - e.t1) / 500, 0, 1)); return [e.endPos[0] + REST[0] * u, e.endPos[1] + REST[1] * u]; }
 function penAt(b, t) {
   const ev = b.events;
   if (!ev.length) return null;
   for (let i = 0; i < ev.length; i++) {
     const e = ev[i];
-    if (t < e.ts) return i ? { pos: restPos(ev[i - 1], t), lift: 1 } : { pos: OFF, lift: 1 };
+    if (t < e.ts) return i ? { pos: restPos(ev[i - 1], t), lift: 1, idle: t - ev[i - 1].t1 } : null;
     if (t < e.t0) {
-      const from = i ? restPos(ev[i - 1], e.ts) : OFF, u = ease(clamp((t - e.ts) / Math.max(1, e.t0 - e.ts), 0, 1));
+      // The dot appears where the first mark starts; after that it glides from where it stopped.
+      const from = i ? restPos(ev[i - 1], e.ts) : e.startPos, u = ease(clamp((t - e.ts) / Math.max(1, e.t0 - e.ts), 0, 1));
       return { pos: lerp2(from, e.startPos, u), lift: 1 - u * (e.type === "draw" ? 1 : 0.5), role: e.m.strokes[0].role };
     }
     if (t <= e.t1) {
       if (e.type === "point") {
         const k = (t - e.t0) / 900, tap = Math.sin(clamp(k * 2.2, 0, 1) * Math.PI) * 0.45;
-        return { pos: [e.endPos[0] + Math.sin(k * 9) * 2, e.endPos[1] + Math.cos(k * 7) * 2], lift: 0.55 - tap, role: e.m.strokes[0].role };
+        return { pos: [e.endPos[0] + Math.sin(k * 9) * 2, e.endPos[1] + Math.cos(k * 7) * 2], lift: 0.55 - tap, role: e.m.strokes[0].role, point: k };
       }
       return tipAt(e.m, (t - e.t0) / (e.t1 - e.t0));
     }
   }
-  return { pos: restPos(ev[ev.length - 1], t), lift: 1 };
+  return { pos: restPos(ev[ev.length - 1], t), lift: 1, idle: t - ev[ev.length - 1].t1 };
 }
 function tipAt(m, p) {
   const v = clamp(p, 0, 1) * m.D, S = m.strokes;
@@ -809,9 +810,9 @@ function tipAt(m, p) {
 
 // ---------------------------------------------------------------- drawing
 const STYLES = {
-  whiteboard: { bg: "#f6f7f5", sheen: "rgba(255,255,255,.75)", ghost: 0.045, blend: "multiply", roles: { ink: "#1d2329", emphasis: "#1f4fb8", second: "#6b3fa0", third: "#1d7a49", fourth: "#c2392b", neutral: "#7b858d", marker: "#ffd23f" }, captionInk: "#22303a", captionMuted: "#8b949b", body: "#2b3238", cap: null },
-  chalk: { bg: "#22322b", sheen: "rgba(255,255,255,.035)", ghost: 0.07, blend: "screen", roles: { ink: "#eef0ea", emphasis: "#9cc7ff", second: "#d8b9ff", third: "#a9e4a0", fourth: "#ffa08e", neutral: "#a3ada6", marker: "#fff0a0" }, captionInk: "#eef0ea", captionMuted: "#93a39a", body: "#e9e6dc", cap: null },
-  paper: { bg: "#fbfbf9", sheen: "rgba(255,255,255,0)", ghost: 0.04, blend: "multiply", roles: { ink: "#22303a", emphasis: "#1e3e9e", second: "#6e86d0", third: "#2f6b4a", fourth: "#9a3b2e", neutral: "#5d6c77", marker: "#e8c27a" }, captionInk: "#22303a", captionMuted: "#98a3ab", body: "#3a464f", cap: null },
+  whiteboard: { bg: "#f6f7f5", sheen: "rgba(255,255,255,.75)", ghost: 0.045, blend: "multiply", roles: { ink: "#1d2329", emphasis: "#1f4fb8", second: "#6b3fa0", third: "#1d7a49", fourth: "#c2392b", neutral: "#7b858d", marker: "#ffd23f" }, captionInk: "#22303a", captionMuted: "#8b949b" },
+  chalk: { bg: "#22322b", sheen: "rgba(255,255,255,.035)", ghost: 0.07, blend: "screen", roles: { ink: "#eef0ea", emphasis: "#9cc7ff", second: "#d8b9ff", third: "#a9e4a0", fourth: "#ffa08e", neutral: "#a3ada6", marker: "#fff0a0" }, captionInk: "#eef0ea", captionMuted: "#93a39a" },
+  paper: { bg: "#fbfbf9", sheen: "rgba(255,255,255,0)", ghost: 0.04, blend: "multiply", roles: { ink: "#22303a", emphasis: "#1e3e9e", second: "#6e86d0", third: "#2f6b4a", fourth: "#9a3b2e", neutral: "#5d6c77", marker: "#e8c27a" }, captionInk: "#22303a", captionMuted: "#98a3ab" },
 };
 let getStroke = null;
 import("https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs")
@@ -871,27 +872,26 @@ function drawBoardAt(ctx, b, t, style, reduced) {
     drawMark(ctx, b, m, reduced && p > 0 ? 1 : p, style);
   }
 }
-function drawPen(ctx, pen, style) {
-  if (!pen) return;
-  const [x, y] = pen.pos, lift = pen.lift, color = style.roles[pen.role || "ink"] || style.roles.ink;
+function drawDot(ctx, dot, style) {
+  if (!dot) return;
+  // No pen or hand: a small dot of ink does the drawing. It glows while it draws, shrinks and dims while it moves
+  // between marks, pulses when it points back at a mark, and fades out once the board is quiet.
+  const fade = dot.idle ? clamp(1 - (dot.idle - 500) / 700, 0, 1) : 1;
+  if (fade <= 0) return;
+  const [x, y] = dot.pos, on = 1 - clamp(dot.lift, 0, 1), color = style.roles[dot.role || "ink"] || style.roles.ink;
   ctx.save();
-  // The shadow falls further from the pen as it lifts off the board.
-  ctx.shadowColor = "rgba(0,0,0,.28)"; ctx.shadowBlur = 8 + lift * 10;
-  ctx.shadowOffsetX = (5 + lift * 14) * scale; ctx.shadowOffsetY = (7 + lift * 18) * scale;
-  ctx.translate(x, y - lift * 9); ctx.rotate(-0.72);
-  ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(16, -6); ctx.lineTo(16, 6); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = style.body; ctx.beginPath(); ctx.roundRect(15, -11, 104, 22, 4); ctx.fill();
-  ctx.shadowColor = "transparent";
-  ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(18, -8, 98, 5);
-  ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(112, -12.5, 48, 25, 7); ctx.fill();
-  ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fillRect(116, -9, 40, 5);
-  ctx.restore();
-}
-function drawEraser(ctx, x, t, style) {
-  ctx.save(); ctx.translate(x, 330 + Math.sin(t / 60) * 120); ctx.rotate(0.06);
-  ctx.globalAlpha = 0.18; ctx.fillStyle = "#000"; ctx.beginPath(); ctx.roundRect(-36, -82, 80, 176, 10); ctx.fill();
-  ctx.globalAlpha = 1; ctx.fillStyle = style === STYLES.chalk ? "#8a6a4a" : "#3b4650"; ctx.beginPath(); ctx.roundRect(-44, -90, 80, 176, 10); ctx.fill();
-  ctx.fillStyle = style === STYLES.chalk ? "#d9d4c7" : "#cfd5da"; ctx.fillRect(-44, -90, 22, 176);
+  if (dot.point !== undefined) {
+    for (const k of [(dot.point * 2) % 1, (dot.point * 2 + 0.5) % 1]) {
+      ctx.globalAlpha = (1 - k) * 0.45 * fade; ctx.strokeStyle = color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, 7 + k * 26, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+  const halo = ctx.createRadialGradient(x, y, 0, x, y, 22);
+  halo.addColorStop(0, color); halo.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.globalAlpha = (0.12 + on * 0.2) * fade; ctx.fillStyle = halo;
+  ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = (0.5 + on * 0.5) * fade; ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(x, y, 3.6 + on * 3.4, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
 
@@ -899,7 +899,7 @@ function drawEraser(ctx, x, t, style) {
 const canvas = document.getElementById("board"), ctx = canvas.getContext("2d");
 const $ = (id) => document.getElementById(id);
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let TL = null, clock = 0, playing = false, styleName = "whiteboard", needDraw = true, showPen = true, scale = 1;
+let TL = null, clock = 0, playing = false, styleName = "whiteboard", needDraw = true, showDot = true, scale = 1;
 const finals = new Map();
 
 function finalFrame(b, style) {
@@ -927,13 +927,15 @@ function render() {
       ctx.drawImage(finalFrame(prev, style), 0, 0);
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, Math.max(0, sweep), H); ctx.clip();
       drawBackground(ctx, style); ctx.globalAlpha = style.ghost * 1.6; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.restore();
-      drawEraser(ctx, sweep, clock, style);
+      const edge = ctx.createLinearGradient(sweep, 0, sweep + 120, 0);
+      edge.addColorStop(0, style.bg); edge.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = edge; ctx.fillRect(sweep, 0, 120, H);
       return;
     }
     ctx.globalAlpha = style.ghost; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.globalAlpha = 1;
   }
   drawBoardAt(ctx, b, clock, style, reduceMotion);
-  if (showPen && !reduceMotion) drawPen(ctx, penAt(b, clock), style);
+  if (showDot && !reduceMotion) drawDot(ctx, penAt(b, clock), style);
 }
 
 function updateCaption() {
@@ -1151,7 +1153,7 @@ function renderExamples() {
 }
 
 // ---------------------------------------------------------------- Sketch with Claude (the page's sample capability)
-const SPEC = `You write one "board" for Studiolo Lumen: a whiteboard sketch that a pen draws while a calm voice explains an idea to an adult learner. Reply with ONLY the board source, no commentary and no code fences.
+const SPEC = `You write one "board" for Studiolo Lumen: a whiteboard sketch that is drawn stroke by stroke while a calm voice explains an idea to an adult learner. Reply with ONLY the board source, no commentary and no code fences.
 
 FORMAT
 <item id="b1" type="board" title="One idea, as a short title">
@@ -1182,7 +1184,7 @@ Use at most three colours and give each one meaning in the roles line.
 OPTIONS: hatch (scribble fill), dash, arrow (on a curve), center (text), small, big, title, size n.
 
 NARRATION
-Each say is plain spoken English, two or three sentences. Put a ref [[b1.id]] right before the word that names a mark, with no space after the brackets: "the [[b1.cache]]cache answers". The pen starts drawing that mark as the word is spoken. Refer to marks in the order they are declared. A mark with no ref is drawn right after the one before it. A second ref to a mark makes the pen point at it again. Every say has at least one ref. Never write the word "board" or describe the drawing; explain the idea.
+Each say is plain spoken English, two or three sentences. Put a ref [[b1.id]] right before the word that names a mark, with no space after the brackets: "the [[b1.cache]]cache answers". That mark starts drawing as the word is spoken. Refer to marks in the order they are declared. A mark with no ref is drawn right after the one before it. A second ref to a mark points at it again. Every say has at least one ref. Never write the word "board" or describe the drawing; explain the idea.
 
 EXAMPLE
 `;
@@ -1225,7 +1227,7 @@ sampleReady.then((sample) => {
 $("play").onclick = () => setPlaying(!playing);
 $("scrub").oninput = (e) => seek(+e.target.value);
 $("style").onchange = (e) => { styleName = e.target.value; applyStyleVars(); };
-$("pen").onchange = (e) => { showPen = e.target.checked; requestDraw(); };
+$("dot").onchange = (e) => { showDot = e.target.checked; requestDraw(); };
 $("speed").onchange = () => voiceStop();
 $("voice").onchange = (e) => { voice.active = e.target.checked && "speechSynthesis" in window; voiceStop(); };
 if (!("speechSynthesis" in window)) $("voice").closest("label").hidden = true;

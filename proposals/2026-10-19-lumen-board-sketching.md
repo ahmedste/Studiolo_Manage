@@ -1,4 +1,4 @@
-# Investigation: board slides for Lumen (pen sketching on a whiteboard)
+# Investigation: board slides for Lumen (sketching on a whiteboard)
 
 Status: investigation and working prototype, for the owner's decision · 19 Oct 2026
 
@@ -6,7 +6,7 @@ Prototype: [`prototypes/lumen-board/index.html`](../prototypes/lumen-board/index
 
 ## 1. Summary
 
-A **board** is a new kind of Lumen slide. A pen draws a rough, coloured sketch on a whiteboard while the voice explains it, the way a person explains an idea at a whiteboard. Boxes, arrows, circles, handwritten labels, underlines and highlights appear **as the voice says the word that names them**. When the narration comes back to something already drawn, the pen goes back and points at it.
+A **board** is a new kind of Lumen slide. A rough, coloured sketch is drawn on a whiteboard while the voice explains it, the way a person explains an idea at a whiteboard. Boxes, arrows, circles, handwritten labels, underlines and highlights appear **as the voice says the word that names them**. No pen or hand is shown: a small dot of ink moves along each stroke as it is drawn. When the narration comes back to something already drawn, the dot goes back and pulses on it.
 
 The prototype shows this works with the pipeline Lumen already has:
 
@@ -24,8 +24,8 @@ References are to `studiolo` @ `c7d39da` (read only; nothing there was changed).
 | Today | Board slide |
 |---|---|
 | Item types: intro, ul/ol, cards, table, code, diff, math, `diagram` (Mermaid), infographic, `animation` (JS scene) (`src/features/explainers/ingest/items.ts`) | Adds `board`. Its body is a header, `---`, then one mark per line. It is plain data with no code, so nothing has to run in the QuickJS sandbox. |
-| A ref `[[s5.rise]]` pins an animation moment to a word and moves the pointer (`contract/text.ts` §4, `player/timeline.ts` `pointerTarget`) | The same syntax. The first ref to a mark starts the pen drawing it; a later ref makes the pen point at it. |
-| The pointer moves to an anchor `leadWords` ahead of the voice (`player/stage/pointer.tsx`) | On a board slide the pen *is* the pointer. It draws, then rests, then returns to point. |
+| A ref `[[s5.rise]]` pins an animation moment to a word and moves the pointer (`contract/text.ts` §4, `player/timeline.ts` `pointerTarget`) | The same syntax. The first ref to a mark starts drawing it; a later ref sends the drawing dot back to point at it. |
+| The pointer moves to an anchor `leadWords` ahead of the voice (`player/stage/pointer.tsx`) | On a board slide the drawing dot *is* the pointer. It draws, fades when the board is quiet, and comes back to pulse on a mark the voice names again. |
 | An animation scene is `draw(s, t, k)`, a pure function of t (`scene/runtime.ts`) | A board is also a pure function of t: `marks + schedule → frame(t)`. |
 | Diagram slides are Mermaid, and the contract says "never imitate a drawing with a diagram" | Boards cover the space between the two: an explained sketch with spatial layout and annotation, with no code for the author to write. |
 | Role colours: emphasis, second, third, fourth, neutral, ink (`scene/role-palette.ts`) | The same role names, so the contract's "roles" legend line and colour rules carry over. The prototype also has whiteboard, chalk and Studiolo-paper palettes. |
@@ -100,7 +100,7 @@ What it does:
 - **Sketch with Claude**: in claude.ai, the page asks Claude to write a board for any idea, streams the script into the editor and draws it. The prompt is the `SPEC` constant in the page, which is a first draft of the contract section.
 - **Player**: play/pause, scrubbing, board ticks on the scrubber, speed control, captions with the current word underlined, a colour legend from the `roles:` line, and whiteboard, chalk and Studiolo-paper styles.
 - **Read aloud** uses the browser's own voice. The clock re-syncs on word-boundary events and waits for the voice at the end of each say. This is only a stand-in for ElevenLabs audio.
-- Reduced motion shows finished marks with no pen; keyboard controls are Space and ← →.
+- Reduced motion shows finished marks with no drawing dot; keyboard controls are Space and ← →.
 
 ### 4.1 The board format (draft)
 
@@ -132,10 +132,10 @@ hit    ring cache third
 3. **Time the words.** The prototype estimates them; the app will use measured timings. A ref's time is the start of its word.
 4. **Schedule the drawing.**
    - A mark starts 140 ms before its word. A mark with no ref follows the mark declared before it, and a mark never starts before the marks it connects.
-   - Drawing time comes from stroke length divided by pen speed: shapes about 900 px/s, handwriting 560 px/s, hatching 2,400 px/s. It is squeezed to as little as 40% when the next cue is close.
-   - The pen travels between marks at about 1,900 px/s, plus small lifts between strokes.
-   - A later ref to a mark already drawn becomes a "point" event when the pen is free.
-5. **Draw at t.** Finished strokes are cached as `Path2D` and only the stroke in progress is recomputed each frame. Then the pen is drawn: its tip, a cap in the ink's colour, and a shadow that grows when it lifts. Between boards an eraser sweeps the old board away and leaves a faint ghost, the way a real whiteboard does.
+   - Drawing time comes from stroke length divided by drawing speed: shapes about 900 px/s, handwriting 560 px/s, hatching 2,400 px/s. It is squeezed to as little as 40% when the next cue is close.
+   - The dot travels between marks at about 1,900 px/s, plus small lifts between strokes.
+   - A later ref to a mark already drawn becomes a "point" event when the dot is free.
+5. **Draw at t.** Finished strokes are cached as `Path2D` and only the stroke in progress is recomputed each frame. Then the drawing dot is drawn in the ink's colour. It glows while drawing, is smaller and dimmer while moving between marks, pulses when pointing, and fades out about a second after the board goes quiet. No pen, hand or eraser is shown. Between boards a soft wipe clears the old board and leaves a faint ghost, the way a real whiteboard does.
 
 ### 4.3 How it was checked
 
@@ -165,7 +165,7 @@ hit    ring cache third
 4. **Player** (`player/stage/board-slide.tsx`):
    - A canvas slide like `animation-slide.tsx`, fed `slideTime` from the timeline.
    - It builds its schedule from the say segments' measured `words` and `refs`, so it needs nothing new from speech.
-   - On board slides, hide the DOM pointer and draw the pen instead. Stills and thumbnails are `frame(Infinity)`.
+   - On board slides, hide the DOM pointer and draw the drawing dot instead. Stills and thumbnails are `frame(Infinity)`.
 5. **Brand**:
    - Map roles to the existing role palette, giving light and dark themes for free. Decide whether "whiteboard" and "chalk" are styles a learner can pick or only internal options.
    - Add the EMS Tech glyphs, or a Tegaki-built font, to the brand kit.
@@ -175,7 +175,7 @@ hit    ring cache third
 
 1. Should a board be its **own slide type** (proposed), or a style on top of the existing `diagram` type?
 2. **Look**: true whiteboard (white and aluminium), chalkboard, or Studiolo paper with marker ink? The prototype lets you compare all three.
-3. **Pen**: keep the visible marker, or show a hand holding it (more "a person explaining", more art to make)?
+3. ~~**Pen**: a visible marker or a hand?~~ Decided 19 Oct 2026: no pen or hand. Only a small ink dot shows where the drawing is happening.
 4. **Handwriting**: is EMS Tech (Architects Daughter) the right voice for Studiolo? Are non-Latin labels needed soon (then Tegaki)?
 5. **Learner editing**: should a learner be able to open a board and change it? That points to Excalidraw (MIT) as the editor, with this renderer kept for playback.
 6. **Eval budget**: about 30 author runs to tune the contract text before release.
@@ -188,7 +188,7 @@ These are estimates, not measured.
 |---|---|
 | Contract text, examples and the version bump | 1 |
 | Ingest parser, payload type and ref validation (port from the prototype) | 1–1.5 |
-| Board slide renderer and pen in the player (port from the prototype, React and theming) | 2–3 |
+| Board slide renderer and drawing dot in the player (port from the prototype, React and theming) | 2–3 |
 | Checks and repair messages | 1 |
 | Author evals and tuning | 1–2 |
 | **Total** | **6–9** |
