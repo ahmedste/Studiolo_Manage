@@ -1,0 +1,1125 @@
+<title>Studiolo Today Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the study (a sidebar that holds the learner's world) beside Today, whose main surface is the week's plan.
+   Tokens are Studiolo's own (studiolo src/styles/tokens.css @ 85e5348): paper and ink, ultramarine accent,
+   ghost blue for what the planner proposes, amber for My Focus. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --ghost: #7b8fd4; --ghost-soft: rgba(123, 143, 212, 0.09); --ghost-ink: #4a5fa8;
+  --focus-ink: #8a5a00; --focus-paper: #fbf3df; --focus-rule: #ecd9a8;
+  --warn: #9a3b2e; --ok: #2f6b4a;
+  --hover: #ecece6; --on-ink: #ffffff; --float: #fbfbf9;
+  --shadow-float: 0 1px 2px rgba(34, 48, 58, 0.06), 0 18px 48px rgba(34, 48, 58, 0.16);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, 0.08), 0 16px 36px rgba(34, 48, 58, 0.15);
+  --scrim: rgba(34, 48, 58, 0.22);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --hour: 48px;
+  --side: 244px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6;
+  --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8;
+  --ghost: #8497dc; --ghost-soft: rgba(132, 151, 220, 0.11); --ghost-ink: #b3c1f0;
+  --focus-ink: #e8c27a; --focus-paper: #33291a; --focus-rule: #5a4824;
+  --warn: #ec9c8d; --ok: #84c9a2;
+  --hover: #2a353f; --on-ink: #131a20; --float: #232e37;
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 18px 48px rgba(0, 0, 0, 0.42);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  --scrim: rgba(4, 8, 11, 0.5);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6;
+  --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8;
+  --ghost: #8497dc; --ghost-soft: rgba(132, 151, 220, 0.11); --ghost-ink: #b3c1f0;
+  --focus-ink: #e8c27a; --focus-paper: #33291a; --focus-rule: #5a4824;
+  --warn: #ec9c8d; --ok: #84c9a2;
+  --hover: #2a353f; --on-ink: #131a20; --float: #232e37;
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 18px 48px rgba(0, 0, 0, 0.42);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  --scrim: rgba(4, 8, 11, 0.5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ico { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+.app { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); height: 100%; transition: grid-template-columns 0.24s var(--ease); }
+.app[data-side="closed"] { --side: 62px; }
+
+/* ---------- The study: the sidebar ---------- */
+.side { position: relative; display: flex; flex-direction: column; min-height: 0; overflow: hidden auto; padding: 16px 12px 12px max(12px, env(safe-area-inset-left, 0px)); background: var(--board); border-right: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 2px 6px 0; text-decoration: none; color: inherit; }
+.mark { position: relative; display: grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 5px; background: var(--ink); color: var(--paper); font: 500 19px/1 var(--read); }
+.mark::after { content: ""; position: absolute; inset: 3px; border: 1px solid color-mix(in srgb, var(--paper) 28%, transparent); border-radius: 3px; }
+.brand-name { display: grid; line-height: 1.1; min-width: 0; }
+.brand-name b { font: 500 19px/1.1 var(--read); letter-spacing: -0.005em; }
+.brand-name i { font: italic 12.5px/1.3 var(--read); color: var(--ink-2); white-space: nowrap; }
+
+/* Banding between the study's compartments: two hairlines with a small lozenge, after the inlaid bands of a studiolo */
+.band { position: relative; height: 7px; margin: 14px 6px 10px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.band::after { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -3px 0 0 -3px; background: var(--board); border: 1px solid var(--ink-3); transform: rotate(45deg); }
+
+.capture { display: flex; align-items: center; gap: 10px; width: 100%; margin: 16px 0 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); cursor: pointer; text-align: left; transition: border-color 0.15s, background 0.15s; }
+.capture:hover { border-color: var(--ink-3); }
+.capture span { flex: 1; font-weight: 500; }
+kbd { font: 11px var(--ui); color: var(--ink-2); padding: 0 5px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); }
+
+.rooms { display: grid; gap: 2px; margin: 12px 0 0; }
+.room { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; column-gap: 11px; padding: 7px 10px; border-radius: 4px; cursor: pointer; color: var(--ink-2); }
+.room:hover { background: var(--hover); color: var(--ink); }
+.room:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.room[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.room-t { display: grid; min-width: 0; line-height: 1.2; }
+.room-t b { font-weight: 500; color: var(--ink); }
+.room-t small { font: italic 12px/1.3 var(--read); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.room-n { font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.shelf-h { display: flex; justify-content: space-between; align-items: baseline; margin: 0 6px 6px; }
+.shelf-h h2 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.shelf-h span { font-size: 11.5px; color: var(--ink-2); }
+.focus-list, .shelf-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; }
+.topic { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; column-gap: 11px; width: 100%; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+.topic:hover, .topic[aria-pressed="true"] { background: var(--focus-paper); }
+.topic[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--focus-rule); }
+.topic:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.star { justify-self: center; color: var(--focus-ink); font-size: 12px; }
+.topic-t { display: grid; min-width: 0; line-height: 1.25; }
+.topic-t b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topic-t small { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--ink-2); }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex: none; border: 1.5px solid var(--status-2); }
+.dot.learning { background: var(--status-2); border-color: var(--status-2); }
+.dot.learned { background: var(--status-3); border-color: var(--status-3); }
+.topic-m { font-size: 11px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.shelf { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; column-gap: 11px; width: 100%; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--ink-2); }
+.shelf:hover { background: var(--hover); color: var(--ink); }
+.shelf:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+.shelf b { font-weight: 400; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shelf span { font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.spines { display: flex; align-items: flex-end; gap: 1.5px; height: 14px; justify-self: center; }
+.spines i { width: 2.5px; border-radius: 0.5px; background: currentColor; opacity: 0.75; }
+
+.side-foot { margin-top: auto; padding-top: 14px; display: grid; gap: 8px; }
+.hours { margin: 0 6px; padding: 10px 0 2px; border-top: 1px solid var(--line); }
+.hours p { display: flex; justify-content: space-between; margin: 0 0 6px; font-size: 12px; color: var(--ink-2); }
+.hours p b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.meter { position: relative; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.meter i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; transition: width 0.4s var(--ease); }
+.meter .m-plan { background: var(--status-1); }
+.meter .m-done { background: var(--accent); }
+.tools { display: flex; gap: 2px; }
+.tool { all: unset; box-sizing: border-box; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 4px; color: var(--ink-2); cursor: pointer; }
+.tool:hover { background: var(--hover); color: var(--ink); }
+.tool:focus-visible { outline: 2px solid var(--accent); }
+.me { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 4px; }
+.avatar { display: grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 12.5px; }
+.me-n { display: grid; line-height: 1.2; min-width: 0; }
+.me-n b { font-weight: 500; font-size: 13px; }
+.me-n small { font-size: 11.5px; color: var(--ink-2); }
+
+/* The study closed: icons only */
+.app[data-side="closed"] .side { padding-inline: 10px; }
+.app[data-side="closed"] :is(.brand-name, .room-t, .room-n, .topic-t, .topic-m, .shelf b, .shelf span, .capture span, .capture kbd, .shelf-h, .hours, .me-n) { display: none; }
+.app[data-side="closed"] :is(.room, .topic, .shelf) { grid-template-columns: 1fr; justify-items: center; padding: 9px 0; }
+.app[data-side="closed"] .capture { justify-content: center; padding: 8px 0; }
+.app[data-side="closed"] .brand { justify-content: center; padding: 2px 0 0; }
+.app[data-side="closed"] .tools { flex-direction: column; align-items: center; }
+.app[data-side="closed"] .me { justify-content: center; }
+.app[data-side="closed"] .band { margin-inline: 4px; }
+
+/* ---------- Today ---------- */
+.stage { min-width: 0; height: 100%; overflow-y: auto; padding-block: 22px 28px; padding-left: 36px; padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+.today { display: grid; gap: 22px; max-width: 1360px; }
+.head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px 24px; flex-wrap: wrap; }
+.head h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+.head h1 span { margin-left: 8px; font-weight: 400; color: var(--ink-2); }
+.head-r { display: flex; align-items: baseline; gap: 14px; font-size: 13px; color: var(--ink-2); }
+.head-r time { font-variant-numeric: tabular-nums; }
+.next-up { all: unset; cursor: pointer; padding: 3px 8px; margin: -3px 0; border-radius: 3px; }
+.next-up:hover { background: var(--hover); color: var(--ink); }
+.next-up:focus-visible { outline: 2px solid var(--accent); }
+.next-up b { font-weight: 500; color: var(--ink); }
+.menu-btn { display: none; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+.next { display: flex; flex-direction: column; justify-content: center; padding: 16px 20px 15px; border-left: 2.5px solid var(--accent); background: var(--panel); }
+.k { margin: 0 0 5px; font-size: 11.5px; font-weight: 500; color: var(--ink-2); }
+.n { margin: 0 0 8px; font: 500 20.5px/1.25 var(--read); text-wrap: balance; }
+.bar { height: 2px; max-width: 420px; margin: 0 0 10px; background: var(--line); }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.m { margin: 0 0 14px; font-size: 13px; color: var(--ink-2); }
+.m b { font-weight: 500; color: var(--ink); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 3px; background: var(--ink); color: var(--on-ink); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: transform 0.08s; }
+.btn:active { transform: scale(0.985); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.btn.quiet:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.btn.ghost { background: var(--ghost-soft); color: var(--ghost-ink); box-shadow: inset 0 0 0 1px var(--ghost); }
+.btn.ghost:hover { background: color-mix(in srgb, var(--ghost) 16%, transparent); }
+.btn.link { padding: 7px 4px; background: none; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
+.btn.link:hover { color: var(--ink); }
+.btn.small { padding: 5px 10px; font-size: 12.5px; }
+.planned-note { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--accent); }
+
+.h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 10px; }
+.h h2 { margin: 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); }
+.h span { font-size: 12px; color: var(--ink-2); }
+.compass { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.narr { padding: 2px 0 2px 16px; border-left: 2px solid var(--line); }
+.narr p { margin: 0; max-width: 62ch; font: 16px/1.55 var(--read); }
+.narr em { font-style: italic; color: var(--accent); }
+.narr .sub { margin-top: 8px; font: 12.5px/1.5 var(--ui); color: var(--ink-2); }
+
+/* ---------- The plan ---------- */
+.plan { display: grid; gap: 12px; }
+.plan-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.plan-bar h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.wk { display: inline-flex; align-items: center; gap: 2px; }
+.wk button { all: unset; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 3px; cursor: pointer; color: var(--ink-2); }
+.wk button:hover { background: var(--hover); color: var(--ink); }
+.wk button:focus-visible { outline: 2px solid var(--accent); }
+.wk-label { min-width: 15ch; font-size: 13px; color: var(--ink-2); text-align: center; font-variant-numeric: tabular-nums; }
+.wk-label b { font-weight: 500; color: var(--ink); }
+.seg { display: inline-flex; padding: 2px; border-radius: 4px; background: var(--board); }
+.seg button { all: unset; padding: 3px 10px; border-radius: 3px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.seg button:focus-visible { outline: 2px solid var(--accent); }
+.goal { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 12.5px; color: var(--ink-2); }
+.goal b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.goal .meter { width: 120px; }
+.goal-btn { all: unset; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.goal-btn:hover { color: var(--ink); }
+.goal-btn:focus-visible { outline: 2px solid var(--accent); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; }
+.check input { accent-color: var(--accent); margin: 0; }
+.sugg-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border: 1px dashed var(--ghost); border-radius: 4px; background: var(--ghost-soft); font-size: 13px; color: var(--ghost-ink); }
+.sugg-bar b { font-weight: 500; }
+.sugg-bar .sp { flex: 1; }
+
+.plan-body { display: grid; grid-template-columns: minmax(0, 1fr) 264px; gap: 20px; align-items: start; }
+
+.cal { position: relative; display: grid; grid-template-rows: auto auto minmax(0, 1fr); height: clamp(460px, calc(100dvh - 300px), 820px); border: 1px solid var(--line); border-radius: 4px; background: var(--panel); overflow: hidden; }
+.cal-row { display: grid; grid-template-columns: 52px repeat(var(--days), minmax(0, 1fr)); }
+.cal-days { border-bottom: 1px solid var(--line); }
+.dh { all: unset; box-sizing: border-box; display: grid; gap: 1px; padding: 8px 8px 7px; border-left: 1px solid var(--line); cursor: pointer; min-width: 0; }
+.dh:hover { background: var(--hover); }
+.dh:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.dh span { font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.dh b { display: flex; align-items: baseline; gap: 6px; font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dh b small { font-size: 11px; font-weight: 400; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dh.is-today b > i { font-style: normal; display: inline-grid; place-items: center; min-width: 26px; height: 26px; margin: -3px 0 -3px -4px; padding: 0 4px; border-radius: 13px; background: var(--ink); color: var(--on-ink); }
+.dh.is-past { opacity: 0.62; }
+.cal-any { border-bottom: 1px solid var(--line); min-height: 38px; }
+.any-l { display: grid; place-items: center end; padding: 0 8px 0 0; font-size: 10.5px; line-height: 1.15; text-align: right; color: var(--ink-2); }
+.any-c { display: grid; align-content: start; gap: 3px; padding: 4px; border-left: 1px solid var(--line); min-width: 0; }
+.any-c.drop-on, .col.drop-on { background: var(--accent-soft); }
+.cal-scroll { position: relative; overflow-y: auto; overscroll-behavior: contain; }
+.cal-grid { position: relative; display: grid; grid-template-columns: 52px repeat(var(--days), minmax(0, 1fr)); height: calc(var(--hour) * var(--hours)); }
+.gutter { position: relative; }
+.gutter span { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; color: var(--ink-2); font-variant-numeric: tabular-nums; background: var(--panel); padding: 0 2px; }
+.col { position: relative; border-left: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--hour) - 1px), var(--line) calc(var(--hour) - 1px), var(--line) var(--hour)); cursor: cell; touch-action: pan-y; }
+.col.is-today { background-color: color-mix(in srgb, var(--accent-soft) 38%, transparent); }
+.col.is-past, .col .past-shade { background-color: color-mix(in srgb, var(--board) 55%, transparent); }
+.past-shade { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; }
+.now { position: absolute; left: -1px; right: 0; height: 0; border-top: 1.5px solid var(--warn); z-index: 4; pointer-events: none; }
+.now::before { content: ""; position: absolute; left: -4px; top: -4.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+.sel { position: absolute; left: 3px; right: 3px; border-radius: 3px; background: var(--accent-soft); border: 1px solid var(--accent); z-index: 5; pointer-events: none; font-size: 11px; padding: 2px 6px; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* A session: the prototype's .ev, given a body so it can be moved and resized */
+.ses { position: absolute; z-index: 2; display: flex; flex-direction: column; gap: 1px; min-height: 22px; padding: 3px 6px 3px 8px; border-left: 2.5px solid var(--accent); border-radius: 0 3px 3px 0; background: var(--accent-soft); color: var(--ink); font-size: 12px; line-height: 1.25; overflow: hidden; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; transition: opacity 0.18s, box-shadow 0.15s; }
+.ses:hover { box-shadow: var(--shadow-lift); z-index: 3; }
+.ses:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; z-index: 3; }
+.ses b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ses small { font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.ses.short { justify-content: center; }
+.ses.short b { -webkit-line-clamp: 1; }
+.ses.short small { display: none; }
+.ses.k-reading, .chip.k-reading { border-left-color: var(--status-2); }
+.ses.k-topic, .chip.k-topic { border-left-color: var(--focus-ink); }
+.ses.k-review, .chip.k-review { border-left-color: var(--ink-3); }
+.ses.is-suggested, .chip.is-suggested { border: 1px dashed var(--ghost); border-left: 2.5px dashed var(--ghost); background: var(--ghost-soft); color: var(--ghost-ink); }
+.ses.is-suggested small { color: var(--ghost-ink); }
+.ses.is-done, .chip.is-done { background: transparent; border-left-color: var(--status-1); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); }
+.ses.is-done b::before, .chip.is-done b::before { content: "✓ "; color: var(--ok); }
+.ses.is-missed { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); }
+.ses.is-missed small::after { content: " · not done yet"; color: var(--warn); }
+.ses.dragging { opacity: 0.88; box-shadow: var(--shadow-float); z-index: 6; cursor: grabbing; transition: none; }
+.ses .grip { position: absolute; left: 0; right: 0; bottom: 0; height: 7px; cursor: ns-resize; }
+.ses .grip::after { content: ""; position: absolute; left: 50%; bottom: 2px; width: 14px; margin-left: -7px; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; height: 2px; opacity: 0; transition: opacity 0.15s; }
+.ses:hover .grip::after { opacity: 0.35; }
+.cal[data-hl] .ses:not([data-topic-hl]), .cal[data-hl] .chip:not([data-topic-hl]) { opacity: 0.28; }
+.chip { all: unset; box-sizing: border-box; display: block; padding: 2px 6px 2px 7px; border-left: 2.5px solid var(--accent); border-radius: 0 3px 3px 0; background: var(--accent-soft); font-size: 11.5px; line-height: 1.3; cursor: grab; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.chip b { font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip:focus-visible { outline: 2px solid var(--accent); }
+
+/* What I did: the T1 log, kept as quiet marks beside the plan */
+.log { position: absolute; right: 3px; z-index: 1; display: flex; align-items: center; gap: 4px; max-width: calc(100% - 8px); padding: 1px 5px; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font-size: 10.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: auto; transform: translateY(-50%); }
+.log::before { content: ""; width: 5px; height: 5px; border-radius: 50%; flex: none; background: var(--accent); }
+.log.saved::before { background: var(--ink-3); }
+.log.copilot::before { background: var(--ghost); }
+
+/* ---------- Ready to plan: the tray ---------- */
+.tray { display: grid; gap: 10px; align-content: start; }
+.tray .h { margin: 0; }
+.tray-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.item { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; padding: 9px 10px 9px 12px; border: 1px solid var(--line); border-left: 2.5px solid var(--accent); border-radius: 0 4px 4px 0; background: var(--panel); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.item:hover { box-shadow: var(--shadow-lift); }
+.item.k-reading { border-left-color: var(--status-2); }
+.item.k-topic { border-left-color: var(--focus-ink); }
+.item.k-review { border-left-color: var(--ink-3); }
+.item p { margin: 0; min-width: 0; }
+.item .ik { grid-column: 1; font-size: 11px; color: var(--ink-2); }
+.item .it { grid-column: 1; font-weight: 500; font-size: 13px; line-height: 1.3; }
+.item .im { grid-column: 1; font-size: 11.5px; color: var(--ink-2); }
+.item .plan-it { grid-column: 2; grid-row: 1 / span 3; }
+.item.is-lifted { opacity: 0.4; }
+.tray-empty { margin: 0; padding: 12px; border: 1px dashed var(--line); border-radius: 4px; font-size: 12.5px; color: var(--ink-2); }
+.tray-hint { margin: 0; font-size: 12px; color: var(--ink-2); }
+.drag-chip { position: fixed; z-index: 80; pointer-events: none; padding: 6px 10px; border-left: 2.5px solid var(--accent); border-radius: 0 3px 3px 0; background: var(--float); box-shadow: var(--shadow-float); font-size: 12.5px; font-weight: 500; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: translate(10px, -50%); }
+.drag-chip small { display: block; font-weight: 400; font-size: 11px; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* ---------- Popover, sheet, toast ---------- */
+.scrim { position: fixed; inset: 0; z-index: 60; background: transparent; }
+.pop { position: fixed; z-index: 70; width: min(340px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 16px; border-radius: 6px; background: var(--float); box-shadow: var(--shadow-float); animation: popIn 0.18s var(--ease); }
+@keyframes popIn { from { opacity: 0; transform: translateY(4px); } }
+.pop .k { margin-bottom: 4px; }
+.pop h3 { margin: 0 0 6px; font: 500 18px/1.25 var(--read); text-wrap: balance; }
+.pop .when { margin: 0 0 12px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.pop .why { margin: 0 0 12px; padding: 8px 10px; border-left: 2px dashed var(--ghost); background: var(--ghost-soft); font-size: 12.5px; color: var(--ghost-ink); }
+.pop .row { gap: 8px; }
+.pop .x { position: absolute; top: 8px; right: 8px; }
+.form { display: grid; gap: 12px; }
+.f { display: grid; gap: 5px; }
+.f > span, .f legend { font-size: 11.5px; font-weight: 500; color: var(--ink-2); padding: 0; }
+fieldset.f { border: 0; margin: 0; padding: 0; }
+.f input[type="text"], .f select { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); color: var(--ink); font: 13.5px var(--ui); }
+.f input[type="text"]:focus, .f select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.durs { display: flex; flex-wrap: wrap; gap: 4px; }
+.durs button { all: unset; padding: 4px 9px; border-radius: 12px; font-size: 12.5px; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; font-variant-numeric: tabular-nums; }
+.durs button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.durs button:focus-visible { outline: 2px solid var(--accent); }
+.toast { position: fixed; left: 50%; bottom: max(18px, calc(env(safe-area-inset-bottom, 0px) + 12px)); z-index: 90; display: flex; align-items: center; gap: 14px; max-width: calc(100vw - 32px); padding: 10px 12px 10px 16px; border-radius: 5px; background: var(--ink); color: var(--on-ink); font-size: 13px; box-shadow: var(--shadow-float); transform: translateX(-50%); animation: popIn 0.2s var(--ease); }
+.toast button { all: unset; cursor: pointer; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.toast button:focus-visible { outline: 2px solid var(--status-1); }
+
+/* The prototype's state bar (as in the app's dev specimens); not part of the design */
+.proto { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 50; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: calc(100vw - 32px); padding: 6px 8px 6px 12px; border-radius: 5px; background: var(--float); box-shadow: var(--shadow-float); font-size: 12px; color: var(--ink-2); }
+.proto b { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ghost-ink); }
+.proto select, .proto button { font: inherit; font-size: 12px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 3px; padding: 3px 6px; cursor: pointer; }
+.proto label { display: inline-flex; align-items: center; gap: 4px; }
+.proto[data-min="true"] > :not(.proto-t) { display: none; }
+.proto-t { all: unset; cursor: pointer; }
+
+/* Phone strip (day view on narrow screens) */
+.strip { display: none; gap: 3px; }
+.strip button { all: unset; position: relative; flex: 1; padding: 5px 0 7px; border-radius: 3px; text-align: center; font-size: 11px; line-height: 1.2; color: var(--ink-2); cursor: pointer; min-height: 44px; box-sizing: border-box; }
+.strip button b { display: block; margin-top: 1px; font-size: 14px; font-weight: 500; color: var(--ink); }
+.strip button i { position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+.strip button[aria-pressed="true"] { background: var(--ink); color: var(--status-1); }
+.strip button[aria-pressed="true"] b { color: var(--on-ink); }
+.strip button[aria-pressed="true"] i { background: var(--on-ink); }
+.strip button:focus-visible { outline: 2px solid var(--accent); }
+
+@media (max-width: 1240px) {
+  .plan-body { grid-template-columns: minmax(0, 1fr); }
+  .tray-list { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+}
+@media (max-width: 1080px) {
+  .top { grid-template-columns: minmax(0, 1fr); }
+  .goal { margin-left: 0; }
+}
+/* Narrow: the study becomes a drawer, Today runs full width */
+@media (max-width: 860px) {
+  .app, .app[data-side="closed"] { grid-template-columns: minmax(0, 1fr); --side: 280px; }
+  .side { position: fixed; inset: 0 auto 0 0; z-index: 75; width: min(300px, 86vw); padding-top: max(16px, calc(env(safe-area-inset-top, 0px) + 12px)); transform: translateX(-102%); transition: transform 0.24s var(--ease); box-shadow: var(--shadow-float); }
+  .app[data-drawer="open"] .side { transform: none; }
+  .app[data-side="closed"] :is(.brand-name, .room-t, .room-n, .topic-t, .topic-m, .shelf b, .shelf span, .capture span, .capture kbd, .shelf-h, .hours, .me-n) { display: revert; }
+  .app[data-side="closed"] :is(.room, .topic, .shelf) { grid-template-columns: 18px minmax(0, 1fr) auto; justify-items: stretch; padding: 7px 10px; }
+  .app[data-side="closed"] .tools { flex-direction: row; }
+  .app[data-side="closed"] .capture { justify-content: flex-start; padding: 8px 10px; }
+  .app[data-side="closed"] .brand { justify-content: flex-start; }
+  .app[data-side="closed"] .me { justify-content: flex-start; }
+  .collapse-tool { display: none !important; }
+  .drawer-scrim { position: fixed; inset: 0; z-index: 74; background: var(--scrim); }
+  .stage { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-top: 14px; padding-bottom: 96px; }
+  .menu-btn { all: unset; display: inline-grid; place-items: center; width: 40px; height: 40px; margin: -8px 4px -8px -10px; border-radius: 4px; vertical-align: middle; cursor: pointer; }
+  .menu-btn:focus-visible { outline: 2px solid var(--accent); }
+}
+@media (max-width: 699.98px) {
+  .head h1 { font-size: 22px; }
+  .head h1 span { display: block; margin: 4px 0 0; font-size: 15px; }
+  .head-r { width: 100%; justify-content: space-between; }
+  .next .row .btn:not(.link) { flex: 1 1 auto; justify-content: center; min-height: 44px; }
+  .strip { display: flex; }
+  .seg-wrap { display: none; }
+  .cal { height: auto; max-height: none; }
+  .cal-scroll { max-height: 70dvh; }
+  .goal .meter { width: 80px; }
+  .tray-list { grid-template-columns: minmax(0, 1fr); }
+  .item { touch-action: auto; }
+  .pop.sheet { left: 0 !important; right: 0; top: auto !important; bottom: 0; width: 100%; max-height: 86dvh; border-radius: 12px 12px 0 0; padding-bottom: max(18px, calc(env(safe-area-inset-bottom, 0px) + 12px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .proto { left: max(12px, env(safe-area-inset-left, 0px)); right: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-lib" viewBox="0 0 24 24"><path d="m16 6 4 14M12 6v14M8 8v12M4 4v16"/></symbol>
+  <symbol id="i-net" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M16 15l-3-3 3-3"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+</svg>
+
+<div class="app" id="app" data-side="open">
+  <aside class="side" id="side" aria-label="Your study">
+    <a class="brand" href="#today" title="Today">
+      <span class="mark" aria-hidden="true">S</span>
+      <span class="brand-name"><b>Studiolo</b><i>Layla's study</i></span>
+    </a>
+
+    <button class="capture" id="capture" type="button" title="Capture (C)">
+      <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>Capture</span><kbd>C</kbd>
+    </button>
+
+    <nav class="rooms" aria-label="Primary">
+      <a class="room" href="#today" aria-current="page" title="Today"><svg class="ico" aria-hidden="true"><use href="#i-sun"/></svg><span class="room-t"><b>Today</b><small>the desk</small></span><span class="room-n" id="n-today"></span></a>
+      <a class="room" href="#learn" data-soon="Learn" title="Learn"><svg class="ico" aria-hidden="true"><use href="#i-cap"/></svg><span class="room-t"><b>Learn</b><small>courses and explainers</small></span><span class="room-n">2</span></a>
+      <a class="room" href="#library" data-soon="Library" title="Library"><svg class="ico" aria-hidden="true"><use href="#i-lib"/></svg><span class="room-t"><b>Library</b><small>your shelves</small></span><span class="room-n">3 to read</span></a>
+      <a class="room" href="#graph" data-soon="Graph" title="Graph"><svg class="ico" aria-hidden="true"><use href="#i-net"/></svg><span class="room-t"><b>Graph</b><small>the map of what you know</small></span><span class="room-n"></span></a>
+    </nav>
+
+    <div class="band" aria-hidden="true"></div>
+
+    <section aria-labelledby="focus-h">
+      <div class="shelf-h"><h2 id="focus-h">My Focus</h2><span>this week</span></div>
+      <ul class="focus-list" id="focus-list"></ul>
+    </section>
+
+    <div class="band" aria-hidden="true"></div>
+
+    <section aria-labelledby="shelves-h">
+      <div class="shelf-h"><h2 id="shelves-h">Shelves</h2><span>collections</span></div>
+      <ul class="shelf-list" id="shelf-list"></ul>
+    </section>
+
+    <div class="side-foot">
+      <div class="hours" id="side-hours"></div>
+      <div class="tools">
+        <button class="tool collapse-tool" id="collapse" type="button" aria-controls="side" aria-expanded="true" title="Close sidebar"><svg class="ico" aria-hidden="true"><use href="#i-panel"/></svg><span class="vh">Close sidebar</span></button>
+        <button class="tool" id="theme" type="button" title="Switch theme"><svg class="ico" aria-hidden="true"><use href="#i-moon"/></svg><span class="vh">Switch light or dark</span></button>
+      </div>
+      <div class="me" title="Layla Haddad"><span class="avatar" aria-hidden="true">L</span><span class="me-n"><b>Layla Haddad</b><small>Architect · Amman</small></span></div>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <div class="today">
+      <header class="head">
+        <h1><button class="menu-btn" id="menu" type="button" aria-label="Open your study" aria-controls="side"><svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg></button>Today <span id="date"></span></h1>
+        <div class="head-r"><span id="next-up"></span><time id="clock"></time></div>
+      </header>
+
+      <div class="top">
+        <section class="next" id="continue" aria-labelledby="cont-t"></section>
+        <section class="compass" aria-labelledby="bp-h">
+          <div class="h"><h2 id="bp-h">The Big Picture</h2><span>Interest: Islamic architecture</span></div>
+          <div class="narr" id="bigpic"></div>
+        </section>
+      </div>
+
+      <section class="plan" aria-labelledby="plan-h">
+        <div class="plan-bar">
+          <h2 id="plan-h">Plan</h2>
+          <div class="wk">
+            <button id="prev" type="button" aria-label="Previous week"><svg class="ico" aria-hidden="true"><use href="#i-l"/></svg></button>
+            <span class="wk-label" id="wk-label" aria-live="polite"></span>
+            <button id="nextwk" type="button" aria-label="Next week"><svg class="ico" aria-hidden="true"><use href="#i-r"/></svg></button>
+          </div>
+          <div class="seg-wrap"><div class="seg" role="group" aria-label="Calendar view"><button id="v-week" type="button" aria-pressed="true">Week</button><button id="v-day" type="button" aria-pressed="false">Day</button></div></div>
+          <label class="check"><input id="show-log" type="checkbox"> What I did</label>
+          <div class="goal" id="goal"></div>
+          <button class="btn ghost small" id="ask-planner" type="button"><svg class="ico" aria-hidden="true" style="width:15px;height:15px"><use href="#i-spark"/></svg>Plan my week</button>
+        </div>
+        <div class="sugg-bar" id="sugg-bar" hidden></div>
+        <div class="strip" id="strip" role="group" aria-label="Days of this week"></div>
+        <div class="plan-body">
+          <div class="cal" id="cal" aria-label="Planned sessions"></div>
+          <aside class="tray" aria-labelledby="tray-h">
+            <div class="h"><h2 id="tray-h">Ready to plan</h2><span id="tray-n"></span></div>
+            <p class="tray-hint">Drag onto a day, or press Plan.</p>
+            <ul class="tray-list" id="tray"></ul>
+          </aside>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="proto" id="proto">
+  <button class="proto-t" id="proto-t" type="button" title="Show or hide prototype controls"><b>Prototype</b></button>
+  <label>Time <select id="p-time"><option value="490">08:10</option><option value="640" selected>10:40</option><option value="750">12:30</option><option value="1180">19:40</option><option value="live">Live</option></select></label>
+  <label>State <select id="p-state"><option value="planned" selected>A planned week</option><option value="empty">Nothing planned yet</option></select></label>
+  <button id="p-reset" type="button">Reset</button>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ---------- Time ----------
+  const START = 7, END = 23, SNAP = 15;
+  const real = new Date();
+  const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const mondayOf = (d) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+  const TODAY = new Date(real.getFullYear(), real.getMonth(), real.getDate());
+  const TODAY_KEY = dayKey(TODAY);
+  const M0 = mondayOf(TODAY);
+  const fmtT = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  const fmtDur = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${String(m % 60).padStart(2, "0")}` : ""}`);
+  const dayName = (k, style = "long") => new Intl.DateTimeFormat("en-GB", { weekday: style }).format(new Date(`${k}T12:00:00`));
+  const dayLong = (k) => new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" }).format(new Date(`${k}T12:00:00`));
+  const dayShort = (k) => new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" }).format(new Date(`${k}T12:00:00`));
+  const rel = (n) => dayKey(addDays(M0, n));
+
+  // ---------- Sample learner (an architect; matches the app's demo world) ----------
+  const TOPICS = [
+    { id: "isl", name: "Islamic architecture", status: "learning", label: "Learning" },
+    { id: "day", name: "Daylighting", status: "learning", label: "Learning" },
+    { id: "tim", name: "Timber structures", status: "not", label: "Not started" },
+    { id: "fac", name: "Facade detailing", status: "learned", label: "Learned" },
+  ];
+  const topic = (id) => TOPICS.find((t) => t.id === id);
+  const SHELVES = [
+    { name: "Sinan's mosques", n: 12, spines: [9, 13, 11, 14] },
+    { name: "Facade details", n: 8, spines: [12, 8, 14] },
+    { name: "Perforated brick", n: 5, spines: [10, 13] },
+    { name: "To read", n: 3, spines: [14, 11, 9] },
+  ];
+  const KIND = { course: "Course part", explainer: "Explainer", reading: "Reading", topic: "Topic session", review: "Note and review" };
+  const VERB = { course: "Continue part", explainer: "Watch", reading: "Open reading", topic: "Open topic", review: "Open notes" };
+
+  const TRAY0 = [
+    { id: "t1", kind: "course", title: "Part 7 · Ornament and geometry", topic: "isl", dur: 25, meta: "Islamic architecture course · 25 min" },
+    { id: "t2", kind: "explainer", title: "Daylighting in deep plans", topic: "day", dur: 10, meta: "New explainer · 6 min to watch" },
+    { id: "t3", kind: "reading", title: "Perforated brick screens, Bait Ur Rouf", topic: "day", dur: 20, meta: "From To read · article" },
+    { id: "t4", kind: "topic", title: "First look at timber structures", topic: "tim", dur: 30, meta: "In focus, not started yet" },
+    { id: "t5", kind: "review", title: "Write up the four-iwan plan", topic: "isl", dur: 20, meta: "A note from last week's part" },
+  ];
+
+  function sampleSessions() {
+    let n = 0; const id = () => `s${++n}`;
+    const S = (d, start, dur, kind, title, tp, state = "planned", extra = {}) => ({ id: id(), date: rel(d), start, dur, kind, title, topic: tp, state, ...extra });
+    return [
+      // last week: what was planned and done
+      S(-7, 450, 25, "course", "Part 3 · Courtyard and iwan", "isl", "done"),
+      S(-6, 1140, 45, "course", "Part 4 · The hypostyle hall", "isl", "done"),
+      S(-5, 750, 20, "reading", "Fathy, Architecture for the Poor, ch. 2", "day", "done"),
+      S(-3, 450, 25, "course", "Part 5 · The four-iwan plan", "isl", "done"),
+      S(-2, 600, 90, "topic", "Saturday desk: Sinan's domes", "isl", "done"),
+      // this week
+      S(0, 450, 25, "explainer", "How a squinch carries a dome", "isl", "planned", { note: "You stopped at 2:40 of 5:10." }),
+      S(0, 750, 20, "reading", "Fathy, the mashrabiya chapter", "day", "suggested", { why: "You saved it on Thursday and Daylighting is in focus. There is a free half hour at lunch." }),
+      S(0, 1140, 45, "course", "Part 6 · Muqarnas and the squinch", "isl", "planned"),
+      S(1, null, 15, "review", "Note on Bait Ur Rouf's light", "day", "planned"),
+      S(1, 480, 30, "reading", "Tabassum interview, Dezeen", "day", "planned"),
+      S(2, 1110, 60, "topic", "Glulam and CLT: a first map", "tim", "suggested", { why: "Timber structures has been in focus for two weeks without a session." }),
+      S(3, 450, 25, "course", "Part 7 · Ornament and geometry", "isl", "planned", { fromTray: "t1" }),
+      S(4, null, 20, "review", "Weekly review: what changed on my map", "isl", "planned"),
+      S(5, 600, 90, "topic", "Saturday desk: the Süleymaniye", "isl", "planned"),
+      // next week
+      S(7, 450, 25, "course", "Part 8 · Light and the qibla wall", "isl", "planned"),
+      S(9, 1140, 45, "topic", "Shading devices compared", "fac", "planned"),
+    ];
+  }
+  const LOG = [
+    { d: -7, at: 470, kind: "watched", t: "Watched Part 3" }, { d: -6, at: 1185, kind: "watched", t: "Watched Part 4" },
+    { d: -6, at: 1260, kind: "copilot", t: "Copilot: precast joints" }, { d: -5, at: 770, kind: "saved", t: "Saved 2 photos" },
+    { d: -4, at: 1320, kind: "saved", t: "Saved Fathy, ch. 5" }, { d: -3, at: 475, kind: "watched", t: "Watched Part 5" },
+    { d: -2, at: 640, kind: "saved", t: "Saved 4 things" }, { d: -2, at: 700, kind: "copilot", t: "Copilot: Sinan's domes" },
+    { d: 0, at: 470, kind: "watched", t: "Watched squinch to 2:40" }, { d: 0, at: 560, kind: "saved", t: "Saved a quote" },
+  ];
+
+  // ---------- State ----------
+  const STORE = "studiolo-today-planner-v1";
+  const fresh = () => ({ sessions: sampleSessions(), tray: TRAY0.map((t) => ({ ...t })), goal: 300, view: "week", week: 0, dayKey: TODAY_KEY, log: false, side: "open", nowSel: "640" });
+  let st = load() || fresh();
+  function load() { try { const v = JSON.parse(localStorage.getItem(STORE) || "null"); return v && v.sessions && v.anchor === TODAY_KEY ? v : null; } catch { return null; } }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify({ ...st, anchor: TODAY_KEY })); } catch { /* the demo still works */ } }
+  let hl = null, pinned = null, toastT = 0, popClose = null;
+
+  const nowMin = () => (st.nowSel === "live" ? real.getHours() * 60 + real.getMinutes() : Number(st.nowSel));
+  const isPast = (s) => s.date < TODAY_KEY || (s.date === TODAY_KEY && s.start != null && s.start + s.dur <= nowMin());
+  const showState = (s) => (s.state === "planned" && isPast(s) && s.start != null ? "missed" : s.state);
+  const weekDays = () => Array.from({ length: 7 }, (_, i) => rel(st.week * 7 + i));
+  const shownDays = () => (st.view === "day" || window.matchMedia("(max-width: 699.98px)").matches ? [st.dayKey] : weekDays());
+  const inWeek = (k) => weekDays().includes(k);
+
+  // ---------- Sidebar ----------
+  function renderSide() {
+    const wk = Array.from({ length: 7 }, (_, i) => rel(i));
+    const fl = $("#focus-list"); fl.innerHTML = "";
+    for (const t of TOPICS) {
+      const mins = st.sessions.filter((s) => s.topic === t.id && wk.includes(s.date) && s.state !== "suggested").reduce((a, s) => a + s.dur, 0);
+      const li = el("li");
+      const b = el("button", "topic", `<span class="star" aria-hidden="true">★</span><span class="topic-t"><b>${esc(t.name)}</b><small><i class="dot ${t.status === "learning" ? "learning" : t.status === "learned" ? "learned" : ""}"></i>${t.label}</small></span><span class="topic-m">${mins ? fmtDur(mins) : "—"}</span>`);
+      b.type = "button"; b.title = `${t.name}: ${mins ? fmtDur(mins) + " planned this week" : "nothing planned this week"}`;
+      b.setAttribute("aria-pressed", String(pinned === t.id));
+      b.addEventListener("mouseenter", () => { hl = t.id; paintHl(); });
+      b.addEventListener("mouseleave", () => { hl = null; paintHl(); });
+      b.addEventListener("click", () => { pinned = pinned === t.id ? null : t.id; renderSide(); paintHl(); toast(pinned ? `Showing ${t.name} in your plan` : "Showing everything"); });
+      li.append(b); fl.append(li);
+    }
+    const sl = $("#shelf-list"); sl.innerHTML = "";
+    for (const s of SHELVES) {
+      const li = el("li");
+      const b = el("button", "shelf", `<span class="spines" aria-hidden="true">${s.spines.map((h) => `<i style="height:${h}px"></i>`).join("")}</span><b>${esc(s.name)}</b><span>${s.n}</span>`);
+      b.type = "button"; b.title = s.name;
+      b.addEventListener("click", () => toast(`${s.name} opens in Library (not part of this prototype)`));
+      li.append(b); sl.append(li);
+    }
+    const w = weekStats(0);
+    $("#side-hours").innerHTML = `<p><span>Study this week</span><b>${fmtDur(w.done)} done</b></p><p><span>${fmtDur(w.planned)} planned</span><span>goal ${fmtDur(st.goal)}</span></p><div class="meter" aria-hidden="true"><i class="m-plan" style="width:${Math.min(100, (w.planned / st.goal) * 100)}%"></i><i class="m-done" style="width:${Math.min(100, (w.done / st.goal) * 100)}%"></i></div>`;
+    const todayCount = st.sessions.filter((s) => s.date === TODAY_KEY && s.state === "planned" && !isPast(s)).length;
+    $("#n-today").textContent = todayCount ? `${todayCount} left` : "";
+  }
+  function paintHl() {
+    const cal = $("#cal"); const t = hl || pinned;
+    if (t) cal.dataset.hl = t; else delete cal.dataset.hl;
+    cal.querySelectorAll("[data-topic]").forEach((n) => { if (n.dataset.topic === t) n.dataset.topicHl = ""; else delete n.dataset.topicHl; });
+  }
+
+  // ---------- Header, Continue, Big Picture ----------
+  function renderHead() {
+    $("#date").textContent = dayLong(TODAY_KEY);
+    $("#clock").textContent = fmtT(nowMin());
+    const next = st.sessions.filter((s) => s.date === TODAY_KEY && s.state === "planned" && s.start != null && s.start + s.dur > nowMin()).sort((a, b) => a.start - b.start)[0];
+    const nu = $("#next-up"); nu.innerHTML = "";
+    if (next) {
+      const inMin = next.start - nowMin();
+      const b = el("button", "next-up", `Next: <b>${esc(next.title)}</b> · ${inMin <= 0 ? "now" : `${fmtT(next.start)}, in ${fmtDur(inMin)}`}`);
+      b.type = "button"; b.addEventListener("click", (e) => openSession(next.id, e.currentTarget)); nu.append(b);
+    } else nu.textContent = "Nothing else planned today";
+  }
+  function renderContinue() {
+    const c = $("#continue");
+    const planned = st.sessions.find((s) => s.title.startsWith("Part 6") && s.state === "planned" && !isPast(s));
+    c.innerHTML = `
+      <p class="k">Continue · Course · Islamic architecture</p>
+      <h2 class="n" id="cont-t">Islamic architecture: form, ritual, geometry</h2>
+      <div class="bar" aria-hidden="true"><i style="width:${Math.round((5 / 12) * 100)}%"></i></div>
+      <p class="m">5 of 12 parts watched · next: <b>Part 6, Muqarnas and the squinch</b> (18 min).</p>
+      <div class="row">
+        <button class="btn" type="button" id="cont-go">Continue part 6</button>
+        ${planned
+          ? `<span class="planned-note">◷ Planned ${planned.date === TODAY_KEY ? "today" : dayName(planned.date)} at ${fmtT(planned.start)}</span><button class="btn link" type="button" id="cont-move">Change</button>`
+          : `<button class="btn quiet" type="button" id="cont-plan">Plan for later…</button>`}
+      </div>
+      <p class="m" style="margin:12px 0 0;font-size:12.5px">Also in progress: How a squinch carries a dome (2:40 of 5:10)</p>`;
+    $("#cont-go").addEventListener("click", () => toast("Opening Part 6 in Learn (not part of this prototype)"));
+    const p = $("#cont-plan"); if (p) p.addEventListener("click", (e) => openComposer({ title: "Part 6 · Muqarnas and the squinch", kind: "course", topic: "isl", dur: 25, date: TODAY_KEY, start: nextFree(TODAY_KEY, 25) }, e.currentTarget));
+    const mv = $("#cont-move"); if (mv) mv.addEventListener("click", (e) => openComposer({ ...planned }, e.currentTarget, planned.id));
+  }
+  function weekStats(w) {
+    const days = Array.from({ length: 7 }, (_, i) => rel(w * 7 + i));
+    const ss = st.sessions.filter((s) => days.includes(s.date) && s.state !== "suggested");
+    return { planned: ss.reduce((a, s) => a + s.dur, 0), done: ss.filter((s) => s.state === "done").reduce((a, s) => a + s.dur, 0), byTopic: TOPICS.map((t) => ({ t, m: ss.filter((s) => s.topic === t.id).reduce((a, s) => a + s.dur, 0) })) };
+  }
+  function renderBig() {
+    const w = weekStats(0);
+    const ranked = w.byTopic.filter((x) => x.m).sort((a, b) => b.m - a.m);
+    const none = w.byTopic.filter((x) => !x.m && x.t.status !== "learned");
+    let p;
+    if (!ranked.length) p = `Nothing is planned this week yet. You are midway through <em>Islamic architecture</em>, and <em>Daylighting</em> has three things waiting. Ask the planner for a week, or drag something from Ready to plan.`;
+    else {
+      const lead = ranked[0], rest = ranked.slice(1);
+      p = `This week leans on <em>${esc(lead.t.name)}</em> (${fmtDur(lead.m)})${rest.length ? `, with ${rest.map((x) => `<em>${esc(x.t.name)}</em> (${fmtDur(x.m)})`).join(" and ")}` : ""}. You are midway through the course, and Part 6 brings the squinch you started on Monday's explainer.`;
+    }
+    const sub = none.length ? `${none.map((x) => x.t.name).join(" and ")} ${none.length === 1 ? "has" : "have"} no session planned yet.` : "Every topic in focus has time this week.";
+    $("#bigpic").innerHTML = `<p>${p}</p><p class="sub">${esc(sub)} Last week you studied ${fmtDur(weekStats(-1).done)}.</p>`;
+  }
+
+  // ---------- Plan bar ----------
+  function renderBar() {
+    const days = weekDays();
+    const a = new Date(`${days[0]}T12:00:00`), b = new Date(`${days[6]}T12:00:00`);
+    const f = (d, m) => new Intl.DateTimeFormat("en-GB", m ? { day: "numeric", month: "short" } : { day: "numeric" }).format(d);
+    const name = st.week === 0 ? "This week" : st.week === -1 ? "Last week" : st.week === 1 ? "Next week" : "";
+    $("#wk-label").innerHTML = `${name ? `<b>${name}</b> · ` : ""}${f(a, a.getMonth() !== b.getMonth())}–${f(b, true)}`;
+    $("#v-week").setAttribute("aria-pressed", String(st.view === "week"));
+    $("#v-day").setAttribute("aria-pressed", String(st.view === "day"));
+    $("#show-log").checked = st.log;
+    const w = weekStats(st.week);
+    $("#goal").innerHTML = `<span><b>${fmtDur(w.planned)}</b> planned · <b>${fmtDur(w.done)}</b> done</span><div class="meter" aria-hidden="true"><i class="m-plan" style="width:${Math.min(100, (w.planned / st.goal) * 100)}%"></i><i class="m-done" style="width:${Math.min(100, (w.done / st.goal) * 100)}%"></i></div><button class="goal-btn" type="button" id="goal-btn" title="Change your weekly goal">goal ${fmtDur(st.goal)}</button>`;
+    $("#goal-btn").addEventListener("click", (e) => openGoal(e.currentTarget));
+    const sug = st.sessions.filter((s) => s.state === "suggested" && inWeek(s.date));
+    const sb = $("#sugg-bar");
+    sb.hidden = !sug.length;
+    if (sug.length) {
+      sb.innerHTML = `<span>The planner suggests <b>${sug.length} ${sug.length === 1 ? "session" : "sessions"}</b> this week. Nothing is added until you accept.</span><span class="sp"></span><button class="btn ghost small" type="button" id="acc-all">Accept all</button><button class="btn link" type="button" id="dis-all">Dismiss</button>`;
+      $("#acc-all").addEventListener("click", () => { const ids = sug.map((s) => s.id); ids.forEach((i) => (find(i).state = "planned")); commit(); toast(`${ids.length} added to your plan`, () => { ids.forEach((i) => (find(i).state = "suggested")); commit(); }); });
+      $("#dis-all").addEventListener("click", () => { const removed = sug.map((s) => ({ ...s })); st.sessions = st.sessions.filter((s) => !sug.includes(s)); commit(); toast("Suggestions dismissed", () => { st.sessions.push(...removed); commit(); }); });
+    }
+    const strip = $("#strip"); strip.innerHTML = "";
+    for (const k of days) {
+      const has = st.sessions.some((s) => s.date === k && s.state !== "suggested");
+      const b = el("button", "", `${dayName(k, "narrow")}<b>${Number(k.slice(8))}</b>${has ? "<i></i>" : ""}`);
+      b.type = "button"; b.setAttribute("aria-pressed", String(k === st.dayKey)); b.setAttribute("aria-label", `${dayLong(k)}${k === TODAY_KEY ? ", today" : ""}`);
+      b.addEventListener("click", () => { st.dayKey = k; commit(); });
+      strip.append(b);
+    }
+  }
+
+  // ---------- Calendar ----------
+  const find = (id) => st.sessions.find((s) => s.id === id);
+  function lanes(list) {
+    const timed = list.filter((s) => s.start != null).sort((a, b) => a.start - b.start || b.dur - a.dur);
+    const out = new Map(); let group = [], groupEnd = -1;
+    const flush = () => { const cols = []; for (const s of group) { let i = cols.findIndex((end) => end <= s.start); if (i < 0) { i = cols.length; cols.push(0); } cols[i] = s.start + Math.max(s.dur, 25); out.set(s.id, { i, n: 0 }); } for (const s of group) out.get(s.id).n = cols.length; group = []; };
+    for (const s of timed) { if (s.start >= groupEnd && group.length) { flush(); groupEnd = -1; } group.push(s); groupEnd = Math.max(groupEnd, s.start + Math.max(s.dur, 25)); }
+    if (group.length) flush();
+    return out;
+  }
+  function sessionEl(s, lane) {
+    const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour")) || 48;
+    const state = showState(s);
+    const n = el("div", `ses k-${s.kind} is-${state}`);
+    const top = ((s.start - START * 60) / 60) * H, h = Math.max(24, (s.dur / 60) * H - 2);
+    n.style.top = `${top + 1}px`; n.style.height = `${h}px`;
+    const L = lane || { i: 0, n: 1 };
+    n.style.left = `calc(${(L.i / L.n) * 100}% + 3px)`; n.style.width = `calc(${100 / L.n}% - 6px)`;
+    if (h < 34) n.classList.add("short");
+    n.dataset.id = s.id; n.dataset.topic = s.topic; n.tabIndex = 0; n.setAttribute("role", "button");
+    const tag = state === "suggested" ? "Suggested · " : "";
+    n.setAttribute("aria-label", `${tag}${s.title}, ${dayLong(s.date)} ${fmtT(s.start)} for ${fmtDur(s.dur)}${state === "done" ? ", done" : state === "missed" ? ", not done yet" : ""}`);
+    n.innerHTML = `<b>${esc(s.title)}</b><small>${state === "suggested" ? "Suggested · " : ""}${fmtT(s.start)} · ${fmtDur(s.dur)}</small>${state !== "suggested" && state !== "done" ? '<span class="grip" aria-hidden="true"></span>' : ""}`;
+    return n;
+  }
+  function renderCal() {
+    const cal = $("#cal");
+    const keep = cal.querySelector(".cal-scroll")?.scrollTop;
+    const days = shownDays();
+    cal.style.setProperty("--days", days.length);
+    cal.style.setProperty("--hours", END - START);
+    cal.innerHTML = "";
+    const head = el("div", "cal-row cal-days"); head.append(el("div"));
+    const any = el("div", "cal-row cal-any"); any.append(el("div", "any-l", "Any<br>time"));
+    const scroll = el("div", "cal-scroll");
+    const grid = el("div", "cal-grid");
+    const gut = el("div", "gutter");
+    for (let h = START + 1; h < END; h++) { const t = el("span", "", `${h}:00`); t.style.top = `calc(var(--hour) * ${h - START})`; gut.append(t); }
+    grid.append(gut);
+    for (const k of days) {
+      const past = k < TODAY_KEY, isT = k === TODAY_KEY;
+      const daySes = st.sessions.filter((s) => s.date === k);
+      const planned = daySes.filter((s) => s.state !== "suggested").reduce((a, s) => a + s.dur, 0);
+      const dh = el("button", `dh${isT ? " is-today" : ""}${past ? " is-past" : ""}`, `<span>${dayName(k, "short")}</span><b><i>${Number(k.slice(8))}</i><small>${planned ? fmtDur(planned) : ""}</small></b>`);
+      dh.type = "button"; dh.title = st.view === "week" ? `Show ${dayLong(k)} on its own` : "Back to the week";
+      dh.addEventListener("click", () => { if (st.view === "week") { st.view = "day"; st.dayKey = k; } else st.view = "week"; commit(); });
+      head.append(dh);
+      const ac = el("div", "any-c"); ac.dataset.date = k;
+      for (const s of daySes.filter((s) => s.start == null)) {
+        const state = showState(s);
+        const c = el("button", `chip k-${s.kind} is-${state}`, `<b>${esc(s.title)}</b>`);
+        c.type = "button"; c.dataset.id = s.id; c.dataset.topic = s.topic; c.title = `${s.title} · any time · ${fmtDur(s.dur)}`;
+        ac.append(c);
+      }
+      any.append(ac);
+      const col = el("div", `col${isT ? " is-today" : ""}${past ? " is-past" : ""}`); col.dataset.date = k;
+      if (isT) {
+        const nm = nowMin();
+        if (nm > START * 60) { const sh = el("div", "past-shade"); sh.style.height = `calc(var(--hour) * ${Math.min(END - START, (nm - START * 60) / 60)})`; col.append(sh); }
+        if (nm >= START * 60 && nm < END * 60) { const nl = el("div", "now"); nl.style.top = `calc(var(--hour) * ${(nm - START * 60) / 60})`; col.append(nl); }
+      }
+      const ln = lanes(daySes);
+      for (const s of daySes.filter((s) => s.start != null)) col.append(sessionEl(s, ln.get(s.id)));
+      if (st.log) {
+        for (const e of LOG.filter((e) => rel(e.d) === k && (k < TODAY_KEY || e.at <= nowMin()))) {
+          const g = el("span", `log ${e.kind}`, esc(e.t)); g.style.top = `calc(var(--hour) * ${(e.at - START * 60) / 60})`; g.title = `${fmtT(e.at)} · ${e.t}`; col.append(g);
+        }
+      }
+      grid.append(col);
+    }
+    scroll.append(grid);
+    cal.append(head, any, scroll);
+    const H = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour")) || 48;
+    const first = Math.min(...st.sessions.filter((s) => days.includes(s.date) && s.start != null).map((s) => s.start), 20 * 60);
+    const focusAt = days.includes(TODAY_KEY) ? Math.min(first, nowMin() - 120) : first - 30;
+    scroll.scrollTop = keep != null && keep > 0 ? keep : Math.max(0, ((focusAt - START * 60) / 60) * H);
+    paintHl();
+  }
+
+  // ---------- Tray ----------
+  function renderTray() {
+    const t = $("#tray"); t.innerHTML = "";
+    $("#tray-n").textContent = st.tray.length ? `${st.tray.length} waiting` : "";
+    if (!st.tray.length) { t.append(el("li", "tray-empty", "Everything waiting has a time. New explainers, course parts and things you save to read appear here.")); return; }
+    for (const it of st.tray) {
+      const li = el("li", `item k-${it.kind}`);
+      li.dataset.tray = it.id; li.dataset.topic = it.topic;
+      li.innerHTML = `<p class="ik">${KIND[it.kind]} · ${esc(topic(it.topic).name)}</p><p class="it">${esc(it.title)}</p><p class="im">${esc(it.meta)}</p><button class="btn quiet small plan-it" type="button">Plan</button>`;
+      li.querySelector(".plan-it").addEventListener("click", (e) => { e.stopPropagation(); openComposer({ title: it.title, kind: it.kind, topic: it.topic, dur: it.dur, date: st.view === "day" ? st.dayKey : TODAY_KEY < weekDays()[0] ? weekDays()[0] : TODAY_KEY, start: null, fromTray: it.id }, e.currentTarget); });
+      t.append(li);
+    }
+  }
+
+  // ---------- Pointer: move, resize, select a range, drag from the tray ----------
+  const H = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hour")) || 48;
+  function hit(x, y) {
+    const els = document.elementsFromPoint(x, y);
+    const col = els.find((n) => n.classList?.contains("col"));
+    if (col) { const r = col.getBoundingClientRect(); const m = START * 60 + ((y - r.top) / H()) * 60; return { date: col.dataset.date, start: Math.max(START * 60, Math.min(END * 60 - SNAP, Math.round(m / SNAP) * SNAP)), col }; }
+    const ac = els.find((n) => n.classList?.contains("any-c"));
+    if (ac) return { date: ac.dataset.date, start: null, col: ac };
+    return null;
+  }
+  let drag = null;
+  function clearDrop() { document.querySelectorAll(".drop-on").forEach((n) => n.classList.remove("drop-on")); }
+  document.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    const cal = $("#cal");
+    const ses = e.target.closest(".ses, .chip");
+    const item = e.target.closest(".item");
+    if (item && !e.target.closest(".plan-it")) {
+      if (e.pointerType === "touch") return;
+      const it = st.tray.find((t) => t.id === item.dataset.tray);
+      drag = { type: "tray", it, x0: e.clientX, y0: e.clientY, moved: false, node: item };
+      return;
+    }
+    if (ses && cal.contains(ses)) {
+      const s = find(ses.dataset.id);
+      const resize = e.target.classList.contains("grip");
+      drag = { type: resize ? "resize" : "move", s, x0: e.clientX, y0: e.clientY, moved: false, node: ses, orig: { date: s.date, start: s.start, dur: s.dur }, grabOff: 0 };
+      if (!resize && s.start != null) { const r = ses.getBoundingClientRect(); drag.grabOff = Math.round((((e.clientY - r.top) / H()) * 60) / SNAP) * SNAP; }
+      ses.setPointerCapture?.(e.pointerId);
+      return;
+    }
+    const col = e.target.closest(".col");
+    if (col && !e.target.closest(".log")) {
+      if (e.pointerType === "touch") { drag = { type: "tap", x0: e.clientX, y0: e.clientY, moved: false }; return; }
+      const h = hit(e.clientX, e.clientY);
+      drag = { type: "range", date: col.dataset.date, a: Math.floor(h.start / 30) * 30, b: Math.floor(h.start / 30) * 30 + 30, col, x0: e.clientX, y0: e.clientY, moved: false };
+      e.preventDefault();
+    }
+  });
+  document.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+    drag.moved = true;
+    if (drag.type === "tap") return;
+    if (drag.type === "tray") {
+      if (!drag.chip) { drag.chip = el("div", "drag-chip", `${esc(drag.it.title)}<small></small>`); document.body.append(drag.chip); drag.node.classList.add("is-lifted"); }
+      drag.chip.style.left = `${e.clientX}px`; drag.chip.style.top = `${e.clientY}px`;
+      clearDrop(); const h = hit(e.clientX, e.clientY);
+      drag.chip.querySelector("small").textContent = h ? `${dayName(h.date, "short")} · ${h.start == null ? "any time" : fmtT(h.start)}` : "Drop on a day";
+      if (h) h.col.classList.add("drop-on");
+      return;
+    }
+    if (drag.type === "range") {
+      const h = hit(e.clientX, e.clientY);
+      if (h && h.date === drag.date && h.start != null) { const anchor = drag.a; const m = h.start + SNAP; drag.b = Math.max(anchor + SNAP, m); }
+      let sel = drag.col.querySelector(".sel"); if (!sel) { sel = el("div", "sel"); drag.col.append(sel); }
+      sel.style.top = `${((drag.a - START * 60) / 60) * H()}px`; sel.style.height = `${((drag.b - drag.a) / 60) * H()}px`;
+      sel.textContent = `${fmtT(drag.a)}–${fmtT(drag.b)}`;
+      return;
+    }
+    const s = drag.s;
+    drag.node.classList.add("dragging");
+    if (drag.type === "resize") {
+      const r = drag.node.getBoundingClientRect();
+      const dur = Math.max(SNAP, Math.round(((e.clientY - r.top) / H()) * 60 / SNAP) * SNAP);
+      s.dur = Math.min(dur, END * 60 - s.start);
+      drag.node.style.height = `${Math.max(22, (s.dur / 60) * H() - 2)}px`;
+      drag.node.querySelector("small").textContent = `${fmtT(s.start)} · ${fmtDur(s.dur)}`;
+      return;
+    }
+    const h = hit(e.clientX, e.clientY);
+    clearDrop();
+    if (!h) return;
+    if (h.start == null) { h.col.classList.add("drop-on"); drag.target = { date: h.date, start: null }; drag.node.style.opacity = "0.4"; return; }
+    drag.node.style.opacity = "";
+    const start = Math.max(START * 60, Math.min(END * 60 - s.dur, h.start - drag.grabOff));
+    drag.target = { date: h.date, start };
+    if (drag.node.parentElement !== h.col && drag.node.classList.contains("ses")) h.col.append(drag.node);
+    if (drag.node.classList.contains("ses")) {
+      drag.node.style.top = `${((start - START * 60) / 60) * H() + 1}px`; drag.node.style.left = "3px"; drag.node.style.width = "calc(100% - 6px)";
+      drag.node.querySelector("small").textContent = `${fmtT(start)} · ${fmtDur(s.dur)}`;
+    } else h.col.classList.add("drop-on");
+  });
+  document.addEventListener("pointerup", (e) => {
+    if (!drag) return;
+    const d = drag; drag = null; clearDrop();
+    if (d.type === "tap") { if (!d.moved) { const h = hit(e.clientX, e.clientY); if (h) openComposer({ date: h.date, start: h.start == null ? null : Math.floor(h.start / 30) * 30, dur: 30 }, null, null, { x: e.clientX, y: e.clientY }); } return; }
+    if (d.type === "tray") {
+      d.chip?.remove(); d.node.classList.remove("is-lifted");
+      if (!d.moved) return;
+      const h = hit(e.clientX, e.clientY);
+      if (!h) return;
+      const start = h.start == null ? null : Math.min(END * 60 - d.it.dur, h.start);
+      const s = { id: `n${Date.now()}`, date: h.date, start, dur: d.it.dur, kind: d.it.kind, title: d.it.title, topic: d.it.topic, state: "planned", fromTray: d.it.id };
+      st.sessions.push(s); st.tray = st.tray.filter((t) => t.id !== d.it.id); commit();
+      toast(`Planned for ${dayName(h.date)}${start == null ? "" : ` at ${fmtT(start)}`}`, () => { st.sessions = st.sessions.filter((x) => x !== s); st.tray.push(d.it); commit(); });
+      return;
+    }
+    if (d.type === "range") {
+      d.col.querySelector(".sel")?.remove();
+      openComposer({ date: d.date, start: d.a, dur: d.b - d.a }, null, null, { x: e.clientX, y: e.clientY });
+      return;
+    }
+    if (!d.moved) { openSession(d.s.id, d.node); return; }
+    const s = d.s;
+    if (d.type === "move" && d.target) { s.date = d.target.date; s.start = d.target.start; }
+    if (s.state === "done" || showState(s) === "missed") { /* moved into the future: planned again */ if (!isPast(s) && s.state !== "suggested") s.state = "planned"; }
+    commit();
+    const o = d.orig;
+    if (o.date !== s.date || o.start !== s.start || o.dur !== s.dur) toast(d.type === "resize" ? `Now ${fmtDur(s.dur)}` : `Moved to ${dayName(s.date)}${s.start == null ? ", any time" : ` at ${fmtT(s.start)}`}`, () => { Object.assign(s, o); commit(); });
+  });
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (chip && $("#cal").contains(chip)) openSession(chip.dataset.id, chip);
+  });
+  document.addEventListener("keydown", (e) => {
+    const ses = e.target.closest?.(".ses");
+    if (ses && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openSession(ses.dataset.id, ses); return; }
+    if (e.key === "Escape") { closePop(); closeDrawer(); return; }
+    if (e.target.closest("input, select, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "c" || e.key === "C") { e.preventDefault(); $("#capture").click(); }
+    if (e.key === "n" || e.key === "N") { e.preventDefault(); openComposer({ date: TODAY_KEY, start: nextFree(TODAY_KEY, 30), dur: 30 }, null, null, { x: innerWidth / 2 - 170, y: 160 }); }
+  });
+
+  // ---------- Popovers ----------
+  function closePop() { if (popClose) { const f = popClose; popClose = null; f(); } }
+  function openPop(anchor, build, at) {
+    closePop();
+    const scrim = el("div", "scrim"); const pop = el("div", "pop");
+    pop.setAttribute("role", "dialog"); pop.setAttribute("aria-modal", "true");
+    pop.innerHTML = `<button class="tool x" type="button" aria-label="Close"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg></button>`;
+    build(pop);
+    document.body.append(scrim, pop);
+    const phone = window.matchMedia("(max-width: 699.98px)").matches;
+    if (phone) { pop.classList.add("sheet"); scrim.style.background = "var(--scrim)"; }
+    else {
+      const pr = pop.getBoundingClientRect();
+      let x, y;
+      if (anchor) { const r = anchor.getBoundingClientRect(); x = r.right + 10; y = r.top; if (x + pr.width > innerWidth - 12) x = r.left - pr.width - 10; if (x < 12) { x = Math.min(innerWidth - pr.width - 12, Math.max(12, r.left)); y = r.bottom + 8; } }
+      else { x = (at?.x ?? innerWidth / 2) + 12; y = (at?.y ?? 120) - 20; if (x + pr.width > innerWidth - 12) x = (at?.x ?? 0) - pr.width - 12; }
+      y = Math.max(12, Math.min(y, innerHeight - pr.height - 12)); x = Math.max(12, x);
+      pop.style.left = `${x}px`; pop.style.top = `${y}px`;
+    }
+    const back = document.activeElement;
+    popClose = () => { scrim.remove(); pop.remove(); back?.focus?.({ preventScroll: true }); };
+    scrim.addEventListener("pointerdown", closePop);
+    pop.querySelector(".x").addEventListener("click", closePop);
+    (pop.querySelector("[data-autofocus]") || pop.querySelector("button:not(.x), input, select"))?.focus({ preventScroll: true });
+    return pop;
+  }
+  function openSession(id, anchor) {
+    const s = find(id); if (!s) return;
+    const state = showState(s);
+    const tp = topic(s.topic);
+    const when = s.start == null ? `${dayLong(s.date)} · any time · ${fmtDur(s.dur)}` : `${dayLong(s.date)} · ${fmtT(s.start)}–${fmtT(s.start + s.dur)} · ${fmtDur(s.dur)}`;
+    openPop(anchor, (p) => {
+      p.insertAdjacentHTML("beforeend", `
+        <p class="k">${state === "suggested" ? "Suggested by the planner · " : state === "done" ? "Done · " : ""}${KIND[s.kind]} · ${esc(tp.name)}</p>
+        <h3>${esc(s.title)}</h3>
+        <p class="when">${when}</p>
+        ${s.why && state === "suggested" ? `<p class="why">${esc(s.why)}</p>` : ""}
+        ${s.note && state !== "done" ? `<p class="when" style="margin-top:-6px">${esc(s.note)}</p>` : ""}
+        ${state === "missed" ? `<p class="when" style="margin-top:-6px">This time has passed. Did you do it?</p>` : ""}
+        <div class="row" id="acts"></div>`);
+      const a = p.querySelector("#acts");
+      const B = (label, cls, fn, auto) => { const b = el("button", `btn ${cls}`, label); b.type = "button"; if (auto) b.dataset.autofocus = ""; b.addEventListener("click", fn); a.append(b); };
+      if (state === "suggested") {
+        B("Add to my plan", "", () => { s.state = "planned"; commit(); closePop(); toast("Added to your plan", () => { s.state = "suggested"; commit(); }); }, true);
+        B("Change time…", "quiet", () => openComposer({ ...s }, anchor, s.id));
+        B("Not now", "link", () => { remove(s, "Suggestion dismissed"); closePop(); });
+      } else if (state === "done") {
+        B("Open again", "quiet", () => toast(`${VERB[s.kind]} (not part of this prototype)`));
+        B("Not done", "link", () => { s.state = "planned"; commit(); closePop(); });
+      } else if (state === "missed") {
+        B("Yes, mark done", "", () => { s.state = "done"; commit(); closePop(); toast("Marked done", () => { s.state = "planned"; commit(); }); }, true);
+        B("Move to next free time", "quiet", () => { const o = { date: s.date, start: s.start }; const k = s.date < TODAY_KEY ? TODAY_KEY : s.date; s.date = k; s.start = nextFree(k, s.dur, s.id); if (s.start == null) { s.date = dayKey(addDays(new Date(`${k}T12:00:00`), 1)); s.start = nextFree(s.date, s.dur, s.id); } commit(); closePop(); toast(`Moved to ${dayName(s.date)} at ${fmtT(s.start)}`, () => { Object.assign(s, o); commit(); }); });
+        B("Remove", "link", () => { remove(s, "Removed from your plan"); closePop(); });
+      } else {
+        const soon = s.date === TODAY_KEY;
+        B(soon ? `Start now` : VERB[s.kind], "", () => { toast(`${VERB[s.kind]}: ${s.title} (not part of this prototype)`); closePop(); }, true);
+        B("Edit…", "quiet", () => openComposer({ ...s }, anchor, s.id));
+        B("Remove", "link", () => { remove(s, "Removed from your plan"); closePop(); });
+      }
+    });
+  }
+  function remove(s, msg) {
+    const i = st.sessions.indexOf(s); st.sessions.splice(i, 1);
+    let back = null;
+    if (s.fromTray && s.state !== "suggested") { const t0 = TRAY0.find((t) => t.id === s.fromTray); if (t0 && !st.tray.some((t) => t.id === t0.id)) { back = { ...t0 }; st.tray.push(back); } }
+    commit();
+    toast(back ? `${msg} · back in Ready to plan` : msg, () => { st.sessions.splice(i, 0, s); if (back) st.tray = st.tray.filter((t) => t !== back); commit(); });
+  }
+  function nextFree(date, dur, skip) {
+    const busy = st.sessions.filter((s) => s.date === date && s.start != null && s.id !== skip);
+    const from = date === TODAY_KEY ? Math.ceil((nowMin() + 10) / 30) * 30 : 8 * 60;
+    for (let m = Math.max(from, 7 * 60); m + dur <= 22 * 60; m += 30) if (!busy.some((b) => m < b.start + b.dur && b.start < m + dur)) return m;
+    return null;
+  }
+  function openComposer(seed, anchor, editId, at) {
+    const days = weekDays().includes(seed.date) ? weekDays() : Array.from({ length: 7 }, (_, i) => dayKey(addDays(new Date(`${seed.date}T12:00:00`), i - ((new Date(`${seed.date}T12:00:00`).getDay() + 6) % 7))));
+    const d = { title: "", kind: "topic", topic: "isl", dur: 30, start: null, ...seed };
+    openPop(anchor, (p) => {
+      const times = [`<option value="">Any time that day</option>`].concat(Array.from({ length: (22 - START) * 4 + 1 }, (_, i) => START * 60 + i * 15).map((m) => `<option value="${m}" ${m === d.start ? "selected" : ""}>${fmtT(m)}</option>`));
+      p.insertAdjacentHTML("beforeend", `
+        <p class="k">${editId ? "Change this session" : "Plan a session"}</p>
+        <form class="form" id="cf" novalidate>
+          <label class="f"><span>What</span><input type="text" id="cf-title" value="${esc(d.title)}" placeholder="A course part, a reading, a topic…" autocomplete="off" ${d.title ? "" : "data-autofocus"}></label>
+          ${!editId && !d.title && st.tray.length ? `<div class="f"><span>Or pick something waiting</span><select id="cf-pick"><option value="">Choose…</option>${st.tray.map((t) => `<option value="${t.id}">${esc(t.title)}</option>`).join("")}</select></div>` : ""}
+          <div class="f2">
+            <label class="f"><span>Day</span><select id="cf-day">${days.map((k) => `<option value="${k}" ${k === d.date ? "selected" : ""}>${dayShort(k)}${k === TODAY_KEY ? " (today)" : ""}</option>`).join("")}</select></label>
+            <label class="f"><span>Time</span><select id="cf-time">${times.join("")}</select></label>
+          </div>
+          <fieldset class="f"><legend>How long</legend><div class="durs" id="cf-dur">${[15, 20, 25, 30, 45, 60, 90].map((m) => `<button type="button" data-m="${m}" aria-pressed="${m === d.dur}">${fmtDur(m)}</button>`).join("")}</div></fieldset>
+          <label class="f"><span>Topic</span><select id="cf-topic">${TOPICS.map((t) => `<option value="${t.id}" ${t.id === d.topic ? "selected" : ""}>★ ${esc(t.name)}</option>`).join("")}</select></label>
+          <div class="row"><button class="btn" type="submit" ${d.title ? "data-autofocus" : ""}>${editId ? "Save" : "Plan it"}</button><button class="btn link" type="button" id="cf-cancel">Cancel</button></div>
+        </form>`);
+      const durs = p.querySelector("#cf-dur");
+      durs.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; d.dur = Number(b.dataset.m); durs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
+      const pick = p.querySelector("#cf-pick");
+      if (pick) pick.addEventListener("change", () => { const t = st.tray.find((x) => x.id === pick.value); if (!t) return; d.fromTray = t.id; d.kind = t.kind; p.querySelector("#cf-title").value = t.title; p.querySelector("#cf-topic").value = t.topic; d.dur = t.dur; durs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(Number(x.dataset.m) === t.dur))); });
+      p.querySelector("#cf-cancel").addEventListener("click", closePop);
+      p.querySelector("#cf").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = p.querySelector("#cf-title").value.trim();
+        if (!title) { const i = p.querySelector("#cf-title"); i.placeholder = "Give the session a name"; i.focus(); return; }
+        const tv = p.querySelector("#cf-time").value;
+        const out = { title, date: p.querySelector("#cf-day").value, start: tv === "" ? null : Number(tv), dur: d.dur, topic: p.querySelector("#cf-topic").value };
+        if (out.start != null) out.start = Math.min(out.start, END * 60 - out.dur);
+        if (editId) {
+          const s = find(editId); const o = { ...s }; Object.assign(s, out); if (s.state === "suggested") s.state = "planned"; if (!isPast(s) && s.state === "done") s.state = "planned";
+          commit(); closePop(); toast("Saved", () => { Object.assign(s, o); commit(); });
+        } else {
+          const s = { id: `n${Date.now()}`, kind: d.kind || "topic", state: "planned", fromTray: d.fromTray, ...out };
+          st.sessions.push(s); const tr = d.fromTray ? st.tray.find((t) => t.id === d.fromTray) : null; if (tr) st.tray = st.tray.filter((t) => t !== tr);
+          commit(); closePop();
+          toast(`Planned for ${dayName(s.date)}${s.start == null ? "" : ` at ${fmtT(s.start)}`}`, () => { st.sessions = st.sessions.filter((x) => x !== s); if (tr) st.tray.push(tr); commit(); });
+        }
+      });
+    }, at);
+  }
+  function openGoal(anchor) {
+    openPop(anchor, (p) => {
+      p.insertAdjacentHTML("beforeend", `<p class="k">Weekly goal</p><h3>How much time do you want to study each week?</h3><p class="when">The planner fills free time up to this, and only proposes. You confirm each session.</p><div class="durs" id="g-d">${[120, 180, 300, 420, 600].map((m) => `<button type="button" data-m="${m}" aria-pressed="${m === st.goal}">${fmtDur(m)}</button>`).join("")}</div>`);
+      p.querySelector("#g-d").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; st.goal = Number(b.dataset.m); commit(); closePop(); toast(`Weekly goal: ${fmtDur(st.goal)}`); });
+    });
+  }
+
+  // ---------- The planner (demo: proposes from what is waiting, into free time, up to the goal) ----------
+  $("#ask-planner").addEventListener("click", () => {
+    const btn = $("#ask-planner");
+    btn.disabled = true; btn.innerHTML = `<svg class="ico" aria-hidden="true" style="width:15px;height:15px"><use href="#i-spark"/></svg>Planning…`;
+    setTimeout(() => {
+      btn.disabled = false; btn.innerHTML = `<svg class="ico" aria-hidden="true" style="width:15px;height:15px"><use href="#i-spark"/></svg>Plan my week`;
+      if (st.week < 0) { toast("The planner plans from today onwards. Go to this week or next."); return; }
+      let left = st.goal - weekStats(st.week).planned;
+      const days = weekDays().filter((k) => k >= TODAY_KEY);
+      const prefs = [1140, 450, 750, 1110, 480];
+      const made = [];
+      const pool = st.tray.filter((t) => !st.sessions.some((s) => s.fromTray === t.id));
+      for (const t of pool) {
+        if (left <= 0) break;
+        let placed = false;
+        for (const k of days) {
+          if (st.sessions.filter((s) => s.date === k && s.state !== "done").length >= 3) continue;
+          for (const m of prefs) {
+            if (k === TODAY_KEY && m < nowMin() + 30) continue;
+            const busy = st.sessions.some((s) => s.date === k && s.start != null && m < s.start + s.dur && s.start < m + t.dur);
+            if (!busy) { const s = { id: `p${Date.now()}${made.length}`, date: k, start: m, dur: t.dur, kind: t.kind, title: t.title, topic: t.topic, state: "suggested", fromTray: t.id, why: whyFor(t) }; st.sessions.push(s); made.push(s); left -= t.dur; placed = true; break; }
+          }
+          if (placed) break;
+        }
+      }
+      made.forEach((s) => { st.tray = st.tray.filter((t) => t.id !== s.fromTray); });
+      commit();
+      toast(made.length ? `The planner suggests ${made.length} ${made.length === 1 ? "session" : "sessions"}. Accept the ones you want.` : left <= 0 ? "Your week already reaches your goal" : "Nothing waiting to plan");
+    }, 900);
+  });
+  const whyFor = (t) => ({ course: "It is the next part of the course you are midway through.", explainer: "It is new, short, and on a topic in your focus.", reading: "You saved it to read and it fits a short gap.", topic: `${topic(t.topic).name} is in focus but has had no time yet.`, review: "Writing it up soon after the part helps it stick." }[t.kind]);
+
+  // ---------- Toast ----------
+  function toast(msg, undo) {
+    document.querySelector(".toast")?.remove(); clearTimeout(toastT);
+    const t = el("div", "toast", `<span>${esc(msg)}</span>`); t.setAttribute("role", "status");
+    if (undo) { const b = el("button", "", "Undo"); b.type = "button"; b.addEventListener("click", () => { undo(); t.remove(); }); t.append(b); }
+    document.body.append(t); toastT = setTimeout(() => t.remove(), undo ? 6000 : 3200);
+  }
+
+  // ---------- Shell controls ----------
+  function closeDrawer() { const a = $("#app"); if (a.dataset.drawer === "open") { a.dataset.drawer = ""; document.querySelector(".drawer-scrim")?.remove(); } }
+  $("#menu").addEventListener("click", () => { const a = $("#app"); a.dataset.drawer = "open"; const s = el("div", "drawer-scrim"); s.addEventListener("click", closeDrawer); a.append(s); $("#side .room[aria-current]")?.focus(); });
+  $("#collapse").addEventListener("click", () => { st.side = st.side === "open" ? "closed" : "open"; commit(); });
+  $("#theme").addEventListener("click", () => {
+    const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    r.dataset.theme = dark ? "light" : "dark"; renderCal();
+  });
+  $("#capture").addEventListener("click", () => toast("Capture opens the Library composer (not part of this prototype)"));
+  document.querySelectorAll(".room[data-soon]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); toast(`${a.dataset.soon} is not part of this prototype`); }));
+  $("#prev").addEventListener("click", () => { st.week--; st.dayKey = weekDays()[0]; commit(); });
+  $("#nextwk").addEventListener("click", () => { st.week++; st.dayKey = weekDays()[0]; commit(); });
+  $("#v-week").addEventListener("click", () => { st.view = "week"; commit(); });
+  $("#v-day").addEventListener("click", () => { st.view = "day"; if (!inWeek(st.dayKey)) st.dayKey = weekDays()[0]; commit(); });
+  $("#show-log").addEventListener("change", (e) => { st.log = e.target.checked; commit(); });
+  $("#p-time").addEventListener("change", (e) => { st.nowSel = e.target.value; commit(); });
+  $("#p-state").addEventListener("change", (e) => {
+    if (e.target.value === "empty") { st.sessions = st.sessions.filter((s) => s.date < rel(0)); st.tray = TRAY0.map((t) => ({ ...t })); }
+    else { st.sessions = sampleSessions(); st.tray = TRAY0.map((t) => ({ ...t })); }
+    commit();
+  });
+  $("#p-reset").addEventListener("click", () => { st = fresh(); $("#p-state").value = "planned"; $("#p-time").value = st.nowSel; commit(); toast("Prototype reset"); });
+  $("#proto-t").addEventListener("click", () => { const p = $("#proto"); p.dataset.min = String(p.dataset.min !== "true"); });
+  window.matchMedia("(max-width: 699.98px)").addEventListener("change", () => renderCal());
+
+  // ---------- Render ----------
+  function commit() { save(); render(); }
+  function render() {
+    // The tray never holds something that already has a session.
+    st.tray = st.tray.filter((t) => !st.sessions.some((s) => s.fromTray === t.id));
+    const a = $("#app"); a.dataset.side = st.side;
+    $("#collapse").setAttribute("aria-expanded", String(st.side === "open")); $("#collapse").title = st.side === "open" ? "Close sidebar" : "Open sidebar";
+    $("#p-time").value = st.nowSel;
+    renderSide(); renderHead(); renderContinue(); renderBig(); renderBar(); renderCal(); renderTray();
+  }
+  if (window.matchMedia("(max-width: 860px)").matches) $("#proto").dataset.min = "true";
+  render();
+})();
+</script>
