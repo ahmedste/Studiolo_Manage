@@ -1,0 +1,948 @@
+<title>Studiolo Commonplace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: Studiolo's Library shell (rail + stage). One stage, two arrangements of the same records: a masonry wall and shelves by collection. Tokens are Studiolo's own (src/styles/tokens.css). */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --s1: #c9d4f1; --s2: #6e86d0; --on-s2: #0f1a3d;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --on-accent: #ffffff;
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5;
+  --cover: #202e38; --cover-ink: #edeff6; --shelf: #22303a;
+  --scrim: rgba(34, 48, 58, 0.28);
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, 0.07), 0 8px 22px rgba(34, 48, 58, 0.09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, 0.08), 0 16px 36px rgba(34, 48, 58, 0.15);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --s1: #34447a; --s2: #7189d8; --on-s2: #0f1a3d;
+  --accent: #9db0f3; --accent-soft: #263156; --on-accent: #131a20;
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --cover: #0e151b; --cover-ink: #edeff6; --shelf: #6b7984;
+  --scrim: rgba(0, 0, 0, 0.5);
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --s1: #34447a; --s2: #7189d8; --on-s2: #0f1a3d;
+  --accent: #9db0f3; --accent-soft: #263156; --on-accent: #131a20;
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --cover: #0e151b; --cover-ink: #edeff6; --shelf: #6b7984;
+  --scrim: rgba(0, 0, 0, 0.5);
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 14px; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Shell */
+.app { display: flex; min-height: 100vh; }
+.rail { flex: none; width: 58px; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 0; position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; }
+.rail .mark { width: 30px; height: 30px; border-radius: 7px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-family: var(--read); font-size: 17px; margin-bottom: 18px; }
+.rail .ri { width: 44px; height: 40px; display: grid; place-items: center; color: var(--ink-2); border-radius: 8px; }
+.rail .ri.on { background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--ink); }
+.rail .ri.cap { color: var(--accent); }
+.rail .foot { margin-top: auto; }
+.stage { flex: 1 1 auto; min-width: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1320px; margin: 0 auto; padding-block: 30px 120px; padding-inline: 28px; }
+
+.crumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.crumb .here { color: var(--ink); }
+.crumb .area { color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 18px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.tabs button { padding: 10px 12px; color: var(--ink-2); }
+.tabs button[aria-current="page"] { color: var(--ink); font-weight: 500; box-shadow: inset 0 -2px 0 var(--accent); }
+
+.tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-top: 20px; }
+.search { flex: 1 1 380px; min-width: 0; max-width: 680px; border-bottom: 1px solid var(--line); }
+.search input { width: 100%; font-family: var(--read); font-size: 25px; color: var(--ink); background: none; border: 0; outline: none; padding: 6px 0 8px; }
+.search input::placeholder { color: var(--ink-3); }
+.tools-r { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.count { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.seg { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--board); }
+.seg button { height: 34px; padding: 0 12px; border-radius: 6px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(34, 48, 58, 0.08); font-weight: 500; }
+
+.row2 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; margin-top: 18px; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; font-size: 13.5px; }
+.chips button { padding: 6px 10px; border-radius: 4px; color: var(--ink-2); }
+.chips button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.bays { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.bays a { padding: 6px 12px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); color: var(--ink); text-decoration: none; }
+.bays a span { color: var(--ink-2); }
+.bays a.lpill { box-shadow: none; border: 1px dashed var(--ink-3); background: none; color: var(--ink-2); }
+.sort { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.sort select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; }
+
+#banner { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+.banner { margin-top: 16px; box-shadow: 0 0 0 4px var(--paper); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 10px 14px; border-radius: 8px; background: var(--accent-soft); font-size: 13.5px; }
+.banner b { color: var(--accent); font-weight: 600; }
+.banner span { color: var(--ink-2); }
+.banner button { margin-left: auto; color: var(--accent); font-size: 13px; padding: 4px 0; }
+
+/* Wall */
+.mason { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); grid-auto-rows: 8px; column-gap: 20px; row-gap: 12px; align-items: start; margin-top: 18px; }
+.card { display: block; width: 100%; min-width: 0; color: var(--ink); }
+.card .ci { display: block; transition: transform 130ms var(--ease), box-shadow 130ms var(--ease); }
+.card:hover .ci { transform: translateY(-2px); }
+.paper { display: flex; flex-direction: column; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 2px; }
+.paper .pb { padding: 14px 15px 12px; display: block; }
+.paper .ft { display: flex; align-items: center; gap: 6px; padding: 8px 15px 10px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--ink-2); }
+.tp { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2); }
+.tp i, .paper .ft i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--ink-3); flex: none; }
+.kick { display: block; font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 5px; }
+.ttl { display: block; font-size: 14px; font-weight: 500; line-height: 1.35; }
+.meta { display: block; font-size: 12px; color: var(--ink-2); margin-top: 3px; line-height: 1.4; }
+.note-c { background: var(--note-paper); border-left: 3px solid var(--s2); }
+.note-c .nt { display: block; font-family: var(--read); font-size: 16px; line-height: 1.45; }
+.quote-c { background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); border-radius: 3px; position: relative; }
+.quote-c .qt { display: block; font-family: var(--read); font-style: italic; font-size: 19px; line-height: 1.35; padding: 18px 34px 12px 18px; }
+.quote-c .qa { display: block; margin: 0 18px; padding: 8px 0 10px; border-top: 1px solid var(--quote-rule); font-size: 12px; color: var(--ink-2); }
+.quote-c::after { content: "\201C"; position: absolute; right: 12px; top: 2px; font-family: var(--read); font-size: 40px; color: var(--quote-rule); }
+.cover { display: flex; flex-direction: column; justify-content: space-between; aspect-ratio: 2 / 3; max-width: 100%; padding: 22px 20px 18px; border-radius: 6px; background: var(--cover); color: var(--cover-ink); box-shadow: inset 4px 0 0 rgba(255, 255, 255, 0.11), inset 6px 0 2px rgba(0, 0, 0, 0.38), var(--shadow-pic); }
+.cover .cvt { font-family: var(--read); font-size: 21px; line-height: 1.22; }
+.cover .cvb { font-size: 11.5px; opacity: 0.75; }
+.cap { display: block; padding: 9px 2px 0; }
+.cap .ttl { font-size: 13.5px; }
+.cap .meta { font-style: normal; }
+.cap .tp { margin-top: 4px; }
+.person-h { display: flex; gap: 12px; align-items: center; }
+.pm { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--board); box-shadow: inset 0 0 0 1px var(--line); font-family: var(--read); font-size: 16px; color: var(--ink-2); }
+.pn { font-family: var(--read); font-size: 19px; line-height: 1.2; }
+.prog { display: block; height: 2px; background: var(--line); margin-top: 10px; }
+.prog i { display: block; height: 2px; background: var(--accent); }
+.capbox { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 2px; }
+.capbox textarea { font-family: var(--read); font-size: 17px; line-height: 1.45; color: var(--ink); background: none; border: 0; outline: none; resize: none; min-height: 150px; }
+.capbox textarea::placeholder { color: var(--ink-2); }
+.capbox .cb-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--ink-2); }
+.capbox select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 5px 6px; max-width: 150px; }
+.btn { font-size: 13px; font-weight: 500; height: 34px; padding: 0 14px; border-radius: 6px; background: var(--accent); color: var(--on-accent); }
+.btn.q { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); font-weight: 400; }
+kbd { font: inherit; font-size: 11px; padding: 0 4px; border: 1px solid var(--line); border-radius: 3px; }
+.empty { font-family: var(--read); font-size: 17px; color: var(--ink-2); margin: 28px 0 0; }
+
+/* Pictures: drawn stand-ins for photos, like the app's dev specimens */
+.pic { position: relative; display: block; overflow: hidden; border-radius: 6px; box-shadow: var(--shadow-pic); }
+.pic .gr { position: absolute; left: 0; right: 0; bottom: 0; height: 18%; }
+.pic .ar { position: absolute; bottom: 18%; width: 12%; height: 40%; border-radius: 999px 999px 0 0; }
+.pic .ar:nth-of-type(2) { left: 10%; } .pic .ar:nth-of-type(3) { left: 30%; } .pic .ar:nth-of-type(4) { left: 50%; } .pic .ar:nth-of-type(5) { left: 70%; }
+.pic .sun { position: absolute; right: 8%; top: 10%; width: 14%; aspect-ratio: 1; border-radius: 50%; background: #f2cf5b; }
+.pic .play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; background: rgba(20, 24, 28, 0.85); display: grid; place-items: center; }
+.pic .dur { position: absolute; right: 6px; bottom: 7px; font-size: 10.5px; font-weight: 600; padding: 2px 5px; border-radius: 3px; background: rgba(0, 0, 0, 0.72); color: #fff; font-variant-numeric: tabular-nums; }
+.pic .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--s2); }
+.sky0 { background: #e9b7c9; } .sky0 .gr { background: #7a5560; } .sky0 .ar { background: #4a2f3a; }
+.sky1 { background: #bcd3ea; } .sky1 .gr { background: #56637e; } .sky1 .ar { background: #273248; }
+.sky2 { background: #bfe3cf; } .sky2 .gr { background: #4f7a6a; } .sky2 .ar { background: #2c4f45; }
+.sky3 { background: #f0d3b0; } .sky3 .gr { background: #9b7a55; } .sky3 .ar { background: #5a3e2a; }
+
+/* Shelves */
+.desk { margin-top: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 22px 20px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; transition: opacity 220ms var(--ease); }
+.desk-h { flex: 0 0 200px; }
+.eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.desk-h h2 { margin: 6px 0 4px; font-family: var(--read); font-weight: 500; font-size: 20px; }
+.desk-h p { margin: 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+.desk-list { flex: 999 1 520px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.dcard { display: flex; gap: 14px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); min-width: 0; }
+.dcard .dt { flex: none; width: 40px; height: 56px; border-radius: 3px; }
+.dcard .db { min-width: 0; flex: 1; }
+.dcard .dk { font-size: 11.5px; color: var(--ink-2); }
+.dcard .dn { font-family: var(--read); font-size: 16px; line-height: 1.25; margin: 2px 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dcard .dm { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+
+.bay { padding-top: 40px; }
+.bay-h { display: flex; align-items: baseline; gap: 14px; padding-bottom: 4px; }
+.bay-h h2 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.bay-h .rule { flex: 1; height: 1px; background: var(--line); }
+.bay-h .n { font-size: 12px; color: var(--ink-2); }
+.shelf { display: flex; flex-wrap: wrap; gap: 0 32px; padding-top: 14px; transition: opacity 220ms var(--ease); }
+.shelf.faded { opacity: 0.4; }
+.slabel { flex: 0 0 200px; padding-top: 40px; min-width: 0; }
+.slabel .sk { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 500; color: var(--ink-2); }
+.slabel .sk i { width: 9px; height: 9px; border-radius: 2px; }
+.slabel h3 { margin: 6px 0; font-family: var(--read); font-weight: 500; font-size: 22px; line-height: 1.2; text-wrap: balance; }
+.slabel .sm { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+.linkb { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--accent); padding: 4px 0; display: inline-flex; align-items: center; gap: 4px; }
+.linkb:hover { color: var(--ink); }
+.sbody { flex: 999 1 520px; min-width: 0; }
+.srow { display: flex; align-items: flex-end; gap: 6px; min-height: 206px; padding: 34px 4px 0; overflow-x: auto; overflow-y: hidden; border-bottom: 2px solid var(--shelf); scrollbar-width: thin; }
+.board { height: 9px; background: var(--board); border-bottom: 1px solid var(--line); border-radius: 0 0 3px 3px; transform-origin: left center; }
+.slot { position: relative; flex: none; display: flex; flex-direction: column; justify-content: flex-end; transition: opacity 220ms var(--ease); }
+.slot.dim { opacity: 0.2; }
+.slot.narrow .since { opacity: 0; transition: opacity 130ms var(--ease); z-index: 2; }
+.slot.narrow:hover .since, .slot.narrow:focus-within .since { opacity: 1; }
+.slot.narrow.marked::before { content: ""; position: absolute; left: 50%; top: -14px; width: 7px; height: 7px; margin-left: -4px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.slot.narrow.marked:hover::before, .slot.narrow.marked:focus-within::before { opacity: 0; }
+.since { position: absolute; left: 50%; top: -24px; transform: translateX(-50%); white-space: nowrap; font-size: 10.5px; line-height: 1; padding: 3px 6px; border-radius: 999px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); pointer-events: none; }
+.sh { display: block; color: var(--ink); transition: transform 130ms var(--ease); }
+.sh:hover { transform: translateY(-6px); }
+.sh.lit { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sh.lit.sel { outline-width: 3px; }
+.spine { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 0; border-radius: 2px 2px 0 0; overflow: hidden; box-shadow: inset -2px 0 0 rgba(0, 0, 0, 0.07); }
+.spine .st { writing-mode: vertical-rl; font-family: var(--read); font-size: 13px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; min-height: 0; }
+.spine .sb { writing-mode: vertical-rl; font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.75; white-space: nowrap; margin-top: 10px; }
+.cA { background: var(--accent); color: var(--on-accent); }
+.cB { background: var(--s2); color: var(--on-s2); }
+.cC { background: var(--s1); color: var(--ink); }
+.cD { background: var(--cover); color: var(--cover-ink); }
+.cE { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.cF { background: var(--quote-paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--quote-rule); }
+.fo { width: 116px; height: 174px; margin-right: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 15px 12px 12px 15px; border-radius: 2px 4px 4px 2px; background: var(--cover); color: var(--cover-ink); box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.11), inset 5px 0 2px rgba(0, 0, 0, 0.38); }
+.fo .ft1 { font-family: var(--read); font-size: 16px; line-height: 1.15; }
+.fo .fb1 { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.8; }
+.binder { display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px 0 14px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 3px 3px 0 0; overflow: hidden; }
+.binder .tag { font-size: 9.5px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.binder .st { writing-mode: vertical-rl; font-family: var(--read); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; min-height: 0; }
+.binder .sb { writing-mode: vertical-rl; font-size: 9.5px; color: var(--ink-2); margin-top: 8px; white-space: nowrap; }
+.sv { width: 196px; }
+.sv .pic { height: 110px; border-radius: 4px; box-shadow: none; }
+.sv .vt { display: block; font-size: 13px; font-weight: 500; line-height: 1.25; padding: 8px 2px 10px; height: 44px; overflow: hidden; }
+.ic { width: 154px; height: 172px; display: flex; flex-direction: column; justify-content: space-between; padding: 13px 13px 11px; background: var(--note-paper); box-shadow: inset 0 0 0 1px var(--line); border-radius: 3px; transform-origin: bottom left; }
+.ic .it1 { font-family: var(--read); font-size: 14px; line-height: 1.32; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; }
+.ic .ib1 { font-size: 11px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 7px; }
+.ic.qq { background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); }
+.ic.qq .it1 { font-style: italic; font-size: 15px; }
+.ic.qq .ib1 { border-top-color: var(--quote-rule); }
+.ic.lean { rotate: -3deg; }
+.pr { padding: 7px 7px 24px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 2px; position: relative; }
+.pr .pic { box-shadow: none; border-radius: 1px; }
+.pr .pl { position: absolute; left: 8px; bottom: 6px; right: 8px; font-size: 10.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt { width: 126px; height: 168px; display: flex; flex-direction: column; justify-content: space-between; padding: 13px 12px; border-radius: 4px; background: var(--s1); color: var(--ink); }
+.pt .pk { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); }
+.pt .pnm { font-family: var(--read); font-size: 21px; line-height: 1.1; }
+.pc { width: 168px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 4px; overflow: hidden; }
+.pc .pic { height: 108px; border-radius: 0; box-shadow: none; }
+.pc .pct { display: block; padding: 8px 10px 0; font-family: var(--read); font-size: 15px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc .pcb { display: block; padding: 2px 10px 10px; font-size: 11.5px; color: var(--ink-2); }
+.stub { flex: none; margin-left: 10px; width: 92px; height: 132px; border: 1px dashed var(--ink-3); border-bottom: 0; border-radius: 4px 4px 0 0; display: grid; place-items: center; text-align: center; padding: 8px; font-size: 12.5px; line-height: 1.35; color: var(--ink-2); }
+.stub:hover { color: var(--accent); border-color: var(--accent); }
+.add { flex: none; width: 44px; height: 44px; margin: 0 4px 4px 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); color: var(--accent); display: grid; place-items: center; }
+.add:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+
+.loose { margin-top: 56px; border: 1px dashed var(--ink-3); border-radius: 12px; padding: 22px 24px 26px; display: flex; flex-wrap: wrap; gap: 20px 32px; transition: opacity 220ms var(--ease); }
+.loose-h { flex: 0 0 200px; }
+.loose-h h2 { margin: 6px 0; font-family: var(--read); font-weight: 500; font-size: 22px; }
+.loose-h p { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+.loose-list { flex: 999 1 520px; min-width: 0; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.lcard { width: 196px; display: flex; flex-direction: column; gap: 8px; }
+.lcard .card { width: 196px; }
+.menu { position: absolute; z-index: 30; min-width: 200px; background: var(--panel); border-radius: 8px; box-shadow: 0 0 0 1px var(--line), var(--shadow-lift); padding: 6px; }
+.menu p { margin: 4px 8px 6px; font-size: 11.5px; color: var(--ink-2); }
+.menu button { display: block; width: 100%; padding: 9px 10px; border-radius: 5px; font-size: 13.5px; }
+.menu button:hover, .menu button:focus-visible { background: var(--accent-soft); }
+
+/* Quick view and dialogs */
+.scrim { position: fixed; inset: 0; z-index: 40; background: var(--scrim); }
+.sheet { position: fixed; z-index: 41; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: var(--paper); box-shadow: -1px 0 0 var(--line), var(--shadow-lift); overflow-y: auto; padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) calc(32px + env(safe-area-inset-bottom, 0px)) 24px; display: flex; flex-direction: column; gap: 18px; }
+.sheet h2 { margin: 0; font-family: var(--read); font-weight: 500; font-size: 26px; line-height: 1.2; text-wrap: balance; }
+.sheet .x { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-2); }
+.sheet .x:hover { background: var(--board); }
+.sheet .lead { font-family: var(--read); font-size: 17px; line-height: 1.5; color: var(--ink); margin: 0; }
+.props { display: grid; grid-template-columns: 110px 1fr; gap: 8px 12px; font-size: 13px; margin: 0; }
+.props dt { color: var(--ink-2); }
+.props dd { margin: 0; }
+.conn h3 { margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.conn ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.conn button { width: 100%; padding: 8px 10px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+.conn button span { color: var(--ink-2); flex: none; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.dlg { position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(480px, calc(100vw - 32px)); background: var(--paper); border-radius: 10px; box-shadow: 0 0 0 1px var(--line), var(--shadow-lift); padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.dlg h2 { margin: 0; font-family: var(--read); font-weight: 500; font-size: 22px; }
+.dlg label { font-size: 12.5px; color: var(--ink-2); display: flex; flex-direction: column; gap: 6px; }
+.dlg input, .dlg textarea { font-family: var(--read); font-size: 17px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+.dlg textarea { min-height: 96px; resize: vertical; }
+.dlg .acts { justify-content: flex-end; }
+
+.toasts { position: fixed; z-index: 60; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.toast { background: var(--ink); color: var(--paper); padding: 10px 14px; border-radius: 8px; font-size: 13px; box-shadow: var(--shadow-lift); max-width: 320px; }
+.proto { position: fixed; z-index: 35; left: calc(74px + env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 10px; background: var(--panel); box-shadow: 0 0 0 1px var(--line), var(--shadow-pic); font-size: 12.5px; color: var(--ink-2); max-width: calc(100vw - 32px); }
+.proto b { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.proto label { display: flex; align-items: center; gap: 6px; }
+.proto button { color: var(--ink); padding: 6px 2px; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.layer { position: fixed; inset: 0; z-index: 50; pointer-events: none; overflow: hidden; }
+.layer > * { position: fixed !important; margin: 0 !important; transform-origin: 0 0; pointer-events: none; }
+
+.tabbar { display: none; }
+@media (max-width: 700px) {
+  .rail { display: none; }
+  .wrap { padding-inline: 0; padding-block: 18px 150px; }
+  .search input { font-size: 21px; }
+  .mason { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 10px; }
+  .cover .cvt { font-size: 16px; }
+  .cover { padding: 14px 12px; }
+  .quote-c .qt { font-size: 16px; }
+  .note-c .nt { font-size: 14.5px; }
+  .slabel { flex-basis: 100%; padding-top: 4px; display: grid; grid-template-columns: 1fr auto; align-items: end; column-gap: 12px; }
+  .slabel .sk, .slabel h3, .slabel .sm { grid-column: 1; }
+  .slabel h3 { font-size: 19px; margin: 2px 0; }
+  .slabel .linkb { grid-column: 2; grid-row: 1 / span 3; margin: 0; }
+  .srow { min-height: 190px; }
+  .desk-h, .loose-h { flex-basis: 100%; }
+  .tabbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; z-index: 34; left: 0; right: 0; bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(0px, env(safe-area-inset-left, 0px)); padding-right: max(0px, env(safe-area-inset-right, 0px)); background: var(--panel); border-top: 1px solid var(--line); }
+  .tabbar button { height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: var(--ink-2); }
+  .tabbar button.on { color: var(--accent); font-weight: 600; }
+  .proto { position: static; margin: 0 max(16px, env(safe-area-inset-left, 0px)) calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .chips, .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chips button, .tabs button { flex: none; }
+  .toasts { bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sh, .card .ci, .slot, .shelf, .desk, .loose { transition: none; }
+  .sh:hover, .card:hover .ci { transform: none; }
+}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Main">
+    <span class="mark" aria-hidden="true">S</span>
+    <button class="ri cap" data-cmd="capture" aria-label="Capture" title="Capture (C)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></button>
+    <button class="ri" data-cmd="elsewhere" aria-label="Today" title="Today"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg></button>
+    <button class="ri" data-cmd="elsewhere" aria-label="Learn" title="Learn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 9 12 5l9.5 4L12 13z"/><path d="M6.5 11v4.5c1.5 1.4 3.4 2 5.5 2s4-.6 5.5-2V11"/></svg></button>
+    <button class="ri on" aria-current="page" aria-label="Library" title="Library"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4v16M9 4v16M13 4v16M16 5l4 15"/></svg></button>
+    <button class="ri" data-cmd="elsewhere" aria-label="Graph" title="Graph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/></svg></button>
+    <button class="ri foot" data-cmd="theme" aria-label="Switch light and dark" title="Switch light and dark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+  </nav>
+
+  <main class="stage">
+    <div class="wrap">
+      <div class="crumb"><span class="here">Library</span><span aria-hidden="true">/</span><span class="area">Architecture</span><span id="crumbCount"></span></div>
+      <nav class="tabs" aria-label="Library">
+        <button aria-current="page">Everything</button>
+        <button data-cmd="elsewhere">Collections</button>
+        <button data-cmd="elsewhere">To read</button>
+        <button data-cmd="elsewhere">Templates</button>
+      </nav>
+
+      <div class="tools">
+        <label class="search"><span class="sr">Search the Library</span><input id="q" type="search" autocomplete="off" placeholder="Search your library (title, creator, topic, text)…"></label>
+        <div class="tools-r">
+          <span class="count" id="count" aria-live="polite"></span>
+          <div class="seg" role="group" aria-label="View">
+            <button id="vWall" aria-pressed="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="8" height="10" rx="1"/><rect x="13" y="3" width="8" height="6" rx="1"/><rect x="3" y="15" width="8" height="6" rx="1"/><rect x="13" y="11" width="8" height="10" rx="1"/></svg>Wall</button>
+            <button id="vShelves" aria-pressed="false"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 20h18M3 11h18M5 11V4M8 11V5M12 11V4M16 20v-6M19 20v-7M5 20v-5"/></svg>Shelves</button>
+          </div>
+        </div>
+      </div>
+
+      <section id="wallView" aria-label="Wall">
+        <div class="row2"><div class="chips" id="chips" role="group" aria-label="Show"></div></div>
+        <div class="mason" id="mason"></div>
+        <p class="empty" id="wallEmpty" hidden></p>
+      </section>
+
+      <section id="shelvesView" aria-label="Shelves" hidden>
+        <div class="row2">
+          <nav class="bays" id="bayLinks" aria-label="Bays"></nav>
+          <label class="sort">Each shelf shows
+            <select id="sort">
+              <option value="mix">A rotating mix</option>
+              <option value="newest">Newest first</option>
+              <option value="least">Least recently opened</option>
+              <option value="az">A to Z</option>
+            </select>
+          </label>
+        </div>
+        <div id="banner"></div>
+        <section class="desk" id="desk" aria-labelledby="deskH"></section>
+        <div id="baysOut"></div>
+        <section class="loose" id="loose" aria-labelledby="looseH"></section>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <button data-cmd="elsewhere"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>Today</button>
+  <button data-cmd="elsewhere"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 9 12 5l9.5 4L12 13z"/><path d="M6.5 11v4.5c1.5 1.4 3.4 2 5.5 2s4-.6 5.5-2V11"/></svg>Learn</button>
+  <button class="on" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4v16M9 4v16M13 4v16M16 5l4 15"/></svg>Library</button>
+  <button data-cmd="theme"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Theme</button>
+</nav>
+
+<div class="proto" role="group" aria-label="Prototype controls">
+  <b>Prototype</b>
+  <label><input type="checkbox" id="slow"> Slow motion</label>
+  <button id="tomorrow">Pretend it’s tomorrow</button>
+  <button id="reset">Reset</button>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="overlay"></div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem("commonplace." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem("commonplace." + k, JSON.stringify(v)); } catch (e) {} },
+    clear: function () { try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("commonplace.") === 0) localStorage.removeItem(k); }); } catch (e) {} }
+  };
+
+  /* ---------- Collections and items (sample library of an architect) ---------- */
+  var BAYS = [
+    { id: "sources", name: "Sources" }, { id: "notes", name: "Notes" },
+    { id: "photos", name: "Photos" }, { id: "objects", name: "Objects" }
+  ];
+  var COLS = [
+    { id: "theory", bay: "sources", name: "Architecture theory", kicker: "Sources · Books", shape: "book", noun: "books", tone: "var(--accent)", cap: 12 },
+    { id: "lectures", bay: "sources", name: "Lectures & talks", kicker: "Sources · Video", shape: "video", noun: "videos", tone: "var(--s2)", cap: 4 },
+    { id: "specs", bay: "sources", name: "Specifications", kicker: "Sources · PDF", shape: "pdf", noun: "PDFs", tone: "var(--s1)", cap: 8 },
+    { id: "quotes", bay: "notes", name: "Commonplace quotes", kicker: "Notes · Quotes", shape: "quote", noun: "quotes", tone: "var(--quote-rule)", cap: 5 },
+    { id: "studio", bay: "notes", name: "Studio notes", kicker: "Notes", shape: "note", noun: "notes", tone: "var(--ink-3)", cap: 5 },
+    { id: "site", bay: "photos", name: "Site photos", kicker: "Photos", shape: "photo", noun: "photos", tone: "var(--s2)", cap: 6 },
+    { id: "renders", bay: "photos", name: "Renders", kicker: "Photos", shape: "photo", noun: "photos", tone: "var(--accent)", cap: 6 },
+    { id: "architects", bay: "objects", name: "Architects", kicker: "Objects · People", shape: "person", noun: "people", tone: "var(--s1)", cap: 6 },
+    { id: "buildings", bay: "objects", name: "Buildings", kicker: "Objects · Things", shape: "thing", noun: "buildings", tone: "var(--ink)", cap: 5 }
+  ];
+  var COL = {}; COLS.forEach(function (c) { COL[c.id] = c; });
+  var TYPE_OF = { book: "sources", video: "sources", pdf: "sources", link: "sources", note: "notes", long: "notes", quote: "notes", photo: "photos", person: "objects", thing: "objects" };
+
+  // saved / opened: days ago. opened null = never opened.
+  function seed() { return [
+    { id: "b1", c: "theory", k: "book", title: "Thinking Architecture", by: "Peter Zumthor", saved: 3, opened: 1, topic: "Atmosphere", links: ["p1", "b2"] },
+    { id: "b14", c: "theory", k: "book", title: "Islamic Architecture: Form, Function and Meaning", by: "Robert Hillenbrand, 1994", saved: 7, opened: 5, topic: "Islamic architecture", links: ["t6", "v5"] },
+    { id: "b3", c: "theory", k: "book", title: "The Eyes of the Skin", by: "Juhani Pallasmaa", saved: 12, opened: 0, topic: "Atmosphere", desk: "Reading", pct: 52, where: "Page 42 of 80" },
+    { id: "b2", c: "theory", k: "book", title: "Atmospheres", by: "Peter Zumthor", saved: 40, opened: 35, topic: "Atmosphere", links: ["p1"] },
+    { id: "b12", c: "theory", k: "book", title: "Architecture for the Poor", by: "Hassan Fathy", saved: 90, opened: 20, topic: "Vernacular", links: ["p5", "t5"] },
+    { id: "b10", c: "theory", k: "book", title: "The Poetics of Space", by: "Gaston Bachelard", saved: 150, opened: 140, topic: "Theory" },
+    { id: "b9", c: "theory", k: "book", title: "The Death and Life of Great American Cities", by: "Jane Jacobs", saved: 200, opened: 30, topic: "Urbanism" },
+    { id: "b13", c: "theory", k: "book", title: "In Praise of Shadows", by: "Jun’ichirō Tanizaki", saved: 230, opened: null, topic: "Atmosphere" },
+    { id: "b11", c: "theory", k: "book", title: "Delirious New York", by: "Rem Koolhaas", saved: 260, opened: 220, topic: "Urbanism" },
+    { id: "b5", c: "theory", k: "book", title: "A Pattern Language", by: "Christopher Alexander", saved: 300, opened: 60, topic: "Theory" },
+    { id: "b7", c: "theory", k: "book", title: "Learning from Las Vegas", by: "Venturi, Scott Brown, Izenour", saved: 360, opened: 360, topic: "Urbanism" },
+    { id: "b6", c: "theory", k: "book", title: "Complexity and Contradiction in Architecture", by: "Robert Venturi", saved: 380, opened: 200, topic: "Theory" },
+    { id: "b4", c: "theory", k: "book", title: "Towards a New Architecture", by: "Le Corbusier", saved: 420, opened: 250, topic: "Theory", links: ["q8"] },
+    { id: "b8", c: "theory", k: "book", title: "S,M,L,XL", by: "OMA, Koolhaas and Mau", saved: 500, opened: null, topic: "Urbanism" },
+
+    { id: "v5", c: "lectures", k: "video", title: "Sultan Hassan: plan, section and the four madrasas", by: "18:42", saved: 2, opened: 2, topic: "Islamic architecture", note: "Saved before lesson 5.", links: ["n5"] },
+    { id: "v1", c: "lectures", k: "video", title: "Light and material at Therme Vals", by: "58:02", saved: 5, opened: 0, topic: "Atmosphere", desk: "Watching", pct: 22, where: "Resume at 12:40", links: ["t1", "p1"] },
+    { id: "v2", c: "lectures", k: "video", title: "Drawing as a way of thinking", by: "41:15", saved: 60, opened: 58, pct: 100, topic: "Drawing" },
+    { id: "v4", c: "lectures", k: "video", title: "Inside the Kimbell’s vaults", by: "23:48", saved: 120, opened: 119, topic: "Structure", links: ["t2", "p4"] },
+    { id: "v6", c: "lectures", k: "video", title: "Squinch vs. pendentive transitions", by: "14:32", saved: 180, opened: 170, pct: 100, topic: "Islamic architecture" },
+    { id: "v3", c: "lectures", k: "video", title: "Brick, timber, stone: a materials talk", by: "1:04:30", saved: 210, opened: null, topic: "Materials" },
+
+    { id: "d3", c: "specs", k: "pdf", title: "Curtain wall spec, rev C", by: "64 pages", saved: 14, opened: 10, topic: "Hillside house" },
+    { id: "d1", c: "specs", k: "pdf", title: "Fire safety guidance", by: "212 pages", saved: 30, opened: 28, topic: "Regulations" },
+    { id: "d4", c: "specs", k: "pdf", title: "Acoustic report, level 3", by: "22 pages", saved: 95, opened: 90, topic: "Hillside house" },
+    { id: "d2", c: "specs", k: "pdf", title: "Timber cladding specification", by: "38 pages", saved: 300, opened: 290, topic: "Materials" },
+    { id: "d5", c: "specs", k: "pdf", title: "Waterproofing details", by: "41 pages", saved: 400, opened: null, topic: "Hillside house" },
+
+    { id: "q6", c: "quotes", k: "quote", title: "Shade first, then mass, then air.", by: "Studio course · p. 3", saved: 4, opened: 4, topic: "Climate" },
+    { id: "q7", c: "quotes", k: "quote", title: "The eye never quite finds the end of the field.", by: "Studio lecture · 10:05", saved: 9, opened: 9, topic: "Islamic architecture" },
+    { id: "q9", c: "quotes", k: "quote", title: "We shape our buildings; thereafter they shape us.", by: "Winston Churchill, 1943", saved: 150, opened: 150, topic: "Theory" },
+    { id: "q1", c: "quotes", k: "quote", title: "Less is more.", by: "Mies van der Rohe", saved: 220, opened: 100, topic: "Theory" },
+    { id: "q3", c: "quotes", k: "quote", title: "Form ever follows function.", by: "Louis Sullivan", saved: 260, opened: 240, topic: "Theory" },
+    { id: "q2", c: "quotes", k: "quote", title: "Even a brick wants to be something.", by: "Louis Kahn", saved: 330, opened: 330, topic: "Materials", links: ["p4"] },
+    { id: "q8", c: "quotes", k: "quote", title: "Architecture is the learned game, correct and magnificent, of forms assembled in the light.", by: "Le Corbusier", saved: 400, opened: 380, topic: "Theory", links: ["b4"] },
+    { id: "q4", c: "quotes", k: "quote", title: "Well building hath three conditions: commodity, firmness, and delight.", by: "Henry Wotton, 1624", saved: 500, opened: null, topic: "Theory" },
+
+    { id: "n5", c: "studio", k: "note", title: "The mausoleum at Sultan Hassan faces the Citadel, not the city.", by: "Note", saved: 3, opened: 3, topic: "Islamic architecture", links: ["v5"] },
+    { id: "n1", c: "studio", k: "note", title: "Threshold as a room, not a line. Test it at the Vals entrance.", by: "Note", saved: 6, opened: 6, topic: "Thresholds", links: ["t1", "p1"] },
+    { id: "n3", c: "studio", k: "note", title: "Client wants north light in the studio; look at roof monitors.", by: "Note", saved: 9, opened: 9, topic: "Hillside house" },
+    { id: "n6", c: "studio", k: "note", title: "Qibla orientation and the prayer hall module.", by: "Note", saved: 11, opened: 11, topic: "Islamic architecture" },
+    { id: "n4", c: "studio", k: "long", title: "Thresholds: a draft essay", text: "Entering a building is a sequence, not a door: the street, a pause, a change of light, then the room.", by: "Long note · 2,400 words", saved: 20, opened: 0, topic: "Thresholds", desk: "Writing", pct: 60, where: "Edited yesterday" },
+    { id: "n2", c: "studio", k: "note", title: "I want to learn how rammed earth handles moisture.", by: "Note · learning goal", saved: 170, opened: null, topic: "Materials" },
+    { id: "n7", c: "studio", k: "note", title: "Kahn’s served and servant spaces: try it on the clinic plan.", by: "Note", saved: 240, opened: 230, topic: "Planning", links: ["p4"] },
+
+    { id: "s6", c: "site", k: "photo", title: "Stair handrail mock-up", by: "Photo · 3 in a group", saved: 8, opened: 8, topic: "Hillside house", sky: 1, ratio: 0.75 },
+    { id: "s1", c: "site", k: "photo", title: "North elevation", by: "Photo", saved: 15, opened: 15, topic: "Hillside house", sky: 2, ratio: 0.66 },
+    { id: "s2", c: "site", k: "photo", title: "Entrance stair", by: "Photo", saved: 16, opened: 16, topic: "Hillside house", sky: 3, ratio: 1.3 },
+    { id: "s3", c: "site", k: "photo", title: "Roof drainage", by: "Photo", saved: 16, opened: 16, topic: "Hillside house", sky: 0, ratio: 0.66 },
+    { id: "s4", c: "site", k: "photo", title: "Courtyard, 4 pm", by: "Photo", saved: 44, opened: 40, topic: "Hillside house", sky: 3, ratio: 1.2 },
+    { id: "s5", c: "site", k: "photo", title: "Formwork detail", by: "Photo", saved: 200, opened: null, topic: "Hillside house", sky: 1, ratio: 1.3 },
+    { id: "r1", c: "renders", k: "photo", title: "Atrium v3", by: "Render", saved: 10, opened: 10, topic: "Hillside house", sky: 0, ratio: 0.62 },
+    { id: "r2", c: "renders", k: "photo", title: "Night view", by: "Render", saved: 25, opened: 25, topic: "Hillside house", sky: 1, ratio: 0.7 },
+    { id: "r3", c: "renders", k: "photo", title: "Section perspective", by: "Render", saved: 70, opened: 70, topic: "Hillside house", sky: 2, ratio: 0.62 },
+
+    { id: "p5", c: "architects", k: "person", title: "Hassan Fathy", by: "Architect, educator · Egypt · 1900–1989", saved: 50, opened: 20, topic: "Vernacular", links: ["b12", "t5"] },
+    { id: "p1", c: "architects", k: "person", title: "Peter Zumthor", by: "Architect · Switzerland", saved: 100, opened: 30, topic: "Atmosphere", links: ["b1", "b2", "v1", "n1", "t1"] },
+    { id: "p2", c: "architects", k: "person", title: "Lina Bo Bardi", by: "Architect · Brazil", saved: 140, opened: 140, topic: "Modernism" },
+    { id: "p4", c: "architects", k: "person", title: "Louis Kahn", by: "Architect · United States", saved: 180, opened: 120, topic: "Structure", links: ["t2", "v4", "q2", "n7"] },
+    { id: "p6", c: "architects", k: "person", title: "Alvar Aalto", by: "Architect · Finland", saved: 240, opened: 200, topic: "Modernism", links: ["t4"] },
+    { id: "p3", c: "architects", k: "person", title: "Tadao Ando", by: "Architect · Japan", saved: 260, opened: null, topic: "Light", links: ["t3"] },
+
+    { id: "t6", c: "buildings", k: "thing", title: "Great Mosque of Córdoba", by: "Building · begun 785", saved: 4, opened: 4, topic: "Islamic architecture", sky: 3, links: ["b14"] },
+    { id: "t5", c: "buildings", k: "thing", title: "New Gourna Village", by: "Hassan Fathy · 1945–48", saved: 60, opened: 30, topic: "Vernacular", sky: 3, links: ["p5", "b12"] },
+    { id: "t1", c: "buildings", k: "thing", title: "Therme Vals", by: "Peter Zumthor · 1996", saved: 80, opened: 25, topic: "Atmosphere", sky: 2, links: ["p1", "v1", "n1"] },
+    { id: "t2", c: "buildings", k: "thing", title: "Kimbell Art Museum", by: "Louis Kahn · 1972", saved: 220, opened: 120, topic: "Structure", sky: 1, links: ["p4", "v4"] },
+    { id: "t3", c: "buildings", k: "thing", title: "Church of the Light", by: "Tadao Ando · 1989", saved: 300, opened: 290, topic: "Light", sky: 0, links: ["p3"] },
+    { id: "t4", c: "buildings", k: "thing", title: "Säynätsalo Town Hall", by: "Alvar Aalto · 1952", saved: 400, opened: null, topic: "Modernism", sky: 2, links: ["p6"] },
+
+    { id: "l1", c: null, k: "link", title: "A review of the new city library", by: "archreview.example", saved: 1, opened: null, topic: "Libraries" },
+    { id: "l2", c: null, k: "note", title: "Ask the engineer about cantilever depth.", by: "Note", saved: 1, opened: 1, topic: "Hillside house" },
+    { id: "l3", c: null, k: "quote", title: "God is in the details.", by: "Attributed to Mies van der Rohe", saved: 3, opened: 3, topic: "Theory" },
+    { id: "l4", c: null, k: "photo", title: "Sketch: canopy junction", by: "Photo", saved: 2, opened: 2, topic: "Hillside house", sky: 0, ratio: 0.8 }
+  ]; }
+
+  var items = store.get("items", null) || seed();
+  var BY = {};
+  function index() { BY = {}; items.forEach(function (it) { BY[it.id] = it; }); }
+  index();
+  function linksOf(id) {
+    var s = {}; (BY[id].links || []).forEach(function (l) { if (BY[l]) s[l] = 1; });
+    items.forEach(function (it) { if ((it.links || []).indexOf(id) >= 0) s[it.id] = 1; });
+    delete s[id]; return Object.keys(s);
+  }
+  function persist() { store.set("items", items); }
+
+  var state = {
+    view: store.get("view", "wall"),
+    sort: store.get("sort", "mix"),
+    day: store.get("day", 0),
+    slow: store.get("slow", false),
+    chip: null, query: "", thread: null, wallScroll: 0
+  };
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var K = function () { return state.slow ? 4 : 1; };
+
+  /* ---------- Small helpers ---------- */
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seedN) { var a = seedN >>> 0; return function () { a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function daysAgoDate(d) { var t = new Date(); t.setDate(t.getDate() - d); return t; }
+  function sinceMark(it) {
+    if (it.opened == null) return it.saved >= 60 ? "Never opened" : "";
+    if (it.opened < 180) return "";
+    var d = daysAgoDate(it.opened), now = new Date();
+    return "Since " + MONTHS[d.getMonth()] + (d.getFullYear() !== now.getFullYear() ? " " + d.getFullYear() : "");
+  }
+  function stale(it) { return it.opened == null ? (it.saved >= 60) : it.opened >= 180; }
+  function ago(d) { if (d == null) return "Never"; if (d === 0) return "Today"; if (d === 1) return "Yesterday"; if (d < 30) return d + " days ago"; if (d < 365) return Math.round(d / 30) + " months ago"; return Math.round(d / 365 * 10) / 10 + " years ago"; }
+  function initials(n) { return n.split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase(); }
+  function spineDims(it) { var h = hash(it.id); return { w: 22 + (h % 34), h: 140 + ((h >>> 6) % 52), c: "ABCDEF"[(h >>> 12) % 6] }; }
+  function matches(it, q) {
+    if (!q) return true; q = q.toLowerCase();
+    var col = it.c ? COL[it.c].name : "";
+    return [it.title, it.by, it.text, it.topic, col, it.note].join(" ").toLowerCase().indexOf(q) >= 0;
+  }
+  function litSet() {
+    if (state.thread && BY[state.thread]) { var s = {}; s[state.thread] = 1; linksOf(state.thread).forEach(function (l) { s[l] = 1; }); return s; }
+    if (state.query) { var m = {}; items.forEach(function (it) { if (matches(it, state.query)) m[it.id] = 1; }); return m; }
+    return null;
+  }
+  var ICON_PLAY = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
+  function pic(it, extra) {
+    return '<span class="pic sky' + (it.sky != null ? it.sky : hash(it.id) % 4) + '"' + (extra || "") + '><span class="gr"></span><span class="ar"></span><span class="ar"></span><span class="ar"></span><span class="ar"></span><span class="sun"></span>' +
+      (it.k === "video" ? '<span class="play">' + ICON_PLAY + '</span><span class="dur">' + esc(it.by) + '</span>' + (it.pct ? '<span class="bar" style="width:' + it.pct + '%"></span>' : "") : "") + '</span>';
+  }
+
+  /* ---------- Wall cards (the Library's frameless cards) ---------- */
+  function wallCard(it, i) {
+    var a = ' data-fid="' + it.id + '" data-ii="' + Math.min(i, 24) + '" data-open="' + it.id + '"';
+    var tp = '<span class="tp"><i></i>' + esc(it.topic) + (it.c ? ' · ' + esc(COL[it.c].name) : "") + '</span>';
+    var lbl = ' aria-label="' + esc(it.title) + '"';
+    switch (it.k) {
+      case "book": return '<button class="card"' + a + lbl + '><span class="ci"><span class="cover"><span class="cvt">' + esc(it.title) + '</span><span class="cvb">' + esc(it.by) + '</span></span><span class="cap">' + tp + '</span></span></button>';
+      case "video": return '<button class="card"' + a + lbl + '><span class="ci">' + pic(it, ' style="aspect-ratio:16/9"') + '<span class="cap"><span class="ttl">' + esc(it.title) + '</span>' + (it.note ? '<span class="meta"><i>' + esc(it.note) + '</i></span>' : "") + tp + '</span></span></button>';
+      case "photo": return '<button class="card"' + a + lbl + '><span class="ci">' + pic(it, ' style="aspect-ratio:' + (1 / (it.ratio || 0.7)).toFixed(3) + '"') + '<span class="cap"><span class="ttl">' + esc(it.title) + '</span>' + tp + '</span></span></button>';
+      case "thing": return '<button class="card"' + a + lbl + '><span class="ci">' + pic(it, ' style="aspect-ratio:4/3"') + '<span class="cap"><span class="ttl">' + esc(it.title) + '</span><span class="meta">' + esc(it.by) + '</span>' + tp + '</span></span></button>';
+      case "pdf": return '<button class="card"' + a + lbl + '><span class="ci paper"><span class="pb"><span class="kick">PDF · ' + esc(it.by) + '</span><span class="ttl" style="font-family:var(--read);font-size:19px;font-weight:400">' + esc(it.title) + '</span><span class="prog"><i style="width:' + (hash(it.id) % 80 + 5) + '%"></i></span></span><span class="ft"><i></i>' + esc(it.topic) + '</span></span></button>';
+      case "note": return '<button class="card"' + a + lbl + '><span class="ci paper note-c"><span class="pb"><span class="nt">' + esc(it.title) + '</span></span><span class="ft"><i></i>' + esc(it.topic) + '</span></span></button>';
+      case "long": return '<button class="card"' + a + lbl + '><span class="ci paper note-c"><span class="pb"><span class="ttl" style="margin-bottom:6px">' + esc(it.title) + '</span><span class="nt" style="font-size:15.5px">' + esc(it.text) + '</span></span><span class="ft"><i></i>' + esc(it.topic) + '</span></span></button>';
+      case "quote": return '<button class="card"' + a + lbl + '><span class="ci quote-c"><span class="qt">' + esc(it.title) + '</span><span class="qa">' + esc(it.by) + '</span></span></button>';
+      case "person": return '<button class="card"' + a + lbl + '><span class="ci paper"><span class="pb"><span class="person-h"><span class="pm">' + esc(initials(it.title)) + '</span><span><span class="pn">' + esc(it.title) + '</span><span class="meta">' + esc(it.by) + '</span></span></span></span><span class="ft"><i></i>' + esc(it.topic) + '</span></span></button>';
+      case "link": return '<button class="card"' + a + lbl + '><span class="ci paper"><span class="pb"><span class="kick">' + esc(it.by) + '</span><span class="ttl">' + esc(it.title) + '</span></span><span class="ft"><i></i>' + esc(it.topic) + '</span></span></button>';
+    }
+    return "";
+  }
+
+  /* ---------- Shelf faces ---------- */
+  function shelfFace(it, si, ii, faceOut, lit) {
+    var a = ' data-fid="' + it.id + '" data-si="' + si + '" data-ii="' + ii + '" data-open="' + it.id + '"';
+    var cls = lit && lit[it.id] ? " lit" + (state.thread === it.id ? " sel" : "") : "";
+    var lbl = ' aria-label="' + esc(it.title + (it.by ? ", " + it.by : "")) + '"';
+    var c = COL[it.c] ? COL[it.c].shape : it.k;
+    if (c === "book") {
+      if (faceOut) return '<button class="sh fo' + cls + '"' + a + lbl + '><span class="ft1">' + esc(it.title) + '</span><span class="fb1">' + esc(it.by) + '</span></button>';
+      var d = spineDims(it);
+      return '<button class="sh spine c' + d.c + cls + '"' + a + lbl + ' style="width:' + d.w + 'px;height:' + d.h + 'px"><span class="st">' + esc(it.title) + '</span><span class="sb">' + esc(it.by.split(/[,·]/)[0].split(" ").slice(-1)[0]) + '</span></button>';
+    }
+    if (c === "pdf") { var e = spineDims(it); return '<button class="sh binder' + cls + '"' + a + lbl + ' style="width:' + (e.w + 6) + 'px;height:' + e.h + 'px"><span class="tag">PDF</span><span class="st">' + esc(it.title) + '</span><span class="sb">' + esc(it.by.replace(" pages", " pp")) + '</span></button>'; }
+    if (c === "video") return '<button class="sh sv' + cls + '"' + a + lbl + '>' + pic(it) + '<span class="vt">' + esc(it.title) + '</span></button>';
+    if (c === "quote" || c === "note") {
+      var q = it.k === "quote";
+      return '<button class="sh ic' + (q ? " qq" : "") + (ii === 4 ? " lean" : "") + cls + '"' + a + lbl + '><span class="it1">' + esc(q ? "“" + it.title + "”" : it.title) + '</span><span class="ib1">' + esc(it.by) + '</span></button>';
+    }
+    if (c === "photo") { var w = it.ratio > 1 ? 112 : 158, h = Math.round(w * (it.ratio || 0.7)); if (h > 150) { h = 150; w = Math.round(150 / it.ratio); } return '<button class="sh pr' + cls + '"' + a + lbl + '>' + pic(it, ' style="width:' + w + 'px;height:' + h + 'px"') + '<span class="pl">' + esc(it.title) + '</span></button>'; }
+    if (c === "person") return '<button class="sh pt' + cls + '"' + a + lbl + '><span class="pk">' + esc(it.by.split("·").slice(-1)[0].trim()) + '</span><span class="pnm">' + esc(it.title) + '</span></button>';
+    if (c === "thing") return '<button class="sh pc' + cls + '"' + a + lbl + '>' + pic(it) + '<span class="pct">' + esc(it.title) + '</span><span class="pcb">' + esc(it.by) + '</span></button>';
+    return "";
+  }
+
+  /* ---------- What a shelf shows ---------- */
+  function front(col, lit) {
+    var all = items.filter(function (it) { return it.c === col.id; });
+    var order = all.slice(); // your order
+    var byNew = all.slice().sort(function (a, b) { return a.saved - b.saved; });
+    var byStale = all.slice().sort(function (a, b) { var x = a.opened == null ? 1e6 + a.saved : a.opened, y = b.opened == null ? 1e6 + b.saved : b.opened; return y - x; });
+    var picked = [];
+    var take = function (it) { if (it && picked.indexOf(it) < 0) picked.push(it); };
+    if (lit) all.filter(function (it) { return lit[it.id]; }).forEach(take);
+    if (state.sort === "newest") byNew.forEach(take);
+    else if (state.sort === "least") byStale.forEach(take);
+    else if (state.sort === "az") all.slice().sort(function (a, b) { return a.title.localeCompare(b.title); }).forEach(take);
+    else {
+      all.filter(function (it) { return it.desk; }).forEach(take);
+      byNew.filter(function (it) { return picked.indexOf(it) < 0; }).slice(0, 2).forEach(take);
+      var pool = byStale.filter(function (it) { return it.saved > 30 && picked.indexOf(it) < 0; }).slice(0, 6);
+      var r = rng(hash(col.id) + state.day * 7919 + Math.floor(Date.now() / 864e5));
+      for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+      pool.slice(0, 2).forEach(take);
+      order.forEach(take);
+    }
+    return { all: all, shown: picked.slice(0, col.cap), more: Math.max(0, all.length - col.cap) };
+  }
+
+  /* ---------- Rendering ---------- */
+  function renderChrome() {
+    var n = items.length;
+    $("#crumbCount").textContent = "· " + n + " entries, " + COLS.length + " collections";
+    $("#vWall").setAttribute("aria-pressed", state.view === "wall");
+    $("#vShelves").setAttribute("aria-pressed", state.view === "shelves");
+    $("#wallView").hidden = state.view !== "wall";
+    $("#shelvesView").hidden = state.view !== "shelves";
+    $("#sort").value = state.sort;
+    $("#slow").checked = state.slow;
+  }
+
+  function renderWall() {
+    var list = items.filter(function (it) { return (!state.chip || (state.chip === "loose" ? !it.c : it.c === state.chip)) && matches(it, state.query); })
+      .sort(function (a, b) { return a.saved - b.saved; });
+    var chips = '<button data-chip="" aria-pressed="' + !state.chip + '">All</button>' +
+      COLS.map(function (c) { return '<button data-chip="' + c.id + '" aria-pressed="' + (state.chip === c.id) + '">' + esc(c.name) + '</button>'; }).join("") +
+      '<button data-chip="loose" aria-pressed="' + (state.chip === "loose") + '">Not on a shelf</button>';
+    $("#chips").innerHTML = chips;
+    var colOpts = '<option value="">No collection</option>' + COLS.filter(function (c) { return c.bay === "notes"; }).map(function (c) { return '<option value="' + c.id + '">' + esc(c.name) + '</option>'; }).join("");
+    var capture = state.chip || state.query ? "" : '<form class="capbox mcard-cap" id="capForm" data-capture><label class="sr" for="capText">Capture</label><textarea id="capText" placeholder="Capture a thought, quote or link…"></textarea><span class="cb-row"><span>Note · Quote · Link</span><span>Press <kbd>C</kbd></span></span><span class="cb-row"><label class="sr" for="capCol">Collection</label><select id="capCol">' + colOpts + '</select><button class="btn" type="submit">Save</button></span></form>';
+    $("#mason").innerHTML = capture + list.map(wallCard).join("");
+    $("#wallEmpty").hidden = list.length > 0;
+    $("#wallEmpty").textContent = state.query ? "Nothing matches “" + state.query + "”." : "Nothing here yet.";
+    state.wallCount = list.length;
+    if (state.view === "wall") $("#count").textContent = list.length + " entries · newest first";
+    layoutMasonry();
+  }
+
+  function layoutMasonry() {
+    var grid = $("#mason"); if (!grid || grid.offsetParent === null) return;
+    var cs = getComputedStyle(grid), rh = parseFloat(cs.gridAutoRows) || 8, gap = parseFloat(cs.rowGap) || 12;
+    Array.prototype.forEach.call(grid.children, function (el) { el.style.gridRowEnd = "auto"; });
+    Array.prototype.forEach.call(grid.children, function (el) { var h = el.getBoundingClientRect().height; el.style.gridRowEnd = "span " + Math.max(1, Math.ceil((h + gap) / (rh + gap))); });
+  }
+
+  function renderShelves() {
+    var lit = litSet();
+    var bayLinks = BAYS.map(function (b) { var n = COLS.filter(function (c) { return c.bay === b.id; }).length; return '<a href="#bay-' + b.id + '">' + b.name + ' <span>' + n + (n === 1 ? " shelf" : " shelves") + '</span></a>'; }).join("");
+    var looseN = items.filter(function (it) { return !it.c; }).length;
+    $("#bayLinks").innerHTML = bayLinks + (looseN ? '<a class="lpill" href="#loose">Not on a shelf ' + looseN + '</a>' : "");
+
+    var banner = "";
+    if (state.thread && BY[state.thread]) {
+      var ls = linksOf(state.thread), shelvesHit = {};
+      ls.forEach(function (l) { if (BY[l].c) shelvesHit[BY[l].c] = 1; });
+      banner = '<div class="banner" role="status"><b>' + esc(BY[state.thread].title) + '</b><span>' + ls.length + ' connected ' + (ls.length === 1 ? "item" : "items") + ' on ' + Object.keys(shelvesHit).length + ' shelves, by links you made. Connected items come to the front of their shelf.</span><button data-cmd="clear">Clear</button></div>';
+    } else if (state.query) {
+      var hits = items.filter(function (it) { return matches(it, state.query); }), sh = {};
+      hits.forEach(function (it) { if (it.c) sh[it.c] = 1; });
+      banner = '<div class="banner" role="status"><b>' + (hits.length ? hits.length + (hits.length === 1 ? " match" : " matches") + " on " + Object.keys(sh).length + " shelves" : "No matches") + '</b><span>for “' + esc(state.query) + '”. ' + (hits.length ? "They light up where they live; shelves without a match fade." : "Try a name, a topic or a word from a note.") + '</span><button data-cmd="clear">Clear</button></div>';
+    }
+    $("#banner").innerHTML = banner;
+
+    var desk = items.filter(function (it) { return it.desk && it.c; });
+    $("#desk").style.opacity = lit ? 0.4 : 1;
+    $("#desk").hidden = desk.length === 0;
+    $("#desk").innerHTML = '<div class="desk-h"><div class="eyebrow">On the desk</div><h2 id="deskH">Open right now</h2><p>What you are reading, watching or writing. It goes back on its shelf when you mark it done.</p></div><div class="desk-list">' +
+      desk.map(function (it) {
+        var th = it.k === "video" ? '<span class="dt sky' + (it.sky || 3) + '" style="width:64px;height:40px"></span>' : '<span class="dt" style="background:' + (it.k === "book" ? "var(--cover)" : "var(--note-paper)") + ';box-shadow:inset 0 0 0 1px var(--line)"></span>';
+        return '<button class="dcard" data-open="' + it.id + '">' + th + '<span class="db"><span class="dk">' + esc(it.desk) + ' · ' + esc(COL[it.c].name) + '</span><span class="dn" style="display:block">' + esc(it.title) + '</span><span class="prog" style="margin:0"><i style="width:' + (it.pct || 0) + '%"></i></span><span class="dm" style="display:block">' + esc(it.where || "") + '</span></span></button>';
+      }).join("") + '</div>';
+
+    var si = 0, out = "";
+    BAYS.forEach(function (b) {
+      var cols = COLS.filter(function (c) { return c.bay === b.id; });
+      var total = items.filter(function (it) { return it.c && COL[it.c].bay === b.id; }).length;
+      out += '<section class="bay" id="bay-' + b.id + '" aria-labelledby="bayH-' + b.id + '"><div class="bay-h"><h2 id="bayH-' + b.id + '">' + b.name + '</h2><span class="rule"></span><span class="n">' + cols.length + (cols.length === 1 ? " shelf" : " shelves") + ' · ' + total + ' items</span></div>';
+      cols.forEach(function (col) {
+        var f = front(col, lit);
+        var st = f.all.filter(stale).length;
+        var anyLit = !lit || f.all.some(function (it) { return lit[it.id]; });
+        var meta = (f.all.length === 1 ? "1 item" : f.all.length + " " + col.noun) + (st ? " · " + st + " not opened in 6 months" + (col.shape === "book" || col.shape === "pdf" ? " (dotted)" : "") : "");
+        var faces = f.shown.map(function (it, ii) {
+          var mark = !lit ? sinceMark(it) : "";
+          var dim = lit && !lit[it.id] ? " dim" : "";
+          var faceOut = col.shape === "book" && ii === 0 && !lit && (state.sort === "mix" || state.sort === "newest");
+          var narrow = (col.shape === "book" && !faceOut) || col.shape === "pdf" ? " narrow" : "";
+          return '<div class="slot' + dim + narrow + (mark ? " marked" : "") + '"' + (mark ? ' title="' + esc(mark) + '"' : "") + '>' + (mark ? '<span class="since">' + esc(mark) + '</span>' : "") + shelfFace(it, si, ii, faceOut, lit) + '</div>';
+        }).join("");
+        out += '<article class="shelf' + (anyLit ? "" : " faded") + '" data-shelf="' + col.id + '" aria-label="' + esc(col.name) + ' shelf">' +
+          '<div class="slabel"><div class="sk"><i style="background:' + col.tone + '"></i>' + esc(col.kicker) + '</div><h3>' + esc(col.name) + '</h3><div class="sm">' + esc(meta) + '</div><button class="linkb" data-openshelf="' + col.id + '">Open shelf <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>' +
+          '<div class="sbody"><div class="srow">' + faces +
+          (f.more ? '<button class="stub" data-stub="' + col.id + '" data-openshelf="' + col.id + '">+ ' + f.more + ' more on this shelf</button>' : "") +
+          '<button class="add" data-add="' + col.id + '" aria-label="Add to ' + esc(col.name) + '" title="Add to ' + esc(col.name) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' +
+          '</div><div class="board" data-board="' + si + '"></div></div></article>';
+        si++;
+      });
+      out += '</section>';
+    });
+    $("#baysOut").innerHTML = out;
+
+    var loose = items.filter(function (it) { return !it.c; });
+    $("#loose").hidden = loose.length === 0;
+    $("#loose").style.opacity = lit ? 0.4 : 1;
+    $("#loose").innerHTML = '<div class="loose-h"><div class="eyebrow" style="color:var(--ink-2)">Not on a shelf</div><h2 id="looseH">' + loose.length + ' loose ' + (loose.length === 1 ? "item" : "items") + '</h2><p>Saved without a collection. Put each one on a shelf with Shelve…</p></div><div class="loose-list">' +
+      loose.map(function (it, i) { return '<div class="lcard">' + wallCard(it, i) + '<button class="btn q" data-shelve="' + it.id + '" aria-haspopup="menu">Shelve…</button></div>'; }).join("") + '</div>';
+  }
+
+  function renderAll() { renderChrome(); renderWall(); renderShelves(); $("#count").textContent = state.view === "wall" ? state.wallCount + " entries · newest first" : COLS.length + " shelves · in your order"; }
+
+  /* ---------- Motion: shared-element morph between any two layouts ---------- */
+  var running = [];
+  var EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+  function finishAll() { var r = running; running = []; r.forEach(function (a) { try { a.finish(); } catch (e) {} }); }
+  ["pointerdown", "keydown", "wheel", "touchstart"].forEach(function (ev) { window.addEventListener(ev, function () { if (running.length) finishAll(); }, { capture: true, passive: true }); });
+
+  function snap() {
+    var m = new Map();
+    $$("[data-fid]").forEach(function (el) {
+      if (el.closest("[hidden]")) return;
+      var r = el.getBoundingClientRect(); if (!r.width && !r.height) return;
+      m.set(el.dataset.fid, { el: el, r: r });
+    });
+    return m;
+  }
+  function stubs() { var m = new Map(); $$("[data-stub]").forEach(function (el) { if (el.closest("[hidden]")) return; m.set(el.dataset.stub, el.getBoundingClientRect()); }); return m; }
+  function place(node, r) {
+    node.removeAttribute("data-fid"); node.removeAttribute("id");
+    node.style.left = r.left + "px"; node.style.top = r.top + "px"; node.style.width = r.width + "px"; node.style.height = r.height + "px";
+    node.style.transform = "none"; node.style.transition = "none";
+    return node;
+  }
+  function track(a, done) { running.push(a); a.onfinish = a.oncancel = function () { var i = running.indexOf(a); if (i >= 0) running.splice(i, 1); if (done) done(); }; return a; }
+
+  function morph(mutate, opts) {
+    opts = opts || {};
+    finishAll();
+    if (reduced) { mutate(); var v = state.view === "wall" ? $("#wallView") : $("#shelvesView"); v.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160 }); return; }
+    var k = K(), VH = innerHeight;
+    var near = function (r) { return r && r.bottom > -60 && r.top < VH + 60; };
+    var before = snap(), bStubs = stubs(), clones = new Map();
+    before.forEach(function (v, id) { var c = v.el.cloneNode(true); c.classList.remove("lit"); clones.set(id, { node: c, cls: v.el.className }); });
+    mutate();
+    var after = snap(), aStubs = stubs();
+    var layer = document.createElement("div"); layer.className = "layer"; document.body.appendChild(layer);
+    var pending = 0, budget = 90;
+    var cleanup = function () { if (--pending <= 0 && layer.parentNode) layer.remove(); };
+    var delayOf = function (el) {
+      if (opts.mode === "toShelves") return (+el.dataset.si || 0) * 55 + (+el.dataset.ii || 0) * 35;
+      if (opts.mode === "toWall") return (+el.dataset.ii || 0) * 22;
+      return 0;
+    };
+    var D = 560 * k;
+    function fly(br, oldNode, ar, newEl, delay) {
+      var dx = ar.left - br.left, dy = ar.top - br.top, sx = ar.width / br.width || 1, sy = ar.height / br.height || 1;
+      pending += 2;
+      var o = place(oldNode, br); layer.appendChild(o);
+      track(o.animate([{ transform: "none", opacity: 1 }, { opacity: 0, offset: 0.6 }, { transform: "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")", opacity: 0 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { o.remove(); cleanup(); });
+      if (!newEl) { cleanup(); return; }
+      var n = place(newEl.cloneNode(true), ar); layer.appendChild(n);
+      newEl.style.visibility = "hidden";
+      track(n.animate([{ transform: "translate(" + (-dx) + "px," + (-dy) + "px) scale(" + (1 / sx) + "," + (1 / sy) + ")", opacity: 0 }, { opacity: 0, offset: 0.2 }, { opacity: 1, offset: 0.65 }, { transform: "none", opacity: 1 }], { duration: D, delay: delay, easing: EASE, fill: "both" }), function () { n.remove(); newEl.style.visibility = ""; cleanup(); });
+    }
+    var ids = new Set(); before.forEach(function (_, id) { ids.add(id); }); after.forEach(function (_, id) { ids.add(id); });
+    ids.forEach(function (id) {
+      if (budget <= 0) return;
+      var b = before.get(id), a = after.get(id), it = BY[id];
+      if (!(b && near(b.r)) && !(a && near(a.r)) && !(opts.origin && opts.origin.id === id)) return;
+      budget--;
+      if (b && a) { fly(b.r, clones.get(id).node, a.r, a.el, delayOf(a.el)); return; }
+      if (b && !a) {
+        var st = it && it.c && aStubs.get(it.c);
+        if (st && near(st)) fly(b.r, clones.get(id).node, { left: st.left + st.width / 2 - 4, top: st.top + st.height / 2 - 4, width: 8, height: 8 }, null, 0);
+        return;
+      }
+      if (!b && a) {
+        var from = opts.origin && opts.origin.id === id ? opts.origin.rect : (it && it.c && bStubs.get(it.c));
+        if (from && near(from)) { fly({ left: from.left, top: from.top, width: Math.max(8, from.width), height: Math.max(8, from.height) }, a.el.cloneNode(true), a.r, a.el, opts.mode ? delayOf(a.el) : 0); }
+        else track(a.el.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 300 * k, delay: (opts.mode === "toShelves" ? 420 : 160) * k, easing: EASE, fill: "both" }));
+      }
+    });
+    if (!pending) layer.remove();
+    if (opts.mode === "toShelves") {
+      $$("#shelvesView .board").forEach(function (el) { var s = +el.dataset.board; track(el.animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: 420 * k, delay: (260 + s * 60) * k, easing: EASE, fill: "both" })); });
+      $$("#shelvesView .slabel, #shelvesView .stub, #shelvesView .add, #shelvesView .since").forEach(function (el, i) { track(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 280 * k, delay: (380 + Math.min(i, 30) * 12) * k, easing: EASE, fill: "both" })); });
+      $$("#shelvesView .row2, #banner, #desk, #loose, #shelvesView .bay-h").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 300 * k, easing: EASE, fill: "both" })); });
+    }
+    if (opts.mode === "toWall") {
+      $$("#wallView .row2, #capForm").forEach(function (el) { track(el.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 260 * k, delay: 380 * k, easing: EASE, fill: "both" })); });
+    }
+  }
+
+  /* ---------- Actions ---------- */
+  function setView(v, extra) {
+    if (state.view === v && !extra) return;
+    var to = v;
+    morph(function () {
+      if (state.view === "wall") state.wallScroll = window.scrollY;
+      state.view = to; store.set("view", to);
+      if (extra) extra();
+      renderAll();
+      window.scrollTo({ top: to === "wall" ? (extra ? 0 : state.wallScroll) : 0, behavior: "instant" });
+      if (to === "wall") layoutMasonry();
+    }, { mode: to === "shelves" ? "toShelves" : "toWall" });
+  }
+  function local(fn, origin) { morph(function () { fn(); renderAll(); }, { origin: origin }); }
+
+  var toastT;
+  function toast(msg) {
+    var t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+    var box = $("#toasts"); box.appendChild(t); while (box.children.length > 3) box.firstChild.remove();
+    setTimeout(function () { t.remove(); }, 4200);
+  }
+
+  var lastFocus = null;
+  function closeOverlay() { $("#overlay").innerHTML = ""; if (state.dirty) { state.dirty = false; renderShelves(); } document.removeEventListener("keydown", trapEsc); if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); }
+  function trapEsc(e) { if (e.key === "Escape") { e.preventDefault(); closeOverlay(); } }
+  function openOverlay(html, focusSel) {
+    lastFocus = document.activeElement;
+    $("#overlay").innerHTML = '<div class="scrim" data-cmd="close"></div>' + html;
+    document.addEventListener("keydown", trapEsc);
+    var f = $(focusSel || "#overlay [data-focus]") || $("#overlay button"); if (f) f.focus();
+  }
+
+  function quickView(id) {
+    var it = BY[id]; if (!it) return;
+    var col = it.c ? COL[it.c] : null;
+    var prev = it.opened, wasStale = stale(it); it.opened = 0; persist(); state.dirty = true;
+    var ls = linksOf(id);
+    var kind = { book: "Book", video: "Video", pdf: "PDF", link: "Link", note: "Note", long: "Long note", quote: "Quote", photo: "Photo", person: "Person", thing: "Building" }[it.k];
+    var faceHtml = (it.k === "photo" || it.k === "thing" || it.k === "video") ? pic(it, ' style="aspect-ratio:' + (it.k === "photo" ? (1 / (it.ratio || 0.7)).toFixed(3) : it.k === "video" ? "16/9" : "4/3") + '"') : "";
+    openOverlay('<aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="qvT">' +
+      '<button class="x" data-cmd="close" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>' +
+      '<div class="eyebrow">' + esc(kind) + (col ? ' · ' + esc(col.name) : ' · Not on a shelf') + '</div>' +
+      '<h2 id="qvT">' + esc(it.k === "quote" ? "“" + it.title + "”" : it.title) + '</h2>' + faceHtml +
+      (it.text ? '<p class="lead">' + esc(it.text) + '</p>' : "") +
+      '<dl class="props"><dt>' + (it.k === "quote" ? "Said by" : "By") + '</dt><dd>' + esc(it.by) + '</dd><dt>Topic</dt><dd>' + esc(it.topic) + '</dd><dt>Saved</dt><dd>' + ago(it.saved) + '</dd><dt>Last opened</dt><dd>' + (prev == null ? "Never, until now" : ago(prev)) + '</dd>' + (it.desk ? '<dt>Status</dt><dd>' + esc(it.desk) + ' · ' + esc(it.where || "") + '</dd>' : "") + '</dl>' +
+      '<div class="conn"><h3>Connected</h3>' + (ls.length ? '<ul>' + ls.map(function (l) { var x = BY[l]; return '<li><button data-qv="' + l + '">' + esc(x.title) + '<span>' + esc(x.c ? COL[x.c].name : "Not on a shelf") + '</span></button></li>'; }).join("") + '</ul>' : '<p style="margin:0;font-size:13px;color:var(--ink-2)">No links yet. In Studiolo you add them with Link…</p>') + '</div>' +
+      '<div class="acts">' + (ls.length ? '<button class="btn" data-thread="' + id + '" data-focus>Show its threads on the shelves</button>' : "") + '<button class="btn q" data-cmd="close"' + (ls.length ? "" : " data-focus") + '>Close</button></div>' +
+      '</aside>');
+    if (wasStale) toast("Dusted off: " + it.title + ". Its “since” mark is gone.");
+  }
+
+  function addDialog(cid) {
+    var col = COL[cid], isNote = col.bay === "notes";
+    openOverlay('<form class="dlg" role="dialog" aria-modal="true" aria-labelledby="adT" id="addForm" data-col="' + cid + '">' +
+      '<h2 id="adT">Add to ' + esc(col.name) + '</h2>' +
+      '<label for="adTitle">' + (isNote ? (col.shape === "quote" ? "The quoted words" : "Your note") : "Title") + (isNote ? '<textarea id="adTitle" required data-focus></textarea>' : '<input id="adTitle" required data-focus>') + '</label>' +
+      '<label for="adBy">' + (col.shape === "quote" ? "Said by (optional)" : col.shape === "person" ? "What they do, and where" : col.shape === "thing" ? "Architect · year" : isNote ? "Topic (optional)" : "By (optional)") + '<input id="adBy"></label>' +
+      '<div class="acts"><button type="button" class="btn q" data-cmd="close">Cancel</button><button class="btn" type="submit">Add to shelf</button></div></form>', "#adTitle");
+  }
+
+  function shelveMenu(btn) {
+    var it = BY[btn.dataset.shelve], type = TYPE_OF[it.k];
+    var opts = COLS.filter(function (c) { return c.bay === type; });
+    var r = btn.getBoundingClientRect();
+    var m = document.createElement("div"); m.className = "menu"; m.setAttribute("role", "menu");
+    m.style.left = Math.min(r.left + window.scrollX, window.scrollX + innerWidth - 216) + "px"; m.style.top = (r.bottom + window.scrollY + 6) + "px";
+    m.innerHTML = '<p>Put “' + esc(it.title.slice(0, 40)) + '” on</p>' + opts.map(function (c) { return '<button role="menuitem" data-to="' + c.id + '" data-item="' + it.id + '">' + esc(c.name) + '</button>'; }).join("");
+    document.body.appendChild(m); m.querySelector("button").focus();
+    var close = function (e) { if (!m.contains(e.target)) { m.remove(); document.removeEventListener("pointerdown", close, true); } };
+    setTimeout(function () { document.addEventListener("pointerdown", close, true); }, 0);
+    m.addEventListener("keydown", function (e) { if (e.key === "Escape") { m.remove(); btn.focus(); } });
+  }
+
+  /* ---------- Events ---------- */
+  $("#vWall").addEventListener("click", function () { setView("wall"); });
+  $("#vShelves").addEventListener("click", function () { state.chip = null; setView("shelves"); });
+  $("#sort").addEventListener("change", function (e) { local(function () { state.sort = e.target.value; store.set("sort", state.sort); }); });
+  $("#slow").addEventListener("change", function (e) { state.slow = e.target.checked; store.set("slow", state.slow); });
+  $("#tomorrow").addEventListener("click", function () {
+    if (state.view !== "shelves") { state.chip = null; setView("shelves", function () { state.day++; store.set("day", state.day); }); }
+    else local(function () { state.day++; store.set("day", state.day); });
+    if (state.sort !== "mix") toast("Rotation only changes the shelves in “A rotating mix”.");
+    else toast("A new day: each shelf brings two different buried items forward.");
+  });
+  $("#reset").addEventListener("click", function () { store.clear(); items = seed(); index(); state.sort = "mix"; state.day = 0; state.query = ""; state.thread = null; state.chip = null; $("#q").value = ""; renderAll(); toast("Back to the sample library."); });
+
+  var qT;
+  $("#q").addEventListener("input", function (e) {
+    var v = e.target.value.trim();
+    clearTimeout(qT);
+    if (state.view === "wall") { state.query = v; state.thread = null; renderWall(); return; }
+    qT = setTimeout(function () { local(function () { state.query = v; state.thread = null; }); }, 260);
+  });
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("button, a, [data-cmd]"); if (!t) return;
+    if (t.dataset.cmd === "close") { closeOverlay(); return; }
+    if (t.dataset.cmd === "clear") { local(function () { state.thread = null; state.query = ""; $("#q").value = ""; }); return; }
+    if (t.dataset.cmd === "elsewhere") { toast("This prototype only has the Library’s Everything page."); return; }
+    if (t.dataset.cmd === "theme") { var root = document.documentElement, dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; root.dataset.theme = dark ? "light" : "dark"; store.set("theme", root.dataset.theme); return; }
+    if (t.dataset.cmd === "capture") { if (state.view !== "wall") setView("wall", function () { state.chip = null; state.query = ""; $("#q").value = ""; }); setTimeout(function () { var c = $("#capText"); if (c) c.focus(); }, 30); return; }
+    if (t.dataset.chip !== undefined) { state.chip = t.dataset.chip || null; renderWall(); return; }
+    if (t.dataset.openshelf) { var cid = t.dataset.openshelf; setView("wall", function () { state.chip = cid; state.query = ""; state.thread = null; $("#q").value = ""; }); return; }
+    if (t.dataset.add) { addDialog(t.dataset.add); return; }
+    if (t.dataset.shelve) { shelveMenu(t); return; }
+    if (t.dataset.to) {
+      var it = BY[t.dataset.item], to = t.dataset.to; t.closest(".menu").remove();
+      local(function () { it.c = to; if (it.k === "link") { it.k = COL[to].shape; it.by = COL[to].shape === "video" ? "12:00" : COL[to].shape === "pdf" ? "8 pages" : "From " + it.by; } persist(); });
+      toast("Shelved on " + COL[to].name + "."); return;
+    }
+    if (t.dataset.thread) {
+      var id = t.dataset.thread; closeOverlay();
+      if (state.view !== "shelves") setView("shelves", function () { state.thread = id; state.query = ""; $("#q").value = ""; });
+      else local(function () { state.thread = id; state.query = ""; $("#q").value = ""; });
+      return;
+    }
+    if (t.dataset.qv) { closeOverlay(); quickView(t.dataset.qv); return; }
+    if (t.dataset.open) { quickView(t.dataset.open); return; }
+  });
+  document.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target;
+    if (f.id === "capForm") {
+      var txt = $("#capText").value.trim(); if (!txt) { $("#capText").focus(); return; }
+      var col = $("#capCol").value || null, isQ = /^["“]/.test(txt), isL = /^https?:\/\//.test(txt);
+      var it = { id: "u" + Date.now(), c: isL ? null : col, k: isL ? "link" : isQ ? "quote" : "note", title: txt.replace(/^["“]|["”]$/g, ""), by: isL ? txt.replace(/^https?:\/\//, "").split("/")[0] : isQ ? "Quote" : "Note", saved: 0, opened: 0, topic: "Architecture" };
+      if (isL) it.title = "Saved link";
+      var origin = { id: it.id, rect: f.getBoundingClientRect() };
+      local(function () { items.unshift(it); index(); persist(); }, origin);
+      toast(it.c ? "Saved to " + COL[it.c].name + "." : "Saved. It’s on the “Not on a shelf” table until you shelve it.");
+      return;
+    }
+    if (f.id === "addForm") {
+      var cid = f.dataset.col, c = COL[cid], title = $("#adTitle").value.trim(), by = $("#adBy").value.trim(); if (!title) return;
+      var kmap = { book: "book", video: "video", pdf: "pdf", quote: "quote", note: "note", photo: "photo", person: "person", thing: "thing" };
+      var n = { id: "u" + Date.now(), c: cid, k: kmap[c.shape], title: title, by: by || (c.shape === "video" ? "12:00" : c.shape === "pdf" ? "10 pages" : c.shape === "quote" ? "Unknown" : c.shape === "note" ? "Note" : c.shape === "photo" ? "Photo" : "Added just now"), saved: 0, opened: 0, topic: c.shape === "note" && by ? by : "Architecture", sky: hash(title) % 4, ratio: 0.7 };
+      var addBtn = $('[data-add="' + cid + '"]'); var origin2 = addBtn ? { id: n.id, rect: addBtn.getBoundingClientRect() } : null;
+      closeOverlay();
+      local(function () { items.unshift(n); index(); persist(); }, origin2);
+      toast("Added to " + c.name + ".");
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "c" && !e.metaKey && !e.ctrlKey && !e.altKey && !/input|textarea|select/i.test(document.activeElement.tagName) && !$("#overlay").innerHTML) {
+      e.preventDefault(); $('[data-cmd="capture"]').click();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && document.activeElement && document.activeElement.id === "capText") { $("#capForm").requestSubmit(); }
+  });
+
+  var ro = new ResizeObserver(function () { if (!running.length) layoutMasonry(); });
+  ro.observe($("#mason"));
+  var th = store.get("theme", null); if (th) document.documentElement.dataset.theme = th;
+  renderAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutMasonry);
+})();
+</script>

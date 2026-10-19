@@ -9,6 +9,8 @@ Mockup: the "Studiolo Commonplace" design canvas, private until shared: https://
 - **Shelves · desktop**: the full Shelves page. The **state** tweak shows Browse, Search ("Zumthor") and Threads (Peter Zumthor selected).
 - **Shelves · phone**.
 
+Working prototype (opens in a browser): https://claude.ai/artifact/N5KZmkmcv8fykfiRkyJDRk, source in [`2026-10-18-commonplace-prototype/index.html`](2026-10-18-commonplace-prototype/index.html). It has the Wall and Shelves views with the re-shelving switch, search that lights up in place, threads from an item's quick view, the rotating front (with "Pretend it's tomorrow"), since-marks, Shelve…, + on each shelf, capture, and a phone layout.
+
 Sources: `studiolo` @ `7150fad` (read-only): `project-docs/product/library.md` (types, collections, areas), `project-docs/design/interface.md` (tokens, wall, motion), `src/styles/tokens.css`, `src/styles/library.css` (`.mason`, frameless cards), `src/components/library/wall-motion.ts` and `src/features/ui/flip.ts` (the wall's existing FLIP glide), and the wall as it is now in `docs/superpowers/evidence/library-areas/closed-light-1280.png`. Craft: *Library - polishment Phase*.
 
 ---
