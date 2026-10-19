@@ -1,0 +1,1252 @@
+<title>Lumen Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a studio desk. The board is the hero on the left; the script and controls sit beside it like notes. */
+:root {
+  --bg: #eef0ed;
+  --panel: #fbfbf9;
+  --ink: #22303a;
+  --muted: #5d6c77;
+  --rule: #d6d9d2;
+  --accent: #1e3e9e;
+  --accent-soft: #dfe5f6;
+  --warn: #9a3b2e;
+  --ok: #2f6b4a;
+  --frame-a: #c9ced2;
+  --frame-b: #9aa2a8;
+  --f-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-read: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-hand: "Architects Daughter", "Comic Sans MS", cursive;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11181d; --panel: #1b252c; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #2f3b44;
+    --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2;
+    --frame-a: #59636b; --frame-b: #394249; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11181d; --panel: #1b252c; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #2f3b44;
+  --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2;
+  --frame-a: #59636b; --frame-b: #394249; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 20px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+header h1 { margin: 0; font: 400 34px/1.1 var(--f-hand); letter-spacing: .01em; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.chip { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; }
+
+.desk { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .desk { grid-template-columns: minmax(0, 1fr); } }
+
+/* The board: an aluminium-framed whiteboard */
+.stage {
+  position: relative; container-type: inline-size;
+  border-radius: 10px; padding: 10px;
+  background: linear-gradient(145deg, var(--frame-a), var(--frame-b));
+  box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 10px 30px -18px rgba(0,0,0,.45);
+}
+.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 4px; background: var(--board-bg, #f6f7f5); max-width: 100%; }
+.mark { position: absolute; top: 4.2%; right: 3.4%; font: 500 clamp(9px, 1.15cqw, 13px)/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted, #8b949b); pointer-events: none; }
+.caption {
+  position: absolute; left: 10px; right: 10px; bottom: 10px; height: calc((100% - 20px) * 120 / 720);
+  display: flex; align-items: center; justify-content: center; padding: 0 6%;
+  font: 400 clamp(12px, 2.05cqw, 23px)/1.35 var(--f-read); color: var(--board-muted, #7d878e);
+  text-align: center; text-wrap: balance; pointer-events: none;
+}
+.caption .w-done { color: var(--board-ink, #22303a); }
+.caption .w-now { color: var(--board-ink, #22303a); text-decoration: underline; text-decoration-color: var(--board-accent, #1f4fb8); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 12px; }
+.btn {
+  font: 500 14px/1 var(--f-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 9px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+.btn[disabled] { opacity: .5; cursor: default; }
+.play { width: 44px; height: 40px; justify-content: center; padding: 0; }
+.time { font: 500 13px/1 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 92px; }
+.scrub { position: relative; flex: 1 1 260px; min-width: 0; display: flex; align-items: center; }
+.scrub input { width: 100%; accent-color: var(--accent); }
+.ticks { position: absolute; inset: auto 0 -6px 0; height: 6px; pointer-events: none; }
+.ticks span { position: absolute; top: 0; width: 2px; height: 6px; background: var(--muted); border-radius: 1px; }
+.opts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; font-size: 13px; color: var(--muted); }
+.opts label { display: inline-flex; gap: 6px; align-items: center; }
+select { font: 13px var(--f-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 5px 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 20px; }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+/* Side panel */
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; display: grid; min-width: 0; }
+.tabs { display: flex; border-bottom: 1px solid var(--rule); }
+.tab { flex: 1; font: 500 13px/1 var(--f-ui); color: var(--muted); background: none; border: 0; padding: 13px 8px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.pane { padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.ex { text-align: left; display: grid; gap: 2px; width: 100%; padding: 12px 14px; }
+.ex b { font: 400 18px/1.2 var(--f-hand); }
+.ex span { font-size: 13px; color: var(--muted); }
+.ex[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+textarea { width: 100%; min-width: 0; font: 12.5px/1.55 var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; resize: vertical; tab-size: 2; }
+#script { height: 380px; white-space: pre; overflow: auto; }
+#idea { height: 92px; font-family: var(--f-ui); font-size: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.problems { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.problems li { padding: 6px 10px; border-radius: 6px; background: var(--bg); border-left: 3px solid var(--muted); }
+.problems li.err { border-left-color: var(--warn); }
+.problems li.ok { border-left-color: var(--ok); }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.status { font-size: 13px; color: var(--muted); min-height: 1.5em; margin: 0; }
+
+/* Reference */
+.ref { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.ref h2 { margin: 0; font: 500 22px/1.2 var(--f-read); text-wrap: balance; }
+.ref p { margin: 0; max-width: 72ch; color: var(--muted); }
+.ref .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 13px; width: 100%; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+code { font: 12.5px var(--f-mono); }
+pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overflow-x: auto; font: 12.5px/1.55 var(--f-mono); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Lumen Board</h1>
+    <span class="chip">Prototype · board slides</span>
+    <p>A pen sketches the idea on a whiteboard while the voice explains it. Each mark is drawn when the narration reaches the word that names it, and the pen comes back to point when the voice returns to something already on the board.</p>
+  </header>
+
+  <div class="desk">
+    <section aria-label="Board player">
+      <div class="stage" id="stageBox">
+        <canvas id="board" width="1280" height="720" aria-label="Whiteboard sketch"></canvas>
+        <div class="mark">Studiolo · Lumen</div>
+        <div class="caption" id="caption" aria-live="off"></div>
+      </div>
+      <div class="controls">
+        <button class="btn play" id="play" aria-label="Play">
+          <svg id="playIcon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+        </button>
+        <span class="time" id="time">0:00 / 0:00</span>
+        <div class="scrub">
+          <input type="range" id="scrub" min="0" max="1000" step="10" value="0" aria-label="Position">
+          <div class="ticks" id="ticks"></div>
+        </div>
+      </div>
+      <div class="controls opts">
+        <label>Board <select id="style">
+          <option value="whiteboard">Whiteboard</option>
+          <option value="chalk">Chalkboard</option>
+          <option value="paper">Studiolo paper</option>
+        </select></label>
+        <label>Speed <select id="speed">
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+        </select></label>
+        <label><input type="checkbox" id="voice"> Read aloud (browser voice)</label>
+        <label><input type="checkbox" id="pen" checked> Show pen</label>
+      </div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <aside class="panel" aria-label="Boards and script">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-ex" aria-selected="true" aria-controls="pane-ex">Examples</button>
+        <button class="tab" role="tab" id="tab-script" aria-selected="false" aria-controls="pane-script">Script</button>
+        <button class="tab" role="tab" id="tab-ask" aria-selected="false" aria-controls="pane-ask">Sketch with Claude</button>
+      </div>
+      <div class="pane" id="pane-ex" role="tabpanel" aria-labelledby="tab-ex"></div>
+      <div class="pane" id="pane-script" role="tabpanel" aria-labelledby="tab-script" hidden>
+        <p class="note">This is what the author model writes: a board item and the narration that drives it. Edit it and press Draw.</p>
+        <textarea id="script" spellcheck="false" aria-label="Board script"></textarea>
+        <div class="row">
+          <button class="btn primary" id="draw">Draw</button>
+          <span class="note" id="scriptStat"></span>
+        </div>
+        <ul class="problems" id="problems"></ul>
+      </div>
+      <div class="pane" id="pane-ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
+        <p class="note">Describe an idea. Claude writes a board in the same format and the pen draws it. This uses your own Claude usage.</p>
+        <textarea id="idea" aria-label="Idea to sketch">Why does a heat pump use less electricity than an electric heater?</textarea>
+        <div class="row">
+          <button class="btn primary" id="ask" disabled>Sketch it</button>
+          <button class="btn" id="stop" hidden>Stop</button>
+        </div>
+        <p class="status" id="askStatus">Checking whether Claude is available here…</p>
+      </div>
+    </aside>
+  </div>
+
+  <section class="ref" aria-labelledby="refTitle">
+    <h2 id="refTitle">How a board is written</h2>
+    <p>A board is one slide. Each line below the three hyphens is one mark: an id, a shape, its numbers on the 1280 × 720 stage, then an optional colour role, options and a label in quotes. Marks stay inside x 64–1216 and y 64–600; the band below is for captions. In the narration, <code>[[b1.cache]]</code> placed before a word makes the pen start drawing <code>cache</code> as that word is spoken. A mark with no ref is drawn straight after the one before it. A second ref to a mark makes the pen go back and point at it.</p>
+    <div class="cols">
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Shape</th><th>Written as</th></tr></thead>
+          <tbody>
+            <tr><td>box</td><td><code>app box x y w h "App"</code></td></tr>
+            <tr><td>circle, ellipse</td><td><code>sun circle cx cy r</code> · <code>ellipse cx cy rx ry</code></td></tr>
+            <tr><td>diamond</td><td><code>ok diamond cx cy w h "Valid?"</code></td></tr>
+            <tr><td>cyl (store)</td><td><code>db cyl x y w h "Database"</code></td></tr>
+            <tr><td>person</td><td><code>you person x y "You"</code></td></tr>
+            <tr><td>text</td><td><code>t text x y "words" big</code> (left edge, middle)</td></tr>
+            <tr><td>arrow, line</td><td><code>a arrow app db bend 0.2 "80 ms"</code> · ends are ids or <code>x,y</code></td></tr>
+            <tr><td>curve</td><td><code>c curve x,y x,y x,y … arrow "label"</code></td></tr>
+            <tr><td>axes</td><td><code>ax axes x y w h "time" "cost"</code></td></tr>
+            <tr><td>ground</td><td><code>g ground x1 y x2</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Annotation or option</th><th>Written as</th></tr></thead>
+          <tbody>
+            <tr><td>underline, ring</td><td><code>u underline title red</code> · <code>r ring cache green</code></td></tr>
+            <tr><td>highlight, cross</td><td><code>h highlight rule</code> · <code>x cross old</code></td></tr>
+            <tr><td>tick</td><td><code>k tick x y</code> or <code>k tick target</code></td></tr>
+            <tr><td>colour roles</td><td>ink, emphasis (blue), second (purple), third (green), fourth (red), neutral (grey), marker (yellow)</td></tr>
+            <tr><td>options</td><td><code>hatch</code> fill · <code>dash</code> · <code>arrow</code> on a curve · <code>bend n</code> · <code>small</code> <code>big</code> <code>title</code> or <code>size n</code> · <code>center</code></td></tr>
+            <tr><td>header</td><td><code>roles: fourth = the slow trip; third = the fast trip</code> becomes the colour legend</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script type="application/json" id="glyphs">{" ":[378,[]],"!":[88,[[122,684,118,202],[137,25,115,9]]],"\"":[224,[[142,772,139,589,148,561],[243,772,239,583,246,564]]],"#":[677,[[249,605,258,104],[447,630,472,110],[91,444,375,472,665,485],[123,246,400,284,665,309]]],"$":[586,[[561,592,356,583,246,558,151,510,110,460,107,413,135,365,205,346,384,346,510,359,583,340,598,299,583,252,504,205,419,161,296,139,154,132],[318,816,387,-54]]],"%":[639,[[224,621,158,605,142,545,148,510,176,488,249,491,306,523,312,583,284,608,224,621],[595,671,230,16],[523,151,501,88,523,38,570,35,617,41,674,85,674,135,652,161,598,167,523,151]]],"&":[728,[[750,309,690,233,605,164,488,88,375,32,271,3,186,6,142,28,145,91,170,145,334,362,400,482,416,548,425,617,410,665,381,687,337,680,280,649,239,598,220,554,217,466,233,397,277,331,315,284,391,214,498,123,602,66,662,41,687,41]]],"'":[142,[[148,611,107,479]]],"(":[299,[[299,813,230,734,173,624,135,517,113,400,104,299,123,192,161,66,217,-35]]],")":[353,[[113,788,208,709,268,611,321,485,343,381,346,287,331,195,293,113,265,60,195,-19]]],"*":[536,[[324,419,410,668,372,428,573,488,365,397,416,154,315,359,176,167,290,406,135,529,324,444]]],"+":[551,[[306,479,318,306,337,126,346,54],[101,255,192,274,302,293,422,309,558,312]]],",":[167,[[158,50,113,-50,85,-88]]],"-":[318,[[110,233,227,252,309,261]]],".":[110,[[98,9,113,13]]],"/":[488,[[532,674,410,482,334,353,271,261,195,145,104,6]]],"0":[646,[[400,668,466,662,548,627,611,551,643,466,658,369,643,246,598,148,517,60,428,19,293,9,180,41,120,104,94,183,110,324,148,450,214,567,271,627,337,665,400,668]]],"1":[239,[[173,671,154,16]]],"2":[551,[[117,558,186,617,258,658,346,680,397,680,447,646,466,595,457,523,432,450,375,340,299,217,208,107,129,19,230,19,356,32,463,54,561,79]]],"3":[523,[[101,608,139,614,268,658,362,674,441,677,488,668,513,633,510,580,479,529,391,454,280,378,186,328,309,378,416,394,485,369,513,328,510,265,457,183,372,104,284,47,176,9,139,3]]],"4":[517,[[432,0,428,532,419,639,394,674,324,621,164,416,101,328,406,340,539,362]]],"5":[548,[[580,668,447,627,318,592,230,583,126,573,132,677,110,331,180,337,299,359,413,362,495,353,554,293,564,217,545,151,469,91,372,47,261,22,113,9,113,38]]],"6":[671,[[438,668,356,643,280,586,211,504,161,432,126,334,123,233,139,161,195,82,277,28,337,9,406,6,498,16,595,66,662,145,680,192,677,249,652,287,598,290,513,255,425,186,369,139,318,88,284,47]]],"7":[567,[[98,636,246,639,422,671,576,687,520,621,444,472,384,340,353,208,337,132,331,47]]],"8":[658,[[397,668,293,621,233,561,211,488,224,432,268,394,328,378,419,406,476,422,564,432,649,397,706,315,699,224,633,123,545,54,444,16,321,9,227,28,151,101,139,173,164,239,217,306,284,362,324,381,532,432,611,485,665,529,671,586,646,633,608,658,510,680,397,668]]],"9":[532,[[576,454,454,422,353,406,249,400,167,416,120,447,117,498,145,558,239,630,340,662,435,671,495,643,542,595,573,523,570,400,545,302,504,205,444,107,375,47,318,19]]],":":[161,[[120,343,142,340],[164,117,183,117]]],";":[91,[[94,331,110,331],[117,60,91,-57,72,-110,50,-151]]],"<":[504,[[463,441,265,284,195,224,268,167,391,117,438,98,476,79]]],"=":[498,[[132,299,438,337],[139,158,334,186,460,208]]],">":[498,[[158,419,268,378,346,343,460,306,410,258,331,198,268,151,176,82]]],"?":[517,[[94,646,195,668,306,680,384,680,466,655,520,621,536,576,529,526,485,482,428,438,321,365,214,315,236,290,299,277,353,277],[321,19,346,19]]],"@":[1137,[[718,472,639,485,513,447,457,391,441,346,447,296,491,271,567,293,646,346,690,387,718,435,756,378,810,346,879,356,936,387,951,425,945,501,901,580,838,630,706,680,551,684,419,646,321,589,249,523,189,432,142,337,126,224,167,117,265,47,387,13,513,-3,662,9,825,38,958,79,1062,135,1137,205]]],"A":[674,[[107,3,227,318,302,526,356,671,372,668,432,570,520,391,583,233,639,94,687,9],[195,243,312,268,447,309,561,331,668,356]]],"B":[756,[[135,655,139,369,151,192,173,6,334,19,504,57,639,110,734,170,750,230,728,293,639,343,545,356,438,369,315,359,180,346,372,397,495,450,580,501,608,551,602,605,570,630,491,665,378,684,265,687,94,677]]],"C":[747,[[580,646,542,680,447,693,328,655,220,580,154,485,120,403,104,312,101,217,151,129,214,63,290,28,391,16,513,35,611,85,696,151,756,202]]],"D":[684,[[123,674,126,0,217,13,328,47,444,107,539,173,614,249,674,337,693,410,684,491,617,570,507,630,400,658,290,665,208,655,126,636]]],"E":[621,[[539,668,129,655,126,309,548,356,129,309,142,22,627,54]]],"F":[734,[[759,662,542,649,394,624,258,611,154,589,135,680,167,529,195,372,195,284,132,255,252,302,482,340,693,375,249,302,195,277,192,9]]],"G":[747,[[548,680,457,671,359,624,287,561,230,501,170,394,129,280,123,176,142,101,189,47,280,9,375,25,488,79,561,132,617,186,630,211,636,403,331,350,743,419,639,400,639,-44]]],"H":[602,[[154,677,142,343,142,189,164,0,145,328,91,309,220,334,365,350,548,359,548,674,545,280,558,129,573,50,592,13]]],"I":[107,[[129,671,126,410,123,277,126,164,126,22]]],"J":[548,[[532,671,539,309,532,173,510,88,479,44,416,19,340,22,268,35,183,63,126,107,88,145,82,173]]],"K":[605,[[142,655,126,422,123,268,123,9],[595,665,428,536,315,450,198,387,145,346,126,265,239,220,387,154,498,101,586,44,627,19]]],"L":[617,[[148,671,148,665,151,391,151,227,142,85,139,28,340,28,627,22]]],"M":[841,[[113,28,145,346,170,573,192,662,211,668,255,636,331,482,410,331,479,189,523,252,639,469,743,671,765,655,788,564,810,410,835,246,860,13]]],"N":[655,[[120,28,129,243,132,428,132,627,148,658,255,542,381,378,545,167,633,47,636,164,636,391,633,677]]],"O":[693,[[403,677,321,662,233,605,164,520,110,410,104,280,148,145,217,79,293,38,400,28,532,41,639,113,706,230,709,350,693,466,630,564,592,617,532,652,460,677,403,677]]],"P":[677,[[145,28,145,205,154,450,161,551,189,621,277,665,413,687,548,684,665,639,699,602,696,526,655,463,564,406,450,372,343,356,151,350]]],"Q":[762,[[633,107,677,158,712,265,724,403,702,523,627,611,510,668,403,665,306,624,239,558,173,463,139,353,113,246,145,117,217,50,302,6,403,-9,488,3,561,32,643,98,747,32,586,142,441,274,422,277]]],"R":[693,[[123,665,132,353,139,22,148,422,129,605,230,665,350,684,447,671,523,668,580,655,614,621,624,580,573,539,482,504,397,466,302,435,145,387,139,362,255,299,346,236,485,154,699,13,721,9]]],"S":[674,[[630,665,501,643,369,608,249,573,198,532,173,501,164,472,189,428,321,384,444,340,570,290,639,252,680,217,677,183,624,120,501,57,356,9,249,3,173,13,129,35,113,66]]],"T":[652,[[76,671,268,662,438,652,605,652,684,671],[331,652,309,337,299,170,299,28]]],"U":[580,[[148,655,110,441,91,277,91,173,129,85,176,32,290,22,400,72,488,154,542,306,567,438,561,662,561,25]]],"V":[633,[[85,662,365,44,403,38,526,350,668,671]]],"W":[1017,[[110,671,372,32,450,211,598,551,639,510,709,400,819,176,895,35,945,176,989,369,1040,662]]],"X":[639,[[104,668,284,422,510,186,665,44],[649,684,419,391,261,202,132,35,123,32]]],"Y":[536,[[110,671,180,608,274,501,416,346,536,671,567,699,539,671,403,299,315,19]]],"Z":[658,[[123,668,684,671,602,545,384,284,192,57,173,35,274,9,384,6,709,25]]],"[":[450,[[375,847,123,788,139,328,170,-63,438,-22]]],"\\":[517,[[85,589,277,315,416,132,523,13]]],"]":[576,[[101,765,249,794,422,816,479,822,488,510,498,296,507,57,513,-50,416,-72,299,-85,205,-91]]],"^":[293,[[104,340,129,391,217,454,274,419,340,346]]],"_":[740,[[142,3,306,32,479,44,731,66]]],"`":[142,[[104,605,170,551]]],"a":[532,[[536,277,479,151,387,66,321,28,258,6,170,16,123,47,110,145,158,243,220,337,321,406,397,441,454,441,523,428,536,381,548,3]]],"b":[589,[[145,671,151,41,198,22,280,38,403,88,554,208,614,312,636,394,617,438,570,457,460,447,362,381,255,306,158,167]]],"c":[602,[[536,416,504,444,410,454,309,416,224,353,132,233,104,107,164,35,287,-3,419,3,513,25,614,79]]],"d":[558,[[554,652,539,387,532,217,539,79,542,19,536,183,444,85,296,19,192,13,120,54,98,161,151,265,280,353,397,372,485,359,542,299]]],"e":[532,[[139,296,265,299,410,302,504,318,520,353,507,387,425,460,321,460,227,425,161,365,113,243,98,170,94,120,148,50,236,6,337,13,444,38,520,76,548,110]]],"f":[602,[[611,542,523,636,419,684,350,690,268,636,230,551,230,460,246,375,280,183,293,25,268,255,82,227,435,274,598,296]]],"g":[551,[[554,261,488,148,369,54,239,6,148,6,120,54,158,173,252,315,359,403,428,438,498,428,554,384,570,-63,558,-214,523,-309,479,-372,438,-406,384,-416,343,-419,230,-416]]],"h":[517,[[139,668,129,356,139,6,164,271,243,372,334,428,416,425,472,378,529,271,539,167,542,28]]],"i":[252,[[180,636,198,636],[205,447,214,44,233,25]]],"j":[167,[[72,633,88,655],[94,491,94,312,107,104,117,-195,107,-312,76,-359,38,-372,9,-372,-72,-353,-123,-312]]],"k":[501,[[91,674,110,293,110,13,117,246,205,321,432,472,126,258,246,170,517,22]]],"l":[202,[[167,690,176,249,183,41]]],"m":[847,[[123,463,129,3,167,318,230,413,340,460,406,463,450,435,485,350,472,3,507,324,583,410,690,460,781,460,838,435,850,356,854,208,860,13]]],"n":[485,[[91,450,94,19,91,324,208,400,321,454,394,460,447,454,482,416,507,306,504,9]]],"o":[554,[[346,469,220,413,154,318,110,224,132,98,173,28,306,6,416,35,529,107,592,224,570,369,520,425,463,460,346,469]]],"p":[517,[[107,441,113,-378,110,378,224,441,353,469,498,447,545,378,536,271,491,198,400,120,306,72,117,25]]],"q":[517,[[526,406,498,454,428,463,302,413,211,328,148,227,117,135,126,50,208,3,299,9,406,57,463,113,501,180,529,353,545,-406]]],"r":[523,[[129,469,117,16,148,271,224,369,321,425,400,457,435,460,539,450,551,441]]],"s":[466,[[501,428,469,460,375,460,268,438,170,387,129,321,129,249,170,217,261,217,359,236,422,233,472,214,504,186,495,139,397,63,271,28,198,0,167,3]]],"t":[419,[[277,671,293,6,284,378,91,378,450,381]]],"u":[501,[[135,460,110,315,101,148,139,50,217,9,350,19,425,66,466,85,507,142,536,202,513,472,545,13]]],"v":[539,[[123,466,337,57,362,16,425,167,561,450]]],"w":[775,[[110,460,180,236,249,98,296,25,315,38,403,312,419,372,460,343,621,47,662,22,806,457]]],"x":[485,[[104,447,321,214,523,13,315,214,485,447,321,211,195,69,126,3]]],"y":[589,[[113,425,438,-38,617,435,290,-425]]],"z":[504,[[120,454,132,454,520,450,539,435,438,321,255,158,145,50,135,19,239,19,532,19,558,9]]],"{":[350,[[419,822,369,819,312,788,280,731,271,655,277,526,271,507,189,438,161,403,158,362,176,318,255,258,299,220,302,94,321,-13,365,-69,416,-98,463,-104]]],"|":[139,[[139,715,148,-38]]],"}":[413,[[154,822,233,803,284,753,299,621,287,498,369,447,425,400,438,356,406,331,284,236,287,139,277,25,239,-41,192,-76,110,-101]]],"~":[450,[[110,284,148,343,192,375,227,375,280,337,346,284,397,293,438,309,491,387]]]}</script>
+
+<script type="module">
+// ---------------------------------------------------------------------------------------------------------------
+// Lumen Board prototype. Everything is a pure function of the clock: parse → build marks → schedule → draw(t).
+// Same idea as Studiolo's scenes (a frame is computed from t alone), so seeking, stills and video export all work.
+// ---------------------------------------------------------------------------------------------------------------
+const GLYPHS = JSON.parse(document.getElementById("glyphs").textContent);
+const W = 1280, H = 720, SAFE = { x0: 64, y0: 64, x1: 1216, y1: 600 };
+const CAP = 800;                 // EMS Tech units per drawn line height (its lowercase is nearly cap height)
+const WPM = 160;                 // estimated speaking rate when there are no measured word timings
+const LEAD = 140;                // the pen starts this many ms before the word that names the mark
+const SAY_GAP = 420, WIPE = 900, TAIL = 900;
+const SPEED = { line: 1000, shape: 900, text: 560, hatch: 2400, hl: 1100 };   // px per second
+const LIFT = { line: 90, shape: 90, text: 38, hatch: 30, hl: 60 };            // pen-up pause after a stroke, ms
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const lerp2 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
+const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+const dist = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
+function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function seeded(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+// ---------------------------------------------------------------- hand-drawn geometry (centrelines, then inked)
+function wobLine(a, b, R, o = {}) {
+  const len = dist(a, b) || 1, dx = (b[0] - a[0]) / len, dy = (b[1] - a[1]) / len, nx = dy, ny = -dx;
+  const over = o.over ?? 1 + R() * 5, pre = o.pre ?? R() * 2;
+  const A = [a[0] - dx * pre, a[1] - dy * pre], B = [b[0] + dx * over, b[1] + dy * over];
+  const L = dist(A, B), n = Math.max(2, Math.ceil(L / 7));
+  const bow = (o.bow ?? (R() - 0.5) * 0.035) * Math.min(L, 520);
+  const f = 1 + R() * 2, ph = R() * 6.28, j = o.jit ?? 0.5 + R() * 0.7;
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i / n, s = Math.sin(Math.PI * u);
+    const off = bow * s + j * Math.sin(u * Math.PI * 2 * f + ph) * s;
+    pts.push([lerp(A[0], B[0], u) + nx * off, lerp(A[1], B[1], u) + ny * off]);
+  }
+  return pts;
+}
+function wobQuad(a, c, b, R) {
+  const L = dist(a, c) + dist(c, b), n = Math.max(6, Math.ceil(L / 7)), ph = R() * 6.28, j = 0.5 + R() * 0.6;
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i / n, v = 1 - u;
+    const x = v * v * a[0] + 2 * v * u * c[0] + u * u * b[0], y = v * v * a[1] + 2 * v * u * c[1] + u * u * b[1];
+    const k = j * Math.sin(u * 9 + ph) * Math.sin(Math.PI * u);
+    pts.push([x + k, y - k * 0.6]);
+  }
+  return pts;
+}
+function wobEllipse(cx, cy, rx, ry, R, o = {}) {
+  const t0 = o.start ?? -2.5 + R() * 0.6, sweep = o.sweep ?? Math.PI * 2 + 0.22 + R() * 0.35;
+  const n = Math.max(24, Math.ceil(((rx + ry) * Math.abs(sweep) * 0.55) / 6));
+  const ph = R() * 6.28, wob = 0.02 + R() * 0.02, grow = (R() < 0.5 ? 1 : -1) * (0.025 + R() * 0.035), tilt = (R() - 0.5) * 0.08;
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const u = i / n, th = t0 + sweep * u, k = 1 + wob * Math.sin(th * 2 + ph) + grow * u;
+    const x = Math.cos(th) * rx * k, y = Math.sin(th) * ry * k;
+    pts.push([cx + x * Math.cos(tilt) - y * Math.sin(tilt), cy + x * Math.sin(tilt) + y * Math.cos(tilt)]);
+  }
+  return pts;
+}
+function catmull(points, R) {
+  const out = [], P = [points[0], ...points, points[points.length - 1]];
+  for (let i = 1; i < P.length - 2; i++) {
+    const [p0, p1, p2, p3] = [P[i - 1], P[i], P[i + 1], P[i + 2]];
+    const n = Math.max(4, Math.ceil(dist(p1, p2) / 7));
+    for (let s = 0; s < n; s++) {
+      const t = s / n, t2 = t * t, t3 = t2 * t;
+      const f = (k) => 0.5 * (2 * p1[k] + (-p0[k] + p2[k]) * t + (2 * p0[k] - 5 * p1[k] + 4 * p2[k] - p3[k]) * t2 + (-p0[k] + 3 * p1[k] - 3 * p2[k] + p3[k]) * t3);
+      out.push([f(0) + (R() - 0.5) * 0.8, f(1) + (R() - 0.5) * 0.8]);
+    }
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+function dashed(pts, on = 15, off = 11) {
+  const out = []; let cur = [pts[0]], acc = 0, drawing = true;
+  for (let i = 1; i < pts.length; i++) {
+    let a = pts[i - 1]; const b = pts[i]; let seg = dist(a, b);
+    while (seg > 0) {
+      const room = (drawing ? on : off) - acc;
+      if (seg < room) { acc += seg; if (drawing) cur.push(b); seg = 0; }
+      else {
+        const p = lerp2(a, b, room / seg); seg -= room; a = p; acc = 0;
+        if (drawing) { cur.push(p); out.push(cur); cur = []; } else cur = [p];
+        drawing = !drawing;
+      }
+    }
+  }
+  if (drawing && cur.length > 1) out.push(cur);
+  return out;
+}
+function arrowHead(pts, R, size = 18) {
+  const tip = pts[pts.length - 1], back = pts[Math.max(0, pts.length - 4)];
+  const ang = Math.atan2(tip[1] - back[1], tip[0] - back[0]), a1 = 0.42 + R() * 0.12, a2 = 0.42 + R() * 0.12;
+  const L = (k) => [tip[0] - Math.cos(ang + k) * size * (0.9 + R() * 0.25), tip[1] - Math.sin(ang + k) * size * (0.9 + R() * 0.25)];
+  return [...wobLine(L(a1), tip, R, { over: 0, pre: 0, jit: 0.3, bow: 0 }), ...wobLine(tip, L(-a2), R, { over: 1, pre: 0, jit: 0.3, bow: 0 }).slice(1)];
+}
+function polygonHatch(poly, R, gap = 12) {
+  // A zig-zag scribble across a convex polygon at about -45°, the way a hand fills a shape quickly.
+  const ang = -0.78 + (R() - 0.5) * 0.2, dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx;
+  const proj = poly.map((p) => p[0] * nx + p[1] * ny), lo = Math.min(...proj) + gap * 0.6, hi = Math.max(...proj) - gap * 0.4;
+  const pts = []; let flip = false;
+  for (let d = lo; d <= hi; d += gap) {
+    const hits = [];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i], b = poly[(i + 1) % poly.length], da = a[0] * nx + a[1] * ny - d, db = b[0] * nx + b[1] * ny - d;
+      if ((da <= 0 && db > 0) || (da > 0 && db <= 0)) hits.push(lerp2(a, b, da / (da - db)));
+    }
+    if (hits.length < 2) continue;
+    hits.sort((p, q) => p[0] * dx + p[1] * dy - (q[0] * dx + q[1] * dy));
+    const [s, e] = flip ? [hits[hits.length - 1], hits[0]] : [hits[0], hits[hits.length - 1]];
+    pts.push([s[0] + (R() - 0.5) * 3, s[1] + (R() - 0.5) * 3], [e[0] + (R() - 0.5) * 3, e[1] + (R() - 0.5) * 3]);
+    flip = !flip;
+  }
+  return pts.length > 1 ? pts : null;
+}
+const rectPoly = (x, y, w, h, i = 5) => [[x + i, y + i], [x + w - i, y + i], [x + w - i, y + h - i], [x + i, y + h - i]];
+const ellPoly = (cx, cy, rx, ry) => Array.from({ length: 36 }, (_, k) => [cx + Math.cos((k / 36) * 6.283) * (rx - 5), cy + Math.sin((k / 36) * 6.283) * (ry - 5)]);
+
+// ---------------------------------------------------------------- handwriting from a single-line font
+const SUBST = { "×": "x", "–": "-", "—": "-", "‘": "'", "’": "'", "“": '"', "”": '"', "…": "...", "→": "->", "≈": "~", "°": "o" };
+const glyph = (ch) => GLYPHS[ch] || GLYPHS[SUBST[ch]] || GLYPHS["?"];
+function measure(str, size) { const s = size / CAP; let w = 0; for (const ch of str) w += glyph(ch)[0] * s + size * 0.05; return Math.max(0, w - size * 0.05); }
+function writeText(str, x, y, size, R, align = "left") {
+  const s = size / CAP, width = measure(str, size);
+  const x0 = align === "center" ? x - width / 2 : align === "right" ? x - width : x;
+  const base = y + size / 2, strokes = [];
+  let cx = x0;
+  for (const ch of str) {
+    const g = glyph(ch), dy = (R() - 0.5) * size * 0.07, rot = (R() - 0.5) * 0.07, sc = s * (0.96 + R() * 0.08);
+    for (const st of g[1]) {
+      const pts = [];
+      for (let i = 0; i < st.length; i += 2) {
+        const gx = st[i] * sc, gy = -st[i + 1] * sc;
+        pts.push([cx + gx * Math.cos(rot) - gy * Math.sin(rot), base + dy + gx * Math.sin(rot) + gy * Math.cos(rot)]);
+      }
+      if (pts.length === 1) pts.push([pts[0][0] + 0.6, pts[0][1] + 0.6]);
+      strokes.push(pts);
+    }
+    cx += g[0] * s + size * 0.05;
+  }
+  return { strokes, box: [x0, y - size / 2 - 3, width, size + 6] };
+}
+function fitLines(label, maxW, size) {
+  let s = size;
+  while (s > 20 && measure(label, s) > maxW) s -= 2;
+  if (measure(label, s) <= maxW || !label.includes(" ")) return { lines: [label], size: s };
+  const words = label.split(" "); let best = null;
+  for (let k = 1; k < words.length; k++) {
+    const a = words.slice(0, k).join(" "), b = words.slice(k).join(" "), w = Math.max(measure(a, 24), measure(b, 24));
+    if (!best || w < best.w) best = { a, b, w };
+  }
+  s = Math.min(size, 26);
+  while (s > 18 && Math.max(measure(best.a, s), measure(best.b, s)) > maxW) s -= 2;
+  return { lines: [best.a, best.b], size: s };
+}
+
+// ---------------------------------------------------------------- parsing the board source
+const ROLE = { ink: "ink", black: "ink", white: "ink", emphasis: "emphasis", blue: "emphasis", second: "second", purple: "second", third: "third", green: "third", fourth: "fourth", red: "fourth", neutral: "neutral", grey: "neutral", gray: "neutral", marker: "marker", yellow: "marker" };
+const SIZES = { small: 24, normal: 30, big: 42, title: 52 };
+const FLAGS = new Set(["hatch", "dash", "arrow", "center", "left", "right"]);
+const SHAPES = {
+  box: { n: 4 }, circle: { n: 3 }, ellipse: { n: 4 }, diamond: { n: 4 }, cyl: { n: 4 }, person: { n: 2 }, text: { n: 2, label: true },
+  arrow: { ends: 2 }, line: { ends: 2 }, curve: { points: 2 }, underline: { target: true }, ring: { target: true }, highlight: { target: true },
+  cross: { target: true }, tick: { tick: true }, axes: { n: 4 }, ground: { n: 3 },
+};
+const KEYWORDS = new Set([...Object.keys(ROLE), ...Object.keys(SIZES), ...FLAGS, "bend", "size"]);
+
+function parseAttrs(s) { const o = {}; for (const m of s.matchAll(/(\w+)\s*=\s*"([^"]*)"/g)) o[m[1]] = m[2]; return o; }
+
+function parseSource(src) {
+  const problems = [], boards = [];
+  const lineOf = (i) => src.slice(0, i).split("\n").length;
+  const re = /<item\s+([^>]*)>([\s\S]*?)<\/item>|<say>([\s\S]*?)<\/say>/g;
+  let m;
+  while ((m = re.exec(src))) {
+    if (m[1] !== undefined) {
+      const a = parseAttrs(m[1]);
+      if (a.type !== "board") { problems.push({ err: false, line: lineOf(m.index), msg: `Skipped an item of type "${a.type || "?"}": this player only draws boards.` }); continue; }
+      boards.push({ id: a.id || `b${boards.length + 1}`, title: a.title || "", body: m[2], bodyLine: lineOf(m.index + m[0].indexOf(">") + 1), says: [] });
+    } else if (!boards.length) problems.push({ err: true, line: lineOf(m.index), msg: "A say comes before any board. Put the board item first." });
+    else boards[boards.length - 1].says.push({ raw: m[3].trim(), line: lineOf(m.index) });
+  }
+  if (!boards.length) problems.push({ err: true, line: 1, msg: 'No board found. Start with <item id="b1" type="board" title="…">.' });
+  for (const b of boards) parseBoard(b, problems);
+  return { boards, problems };
+}
+
+function parseBoard(b, problems) {
+  const lines = b.body.split("\n");
+  const sep = lines.findIndex((l) => l.trim() === "---");
+  b.header = {}; b.specs = []; b.legend = [];
+  const ids = new Set();
+  lines.forEach((raw, i) => {
+    const line = raw.trim(), ln = b.bodyLine + i - 1;
+    if (!line || line.startsWith("#") || line.startsWith("//") || line === "---") return;
+    if (sep > -1 && i < sep) {
+      const k = line.indexOf(":");
+      if (k > 0) b.header[line.slice(0, k).trim().toLowerCase()] = line.slice(k + 1).trim();
+      return;
+    }
+    const spec = parseMarkLine(line, ln, ids, problems, b.id);
+    if (spec) { b.specs.push(spec); ids.add(spec.id); }
+  });
+  if (b.header.roles) {
+    for (const part of b.header.roles.split(";")) {
+      const [r, meaning] = part.split("=").map((s) => s && s.trim());
+      if (r && meaning && ROLE[r.toLowerCase()]) b.legend.push({ role: ROLE[r.toLowerCase()], meaning });
+    }
+  }
+}
+
+function parseMarkLine(line, ln, ids, problems, boardId) {
+  const toks = [...line.matchAll(/"([^"]*)"|(\S+)/g)].map((m) => (m[1] !== undefined ? { q: m[1] } : { w: m[2] }));
+  const fail = (msg) => { problems.push({ err: true, line: ln, msg }); return null; };
+  if (toks.length < 2 || !toks[0].w || !toks[1].w) return fail(`Expected "id shape …" but got "${line}".`);
+  const id = toks[0].w, shape = toks[1].w.toLowerCase();
+  if (!/^[A-Za-z][\w-]*$/.test(id)) return fail(`"${id}" can't be an id: use letters, digits, - and _.`);
+  if (KEYWORDS.has(id.toLowerCase())) return fail(`"${id}" is a keyword; give this mark another id.`);
+  if (ids.has(id)) return fail(`The id "${id}" is used twice on board ${boardId}.`);
+  if (!SHAPES[shape]) return fail(`Unknown shape "${toks[1].w}". Shapes: ${Object.keys(SHAPES).join(", ")}.`);
+  const spec = { id, shape, line: ln, nums: [], ends: [], labels: [], role: null, flags: {}, size: null, bend: 0 };
+  for (let i = 2; i < toks.length; i++) {
+    const t = toks[i];
+    if (t.q !== undefined) { spec.labels.push(t.q); continue; }
+    const w = t.w, lw = w.toLowerCase();
+    if (/^-?\d+(\.\d+)?$/.test(w)) spec.nums.push(+w);
+    else if (/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(w)) spec.ends.push({ pt: w.split(",").map(Number) });
+    else if (lw === "bend" || lw === "size") {
+      const v = toks[i + 1]?.w;
+      if (v === undefined || Number.isNaN(+v)) return fail(`"${lw}" needs a number after it.`);
+      spec[lw] = +v; i++;
+    } else if (ROLE[lw]) spec.role = ROLE[lw];
+    else if (SIZES[lw]) spec.size = SIZES[lw];
+    else if (FLAGS.has(lw)) spec.flags[lw] = true;
+    else if (lw === "->") continue;
+    else if (ids.has(w)) spec.ends.push({ ref: w });
+    else return fail(`Unknown word "${w}" in ${id}: not a number, point, colour, option or an earlier mark's id.`);
+  }
+  const S = SHAPES[shape];
+  if (S.n && spec.nums.length !== S.n && !(S.n && shape === "tick")) return fail(`${id}: a ${shape} takes ${S.n} numbers, got ${spec.nums.length}.`);
+  if (S.label && !spec.labels.length) return fail(`${id}: text needs its words in quotes.`);
+  if (S.ends && (spec.ends.length !== 2)) return fail(`${id}: an ${shape} needs two ends, each an earlier mark's id or a point like 400,300.`);
+  if (S.points && (spec.ends.length < 2 || spec.ends.some((e) => !e.pt))) return fail(`${id}: a curve needs at least two points like 100,400 300,250.`);
+  if (S.target && (spec.ends.length !== 1 || !spec.ends[0].ref)) return fail(`${id}: ${shape} needs exactly one earlier mark to mark up.`);
+  if (S.tick && !(spec.nums.length === 2 || (spec.ends.length === 1 && spec.ends[0].ref))) return fail(`${id}: tick takes x y or an earlier mark.`);
+  return spec;
+}
+
+// ---------------------------------------------------------------- building marks (strokes, boxes, timing)
+function buildBoard(b, problems) {
+  const marks = [], byId = new Map();
+  for (const spec of b.specs) {
+    try {
+      const m = buildMark(spec, byId, seeded(hash(`${b.id}:${spec.id}`)));
+      finishMark(m);
+      marks.push(m); byId.set(m.id, m);
+      const out = m.strokes.some((s) => s.pts.some((p) => p[0] < SAFE.x0 - 6 || p[0] > SAFE.x1 + 6 || p[1] < SAFE.y0 - 6 || p[1] > SAFE.y1 + 6));
+      if (out) problems.push({ err: false, line: spec.line, msg: `${b.id}.${m.id} reaches outside the drawing area (x 64–1216, y 64–600).` });
+    } catch (e) {
+      problems.push({ err: true, line: spec.line, msg: `${spec.id}: ${e.message}` });
+    }
+  }
+  const solid = marks.filter((m) => ["box", "circle", "ellipse", "diamond", "cyl", "person", "text"].includes(m.shape));
+  for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++) {
+    const [a, c] = [solid[i].box, solid[j].box];
+    const ox = Math.min(a[0] + a[2], c[0] + c[2]) - Math.max(a[0], c[0]), oy = Math.min(a[1] + a[3], c[1] + c[3]) - Math.max(a[1], c[1]);
+    if (ox > 8 && oy > 8) problems.push({ err: false, line: b.specs.find((s) => s.id === solid[j].id).line, msg: `${solid[j].id} overlaps ${solid[i].id}.` });
+  }
+  b.marks = marks; b.byId = byId;
+}
+
+function buildMark(spec, byId, R) {
+  const { shape, nums: n, labels } = spec;
+  const m = { id: spec.id, shape, role: spec.role, strokes: [], deps: spec.ends.filter((e) => e.ref).map((e) => e.ref) };
+  const role = spec.role || (shape === "highlight" ? "marker" : "ink");
+  const add = (pts, kind = "shape", o = {}) => { if (pts && pts.length > 1) m.strokes.push({ pts, kind, role: o.role || role, w: o.w ?? (kind === "hatch" ? 2.2 : 4.4), alpha: o.alpha ?? 1 }); };
+  const addDash = (pts, kind) => (spec.flags.dash ? dashed(pts).forEach((p) => add(p, kind)) : add(pts, kind));
+  const write = (text, x, y, size, align, r = role) => {
+    const t = writeText(text, x, y, size, R, align);
+    t.strokes.forEach((p) => add(p, "text", { w: clamp(size * 0.115, 2.4, 5.6), role: r }));
+    return t.box;
+  };
+  const inside = (cx, cy, w) => {
+    if (!labels[0]) return;
+    const f = fitLines(labels[0], w, spec.size || 30);
+    if (f.lines.length === 1) write(f.lines[0], cx, cy, f.size, "center");
+    else { write(f.lines[0], cx, cy - f.size * 0.68, f.size, "center"); write(f.lines[1], cx, cy + f.size * 0.68, f.size, "center"); }
+  };
+  const hatch = (poly) => { if (spec.flags.hatch) add(polygonHatch(poly, R), "hatch", { alpha: 0.5 }); };
+  const beside = (box, gap = 16) => {
+    if (!labels[0]) return;
+    const size = spec.size || 26, wTxt = measure(labels[0], size), right = box[0] + box[2] + gap;
+    if (right + wTxt <= SAFE.x1) write(labels[0], right, box[1] + box[3] / 2, size, "left");
+    else write(labels[0], box[0] + box[2] / 2, Math.min(box[1] + box[3] + gap + size / 2, SAFE.y1 - size / 2), size, "center");
+  };
+  const target = () => byId.get(spec.ends[0].ref);
+
+  if (shape === "box") {
+    const [x, y, w, h] = n, tl = [x, y], tr = [x + w, y], br = [x + w, y + h], bl = [x, y + h];
+    add([...wobLine(tl, tr, R), ...wobLine(tr, br, R, { pre: 0 })]);
+    add([...wobLine(tl, bl, R, { pre: 1 }), ...wobLine(bl, br, R, { pre: 0 })]);
+    hatch(rectPoly(x, y, w, h)); inside(x + w / 2, y + h / 2, w - 28);
+    Object.assign(m, { box: [x, y, w, h], outline: { kind: "rect", box: [x, y, w, h] } });
+  } else if (shape === "circle" || shape === "ellipse") {
+    const [cx, cy, rx, ry = rx] = n;
+    add(wobEllipse(cx, cy, rx, ry, R)); hatch(ellPoly(cx, cy, rx, ry)); inside(cx, cy, rx * 1.6 - 16);
+    Object.assign(m, { box: [cx - rx, cy - ry, rx * 2, ry * 2], outline: { kind: "ellipse", cx, cy, rx, ry } });
+  } else if (shape === "diamond") {
+    const [cx, cy, w, h] = n, T = [cx, cy - h / 2], Rr = [cx + w / 2, cy], B = [cx, cy + h / 2], L = [cx - w / 2, cy];
+    add([...wobLine(T, Rr, R, { over: 2 }), ...wobLine(Rr, B, R, { pre: 0 })]);
+    add([...wobLine(T, L, R, { over: 2 }), ...wobLine(L, B, R, { pre: 0 })]);
+    hatch([T, Rr, B, L]); inside(cx, cy, w * 0.55);
+    Object.assign(m, { box: [cx - w / 2, cy - h / 2, w, h], outline: { kind: "ellipse", cx, cy, rx: w / 2, ry: h / 2 } });
+  } else if (shape === "cyl") {
+    const [x, y, w, h] = n, rx = w / 2, ry = Math.min(h * 0.13, 24), cx = x + rx;
+    add(wobEllipse(cx, y + ry, rx, ry, R, { start: Math.PI * 0.95 }));
+    add(wobLine([x, y + ry], [x, y + h - ry], R, { over: 0 }));
+    add(wobEllipse(cx, y + h - ry, rx, ry, R, { start: Math.PI, sweep: -Math.PI }));
+    add(wobLine([x + w, y + h - ry], [x + w, y + ry], R, { over: 0 }));
+    hatch(rectPoly(x, y + ry * 2, w, h - ry * 3)); inside(cx, y + h / 2 + ry / 2, w - 24);
+    Object.assign(m, { box: [x, y, w, h], outline: { kind: "rect", box: [x, y, w, h] } });
+  } else if (shape === "person") {
+    const [x, y] = n, k = (spec.size || 30) / 30;
+    add(wobEllipse(x, y + 18 * k, 17 * k, 18 * k, R));
+    add(wobLine([x, y + 37 * k], [x + 1, y + 88 * k], R, { over: 0 }));
+    add(wobLine([x - 32 * k, y + 52 * k], [x + 32 * k, y + 50 * k], R));
+    add([...wobLine([x - 26 * k, y + 132 * k], [x, y + 88 * k], R, { over: 0 }), ...wobLine([x, y + 88 * k], [x + 26 * k, y + 132 * k], R, { pre: 0 })]);
+    if (labels[0]) write(labels[0], x, y + 156 * k, 26, "center");
+    Object.assign(m, { box: [x - 34 * k, y, 68 * k, labels[0] ? 172 * k : 134 * k], outline: { kind: "rect", box: [x - 34 * k, y, 68 * k, 134 * k] } });
+  } else if (shape === "text") {
+    const align = spec.flags.center ? "center" : spec.flags.right ? "right" : "left";
+    const box = write(labels[0], n[0], n[1], spec.size || 30, align);
+    Object.assign(m, { box, outline: { kind: "rect", box } });
+  } else if (shape === "arrow" || shape === "line") {
+    const [e1, e2] = spec.ends;
+    const c1 = e1.pt || byId.get(e1.ref).center, c2 = e2.pt || byId.get(e2.ref).center;
+    const p1 = e1.pt || edgePoint(byId.get(e1.ref), c2), p2 = e2.pt || edgePoint(byId.get(e2.ref), c1);
+    const len = dist(p1, p2), nx = (p2[1] - p1[1]) / len, ny = -(p2[0] - p1[0]) / len;
+    const mid = lerp2(p1, p2, 0.5), ctrl = [mid[0] + nx * spec.bend * len, mid[1] + ny * spec.bend * len];
+    const path = spec.bend ? wobQuad(p1, ctrl, p2, R) : wobLine(p1, p2, R, { over: 0, pre: 0, bow: (R() - 0.5) * 0.03 });
+    addDash(path, "line");
+    if (shape === "arrow") add(arrowHead(path, R), "line");
+    const apex = spec.bend ? lerp2(mid, ctrl, 0.5) : mid;
+    const side = spec.bend ? Math.sign(spec.bend) : ny < -0.2 || (Math.abs(ny) <= 0.2 && nx > 0) ? 1 : -1;
+    if (labels[0]) {
+      // Push the label's centre out along the normal far enough that its whole box clears the line.
+      const size = spec.size || 24, wTxt = measure(labels[0], size), off = Math.abs(nx) * (wTxt / 2) + Math.abs(ny) * (size / 2) + 12;
+      const lx = clamp(apex[0] + nx * side * off, SAFE.x0 + wTxt / 2, SAFE.x1 - wTxt / 2), ly = clamp(apex[1] + ny * side * off, SAFE.y0 + size / 2, SAFE.y1 - size / 2);
+      write(labels[0], lx, ly, size, "center");
+    }
+    Object.assign(m, { outline: { kind: "point", at: apex } });
+  } else if (shape === "curve") {
+    const pts = catmull(spec.ends.map((e) => e.pt), R);
+    addDash(pts, "line");
+    if (spec.flags.arrow) add(arrowHead(pts, R), "line");
+    const end = pts[pts.length - 1];
+    if (labels[0]) {
+      const size = spec.size || 26, wTxt = measure(labels[0], size);
+      if (end[0] + 14 + wTxt <= SAFE.x1) write(labels[0], end[0] + 14, end[1] - 4, size, "left");
+      else write(labels[0], end[0] - 8, end[1] - size, size, "right");
+    }
+    Object.assign(m, { outline: { kind: "point", at: pts[Math.floor(pts.length / 2)] } });
+  } else if (shape === "underline") {
+    const t = target().box, y = t[1] + t[3] + 7;
+    add(wobLine([t[0] - 6, y + 1], [t[0] + t[2] + 8, y - 3], R, { bow: (R() - 0.5) * 0.02 }), "line");
+    beside([t[0], y - 10, t[2] + 10, 20]);
+    Object.assign(m, { outline: { kind: "rect", box: [t[0], y - 6, t[2], 12] } });
+  } else if (shape === "ring") {
+    const t = target(), o = t.outline;
+    const [cx, cy, rx, ry] = o.kind === "ellipse" ? [o.cx, o.cy, o.rx + 16, o.ry + 14] : [t.box[0] + t.box[2] / 2, t.box[1] + t.box[3] / 2, t.box[2] / 2 + 26, t.box[3] / 2 + 20];
+    add(wobEllipse(cx, cy, rx, ry, R, { sweep: Math.PI * 2 + 0.5 + R() * 0.3 }), "line");
+    beside([cx - rx, cy - ry, rx * 2, ry * 2]);
+    Object.assign(m, { outline: { kind: "ellipse", cx, cy, rx, ry } });
+  } else if (shape === "highlight") {
+    const t = target().box, y = t[1] + t[3] / 2, w = clamp(t[3] * 0.95, 16, 46);
+    add(wobLine([t[0] - 8, y + 2], [t[0] + t[2] + 8, y - 1], R, { bow: 0.006, jit: 0.8 }), "hl", { w, alpha: 0.42 });
+    Object.assign(m, { outline: { kind: "rect", box: t } });
+  } else if (shape === "cross") {
+    const [x, y, w, h] = target().box;
+    add(wobLine([x - 4, y - 2], [x + w + 4, y + h + 2], R), "line");
+    add(wobLine([x + w + 4, y - 2], [x - 4, y + h + 2], R), "line");
+    Object.assign(m, { outline: { kind: "rect", box: [x, y, w, h] } });
+  } else if (shape === "tick") {
+    const [x, y] = spec.nums.length === 2 ? spec.nums : (() => { const b = target().box; return [b[0] + b[2] - 6, b[1] - 26]; })();
+    add([...wobLine([x - 16, y - 2], [x - 5, y + 13], R, { over: 0, jit: 0.3 }), ...wobLine([x - 5, y + 13], [x + 22, y - 22], R, { pre: 0, jit: 0.3 })], "line");
+    Object.assign(m, { outline: { kind: "rect", box: [x - 16, y - 22, 38, 35] } });
+  } else if (shape === "axes") {
+    const [x, y, w, h] = n, o = [x, y + h];
+    const up = wobLine(o, [x, y], R, { over: 0 }); add(up, "line"); add(arrowHead(up, R, 15), "line");
+    const right = wobLine(o, [x + w, y + h], R, { over: 0 }); add(right, "line"); add(arrowHead(right, R, 15), "line");
+    if (labels[0]) write(labels[0], x + w, y + h + 30, 24, "right");
+    if (labels[1]) write(labels[1], x + 18, y + 12, 24, "left");
+    Object.assign(m, { box: [x, y, w, h], outline: { kind: "rect", box: [x, y, w, h] } });
+  } else if (shape === "ground") {
+    const [x1, y, x2] = n;
+    add(wobLine([x1, y], [x2, y], R), "line");
+    for (let x = x1 + 12; x < x2 - 4; x += 24) add(wobLine([x + 6, y + 2], [x - 10, y + 18], R, { over: 0, jit: 0.2 }), "hatch", { w: 2.4 });
+    Object.assign(m, { box: [x1, y - 4, x2 - x1, 24], outline: { kind: "rect", box: [x1, y - 4, x2 - x1, 24] } });
+  }
+  return m;
+}
+
+function edgePoint(m, toward) {
+  const c = m.center, dx = toward[0] - c[0], dy = toward[1] - c[1], o = m.outline, gap = 12;
+  if (o.kind === "point") return o.at;
+  if (o.kind === "ellipse") {
+    const t = 1 / Math.sqrt((dx / (o.rx + gap)) ** 2 + (dy / (o.ry + gap)) ** 2);
+    return [c[0] + dx * t, c[1] + dy * t];
+  }
+  const [, , w, h] = o.box, t = Math.min(Math.abs(dx) > 1e-6 ? (w / 2 + gap) / Math.abs(dx) : Infinity, Math.abs(dy) > 1e-6 ? (h / 2 + gap) / Math.abs(dy) : Infinity);
+  return [c[0] + dx * t, c[1] + dy * t];
+}
+
+function finishMark(m) {
+  if (!m.strokes.length) throw new Error("nothing to draw");
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, v = 0;
+  for (const s of m.strokes) {
+    s.cum = [0];
+    for (let i = 1; i < s.pts.length; i++) s.cum.push(s.cum[i - 1] + dist(s.pts[i - 1], s.pts[i]));
+    s.len = s.cum[s.cum.length - 1];
+    for (const p of s.pts) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); }
+    s.a = v; s.b = v + (s.len / SPEED[s.kind]) * 1000; v = s.b + LIFT[s.kind];
+  }
+  m.D = v - LIFT[m.strokes[m.strokes.length - 1].kind];
+  m.inkBox = [x0, y0, x1 - x0, y1 - y0];
+  m.box = m.box || m.inkBox;
+  m.center = m.outline.kind === "point" ? m.outline.at : m.outline.kind === "ellipse" ? [m.outline.cx, m.outline.cy] : [m.box[0] + m.box[2] / 2, m.box[1] + m.box[3] / 2];
+  m.start = m.strokes[0].pts[0];
+  const last = m.strokes[m.strokes.length - 1];
+  m.end = last.pts[last.pts.length - 1];
+  // Where the pen rests when it points back at this mark: just below and right of its middle, clear of its label.
+  m.anchor = m.outline.kind === "point" ? [m.center[0] + 8, m.center[1] + 10] : [clamp(m.box[0] + m.box[2] * 0.72, SAFE.x0, SAFE.x1), clamp(m.box[1] + m.box[3] + 6, SAFE.y0, SAFE.y1)];
+}
+
+function pointOn(s, frac) {
+  const want = s.len * frac;
+  let i = 1;
+  while (i < s.cum.length - 1 && s.cum[i] < want) i++;
+  const seg = s.cum[i] - s.cum[i - 1] || 1, u = clamp((want - s.cum[i - 1]) / seg, 0, 1);
+  return { i, p: lerp2(s.pts[i - 1], s.pts[i], u) };
+}
+
+// ---------------------------------------------------------------- narration, word timings and the pen's schedule
+const REF = /\[\[([\w-]+)(?:\.([\w-]+))?\]\]/g;
+function estimateWords(text) {
+  const words = []; let ms = 0;
+  for (const m of text.matchAll(/\S+/g)) {
+    const w = m[0], letters = w.replace(/[^\p{L}\p{N}]/gu, "").length;
+    const dur = (60000 / WPM) * clamp(0.5 + letters * 0.09, 0.55, 1.6);
+    words.push({ c: m.index, len: w.length, startMs: ms, endMs: ms + dur });
+    ms += dur + (/[.!?]["')]?$/.test(w) ? 380 : /[,;:—]$/.test(w) ? 180 : 0);
+  }
+  return { words, durationMs: words.length ? words[words.length - 1].endMs + 120 : 0 };
+}
+function wordAtChar(words, c) { let k = 0; for (let i = 0; i < words.length; i++) { if (words[i].c <= c) k = i; else break; } return k; }
+
+function buildTimeline(parsed) {
+  const { boards, problems } = parsed;
+  const segs = []; let clock = 0;
+  boards.forEach((b, bi) => {
+    buildBoard(b, problems);
+    b.startMs = clock;
+    clock += bi > 0 ? WIPE : 300;
+    const drawFrom = clock;
+    b.segs = [];
+    for (const say of b.says) {
+      let text = "", last = 0; const refs = [];
+      for (const m of say.raw.matchAll(REF)) {
+        text += say.raw.slice(last, m.index); last = m.index + m[0].length;
+        if (m[1] !== b.id) { problems.push({ err: true, line: say.line, msg: `[[${m[1]}${m[2] ? "." + m[2] : ""}]] points at another board; refs in a say point at its own board (${b.id}).` }); continue; }
+        if (m[2] && !b.byId.has(m[2])) { problems.push({ err: true, line: say.line, msg: `[[${b.id}.${m[2]}]] names a mark that isn't on the board.` }); continue; }
+        refs.push({ c: text.length, mark: m[2] || null });
+      }
+      text = (text + say.raw.slice(last)).replace(/\s+/g, " ").trim();
+      const est = estimateWords(text);
+      const seg = { bi, text, words: est.words, startMs: clock, durationMs: est.durationMs, refs: [] };
+      for (const r of refs) {
+        const w = est.words[wordAtChar(est.words, Math.min(r.c, Math.max(0, text.length - 1)))];
+        seg.refs.push({ mark: r.mark, timeMs: clock + (w ? w.startMs : 0) });
+      }
+      if (!refs.length) problems.push({ err: false, line: say.line, msg: "This say has no ref, so the pen won't react to it." });
+      segs.push(seg); b.segs.push(seg);
+      clock += est.durationMs + SAY_GAP;
+    }
+    const drawEnd = scheduleBoard(b, drawFrom);
+    b.endMs = Math.max(clock, drawEnd + TAIL);
+    clock = b.endMs;
+  });
+  return { boards, segs, total: clock, problems };
+}
+
+function scheduleBoard(b, t0) {
+  const cue = new Map(), again = [];
+  for (const seg of b.segs) for (const r of seg.refs) {
+    if (!r.mark) continue;
+    if (!cue.has(r.mark)) cue.set(r.mark, r.timeMs - LEAD); else again.push(r);
+  }
+  // Draw order: a cued mark goes at its cue; an uncued one right after the mark declared before it; never before what it connects.
+  const key = new Map(); let prev = t0;
+  const order = b.marks.map((m, i) => {
+    let k = cue.has(m.id) ? cue.get(m.id) : prev + 1e-3;
+    for (const d of m.deps) if (key.has(d)) k = Math.max(k, key.get(d) + 1e-3);
+    key.set(m.id, k); prev = k;
+    return { m, k, i };
+  }).sort((p, q) => p.k - q.k || p.i - q.i);
+
+  const events = []; let cursor = t0, pen = [1250, 700];
+  order.forEach(({ m }, j) => {
+    const travel = clamp(dist(pen, m.start) / 1.9, 150, 420);
+    const c = cue.has(m.id) ? cue.get(m.id) : -Infinity;
+    const start = Math.max(cursor + travel, c);
+    let nextCue = Infinity;
+    for (let q = j + 1; q < order.length; q++) if (cue.has(order[q].m.id)) { nextCue = Math.max(cue.get(order[q].m.id), start); break; }
+    const avail = nextCue - start - 240;
+    const dur = clamp(Math.min(m.D, Math.max(m.D * 0.4, avail)), 180, 6000);
+    events.push({ type: "draw", m, t0: start, t1: start + dur, travel, startPos: m.start, endPos: m.end });
+    cursor = start + dur; pen = m.end;
+    m.t0 = start; m.t1 = start + dur;
+  });
+  // A later ref to a mark already on the board sends the pen back to point at it, when the pen is free.
+  for (const r of again) {
+    const m = b.byId.get(r.mark), t = r.timeMs - LEAD;
+    if (t < m.t1) continue;
+    if (events.some((e) => e.t0 < t + 900 && e.t1 > t - 250)) continue;
+    events.push({ type: "point", m, t0: t, t1: t + 900, travel: 340, startPos: m.anchor, endPos: m.anchor });
+  }
+  events.sort((p, q) => p.t0 - q.t0);
+  let prevEnd = t0 - 400;
+  for (const e of events) { e.ts = Math.max(prevEnd, e.t0 - e.travel); prevEnd = e.t1; }
+  b.events = events;
+  return events.length ? Math.max(...events.map((e) => e.t1)) : t0;
+}
+
+// ---------------------------------------------------------------- pen position at time t
+const REST = [26, 30], OFF = [1330, 760];
+function restPos(e, t) { const u = ease(clamp((t - e.t1) / 500, 0, 1)); return [e.endPos[0] + REST[0] * u, e.endPos[1] + REST[1] * u]; }
+function penAt(b, t) {
+  const ev = b.events;
+  if (!ev.length) return null;
+  for (let i = 0; i < ev.length; i++) {
+    const e = ev[i];
+    if (t < e.ts) return i ? { pos: restPos(ev[i - 1], t), lift: 1 } : { pos: OFF, lift: 1 };
+    if (t < e.t0) {
+      const from = i ? restPos(ev[i - 1], e.ts) : OFF, u = ease(clamp((t - e.ts) / Math.max(1, e.t0 - e.ts), 0, 1));
+      return { pos: lerp2(from, e.startPos, u), lift: 1 - u * (e.type === "draw" ? 1 : 0.5), role: e.m.strokes[0].role };
+    }
+    if (t <= e.t1) {
+      if (e.type === "point") {
+        const k = (t - e.t0) / 900, tap = Math.sin(clamp(k * 2.2, 0, 1) * Math.PI) * 0.45;
+        return { pos: [e.endPos[0] + Math.sin(k * 9) * 2, e.endPos[1] + Math.cos(k * 7) * 2], lift: 0.55 - tap, role: e.m.strokes[0].role };
+      }
+      return tipAt(e.m, (t - e.t0) / (e.t1 - e.t0));
+    }
+  }
+  return { pos: restPos(ev[ev.length - 1], t), lift: 1 };
+}
+function tipAt(m, p) {
+  const v = clamp(p, 0, 1) * m.D, S = m.strokes;
+  for (let i = 0; i < S.length; i++) {
+    const s = S[i];
+    if (v <= s.b) return { pos: pointOn(s, clamp((v - s.a) / Math.max(1, s.b - s.a), 0, 1)).p, lift: 0, role: s.role };
+    const n = S[i + 1];
+    if (n && v < n.a) { const u = (v - s.b) / Math.max(1, n.a - s.b); return { pos: lerp2(s.pts[s.pts.length - 1], n.pts[0], ease(u)), lift: Math.sin(u * Math.PI) * 0.6, role: n.role }; }
+  }
+  return { pos: m.end, lift: 0, role: S[S.length - 1].role };
+}
+
+// ---------------------------------------------------------------- drawing
+const STYLES = {
+  whiteboard: { bg: "#f6f7f5", sheen: "rgba(255,255,255,.75)", ghost: 0.045, blend: "multiply", roles: { ink: "#1d2329", emphasis: "#1f4fb8", second: "#6b3fa0", third: "#1d7a49", fourth: "#c2392b", neutral: "#7b858d", marker: "#ffd23f" }, captionInk: "#22303a", captionMuted: "#8b949b", body: "#2b3238", cap: null },
+  chalk: { bg: "#22322b", sheen: "rgba(255,255,255,.035)", ghost: 0.07, blend: "screen", roles: { ink: "#eef0ea", emphasis: "#9cc7ff", second: "#d8b9ff", third: "#a9e4a0", fourth: "#ffa08e", neutral: "#a3ada6", marker: "#fff0a0" }, captionInk: "#eef0ea", captionMuted: "#93a39a", body: "#e9e6dc", cap: null },
+  paper: { bg: "#fbfbf9", sheen: "rgba(255,255,255,0)", ghost: 0.04, blend: "multiply", roles: { ink: "#22303a", emphasis: "#1e3e9e", second: "#6e86d0", third: "#2f6b4a", fourth: "#9a3b2e", neutral: "#5d6c77", marker: "#e8c27a" }, captionInk: "#22303a", captionMuted: "#98a3ab", body: "#3a464f", cap: null },
+};
+let getStroke = null;
+import("https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs")
+  .then((mod) => { getStroke = mod.getStroke; pathCache.clear(); requestDraw(); })
+  .catch(() => { /* plain round-capped strokes are the fallback */ });
+
+const pathCache = new Map();
+function outlinePath(pts, w, complete) {
+  const out = getStroke(pts, { size: w * 1.25, thinning: 0.22, smoothing: 0.55, streamline: 0.25, simulatePressure: true, last: complete, start: { cap: true, taper: 0 }, end: { cap: true, taper: 0 } });
+  if (out.length < 3) return null;
+  let d = `M${out[0][0].toFixed(1)},${out[0][1].toFixed(1)}Q`;
+  for (let i = 0; i < out.length; i++) {
+    const a = out[i], b = out[(i + 1) % out.length];
+    d += `${a[0].toFixed(1)},${a[1].toFixed(1)} ${((a[0] + b[0]) / 2).toFixed(1)},${((a[1] + b[1]) / 2).toFixed(1)} `;
+  }
+  return new Path2D(d + "Z");
+}
+function inkStroke(ctx, s, pts, complete, key, style) {
+  const color = style.roles[s.role] || style.roles.ink;
+  ctx.globalAlpha = s.alpha * (style === STYLES.chalk ? 0.93 : 1);
+  if (s.kind === "hl") {
+    ctx.save(); ctx.globalCompositeOperation = style.blend; ctx.strokeStyle = color; ctx.lineWidth = s.w; ctx.lineCap = "butt"; ctx.lineJoin = "round";
+    ctx.globalAlpha = style === STYLES.chalk ? 0.28 : 0.55;
+    ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); ctx.restore();
+    return;
+  }
+  if (getStroke) {
+    let path = complete ? pathCache.get(key) : null;
+    if (!path) { path = outlinePath(pts, s.w, complete); if (complete && path) pathCache.set(key, path); }
+    if (path) { ctx.fillStyle = color; ctx.fill(path); return; }
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = s.w; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke();
+}
+function drawMark(ctx, b, m, p, style) {
+  if (p <= 0) return;
+  const v = p >= 1 ? Infinity : p * m.D;
+  m.strokes.forEach((s, si) => {
+    if (v <= s.a) return;
+    const key = `${b.id}:${m.id}:${si}`;
+    if (v >= s.b) return inkStroke(ctx, s, s.pts, true, key, style);
+    const { i, p: tip } = pointOn(s, (v - s.a) / (s.b - s.a));
+    inkStroke(ctx, s, [...s.pts.slice(0, i), tip], false, key, style);
+  });
+  ctx.globalAlpha = 1;
+}
+function drawBackground(ctx, style) {
+  ctx.fillStyle = style.bg; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(0.42, style.sheen); g.addColorStop(0.58, "rgba(255,255,255,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function drawBoardAt(ctx, b, t, style, reduced) {
+  for (const m of b.marks) {
+    if (m.t0 === undefined) continue;
+    const p = t < m.t0 ? 0 : t >= m.t1 ? 1 : (t - m.t0) / (m.t1 - m.t0);
+    drawMark(ctx, b, m, reduced && p > 0 ? 1 : p, style);
+  }
+}
+function drawPen(ctx, pen, style) {
+  if (!pen) return;
+  const [x, y] = pen.pos, lift = pen.lift, color = style.roles[pen.role || "ink"] || style.roles.ink;
+  ctx.save();
+  // The shadow falls further from the pen as it lifts off the board.
+  ctx.shadowColor = "rgba(0,0,0,.28)"; ctx.shadowBlur = 8 + lift * 10;
+  ctx.shadowOffsetX = (5 + lift * 14) * scale; ctx.shadowOffsetY = (7 + lift * 18) * scale;
+  ctx.translate(x, y - lift * 9); ctx.rotate(-0.72);
+  ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(16, -6); ctx.lineTo(16, 6); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = style.body; ctx.beginPath(); ctx.roundRect(15, -11, 104, 22, 4); ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(18, -8, 98, 5);
+  ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(112, -12.5, 48, 25, 7); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fillRect(116, -9, 40, 5);
+  ctx.restore();
+}
+function drawEraser(ctx, x, t, style) {
+  ctx.save(); ctx.translate(x, 330 + Math.sin(t / 60) * 120); ctx.rotate(0.06);
+  ctx.globalAlpha = 0.18; ctx.fillStyle = "#000"; ctx.beginPath(); ctx.roundRect(-36, -82, 80, 176, 10); ctx.fill();
+  ctx.globalAlpha = 1; ctx.fillStyle = style === STYLES.chalk ? "#8a6a4a" : "#3b4650"; ctx.beginPath(); ctx.roundRect(-44, -90, 80, 176, 10); ctx.fill();
+  ctx.fillStyle = style === STYLES.chalk ? "#d9d4c7" : "#cfd5da"; ctx.fillRect(-44, -90, 22, 176);
+  ctx.restore();
+}
+
+// ---------------------------------------------------------------- player state
+const canvas = document.getElementById("board"), ctx = canvas.getContext("2d");
+const $ = (id) => document.getElementById(id);
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let TL = null, clock = 0, playing = false, styleName = "whiteboard", needDraw = true, showPen = true, scale = 1;
+const finals = new Map();
+
+function finalFrame(b, style) {
+  const key = `${b.id}:${styleName}:${b.endMs}`;
+  if (finals.has(key)) return finals.get(key);
+  const off = document.createElement("canvas"); off.width = W; off.height = H;
+  const o = off.getContext("2d");
+  drawBoardAt(o, b, Infinity, style, false);
+  finals.set(key, off);
+  return off;
+}
+
+function boardIndexAt(t) { if (!TL || !TL.boards.length) return -1; let k = 0; TL.boards.forEach((b, i) => { if (t >= b.startMs) k = i; }); return k; }
+
+function render() {
+  const style = STYLES[styleName];
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  drawBackground(ctx, style);
+  if (!TL || !TL.boards.length) return;
+  const bi = boardIndexAt(clock), b = TL.boards[bi];
+  if (bi > 0) {
+    const prev = TL.boards[bi - 1], u = (clock - b.startMs) / WIPE;
+    if (u < 1) {
+      const sweep = ease(clamp(u, 0, 1)) * (W + 240) - 120;
+      ctx.drawImage(finalFrame(prev, style), 0, 0);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, Math.max(0, sweep), H); ctx.clip();
+      drawBackground(ctx, style); ctx.globalAlpha = style.ghost * 1.6; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.restore();
+      drawEraser(ctx, sweep, clock, style);
+      return;
+    }
+    ctx.globalAlpha = style.ghost; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.globalAlpha = 1;
+  }
+  drawBoardAt(ctx, b, clock, style, reduceMotion);
+  if (showPen && !reduceMotion) drawPen(ctx, penAt(b, clock), style);
+}
+
+function updateCaption() {
+  const cap = $("caption");
+  if (!TL) { cap.textContent = ""; return; }
+  const seg = TL.segs.find((s) => clock >= s.startMs && clock < s.startMs + s.durationMs + SAY_GAP * 0.6);
+  if (!seg) { cap.textContent = ""; return; }
+  const local = clock - seg.startMs; let now = -1;
+  seg.words.forEach((w, i) => { if (w.startMs <= local) now = i; });
+  const line = document.createElement("span");
+  seg.words.forEach((w, i) => {
+    const span = document.createElement("span");
+    span.className = i < now ? "w-done" : i === now ? "w-now" : "";
+    span.textContent = seg.text.slice(w.c, w.c + w.len);
+    line.append(span, i < seg.words.length - 1 ? " " : "");
+  });
+  cap.replaceChildren(line);
+}
+const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+function updateChrome() {
+  $("time").textContent = `${fmt(clock)} / ${fmt(TL ? TL.total : 0)}`;
+  $("scrub").value = String(Math.round(clock));
+  updateCaption();
+  const b = TL && TL.boards[boardIndexAt(clock)];
+  const style = STYLES[styleName];
+  $("legend").replaceChildren(...(b ? b.legend : []).map((l) => {
+    const span = document.createElement("span"), sw = document.createElement("i");
+    sw.style.background = style.roles[l.role]; span.append(sw, l.meaning); return span;
+  }));
+}
+function requestDraw() { needDraw = true; }
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(100, now - last); last = now;
+  if (playing && TL) {
+    let next = clock + dt * +$("speed").value;
+    if (voice.active && voice.holdUntil !== null) next = Math.min(next, voice.holdUntil);
+    clock = Math.min(next, TL.total);
+    if (clock >= TL.total) setPlaying(false);
+    voiceTick();
+    needDraw = true;
+  }
+  if (needDraw) { render(); updateChrome(); needDraw = false; }
+  requestAnimationFrame(frame);
+}
+
+function setPlaying(on) {
+  playing = on && !!TL;
+  if (playing && TL && clock >= TL.total - 1) clock = 0;
+  $("play").setAttribute("aria-label", playing ? "Pause" : "Play");
+  $("playIcon").innerHTML = playing ? '<path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"/>' : '<path d="M4 2.5v11l9-5.5z" fill="currentColor"/>';
+  if (!playing) voiceStop();
+  needDraw = true;
+}
+function seek(ms) { clock = clamp(ms, 0, TL ? TL.total : 0); voiceStop(); needDraw = true; }
+
+function resize() {
+  const css = canvas.getBoundingClientRect().width || W;
+  const next = clamp(((window.devicePixelRatio || 1) * css) / W, 1, 2);
+  if (Math.abs(next - scale) > 0.05 || canvas.width !== Math.round(W * next)) {
+    scale = next; canvas.width = Math.round(W * scale); canvas.height = Math.round(H * scale); needDraw = true;
+  }
+}
+new ResizeObserver(resize).observe(canvas);
+
+// ---------------------------------------------------------------- voice (browser speech, re-synced on word boundaries)
+const voice = { active: false, seg: -1, token: 0, holdUntil: null };
+function voiceStop() { voice.token++; voice.seg = -1; voice.holdUntil = null; try { speechSynthesis.cancel(); } catch { /* no speech */ } }
+function voiceTick() {
+  if (!voice.active || !TL || !("speechSynthesis" in window)) return;
+  const si = TL.segs.findIndex((s) => clock >= s.startMs && clock < s.startMs + s.durationMs);
+  if (si < 0 || si === voice.seg) return;
+  const seg = TL.segs[si], local = clock - seg.startMs;
+  const wi = Math.max(0, seg.words.findIndex((w) => w.endMs > local));
+  const off = seg.words[wi] ? seg.words[wi].c : 0;
+  speechSynthesis.cancel();
+  const token = ++voice.token;
+  voice.seg = si; voice.holdUntil = seg.startMs + seg.durationMs - 20;
+  const u = new SpeechSynthesisUtterance(seg.text.slice(off));
+  u.lang = "en-GB"; u.rate = +$("speed").value;
+  u.onboundary = (e) => {
+    if (token !== voice.token || (e.name && e.name !== "word")) return;
+    const k = wordAtChar(seg.words, off + e.charIndex);
+    clock = Math.max(clock - 400, seg.startMs + seg.words[k].startMs);
+  };
+  const done = () => { if (token !== voice.token) return; voice.holdUntil = null; if (clock < seg.startMs + seg.durationMs) clock = seg.startMs + seg.durationMs; };
+  u.onend = done; u.onerror = done;
+  setTimeout(() => { if (token === voice.token && !speechSynthesis.speaking) done(); }, 1500);
+  speechSynthesis.speak(u);
+}
+
+// ---------------------------------------------------------------- loading a source
+let currentExample = null;
+function load(src, { autoplay = false } = {}) {
+  const parsed = parseSource(src);
+  const tl = buildTimeline(parsed);
+  finals.clear(); pathCache.clear();
+  TL = tl.boards.length && tl.boards.some((b) => b.marks.length) ? tl : null;
+  const hdrStyle = tl.boards[0]?.header.style;
+  if (hdrStyle && STYLES[hdrStyle]) { styleName = hdrStyle; $("style").value = hdrStyle; applyStyleVars(); }
+  $("scrub").max = String(Math.round(TL ? TL.total : 0));
+  $("ticks").replaceChildren(...(TL ? TL.boards.slice(1) : []).map((b) => { const s = document.createElement("span"); s.style.left = `${(b.startMs / TL.total) * 100}%`; return s; }));
+  showProblems(tl.problems, tl);
+  seek(0);
+  if (TL && reduceMotion) clock = Math.min(TL.total, TL.boards[0].endMs - 1);
+  setPlaying(autoplay && !!TL);
+}
+function showProblems(problems, tl) {
+  const list = $("problems");
+  const items = problems.slice(0, 30).map((p) => { const li = document.createElement("li"); li.className = p.err ? "err" : ""; li.textContent = `Line ${p.line}: ${p.msg}`; return li; });
+  if (!problems.length) { const li = document.createElement("li"); li.className = "ok"; li.textContent = "No problems found."; items.push(li); }
+  list.replaceChildren(...items);
+  const marks = tl.boards.reduce((n, b) => n + (b.marks ? b.marks.length : 0), 0);
+  $("scriptStat").textContent = `${tl.boards.length} board${tl.boards.length === 1 ? "" : "s"} · ${marks} marks · ${fmt(tl.total)}`;
+}
+function applyStyleVars() {
+  const s = STYLES[styleName], box = $("stageBox");
+  box.style.setProperty("--board-bg", s.bg); box.style.setProperty("--board-ink", s.captionInk);
+  box.style.setProperty("--board-muted", s.captionMuted); box.style.setProperty("--board-accent", s.roles.emphasis);
+  requestDraw();
+}
+
+// ---------------------------------------------------------------- examples
+const EXAMPLES = [
+  { title: "Why a cache makes reads fast", line: "Software · boxes, arrows, a ring and a note", src: `<item id="b1" type="board" title="Why a cache makes reads fast">
+roles: fourth = the slow trip; third = the fast trip
+---
+head   text 96 112 "Reading the same data twice" big
+app    box 120 250 200 110 ink "App"
+db     cyl 960 220 200 170 ink "Database"
+slow   arrow app db fourth bend 0.22 "every read: ~80 ms"
+cache  box 540 420 200 110 emphasis hatch "Cache"
+check  arrow app cache emphasis "ask first"
+fill   arrow db cache neutral dash "copy on a miss"
+hit    ring cache third
+fast   text 790 562 "hit: ~1 ms" third
+win    underline fast third
+</item>
+<say>Suppose your [[b1.app]]app needs the same record again and again. Each time, it goes all the way to the [[b1.db]]database, and that [[b1.slow]]round trip costs around eighty milliseconds.</say>
+<say>So we put a small, fast store in between: a [[b1.cache]]cache. Now the app [[b1.check]]asks the cache first.</say>
+<say>If the record isn't there, it is fetched once and [[b1.fill]]copied into the cache. Every later read is a [[b1.hit]]hit, served from memory in about [[b1.fast]]one millisecond.</say>
+<say>That is the whole trick: pay for the [[b1.slow]]slow trip once, then [[b1.win]]reuse the answer.</say>` },
+
+  { title: "How a load finds the ground", line: "Architecture · a section, a load path, a footing", src: `<item id="b1" type="board" title="How a load finds the ground">
+roles: fourth = load; emphasis = structure
+---
+snow   text 474 98 "snow + people" fourth
+l1     arrow 480,128 480,196 fourth
+l2     arrow 640,128 640,196 fourth
+l3     arrow 800,128 800,196 fourth
+slab   box 360 210 560 26 emphasis hatch
+lwall  box 404 236 34 276 emphasis hatch
+rwall  box 842 236 34 276 emphasis hatch
+ground ground 120 490 1160
+lfoot  box 366 512 110 28 emphasis hatch
+rfoot  box 804 512 110 28 emphasis hatch
+path   curve 600,262 520,262 470,300 460,380 460,500 dash fourth arrow
+spread arrow 421,548 376,594 fourth
+spread2 arrow 421,548 466,594 fourth
+wide   ring lfoot neutral
+less   text 500 580 "wider footing, less pressure" small neutral
+</item>
+<say>Start at the top. The roof carries [[b1.snow]]snow and people, pressing [[b1.l1]]straight down.</say>
+<say>The [[b1.slab]]slab collects that weight and hands it sideways to the [[b1.lwall]]walls on either side.</say>
+<say>Each wall carries it down to the [[b1.ground]]ground, and the load [[b1.path]]travels down through the wall, into the [[b1.lfoot]]footing.</say>
+<say>The footing's job is to [[b1.spread]]spread the load over more soil, so [[b1.wide]]a wider footing means [[b1.less]]less pressure on the ground below.</say>` },
+
+  { title: "Why compound growth bends upward", line: "Finance · axes, two curves, a highlight", src: `<item id="b1" type="board" title="Why compound growth bends upward">
+roles: neutral = simple interest; emphasis = compound interest
+---
+rule   text 150 96 "growth = rate × what you already have"
+ax     axes 150 160 820 370 "years" "money"
+simple line 150,530 970,410 neutral "simple"
+comp   curve 150,530 400,510 620,458 800,362 970,200 emphasis "compound"
+gap    line 970,402 970,216 fourth dash
+extra  text 990 296 "interest on" fourth small
+extra2 text 990 328 "interest" fourth small
+mark   highlight rule
+</item>
+<say>One rule explains everything on this sketch. Put [[b1.ax]]time along the bottom and money up the side.</say>
+<say>With [[b1.simple]]simple interest you earn the same amount every year, so the line is straight.</say>
+<say>With [[b1.comp]]compound interest, each year's interest is added to the pile, and next year you earn on the bigger pile, so the curve bends upward.</say>
+<say>After enough years the difference is large, and all of it is [[b1.gap]]interest earned on [[b1.extra]]earlier interest.</say>
+<say>That is the rule: [[b1.mark]]growth equals the rate times what you already have. The pile grows, so the growth grows, and the curve [[b1.comp]]keeps steepening.</say>` },
+
+  { title: "Two boards: request, then response", line: "Web · two boards with an eraser wipe", src: `<item id="b1" type="board" title="A request leaves the browser">
+---
+you    person 170 250 "You"
+web    box 360 270 220 120 ink "Browser"
+srv    box 900 270 220 120 emphasis "Server"
+ask    arrow web srv emphasis bend -0.15 "GET /page"
+</item>
+<say>[[b1.you]]You click a link. The [[b1.web]]browser turns that click into a request, and sends it to a [[b1.srv]]server: [[b1.ask]]give me this page.</say>
+<item id="b2" type="board" title="The response comes back">
+---
+srv    box 900 270 220 120 emphasis "Server"
+html   box 360 270 220 120 third hatch "HTML"
+back   arrow srv html third bend -0.15 "200 OK"
+done   tick html third
+</item>
+<say>The [[b2.srv]]server answers with a [[b2.back]]response: a status code and the page itself, as [[b2.html]]HTML. The browser draws it, and [[b2.done]]you see the page.</say>` },
+];
+
+function renderExamples() {
+  $("pane-ex").replaceChildren(...EXAMPLES.map((ex, i) => {
+    const btn = document.createElement("button");
+    btn.className = "btn ex"; btn.setAttribute("aria-current", String(i === currentExample));
+    const t = document.createElement("b"); t.textContent = ex.title;
+    const s = document.createElement("span"); s.textContent = ex.line;
+    btn.append(t, s);
+    btn.onclick = () => { currentExample = i; $("script").value = ex.src; load(ex.src, { autoplay: true }); renderExamples(); };
+    return btn;
+  }));
+}
+
+// ---------------------------------------------------------------- Sketch with Claude (the page's sample capability)
+const SPEC = `You write one "board" for Studiolo Lumen: a whiteboard sketch that a pen draws while a calm voice explains an idea to an adult learner. Reply with ONLY the board source, no commentary and no code fences.
+
+FORMAT
+<item id="b1" type="board" title="One idea, as a short title">
+roles: fourth = what red means here; emphasis = what blue means here
+---
+<one mark per line>
+</item>
+<say>…</say>   (3 to 5 say blocks, after the item)
+
+A mark line is: id shape numbers [colour] [options] ["label"]
+The stage is 1280 by 720, x to the right, y downwards. Every mark stays inside x 64..1216 and y 64..600 (below 600 is the caption band). Plan the layout first: flow left to right or top to bottom, keep 40 px between shapes, keep labels short (1 to 4 words), and use 8 to 14 marks.
+
+SHAPES
+box x y w h "Label"            (x y = top-left corner; the label is written inside)
+circle cx cy r "Label" · ellipse cx cy rx ry "Label" · diamond cx cy w h "Label"
+cyl x y w h "Label"            (a store or database drum)
+person x y "Label"             (stick figure, x y = top of head, about 70 wide and 170 tall)
+text x y "words" [small|big|title]   (x = left edge, y = middle of the line; normal size is 30 px tall and about 18 px per character, small 24 px and 14 px per character)
+arrow A B [bend n] "label"     (A and B are earlier mark ids or points like 400,300; bend -0.3..0.3 curves it)
+line A B "label"
+curve x,y x,y x,y … [arrow] "label"
+axes x y w h "x label" "y label"
+ground x1 y x2                 (a ground line with hatching)
+underline T · ring T · highlight T · cross T · tick T   (T = an earlier mark id; ring can take a "note" written beside it)
+
+COLOURS: ink (default), emphasis (blue), second (purple), third (green), fourth (red), neutral (grey), marker (yellow, for highlight).
+Use at most three colours and give each one meaning in the roles line.
+OPTIONS: hatch (scribble fill), dash, arrow (on a curve), center (text), small, big, title, size n.
+
+NARRATION
+Each say is plain spoken English, two or three sentences. Put a ref [[b1.id]] right before the word that names a mark, with no space after the brackets: "the [[b1.cache]]cache answers". The pen starts drawing that mark as the word is spoken. Refer to marks in the order they are declared. A mark with no ref is drawn right after the one before it. A second ref to a mark makes the pen point at it again. Every say has at least one ref. Never write the word "board" or describe the drawing; explain the idea.
+
+EXAMPLE
+`;
+
+const sampleReady = window.claude?.use ? window.claude.use("sample").catch(() => null) : Promise.resolve(null);
+let askCtl = null;
+sampleReady.then((sample) => {
+  const btn = $("ask"), status = $("askStatus");
+  if (!sample) { status.textContent = "Sketching with Claude works when this page is opened in Claude. The examples and the script editor work everywhere."; return; }
+  btn.disabled = false; status.textContent = "Ready. Claude writes the script; you'll see it appear in the Script tab.";
+  btn.onclick = async () => {
+    const idea = $("idea").value.trim();
+    if (!idea) { status.textContent = "Write the idea you want explained first."; return; }
+    askCtl = new AbortController();
+    btn.disabled = true; $("stop").hidden = false; status.textContent = "Thinking…";
+    const prompt = `${SPEC}${EXAMPLES[0].src}\n\nNow write the board for this idea:\n${idea}`;
+    try {
+      const { text, truncated } = await sample(prompt, {
+        signal: askCtl.signal, cache: false,
+        onText: ({ text }) => { status.textContent = "Writing the board…"; $("script").value = text; },
+      });
+      const start = text.indexOf("<item"), end = text.lastIndexOf("</say>");
+      const src = start > -1 && end > start ? text.slice(start, end + 6) : text;
+      $("script").value = src; currentExample = null; renderExamples();
+      load(src, { autoplay: true });
+      const errs = TL ? 0 : 1;
+      status.textContent = truncated ? "The answer was cut short; the board may be incomplete." : errs ? "Claude's board had problems; see the Script tab." : "Drawn. Open the Script tab to see or edit what Claude wrote.";
+    } catch (e) {
+      const code = e && e.code;
+      status.textContent = code === "cancelled" ? "Stopped." : code === "not_granted" || code === "sampling_disabled" ? "Claude isn't allowed for this page, so sketching is off." : code === "rate_limited" ? "Too many requests just now. Try again in a minute." : code === "refused" ? "Claude declined this idea. Try wording it differently." : "Something went wrong reaching Claude. Try again.";
+      if (code === "not_granted" || code === "sampling_disabled") btn.hidden = true;
+    } finally {
+      btn.disabled = false; $("stop").hidden = true;
+    }
+  };
+  $("stop").onclick = () => askCtl?.abort();
+});
+
+// ---------------------------------------------------------------- wiring
+$("play").onclick = () => setPlaying(!playing);
+$("scrub").oninput = (e) => seek(+e.target.value);
+$("style").onchange = (e) => { styleName = e.target.value; applyStyleVars(); };
+$("pen").onchange = (e) => { showPen = e.target.checked; requestDraw(); };
+$("speed").onchange = () => voiceStop();
+$("voice").onchange = (e) => { voice.active = e.target.checked && "speechSynthesis" in window; voiceStop(); };
+if (!("speechSynthesis" in window)) $("voice").closest("label").hidden = true;
+$("draw").onclick = () => { currentExample = null; renderExamples(); load($("script").value, { autoplay: true }); };
+document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach((t) => { const on = t === tab; t.setAttribute("aria-selected", String(on)); $(t.getAttribute("aria-controls")).hidden = !on; });
+}));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("textarea, input, select")) return;
+  if (e.code === "Space") { e.preventDefault(); setPlaying(!playing); }
+  if (e.code === "ArrowRight") seek(clock + 5000);
+  if (e.code === "ArrowLeft") seek(clock - 5000);
+});
+
+currentExample = 0;
+renderExamples();
+$("script").value = EXAMPLES[0].src;
+applyStyleVars();
+load(EXAMPLES[0].src);
+// Open on a finished board so the first view shows what this does; Play draws it from the start.
+clock = TL ? TL.boards[0].endMs - 1 : 0;
+resize();
+requestAnimationFrame(frame);
+</script>
