@@ -2,6 +2,7 @@
 
 Status: review and plan, for the owner's decision · 19 Oct 2026
 Builds on: [`2026-10-19-lumen-board-sketching.md`](2026-10-19-lumen-board-sketching.md) and the [board prototype](../prototypes/lumen-board/index.html)
+Prototype for this plan: [`prototypes/lumen-board/`](../prototypes/lumen-board/README.md). It mocks the real player, Learn, Library and Explain dialog, and the copilot, with a Today / Proposed switch covering §4.2, the board slide (§5.2), the dialog hint, copilot offer, Draw it short and course-part hint (§5.3, §5.5), and posters.
 Evidence: `studiolo` @ `c7d39da` (main, 19 Oct; read only), its run evidence and specs, and the Craft Studilo space (read only).
 
 ## 1. Summary

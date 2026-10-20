@@ -2,239 +2,547 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a studio desk. The board is the hero on the left; the script and controls sit beside it like notes. */
+/* Layout: Studiolo's own app shell (rail + page), copied from studiolo@main tokens.css, explainer.css, copilot.css,
+   graph.css and shell.css, so every screen reads like the product. A thin prototype bar sits above it. */
 :root {
-  --bg: #f3f3ef;
-  --panel: #fbfbf9;
-  --ink: #22303a;
-  --muted: #5d6c77;
-  --rule: #dbdbd3;
-  --accent: #1e3e9e;
-  --accent-soft: #dfe5f6;
-  --warn: #9a3b2e;
-  --ok: #2f6b4a;
-  --f-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-read: "Newsreader", Georgia, "Times New Roman", serif;
-  --f-hand: "Architects Daughter", "Comic Sans MS", cursive;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --hover-fill: #ecece6; --warn: #9a3b2e; --ok: #2f6b4a; --on-accent: #ffffff; --on-ink: #ffffff;
+  --ghost-soft: rgba(123, 143, 212, 0.08); --ghost-ink: #4a5fa8;
+  --myfocus-ink: #8a5a00; --myfocus-paper: #fbf3df;
+  --shade: rgb(34, 48, 58);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, 0.06), 0 18px 48px rgba(34, 48, 58, 0.16);
+  --scrim-dialog: rgba(34, 48, 58, 0.28);
+  --caption-bg: rgba(236, 236, 233, 0.94); --caption-ink: #1f1f1d;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --focus-ring: 2px solid var(--accent);
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1); --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --dur-quick: 130ms; --dur-standard: 220ms; --dur-move: 380ms;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #131a20; --panel: #1d272f; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #313d47;
-    --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2; color-scheme: dark;
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8;
+    --hover-fill: #2a353f; --warn: #ec9c8d; --ok: #84c9a2; --on-accent: #131a20; --on-ink: #131a20;
+    --ghost-soft: rgba(132, 151, 220, 0.1); --ghost-ink: #b3c1f0;
+    --myfocus-ink: #e8c27a; --myfocus-paper: #33291a;
+    --shade: rgb(0, 0, 0);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+    --scrim-dialog: rgba(4, 8, 11, 0.6);
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #131a20; --panel: #1d272f; --ink: #e2e5e0; --muted: #9ba7b0; --rule: #313d47;
-  --accent: #9db0f3; --accent-soft: #263457; --warn: #ec9c8d; --ok: #84c9a2; color-scheme: dark;
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8;
+  --hover-fill: #2a353f; --warn: #ec9c8d; --ok: #84c9a2; --on-accent: #131a20; --on-ink: #131a20;
+  --ghost-soft: rgba(132, 151, 220, 0.1); --ghost-ink: #b3c1f0;
+  --myfocus-ink: #e8c27a; --myfocus-paper: #33291a;
+  --shade: rgb(0, 0, 0);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+  --scrim-dialog: rgba(4, 8, 11, 0.6);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body {
-  background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-ui);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px 48px;
-}
-.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 20px; }
-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
-header h1 { margin: 0; font: 400 34px/1.1 var(--f-hand); letter-spacing: .01em; }
-header p { margin: 0; color: var(--muted); max-width: 70ch; }
-.chip { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; }
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 
-.desk { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
-@media (max-width: 1000px) { .desk { grid-template-columns: minmax(0, 1fr); } }
-
-/* The stage: Studiolo's 16:9 video surface, in the app's light or dark theme */
-.stage {
-  position: relative; container-type: inline-size; overflow: hidden;
-  border-radius: 12px; border: 1px solid var(--board-rule, var(--rule)); background: var(--board-bg, #fbfbf9);
+/* Prototype bar: not part of Studiolo; it switches between today's player and the proposed one. */
+.proto {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px dashed var(--line); font-size: 12.5px; color: var(--ink-2);
 }
-.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--board-bg, #fbfbf9); max-width: 100%; }
-.mark { position: absolute; top: 4.2%; right: 3.4%; font: 500 clamp(9px, 1.15cqw, 13px)/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted, #8b949b); pointer-events: none; }
-.caption {
-  position: absolute; left: 0; right: 0; bottom: 0; height: calc(100% * 120 / 720);
-  display: flex; align-items: center; justify-content: center; padding: 0 6%;
-  font: 400 clamp(12px, 2.05cqw, 23px)/1.35 var(--f-read); color: var(--board-muted, #7d878e);
-  text-align: center; text-wrap: balance; pointer-events: none;
-}
-.caption .w-done { color: var(--board-ink, #22303a); }
-.caption .w-now { color: var(--board-ink, #22303a); text-decoration: underline; text-decoration-color: var(--board-accent, #1f4fb8); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.proto b { color: var(--ink); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 11px; }
+.seg { display: inline-flex; padding: 2px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.seg button { border: 0; background: transparent; padding: 4px 10px; border-radius: 4px; cursor: pointer; color: var(--ink-2); font-size: 12.5px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.proto .hint { flex: 1 1 260px; min-width: 0; }
 
-.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 12px; }
-.btn {
-  font: 500 14px/1 var(--f-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
-  border-radius: 8px; padding: 9px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+/* App shell: the rail and the page */
+.shell { display: flex; min-height: calc(100% - 41px); }
+.rail {
+  flex: none; width: 58px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 0 16px; border-right: 1px solid var(--line); position: sticky; top: 0; height: calc(100dvh - 41px); min-height: 360px;
 }
-.btn:hover { border-color: var(--muted); }
-.btn:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn.primary { background: var(--accent); color: var(--panel); border-color: var(--accent); }
-.btn[disabled] { opacity: .5; cursor: default; }
-.play { width: 44px; height: 40px; justify-content: center; padding: 0; }
-.time { font: 500 13px/1 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 92px; }
-.scrub { position: relative; flex: 1 1 260px; min-width: 0; display: flex; align-items: center; }
-.scrub input { width: 100%; accent-color: var(--accent); }
-.ticks { position: absolute; inset: auto 0 -6px 0; height: 6px; pointer-events: none; }
-.ticks span { position: absolute; top: 0; width: 2px; height: 6px; background: var(--muted); border-radius: 1px; }
-.opts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; font-size: 13px; color: var(--muted); }
-.opts label { display: inline-flex; gap: 6px; align-items: center; }
-select { font: 13px var(--f-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 5px 8px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 20px; }
-.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.logo { width: 30px; height: 30px; border-radius: 7px; background: var(--ink); color: var(--on-ink); display: grid; place-items: center; font: 500 19px/1 var(--read); margin-bottom: 12px; }
+.rb { width: 46px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 6px; color: var(--ink-2); cursor: pointer; }
+.rb:hover { background: var(--hover-fill); color: var(--ink); }
+.rb[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.rb svg { width: 17px; height: 17px; }
+.rail .grow { flex: 1; }
+.av { width: 24px; height: 24px; border-radius: 50%; background: var(--hover-fill); display: grid; place-items: center; font-size: 11px; color: var(--ink-2); }
+.page { flex: 1; min-width: 0; padding-block: 18px 28px; padding-left: max(16px, min(44px, 3vw)); padding-right: max(16px, env(safe-area-inset-right, 0px), min(44px, 3vw)); }
+.crumb { font-size: 13px; color: var(--ink-2); margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.crumb a { color: var(--ink-2); text-decoration: none; cursor: pointer; }
+.crumb a:hover { color: var(--accent); }
+.crumb span.cur { color: var(--ink); }
+.headrow { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin: 4px 0 18px; }
+.tabs a { padding: 6px 12px 9px; color: var(--ink-2); font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; text-decoration: none; cursor: default; }
+.tabs a.on { color: var(--ink); border-bottom-color: var(--accent); }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; gap: 8px; padding: 8px 14px; border: 0; border-radius: 2px; background: var(--accent); color: var(--on-accent); font-weight: 500; cursor: pointer; }
+.button-quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.button-sm { min-height: 28px; padding: 4px 12px; font-size: 12.5px; }
+.button[disabled] { opacity: .5; cursor: default; }
+.newtag { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 9px; background: var(--myfocus-paper); color: var(--myfocus-ink); font: 600 10px/1.5 var(--ui); letter-spacing: .05em; text-transform: uppercase; vertical-align: 1px; }
 
-/* Side panel */
-.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; display: grid; min-width: 0; }
-.tabs { display: flex; border-bottom: 1px solid var(--rule); }
-.tab { flex: 1; font: 500 13px/1 var(--f-ui); color: var(--muted); background: none; border: 0; padding: 13px 8px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
-.pane { padding: 16px; display: grid; gap: 12px; min-width: 0; }
-.ex { text-align: left; display: grid; gap: 2px; width: 100%; padding: 12px 14px; }
-.ex b { font: 400 18px/1.2 var(--f-hand); }
-.ex span { font-size: 13px; color: var(--muted); }
-.ex[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
-textarea { width: 100%; min-width: 0; font: 12.5px/1.55 var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 10px; resize: vertical; tab-size: 2; }
-#script { height: 380px; white-space: pre; overflow: auto; }
-#idea { height: 92px; font-family: var(--f-ui); font-size: 14px; }
-.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.problems { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
-.problems li { padding: 6px 10px; border-radius: 6px; background: var(--bg); border-left: 3px solid var(--muted); }
+/* ---------- Explainer stage (explainer.css) ---------- */
+.xp-player { display: flex; gap: 20px; align-items: flex-start; }
+.xp-pcol { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px; max-width: 1060px; }
+.xp-screen { position: relative; container-type: inline-size; cursor: pointer; }
+.xp-box { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--board); box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px color-mix(in srgb, var(--shade) 16%, transparent); border-radius: 3px; max-width: 100%; }
+.xp-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: var(--panel); color: var(--ink); font-family: var(--ui); font-size: 30px; }
+.xp-slide { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 64px 96px; animation: xp-in var(--dur-standard) var(--ease-entrance) both; }
+@keyframes xp-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.xp-title { margin: 0 0 36px; font: 400 56px/1.1 var(--read); letter-spacing: -0.01em; max-width: 1000px; }
+.xp-body { display: flex; flex-direction: column; min-height: 0; }
+.xp-mark { display: grid; place-items: center; border-radius: 23%; background: var(--ink); color: var(--panel); font-family: var(--read); font-weight: 500; line-height: 1; }
+.xp-tc { padding: 0; animation: none; }
+.xp-tc-brand { position: absolute; left: 96px; top: 96px; display: flex; align-items: center; gap: 20px; }
+.xp-tc-mark { width: 64px; height: 64px; font-size: 40px; }
+.xp-tc-kicker { font-size: 20px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.xp-tc-block { position: absolute; left: 96px; top: 230px; right: 64px; }
+.xp-tc-text { min-height: 190px; padding: 20px 0 20px 30px; border-left: 6px solid var(--accent); }
+.xp-tc-title { margin: 0; max-width: 1040px; font: 500 72px/1.1 var(--read); letter-spacing: -0.01em; }
+.xp-tc-question { margin: 22px 0 0 2px; max-width: 1000px; font: 400 30px/1.3 var(--read); color: var(--ink-2); }
+.xp-tc-meta { display: flex; align-items: center; gap: 16px; margin: 32px 0 0 38px; }
+.xp-tc-subject { padding: 8px 14px; border-radius: 999px; background: var(--ink-2); color: var(--panel); font-size: 20px; font-weight: 600; line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; }
+.xp-tc-length { font-size: 22px; font-weight: 500; color: var(--ink-2); }
+.xp-tc-brand, .xp-tc-text { animation: xp-tc-rise 800ms var(--ease-entrance) both; }
+.xp-tc-question { animation: xp-tc-fade 800ms var(--ease-entrance) 300ms both; }
+.xp-tc-meta { animation: xp-tc-fade 600ms var(--ease-entrance) 600ms both; }
+@keyframes xp-tc-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes xp-tc-fade { from { opacity: 0; } to { opacity: 1; } }
+.xp-watermark { position: absolute; right: 22px; top: 22px; z-index: 3; opacity: 0.55; pointer-events: none; }
+.xp-watermark .xp-mark { width: 26px; height: 26px; font-size: 16px; }
+.xp-list { margin: 0; padding: 0; list-style: none; counter-reset: xp-item; display: grid; gap: 18px; max-width: 1000px; }
+.xp-list li { position: relative; padding: 4px 12px 4px 52px; font-size: 30px; line-height: 1.35; counter-increment: xp-item; }
+ul.xp-list li::before { content: ""; position: absolute; left: 14px; top: 0.62em; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+ol.xp-list li::before { content: counter(xp-item); position: absolute; left: 0; top: 0.18em; width: 36px; font-size: 22px; font-weight: 600; color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; }
+.xp-cards { display: grid; grid-template-columns: repeat(var(--xp-cols, 3), minmax(0, 1fr)); gap: 28px; }
+.xp-card { padding: 30px 30px 34px; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line); min-height: 300px; }
+.xp-card h3 { margin: 0 0 14px; font: 400 38px/1.1 var(--read); }
+.xp-card p { margin: 0; font-size: 24px; line-height: 1.4; color: var(--ink-2); }
+.xp-table { border-collapse: collapse; width: 100%; font-size: 26px; }
+.xp-table th, .xp-table td { text-align: left; padding: 16px 20px; border-bottom: 2px solid var(--line); }
+.xp-table th { font-size: 20px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); }
+.xp-table td:first-child { color: var(--ink-2); }
+.xp-hl { transition: box-shadow var(--dur-standard) var(--ease-standard), background var(--dur-standard) var(--ease-standard), opacity 420ms var(--ease-standard); }
+.xp-hl[data-lit="true"] { box-shadow: inset 0 0 0 3px var(--accent); background: var(--accent-soft); }
+.xp-table tr.xp-hl[data-lit="true"] td, .xp-list li.xp-hl[data-lit="true"] { box-shadow: inset 0 -4px 0 var(--accent); background: transparent; }
+.xp-table tr.xp-hl[data-lit="true"] { box-shadow: none; background: transparent; }
+.xp-board { padding: 0; }
+.xp-board canvas { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+.xp-pointer { position: absolute; left: 0; top: 0; z-index: 5; margin: -2.2px 0 0 -2.2px; line-height: 0; opacity: 0; pointer-events: none;
+  transition: transform var(--dur-move) var(--ease-spring), opacity var(--dur-standard) var(--ease-standard); }
+.xp-pointer svg { display: block; width: 22px; height: 31px; fill: var(--accent); filter: drop-shadow(0 2px 3.5px color-mix(in srgb, var(--shade) 22%, transparent)); }
+.xp-pointer[data-visible="true"] { opacity: 1; }
+.xp-pointer[data-jump="true"] { transition: opacity var(--dur-standard) var(--ease-standard); }
+
+/* Proposed behaviour: build with the voice, fill the frame, crossfade with a staggered entrance */
+[data-mode="proposed"] .xp-slide:not(.xp-tc):not(.xp-board) .xp-body { flex: 1 1 auto; justify-content: center; padding-bottom: 40px; }
+[data-mode="proposed"] .xp-hl[data-reached="false"] { opacity: 0.16; }
+[data-mode="proposed"] .xp-slide.xp-stagger { animation: xp-fade 320ms var(--ease-standard) both; }
+[data-mode="proposed"] .xp-slide.xp-stagger .xp-title { animation: xp-in 420ms var(--ease-entrance) 60ms both; }
+[data-mode="proposed"] .xp-slide.xp-stagger .xp-body { animation: xp-in 460ms var(--ease-entrance) 200ms both; }
+.xp-slide.xp-leaving { animation: xp-out 320ms var(--ease-standard) both; z-index: 0; }
+@keyframes xp-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes xp-out { from { opacity: 1; } to { opacity: 0; } }
+
+.xp-overlay { position: absolute; inset: 0; pointer-events: none; }
+.xp-caption { position: absolute; left: 50%; bottom: max(8px, 2.03cqw); z-index: 6; width: max-content; max-width: min(78cqw, calc(100% - 16px)); padding: 0.4em 0.8em; transform: translateX(-50%); border-radius: 3px; background: var(--caption-bg); color: color-mix(in srgb, var(--caption-ink) 64%, transparent); font-size: max(12px, 1.95cqw); line-height: 1.35; text-align: center; transition: opacity var(--dur-standard) var(--ease-standard); }
+.xp-caption b { color: var(--caption-ink); font-weight: 400; }
+.xp-caption[data-visible="false"] { opacity: 0; }
+.xp-paused { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.xp-paused span { width: max(36px, 5cqw); height: max(36px, 5cqw); border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--paper); box-shadow: 0 6px 24px color-mix(in srgb, var(--shade) 25%, transparent); }
+.xp-paused svg { width: 38%; height: 38%; margin-left: 8%; }
+.xp-endbox { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; padding: 12px; background: color-mix(in srgb, var(--panel) 78%, transparent); cursor: default; animation: xp-fade var(--dur-standard) var(--ease-entrance); }
+.xp-endbox-card { display: grid; gap: 12px; width: min(100%, max(300px, 48cqw)); padding: max(16px, 2.4cqw) max(18px, 2.8cqw); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-float); }
+.xp-endbox-card h2 { margin: 0; font: 400 max(18px, 2.3cqw)/1.15 var(--read); }
+.xp-ask-h { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; color: var(--ink-2); font-size: 12px; }
+.xp-asks { display: flex; flex-wrap: wrap; gap: 8px; }
+.xp-ask-chip { display: inline-flex; gap: 6px; max-width: 100%; padding: 8px 12px; border: 0; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); font-size: 13px; line-height: 1.35; text-align: left; cursor: pointer; }
+.xp-ask-chip:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+
+.xp-ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.xp-ib { display: grid; place-items: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--ink-2); cursor: pointer; }
+.xp-ib:hover { background: var(--hover-fill); color: var(--ink); }
+.xp-ib svg { width: 17px; height: 17px; }
+.xp-ib[data-on="true"] { color: var(--accent); }
+.xp-ib-play { width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: var(--paper); }
+.xp-ib-play:hover { background: var(--ink); color: var(--paper); opacity: .9; }
+.xp-tm { min-width: 86px; color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.xp-spd { padding: 4px 8px; border: 0; border-radius: 3px; background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; cursor: pointer; }
+.xp-scrub { position: relative; flex: 1; min-width: 140px; height: 22px; margin-inline: 4px 10px; cursor: pointer; touch-action: none; }
+.xp-scrub > span { position: absolute; top: 10px; height: 3px; pointer-events: none; }
+.xp-scrub > .t { left: 0; right: 0; background: var(--line); }
+.xp-scrub > .f { left: 0; background: var(--accent); }
+.xp-scrub > .k { top: 7px; width: 2px; height: 9px; background: var(--paper); }
+.xp-scrub > .n { top: 5px; width: 13px; height: 13px; margin-left: -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--paper); }
+.xp-scrub-tip { position: absolute; bottom: 26px; transform: translateX(-50%); padding: 4px 8px; border-radius: 4px; background: var(--ink); color: var(--paper); font-size: 12px; white-space: nowrap; pointer-events: none; }
+.xp-meta { display: grid; gap: 4px; }
+.xp-meta h1 { margin: 0; font: 400 24px/1.1 var(--read); letter-spacing: -0.01em; text-wrap: balance; }
+.xp-meta-line, .xp-meta-source { margin: 0; color: var(--ink-2); font-size: 12.5px; }
+.xp-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--ink-2); min-height: 18px; }
+.xp-legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+.xp-tx { flex: 0 1 340px; min-width: 260px; max-width: 400px; align-self: stretch; }
+.xp-tx-in { display: flex; flex-direction: column; height: 100%; max-height: 640px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.xp-tx-tabs { display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid var(--line); }
+.xp-tx-tab { margin-bottom: -1px; padding: 6px 10px 8px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ink-2); font-size: 13px; cursor: pointer; }
+.xp-tx-tab[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 500; }
+.xp-tx-body { display: grid; align-content: start; gap: 2px; min-height: 0; overflow: auto; padding: 8px 6px 14px; flex: 1 1 0; }
+.xp-sec { display: block; width: 100%; padding: 8px 10px; border: 0; border-radius: 3px; background: transparent; text-align: left; cursor: pointer; }
+.xp-sec:hover { background: var(--hover-fill); }
+.xp-sec[data-current="true"] { background: var(--accent-soft); }
+.xp-sec-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; color: var(--ink-2); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.xp-sec-head b { font-weight: 600; letter-spacing: 0.03em; }
+.xp-sec-text { display: block; color: var(--ink-2); font: 15.5px/1.45 var(--read); }
+.xp-sec[data-current="true"] .xp-sec-text { color: var(--ink); }
+.xp-gk { text-decoration: underline dotted var(--ink-2); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.xp-cites { display: flex; flex-wrap: wrap; gap: 0 12px; margin-top: 4px; }
+.xp-cite { color: var(--ink-2); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.xp-thumbs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px; }
+.xp-thumb { position: relative; display: block; padding: 0; border: 1px solid var(--line); background: var(--panel); cursor: pointer; overflow: hidden; }
+.xp-thumb[data-current="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.mini { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--panel); }
+.mini .xp-stage { pointer-events: none; }
+.mini .xp-slide, .mini .xp-slide *, .mini .xp-tc * { animation: none !important; }
+.mini canvas.poster { position: absolute; inset: 0; width: 100%; height: 100%; }
+.changes { margin: 6px 0 0; padding: 12px 14px; border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; color: var(--ink-2); }
+.changes summary { cursor: pointer; color: var(--ink); font-weight: 500; }
+.changes ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 3px; }
+@media (max-width: 1023px) {
+  .xp-player { flex-direction: column; }
+  .xp-pcol { max-width: none; width: 100%; }
+  .xp-tx { width: 100%; max-width: none; flex: none; }
+  .xp-tx-in { max-height: 420px; }
+}
+
+/* ---------- Learn list ---------- */
+.ll { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px 20px; }
+.ll-card { display: grid; gap: 8px; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.ll-card .mini { border-radius: 3px; box-shadow: inset 0 0 0 1px var(--line); }
+.ll-card h3 { margin: 0; font: 400 18px/1.2 var(--read); }
+.ll-card p { margin: 0; color: var(--ink-2); font-size: 12.5px; }
+.ll-card:hover h3 { color: var(--accent); }
+.sectionhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin: 0 0 14px; }
+.sectionhead h2 { margin: 0; font: 400 22px/1.2 var(--read); }
+.sectionhead p { margin: 0; color: var(--ink-2); font-size: 12.5px; }
+
+/* ---------- Library ---------- */
+.lib-search { font: 400 26px/1.2 var(--read); color: var(--ink-3); padding: 6px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; align-items: start; }
+.lib-card { display: grid; gap: 6px; }
+.lib-cover { position: relative; aspect-ratio: 4 / 3; background: var(--board); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.lib-cover.pdf { background: var(--panel); }
+.lib-cover.pdf .pg { position: absolute; left: 12%; top: 10%; right: 12%; bottom: 0; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 22px rgba(34,48,58,.09); padding: 10% 9%; display: grid; align-content: start; gap: 7px; }
+.lib-cover.pdf .pg i { display: block; height: 6px; background: #e3e5e7; }
+.lib-cover.pdf .pg i:first-child { height: 10px; width: 70%; background: #c7cdd2; }
+.lib-cover.note { background: var(--panel); padding: 16px 18px; font: italic 400 19px/1.35 var(--read); color: var(--ink); }
+.lib-cover.photo { background: linear-gradient(180deg, #b49ac9 0%, #a385b8 58%, #6e5371 58%, #6e5371 100%); }
+.lib-cover.photo::before { content: ""; position: absolute; left: 8%; right: 8%; bottom: 28%; height: 34%; background: repeating-linear-gradient(90deg, #3e2a44 0 13%, transparent 13% 20%); border-radius: 40px 40px 0 0 / 40px 40px 0 0; }
+.lib-kind { font-size: 12px; color: var(--ink-2); }
+.lib-card h3 { margin: 0; font-size: 14.5px; font-weight: 500; }
+.lib-card p { margin: 0; color: var(--ink-2); font-size: 12.5px; line-height: 1.45; }
+.lib-acts { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+
+/* ---------- Dialog (graph.css .graph-dialog) ---------- */
+.overlay { position: fixed; inset: 0; z-index: 40; background: var(--scrim-dialog); animation: xp-fade var(--dur-quick) var(--ease-entrance); }
+.dialog { position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 5px; box-shadow: var(--shadow-float); padding: 22px; font-size: 13px; }
+.dialog h2 { font: 400 22px/1.2 var(--read); margin: 0 0 8px; text-wrap: balance; }
+.dialog .note { margin: 0 0 14px; color: var(--ink-2); line-height: 1.5; }
+.field { display: grid; gap: 6px; margin-bottom: 12px; }
+.field-label { font-size: 13px; font-weight: 500; }
+.field-control { width: 100%; min-height: 36px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); color: var(--ink); font: inherit; font-size: 13px; }
+.field-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.pages { display: flex; align-items: center; gap: 8px; }
+.pages .field-control { width: 80px; }
+.explain-opt { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 2px 10px; padding: 10px 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; }
+.explain-opt:hover { background: var(--hover-fill); }
+.explain-opt[data-on="true"] { box-shadow: inset 0 0 0 1px var(--accent); }
+.explain-opt input { grid-row: 1 / 3; width: 16px; height: 16px; margin: 1px 0 0; accent-color: var(--accent); }
+.explain-opt b { font-size: 13.5px; font-weight: 500; }
+.explain-opt small { grid-column: 2; color: var(--ink-2); font-size: 12.5px; line-height: 1.45; }
+.dialog .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-top: 16px; }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-float); font-size: 13px; max-width: calc(100vw - 32px); }
+.toast i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: breathe 1.4s ease-in-out infinite; flex: none; }
+@keyframes breathe { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+/* ---------- Graph + copilot (copilot.css) ---------- */
+.graphwrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); gap: 20px; align-items: start; }
+.map { min-width: 0; }
+.map svg { width: 100%; height: auto; display: block; }
+.map text { font-family: var(--read); fill: var(--ink); }
+.cp { background: var(--panel); border-radius: 10px; box-shadow: var(--shadow-float); display: flex; flex-direction: column; min-width: 0; }
+.cp-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.cp-body { padding: 14px 16px 16px; display: grid; gap: 14px; font-size: 13px; }
+.msg.user { display: flex; justify-content: flex-end; }
+.msg.user p { margin: 0; max-width: 85%; background: var(--hover-fill); padding: 8px 12px; border-radius: 14px 14px 4px 14px; font-size: 13.5px; }
+.who { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-2); margin: 0 0 4px; }
+.who .avs { width: 18px; height: 18px; border-radius: 5px; background: var(--ink); color: var(--on-ink); font: 11px/1 var(--read); display: grid; place-items: center; }
+.msg.ai .txt { font: 15.5px/1.5 var(--read); }
+.msg.ai .txt p { margin: 0 0 8px; }
+.cp-card { margin: 6px 0 0; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); padding: 12px; font-size: 13px; line-height: 1.5; }
+.cp-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 6px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.cp-tag { font-size: 10.5px; font-weight: 600; letter-spacing: .04em; padding: 2px 7px; border-radius: 10px; background: var(--ghost-soft); color: var(--ghost-ink); }
+.cp-req { margin: 0; font: 15px/1.45 var(--read); }
+.cp-card .acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+.cp-card .acts .button { min-height: 0; padding: 6px 11px; font-size: 12.5px; border-radius: 3px; }
+.cp-card .note { font-size: 12px; color: var(--ink-2); margin: 8px 0 0; }
+.cp-bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 10px; }
+.cp-bar i { display: block; height: 100%; width: 0; background: var(--accent); animation: cp-xbar 2.2s cubic-bezier(0.1, 0.6, 0.3, 1) forwards; }
+@keyframes cp-xbar { to { width: 100%; } }
+.cp-mini { margin-top: 10px; container-type: inline-size; }
+.cp-mini .xp-box { border-radius: 4px; }
+.cp-mini .xp-caption { font-size: max(11px, 3.6cqw); bottom: 6px; max-width: calc(100% - 12px); }
+.plan-title { margin: 0 0 4px; font: 600 15px/1.35 var(--read); }
+.plan-sub { margin: 0 0 8px; color: var(--ink-2); font-size: 12px; }
+.plan { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.plan li { display: grid; grid-template-columns: 16px 16px minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; padding: 5px 6px; border-radius: 4px; }
+.plan li input { margin: 0; accent-color: var(--accent); }
+.plan li .n { color: var(--ink-2); font-size: 12px; }
+.plan li b { font-weight: 600; font-size: 13px; }
+.plan li .k { font-size: 11.5px; color: var(--ink-2); }
+.plan li small { grid-column: 3 / 5; color: var(--ink-2); font-size: 12px; }
+.composer { margin-top: 4px; display: flex; gap: 8px; }
+.composer input { flex: 1; min-width: 0; }
+@media (max-width: 900px) { .graphwrap { grid-template-columns: minmax(0, 1fr); } .map { display: none; } }
+
+/* ---------- Board lab ---------- */
+.lab { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 20px; align-items: start; }
+.panel { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel h2 { margin: 0; font: 400 20px/1.2 var(--read); }
+.panel p { margin: 0; color: var(--ink-2); font-size: 13px; }
+textarea.code { width: 100%; min-width: 0; height: 420px; font: 12.5px/1.55 var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 10px; resize: vertical; white-space: pre; overflow: auto; }
+textarea.idea { width: 100%; height: 88px; font: 14px/1.45 var(--ui); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 10px; resize: vertical; }
+.problems { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 12.5px; }
+.problems li { padding: 6px 10px; border-radius: 4px; background: var(--paper); border-left: 3px solid var(--ink-3); }
 .problems li.err { border-left-color: var(--warn); }
 .problems li.ok { border-left-color: var(--ok); }
-.note { font-size: 13px; color: var(--muted); margin: 0; }
-.status { font-size: 13px; color: var(--muted); min-height: 1.5em; margin: 0; }
-
-/* Reference */
-.ref { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
-.ref h2 { margin: 0; font: 500 22px/1.2 var(--f-read); text-wrap: balance; }
-.ref p { margin: 0; max-width: 72ch; color: var(--muted); }
-.ref .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
-.tbl { overflow-x: auto; }
-table { border-collapse: collapse; font-size: 13px; width: 100%; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
-th { font-weight: 600; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
-code { font: 12.5px var(--f-mono); }
-pre { margin: 0; padding: 12px; background: var(--bg); border-radius: 8px; overflow-x: auto; font: 12.5px/1.55 var(--f-mono); }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+.ref table { border-collapse: collapse; font-size: 12.5px; width: 100%; }
+.ref td, .ref th { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ref th { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.ref code, .panel code { font: 12px var(--mono); }
+.tblwrap { overflow-x: auto; }
+@media (max-width: 900px) { .lab { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) {
+  .rail { width: 46px; }
+  .rb { width: 38px; }
+  .xp-ctrl .hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xp-slide, .xp-slide *, .xp-tc *, .overlay, .xp-endbox { animation: none !important; }
+  .xp-pointer { transition: opacity var(--dur-standard) linear; }
+}
 </style>
 
-<div class="wrap">
-  <header>
-    <h1>Lumen Board</h1>
-    <span class="chip">Prototype · board slides</span>
-    <p>The idea is sketched on the stage while the voice explains it. A small dot of ink does the drawing: each mark appears as the narration reaches the word that names it, and the dot comes back to point when the voice returns to something already on the board.</p>
-  </header>
-
-  <div class="desk">
-    <section aria-label="Board player">
-      <div class="stage" id="stageBox">
-        <canvas id="board" width="1280" height="720" aria-label="Whiteboard sketch"></canvas>
-        <div class="mark">Studiolo · Lumen</div>
-        <div class="caption" id="caption" aria-live="off"></div>
-      </div>
-      <div class="controls">
-        <button class="btn play" id="play" aria-label="Play">
-          <svg id="playIcon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
-        </button>
-        <span class="time" id="time">0:00 / 0:00</span>
-        <div class="scrub">
-          <input type="range" id="scrub" min="0" max="1000" step="10" value="0" aria-label="Position">
-          <div class="ticks" id="ticks"></div>
-        </div>
-      </div>
-      <div class="controls opts">
-        <label>Theme <select id="theme">
-          <option value="auto">Match app</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select></label>
-        <label>Speed <select id="speed">
-          <option value="0.75">0.75×</option>
-          <option value="1" selected>1×</option>
-          <option value="1.25">1.25×</option>
-          <option value="1.5">1.5×</option>
-        </select></label>
-        <label><input type="checkbox" id="voice"> Read aloud (browser voice)</label>
-        <label><input type="checkbox" id="dot" checked> Show drawing dot</label>
-      </div>
-      <div class="legend" id="legend"></div>
-    </section>
-
-    <aside class="panel" aria-label="Boards and script">
-      <div class="tabs" role="tablist">
-        <button class="tab" role="tab" id="tab-ex" aria-selected="true" aria-controls="pane-ex">Examples</button>
-        <button class="tab" role="tab" id="tab-script" aria-selected="false" aria-controls="pane-script">Script</button>
-        <button class="tab" role="tab" id="tab-ask" aria-selected="false" aria-controls="pane-ask">Sketch with Claude</button>
-      </div>
-      <div class="pane" id="pane-ex" role="tabpanel" aria-labelledby="tab-ex"></div>
-      <div class="pane" id="pane-script" role="tabpanel" aria-labelledby="tab-script" hidden>
-        <p class="note">This is what the author model writes: a board item and the narration that drives it. Edit it and press Draw.</p>
-        <textarea id="script" spellcheck="false" aria-label="Board script"></textarea>
-        <div class="row">
-          <button class="btn primary" id="draw">Draw</button>
-          <span class="note" id="scriptStat"></span>
-        </div>
-        <ul class="problems" id="problems"></ul>
-      </div>
-      <div class="pane" id="pane-ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
-        <p class="note">Describe an idea. Claude writes a board in the same format and it is sketched for you. This uses your own Claude usage.</p>
-        <textarea id="idea" aria-label="Idea to sketch">Why does a heat pump use less electricity than an electric heater?</textarea>
-        <div class="row">
-          <button class="btn primary" id="ask" disabled>Sketch it</button>
-          <button class="btn" id="stop" hidden>Stop</button>
-        </div>
-        <p class="status" id="askStatus">Checking whether Claude is available here…</p>
-      </div>
-    </aside>
-  </div>
-
-  <section class="ref" aria-labelledby="refTitle">
-    <h2 id="refTitle">How a board is written</h2>
-    <p>A board is one slide. Each line below the three hyphens is one mark: an id, a shape, its numbers on the 1280 × 720 stage, then an optional colour role, options and a label in quotes. Marks stay inside x 64–1216 and y 64–600; the band below is for captions. In the narration, <code>[[b1.cache]]</code> placed before a word starts drawing <code>cache</code> as that word is spoken. A mark with no ref is drawn straight after the one before it. A second ref to a mark sends the drawing dot back to point at it.</p>
-    <div class="cols">
-      <div class="tbl">
-        <table>
-          <thead><tr><th>Shape</th><th>Written as</th></tr></thead>
-          <tbody>
-            <tr><td>box</td><td><code>app box x y w h "App"</code></td></tr>
-            <tr><td>circle, ellipse</td><td><code>sun circle cx cy r</code> · <code>ellipse cx cy rx ry</code></td></tr>
-            <tr><td>poly</td><td><code>roof poly x,y x,y x,y …</code> (closed, convex)</td></tr>
-            <tr><td>diamond</td><td><code>ok diamond cx cy w h "Valid?"</code></td></tr>
-            <tr><td>cyl (store)</td><td><code>db cyl x y w h "Database"</code></td></tr>
-            <tr><td>person</td><td><code>you person x y "You"</code></td></tr>
-            <tr><td>text</td><td><code>t text x y "words" big</code> (left edge, middle)</td></tr>
-            <tr><td>arrow, line</td><td><code>a arrow app db bend 0.2 "80 ms"</code> · ends are ids or <code>x,y</code></td></tr>
-            <tr><td>curve</td><td><code>c curve x,y x,y x,y … arrow "label"</code></td></tr>
-            <tr><td>axes</td><td><code>ax axes x y w h "time" "cost"</code></td></tr>
-            <tr><td>ground</td><td><code>g ground x1 y x2</code></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tbl">
-        <table>
-          <thead><tr><th>Annotation or option</th><th>Written as</th></tr></thead>
-          <tbody>
-            <tr><td>underline, ring</td><td><code>u underline title red</code> · <code>r ring cache green</code></td></tr>
-            <tr><td>highlight, cross</td><td><code>h highlight rule</code> · <code>x cross old</code></td></tr>
-            <tr><td>tick</td><td><code>k tick x y</code> or <code>k tick target</code></td></tr>
-            <tr><td>colour roles</td><td>ink, emphasis (blue), second (purple), third (green), fourth (red), neutral (grey), marker (yellow)</td></tr>
-            <tr><td>options</td><td><code>hatch</code> fill · <code>dash</code> · <code>arrow</code> on a curve · <code>bend n</code> · <code>small</code> <code>big</code> <code>title</code> or <code>size n</code> · <code>center</code></td></tr>
-            <tr><td>header</td><td><code>roles: fourth = the slow trip; third = the fast trip</code> becomes the colour legend</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+<div class="proto" role="region" aria-label="Prototype controls">
+  <b>Prototype</b>
+  <span>Player</span>
+  <span class="seg" role="group" aria-label="Player behaviour">
+    <button type="button" id="mode-today" aria-pressed="false">Today</button>
+    <button type="button" id="mode-proposed" aria-pressed="true">Proposed</button>
+  </span>
+  <span class="hint" id="modeHint"></span>
 </div>
 
-<script type="application/json" id="glyphs">{" ":[378,[]],"!":[88,[[122,684,118,202],[137,25,115,9]]],"\"":[224,[[142,772,139,589,148,561],[243,772,239,583,246,564]]],"#":[677,[[249,605,258,104],[447,630,472,110],[91,444,375,472,665,485],[123,246,400,284,665,309]]],"$":[586,[[561,592,356,583,246,558,151,510,110,460,107,413,135,365,205,346,384,346,510,359,583,340,598,299,583,252,504,205,419,161,296,139,154,132],[318,816,387,-54]]],"%":[639,[[224,621,158,605,142,545,148,510,176,488,249,491,306,523,312,583,284,608,224,621],[595,671,230,16],[523,151,501,88,523,38,570,35,617,41,674,85,674,135,652,161,598,167,523,151]]],"&":[728,[[750,309,690,233,605,164,488,88,375,32,271,3,186,6,142,28,145,91,170,145,334,362,400,482,416,548,425,617,410,665,381,687,337,680,280,649,239,598,220,554,217,466,233,397,277,331,315,284,391,214,498,123,602,66,662,41,687,41]]],"'":[142,[[148,611,107,479]]],"(":[299,[[299,813,230,734,173,624,135,517,113,400,104,299,123,192,161,66,217,-35]]],")":[353,[[113,788,208,709,268,611,321,485,343,381,346,287,331,195,293,113,265,60,195,-19]]],"*":[536,[[324,419,410,668,372,428,573,488,365,397,416,154,315,359,176,167,290,406,135,529,324,444]]],"+":[551,[[306,479,318,306,337,126,346,54],[101,255,192,274,302,293,422,309,558,312]]],",":[167,[[158,50,113,-50,85,-88]]],"-":[318,[[110,233,227,252,309,261]]],".":[110,[[98,9,113,13]]],"/":[488,[[532,674,410,482,334,353,271,261,195,145,104,6]]],"0":[646,[[400,668,466,662,548,627,611,551,643,466,658,369,643,246,598,148,517,60,428,19,293,9,180,41,120,104,94,183,110,324,148,450,214,567,271,627,337,665,400,668]]],"1":[239,[[173,671,154,16]]],"2":[551,[[117,558,186,617,258,658,346,680,397,680,447,646,466,595,457,523,432,450,375,340,299,217,208,107,129,19,230,19,356,32,463,54,561,79]]],"3":[523,[[101,608,139,614,268,658,362,674,441,677,488,668,513,633,510,580,479,529,391,454,280,378,186,328,309,378,416,394,485,369,513,328,510,265,457,183,372,104,284,47,176,9,139,3]]],"4":[517,[[432,0,428,532,419,639,394,674,324,621,164,416,101,328,406,340,539,362]]],"5":[548,[[580,668,447,627,318,592,230,583,126,573,132,677,110,331,180,337,299,359,413,362,495,353,554,293,564,217,545,151,469,91,372,47,261,22,113,9,113,38]]],"6":[671,[[438,668,356,643,280,586,211,504,161,432,126,334,123,233,139,161,195,82,277,28,337,9,406,6,498,16,595,66,662,145,680,192,677,249,652,287,598,290,513,255,425,186,369,139,318,88,284,47]]],"7":[567,[[98,636,246,639,422,671,576,687,520,621,444,472,384,340,353,208,337,132,331,47]]],"8":[658,[[397,668,293,621,233,561,211,488,224,432,268,394,328,378,419,406,476,422,564,432,649,397,706,315,699,224,633,123,545,54,444,16,321,9,227,28,151,101,139,173,164,239,217,306,284,362,324,381,532,432,611,485,665,529,671,586,646,633,608,658,510,680,397,668]]],"9":[532,[[576,454,454,422,353,406,249,400,167,416,120,447,117,498,145,558,239,630,340,662,435,671,495,643,542,595,573,523,570,400,545,302,504,205,444,107,375,47,318,19]]],":":[161,[[120,343,142,340],[164,117,183,117]]],";":[91,[[94,331,110,331],[117,60,91,-57,72,-110,50,-151]]],"<":[504,[[463,441,265,284,195,224,268,167,391,117,438,98,476,79]]],"=":[498,[[132,299,438,337],[139,158,334,186,460,208]]],">":[498,[[158,419,268,378,346,343,460,306,410,258,331,198,268,151,176,82]]],"?":[517,[[94,646,195,668,306,680,384,680,466,655,520,621,536,576,529,526,485,482,428,438,321,365,214,315,236,290,299,277,353,277],[321,19,346,19]]],"@":[1137,[[718,472,639,485,513,447,457,391,441,346,447,296,491,271,567,293,646,346,690,387,718,435,756,378,810,346,879,356,936,387,951,425,945,501,901,580,838,630,706,680,551,684,419,646,321,589,249,523,189,432,142,337,126,224,167,117,265,47,387,13,513,-3,662,9,825,38,958,79,1062,135,1137,205]]],"A":[674,[[107,3,227,318,302,526,356,671,372,668,432,570,520,391,583,233,639,94,687,9],[195,243,312,268,447,309,561,331,668,356]]],"B":[756,[[135,655,139,369,151,192,173,6,334,19,504,57,639,110,734,170,750,230,728,293,639,343,545,356,438,369,315,359,180,346,372,397,495,450,580,501,608,551,602,605,570,630,491,665,378,684,265,687,94,677]]],"C":[747,[[580,646,542,680,447,693,328,655,220,580,154,485,120,403,104,312,101,217,151,129,214,63,290,28,391,16,513,35,611,85,696,151,756,202]]],"D":[684,[[123,674,126,0,217,13,328,47,444,107,539,173,614,249,674,337,693,410,684,491,617,570,507,630,400,658,290,665,208,655,126,636]]],"E":[621,[[539,668,129,655,126,309,548,356,129,309,142,22,627,54]]],"F":[734,[[759,662,542,649,394,624,258,611,154,589,135,680,167,529,195,372,195,284,132,255,252,302,482,340,693,375,249,302,195,277,192,9]]],"G":[747,[[548,680,457,671,359,624,287,561,230,501,170,394,129,280,123,176,142,101,189,47,280,9,375,25,488,79,561,132,617,186,630,211,636,403,331,350,743,419,639,400,639,-44]]],"H":[602,[[154,677,142,343,142,189,164,0,145,328,91,309,220,334,365,350,548,359,548,674,545,280,558,129,573,50,592,13]]],"I":[107,[[129,671,126,410,123,277,126,164,126,22]]],"J":[548,[[532,671,539,309,532,173,510,88,479,44,416,19,340,22,268,35,183,63,126,107,88,145,82,173]]],"K":[605,[[142,655,126,422,123,268,123,9],[595,665,428,536,315,450,198,387,145,346,126,265,239,220,387,154,498,101,586,44,627,19]]],"L":[617,[[148,671,148,665,151,391,151,227,142,85,139,28,340,28,627,22]]],"M":[841,[[113,28,145,346,170,573,192,662,211,668,255,636,331,482,410,331,479,189,523,252,639,469,743,671,765,655,788,564,810,410,835,246,860,13]]],"N":[655,[[120,28,129,243,132,428,132,627,148,658,255,542,381,378,545,167,633,47,636,164,636,391,633,677]]],"O":[693,[[403,677,321,662,233,605,164,520,110,410,104,280,148,145,217,79,293,38,400,28,532,41,639,113,706,230,709,350,693,466,630,564,592,617,532,652,460,677,403,677]]],"P":[677,[[145,28,145,205,154,450,161,551,189,621,277,665,413,687,548,684,665,639,699,602,696,526,655,463,564,406,450,372,343,356,151,350]]],"Q":[762,[[633,107,677,158,712,265,724,403,702,523,627,611,510,668,403,665,306,624,239,558,173,463,139,353,113,246,145,117,217,50,302,6,403,-9,488,3,561,32,643,98,747,32,586,142,441,274,422,277]]],"R":[693,[[123,665,132,353,139,22,148,422,129,605,230,665,350,684,447,671,523,668,580,655,614,621,624,580,573,539,482,504,397,466,302,435,145,387,139,362,255,299,346,236,485,154,699,13,721,9]]],"S":[674,[[630,665,501,643,369,608,249,573,198,532,173,501,164,472,189,428,321,384,444,340,570,290,639,252,680,217,677,183,624,120,501,57,356,9,249,3,173,13,129,35,113,66]]],"T":[652,[[76,671,268,662,438,652,605,652,684,671],[331,652,309,337,299,170,299,28]]],"U":[580,[[148,655,110,441,91,277,91,173,129,85,176,32,290,22,400,72,488,154,542,306,567,438,561,662,561,25]]],"V":[633,[[85,662,365,44,403,38,526,350,668,671]]],"W":[1017,[[110,671,372,32,450,211,598,551,639,510,709,400,819,176,895,35,945,176,989,369,1040,662]]],"X":[639,[[104,668,284,422,510,186,665,44],[649,684,419,391,261,202,132,35,123,32]]],"Y":[536,[[110,671,180,608,274,501,416,346,536,671,567,699,539,671,403,299,315,19]]],"Z":[658,[[123,668,684,671,602,545,384,284,192,57,173,35,274,9,384,6,709,25]]],"[":[450,[[375,847,123,788,139,328,170,-63,438,-22]]],"\\":[517,[[85,589,277,315,416,132,523,13]]],"]":[576,[[101,765,249,794,422,816,479,822,488,510,498,296,507,57,513,-50,416,-72,299,-85,205,-91]]],"^":[293,[[104,340,129,391,217,454,274,419,340,346]]],"_":[740,[[142,3,306,32,479,44,731,66]]],"`":[142,[[104,605,170,551]]],"a":[532,[[536,277,479,151,387,66,321,28,258,6,170,16,123,47,110,145,158,243,220,337,321,406,397,441,454,441,523,428,536,381,548,3]]],"b":[589,[[145,671,151,41,198,22,280,38,403,88,554,208,614,312,636,394,617,438,570,457,460,447,362,381,255,306,158,167]]],"c":[602,[[536,416,504,444,410,454,309,416,224,353,132,233,104,107,164,35,287,-3,419,3,513,25,614,79]]],"d":[558,[[554,652,539,387,532,217,539,79,542,19,536,183,444,85,296,19,192,13,120,54,98,161,151,265,280,353,397,372,485,359,542,299]]],"e":[532,[[139,296,265,299,410,302,504,318,520,353,507,387,425,460,321,460,227,425,161,365,113,243,98,170,94,120,148,50,236,6,337,13,444,38,520,76,548,110]]],"f":[602,[[611,542,523,636,419,684,350,690,268,636,230,551,230,460,246,375,280,183,293,25,268,255,82,227,435,274,598,296]]],"g":[551,[[554,261,488,148,369,54,239,6,148,6,120,54,158,173,252,315,359,403,428,438,498,428,554,384,570,-63,558,-214,523,-309,479,-372,438,-406,384,-416,343,-419,230,-416]]],"h":[517,[[139,668,129,356,139,6,164,271,243,372,334,428,416,425,472,378,529,271,539,167,542,28]]],"i":[252,[[180,636,198,636],[205,447,214,44,233,25]]],"j":[167,[[72,633,88,655],[94,491,94,312,107,104,117,-195,107,-312,76,-359,38,-372,9,-372,-72,-353,-123,-312]]],"k":[501,[[91,674,110,293,110,13,117,246,205,321,432,472,126,258,246,170,517,22]]],"l":[202,[[167,690,176,249,183,41]]],"m":[847,[[123,463,129,3,167,318,230,413,340,460,406,463,450,435,485,350,472,3,507,324,583,410,690,460,781,460,838,435,850,356,854,208,860,13]]],"n":[485,[[91,450,94,19,91,324,208,400,321,454,394,460,447,454,482,416,507,306,504,9]]],"o":[554,[[346,469,220,413,154,318,110,224,132,98,173,28,306,6,416,35,529,107,592,224,570,369,520,425,463,460,346,469]]],"p":[517,[[107,441,113,-378,110,378,224,441,353,469,498,447,545,378,536,271,491,198,400,120,306,72,117,25]]],"q":[517,[[526,406,498,454,428,463,302,413,211,328,148,227,117,135,126,50,208,3,299,9,406,57,463,113,501,180,529,353,545,-406]]],"r":[523,[[129,469,117,16,148,271,224,369,321,425,400,457,435,460,539,450,551,441]]],"s":[466,[[501,428,469,460,375,460,268,438,170,387,129,321,129,249,170,217,261,217,359,236,422,233,472,214,504,186,495,139,397,63,271,28,198,0,167,3]]],"t":[419,[[277,671,293,6,284,378,91,378,450,381]]],"u":[501,[[135,460,110,315,101,148,139,50,217,9,350,19,425,66,466,85,507,142,536,202,513,472,545,13]]],"v":[539,[[123,466,337,57,362,16,425,167,561,450]]],"w":[775,[[110,460,180,236,249,98,296,25,315,38,403,312,419,372,460,343,621,47,662,22,806,457]]],"x":[485,[[104,447,321,214,523,13,315,214,485,447,321,211,195,69,126,3]]],"y":[589,[[113,425,438,-38,617,435,290,-425]]],"z":[504,[[120,454,132,454,520,450,539,435,438,321,255,158,145,50,135,19,239,19,532,19,558,9]]],"{":[350,[[419,822,369,819,312,788,280,731,271,655,277,526,271,507,189,438,161,403,158,362,176,318,255,258,299,220,302,94,321,-13,365,-69,416,-98,463,-104]]],"|":[139,[[139,715,148,-38]]],"}":[413,[[154,822,233,803,284,753,299,621,287,498,369,447,425,400,438,356,406,331,284,236,287,139,277,25,239,-41,192,-76,110,-101]]],"~":[450,[[110,284,148,343,192,375,227,375,280,337,346,284,397,293,438,309,491,387]]]}</script>
+<div class="shell">
+  <nav class="rail" aria-label="Studiolo">
+    <span class="logo" aria-hidden="true">S</span>
+    <button class="rb" data-go="learn" title="Learn" aria-label="Learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2 9.5 12 5l10 4.5L12 14z"/><path d="M6 11.5V16c3.5 2.6 8.5 2.6 12 0v-4.5"/></svg></button>
+    <button class="rb" data-go="library" title="Library" aria-label="Library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 4v16M9 4v16M13.5 4.5l5 15"/></svg></button>
+    <button class="rb" data-go="graph" title="Graph and copilot" aria-label="Graph and copilot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="9" y="3" width="6" height="5"/><rect x="3" y="16" width="6" height="5"/><rect x="15" y="16" width="6" height="5"/><path d="M12 8v4M6 16v-4h12v4"/></svg></button>
+    <button class="rb" data-go="lab" title="Board lab (prototype only)" aria-label="Board lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c3-1 4-4 7-4s3 2 6 1"/><path d="m14 4 6 6-8 8H6v-6z"/></svg></button>
+    <span class="grow"></span>
+    <button class="rb" id="themeBtn" title="Theme" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+    <span class="av" aria-hidden="true">S</span>
+  </nav>
 
+  <main class="page">
+    <!-- Learn list -->
+    <section id="screen-learn" aria-label="Learn">
+      <p class="crumb"><span class="cur">Learn</span></p>
+      <div class="tabs"><a class="on">Lumens</a><a>Courses</a></div>
+      <div class="sectionhead"><h2>Lumens made for you</h2><p id="posterNote"></p></div>
+      <div class="ll" id="learnList"></div>
+    </section>
+
+    <!-- Player -->
+    <section id="screen-player" aria-label="Lumen player" hidden>
+      <div class="headrow">
+        <p class="crumb"><a data-go="learn">Learn</a> / <a data-go="learn">Lumens</a> / <span class="cur" id="crumbTitle"></span></p>
+        <button class="button button-quiet button-sm" type="button" id="shareBtn">Share</button>
+      </div>
+      <div class="xp-player">
+        <div class="xp-pcol">
+          <div class="xp-screen" id="screenBox">
+            <div class="xp-box" id="stageBox">
+              <div class="xp-stage" id="stage">
+                <div class="xp-watermark" id="watermark"><span class="xp-mark">S</span></div>
+                <div class="xp-pointer" id="pointer" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M2 2v21l5.6-5.2 3.7 8.6 3.6-1.6-3.7-8.4H19z"/></svg></div>
+              </div>
+              <div class="xp-overlay">
+                <div class="xp-caption" id="caption" data-visible="false"></div>
+                <div class="xp-paused" id="pausedGlyph" hidden><span><svg viewBox="0 0 16 16"><path d="M3 1.5v13l11-6.5z" fill="currentColor"/></svg></span></div>
+              </div>
+              <div class="xp-endbox" id="endbox" hidden>
+                <div class="xp-endbox-card">
+                  <h2>What would you like next?</h2>
+                  <div class="xp-asks" id="endAsks"></div>
+                  <div><button class="button button-quiet button-sm" type="button" id="replayBtn">Watch again</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="xp-ctrl">
+            <button class="xp-ib xp-ib-play" id="playBtn" aria-label="Play"><svg viewBox="0 0 16 16" id="playIcon"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg></button>
+            <button class="xp-ib hide-sm" id="backBtn" aria-label="Back 10 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></button>
+            <button class="xp-ib hide-sm" id="fwdBtn" aria-label="Forward 10 seconds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4h-4"/></svg></button>
+            <button class="xp-ib" id="voiceBtn" aria-label="Turn on the browser voice" title="Read aloud with the browser voice (stand-in for ElevenLabs)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" id="voiceIcon"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="m17 9 4 6m0-6-4 6" stroke-linecap="round"/></svg></button>
+            <div class="xp-scrub" id="scrub" role="slider" tabindex="0" aria-label="Position" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><span class="t"></span><span class="f" id="scrubFill"></span><span id="scrubTicks"></span><span class="n" id="scrubKnob"></span><div class="xp-scrub-tip" id="scrubTip" hidden></div></div>
+            <span class="xp-tm" id="time">0:00 / 0:00</span>
+            <button class="xp-spd" id="speedBtn" aria-label="Speed">1×</button>
+            <button class="xp-ib" id="ccBtn" aria-label="Captions" data-on="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3" stroke-linecap="round"/></svg></button>
+            <button class="xp-ib hide-sm" id="txBtn" aria-label="Transcript" data-on="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 11h16M4 16h10"/></svg></button>
+            <button class="xp-ib hide-sm" id="fsBtn" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          </div>
+          <div class="xp-meta">
+            <h1 id="metaTitle"></h1>
+            <p class="xp-meta-source" id="metaSource"></p>
+            <p class="xp-meta-line" id="metaLine"></p>
+            <div class="xp-legend" id="legend"></div>
+            <p class="xp-ask-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg> Ask about this</p>
+            <div class="xp-asks" id="asks"></div>
+            <details class="changes" id="changes">
+              <summary>What the proposed player changes</summary>
+              <ul>
+                <li><b>Board slides</b>: sketches drawn stroke by stroke as the voice names each part, with a small ink dot instead of the cursor.</li>
+                <li><b>Builds with the voice</b>: list items, table rows and cards stay dim until they are spoken.</li>
+                <li><b>Fills the frame</b>: sparse slides sit in the middle of the stage instead of the top.</li>
+                <li><b>Crossfade</b> between slides, with the title arriving before the body.</li>
+                <li><b>Phrase captions</b>: about twelve words at a time instead of the whole say.</li>
+                <li><b>Cursor fix</b>: it jumps to its first point on a new slide instead of flying in from the corner.</li>
+                <li><b>Scrubber chapters</b>: hover shows the slide title; , and . step between slides.</li>
+                <li><b>Paused state</b> on the stage, and <b>posters</b> in Learn that show a real slide.</li>
+              </ul>
+            </details>
+          </div>
+        </div>
+        <aside class="xp-tx" id="txPanel">
+          <div class="xp-tx-in">
+            <div class="xp-tx-tabs" role="tablist">
+              <button class="xp-tx-tab" role="tab" aria-selected="true" id="tab-tx">Transcript</button>
+              <button class="xp-tx-tab" role="tab" aria-selected="false" id="tab-sl">Slides</button>
+            </div>
+            <div class="xp-tx-body" id="txBody"></div>
+            <div class="xp-tx-body" id="slBody" hidden><div class="xp-thumbs" id="thumbs"></div></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Library -->
+    <section id="screen-library" aria-label="Library" hidden>
+      <p class="crumb"><span class="cur">Library</span> / 4 entries</p>
+      <div class="tabs"><a class="on">Everything</a><a>Collections</a><a>To read</a></div>
+      <div class="lib-search">Search your library (title, creator, topic, text)…</div>
+      <div class="lib" id="libGrid"></div>
+    </section>
+
+    <!-- Graph + copilot -->
+    <section id="screen-graph" aria-label="Graph and copilot" hidden>
+      <p class="crumb"><span class="cur">Graph</span></p>
+      <div class="tabs"><a class="on">Map</a><a>List</a><a>Overview</a></div>
+      <div class="graphwrap">
+        <div class="map" aria-hidden="true"><svg viewBox="0 0 600 460" id="mapSvg"></svg></div>
+        <div class="cp" aria-label="Copilot">
+          <div class="cp-head">Studiolo · Construction Law</div>
+          <div class="cp-body" id="thread"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Board lab -->
+    <section id="screen-lab" aria-label="Board lab" hidden>
+      <p class="crumb"><span class="cur">Board lab</span> <span class="newtag">Prototype only</span></p>
+      <div class="lab">
+        <div class="panel">
+          <h2>Lumen source</h2>
+          <p>What the author model writes: items, say blocks with refs, and board items. Edit it and play it in the Learn player.</p>
+          <div class="pages"><label class="field-label" for="labPick">Start from</label><select class="field-control" id="labPick" style="width:auto"></select></div>
+          <textarea class="code" id="labSrc" spellcheck="false" aria-label="Lumen source"></textarea>
+          <div class="lib-acts"><button class="button" type="button" id="labPlay">Play in Learn</button><span class="lib-kind" id="labStat"></span></div>
+          <ul class="problems" id="labProblems"></ul>
+        </div>
+        <div style="display:grid;gap:20px;min-width:0">
+          <div class="panel">
+            <h2>Sketch with Claude</h2>
+            <p>Describe an idea. Claude writes one board and its narration, the way a short "Draw it" answer would be made, and it plays in the Learn player. This uses your own Claude usage.</p>
+            <textarea class="idea" id="idea" aria-label="Idea to draw">How does a leasehold differ from a freehold?</textarea>
+            <div class="lib-acts"><button class="button" type="button" id="askBtn" disabled>Draw it</button><button class="button button-quiet" type="button" id="stopBtn" hidden>Stop</button></div>
+            <p id="askStatus">Checking whether Claude is available here…</p>
+          </div>
+          <div class="panel ref">
+            <h2>Board marks</h2>
+            <p>One line per mark: id, shape, numbers on the 1280 × 720 stage, colour role, options, "label". Marks stay in x 64–1216, y 64–600.</p>
+            <div class="tblwrap"><table>
+              <thead><tr><th>Shape</th><th>Written as</th></tr></thead>
+              <tbody>
+                <tr><td>box, cyl</td><td><code>app box x y w h "App"</code></td></tr>
+                <tr><td>circle, ellipse</td><td><code>c circle cx cy r</code></td></tr>
+                <tr><td>diamond, poly</td><td><code>roof poly x,y x,y x,y</code></td></tr>
+                <tr><td>person, text</td><td><code>t text x y "words" small</code></td></tr>
+                <tr><td>arrow, line</td><td><code>a arrow app db bend 0.2 "80 ms"</code></td></tr>
+                <tr><td>curve, axes, ground</td><td><code>c curve x,y x,y … arrow</code></td></tr>
+                <tr><td>annotations</td><td><code>underline</code> <code>ring</code> <code>highlight</code> <code>cross</code> <code>tick</code> + an earlier id</td></tr>
+                <tr><td>options</td><td>emphasis, second, third, fourth, neutral, marker · hatch · dash · small · big · size n</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" id="dlgScrim" hidden></div>
+<div class="dialog" id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgTitle" hidden>
+  <h2 id="dlgTitle"></h2>
+  <p class="note" id="dlgNote"></p>
+  <div class="field" id="dlgPagesField">
+    <span class="field-label">Pages</span>
+    <span class="pages"><input class="field-control" id="pFrom" value="12" inputmode="numeric" aria-label="From page"> to <input class="field-control" id="pTo" value="18" inputmode="numeric" aria-label="To page"></span>
+  </div>
+  <div class="field">
+    <label class="field-label" for="dlgFocus">Focus on… (optional)</label>
+    <input class="field-control" id="dlgFocus" placeholder="A part of it you want to understand">
+  </div>
+  <label class="explain-opt" id="dlgDrawOpt" data-on="true">
+    <input type="checkbox" id="dlgDraw" checked>
+    <b>Draw it as it explains <span class="newtag">Proposed</span></b>
+    <small>Sketches how the parts relate on a board when that helps. Labels are checked against the pages.</small>
+  </label>
+  <div class="row"><button class="button button-quiet" type="button" id="dlgCancel">Cancel</button><button class="button" type="button" id="dlgGo">Explain</button></div>
+</div>
+<div class="toast" id="toast" hidden><i></i><span id="toastText"></span></div>
+
+<script type="application/json" id="glyphs">{" ":[378,[]],"!":[88,[[122,684,118,202],[137,25,115,9]]],"\"":[224,[[142,772,139,589,148,561],[243,772,239,583,246,564]]],"#":[677,[[249,605,258,104],[447,630,472,110],[91,444,375,472,665,485],[123,246,400,284,665,309]]],"$":[586,[[561,592,356,583,246,558,151,510,110,460,107,413,135,365,205,346,384,346,510,359,583,340,598,299,583,252,504,205,419,161,296,139,154,132],[318,816,387,-54]]],"%":[639,[[224,621,158,605,142,545,148,510,176,488,249,491,306,523,312,583,284,608,224,621],[595,671,230,16],[523,151,501,88,523,38,570,35,617,41,674,85,674,135,652,161,598,167,523,151]]],"&":[728,[[750,309,690,233,605,164,488,88,375,32,271,3,186,6,142,28,145,91,170,145,334,362,400,482,416,548,425,617,410,665,381,687,337,680,280,649,239,598,220,554,217,466,233,397,277,331,315,284,391,214,498,123,602,66,662,41,687,41]]],"'":[142,[[148,611,107,479]]],"(":[299,[[299,813,230,734,173,624,135,517,113,400,104,299,123,192,161,66,217,-35]]],")":[353,[[113,788,208,709,268,611,321,485,343,381,346,287,331,195,293,113,265,60,195,-19]]],"*":[536,[[324,419,410,668,372,428,573,488,365,397,416,154,315,359,176,167,290,406,135,529,324,444]]],"+":[551,[[306,479,318,306,337,126,346,54],[101,255,192,274,302,293,422,309,558,312]]],",":[167,[[158,50,113,-50,85,-88]]],"-":[318,[[110,233,227,252,309,261]]],".":[110,[[98,9,113,13]]],"/":[488,[[532,674,410,482,334,353,271,261,195,145,104,6]]],"0":[646,[[400,668,466,662,548,627,611,551,643,466,658,369,643,246,598,148,517,60,428,19,293,9,180,41,120,104,94,183,110,324,148,450,214,567,271,627,337,665,400,668]]],"1":[239,[[173,671,154,16]]],"2":[551,[[117,558,186,617,258,658,346,680,397,680,447,646,466,595,457,523,432,450,375,340,299,217,208,107,129,19,230,19,356,32,463,54,561,79]]],"3":[523,[[101,608,139,614,268,658,362,674,441,677,488,668,513,633,510,580,479,529,391,454,280,378,186,328,309,378,416,394,485,369,513,328,510,265,457,183,372,104,284,47,176,9,139,3]]],"4":[517,[[432,0,428,532,419,639,394,674,324,621,164,416,101,328,406,340,539,362]]],"5":[548,[[580,668,447,627,318,592,230,583,126,573,132,677,110,331,180,337,299,359,413,362,495,353,554,293,564,217,545,151,469,91,372,47,261,22,113,9,113,38]]],"6":[671,[[438,668,356,643,280,586,211,504,161,432,126,334,123,233,139,161,195,82,277,28,337,9,406,6,498,16,595,66,662,145,680,192,677,249,652,287,598,290,513,255,425,186,369,139,318,88,284,47]]],"7":[567,[[98,636,246,639,422,671,576,687,520,621,444,472,384,340,353,208,337,132,331,47]]],"8":[658,[[397,668,293,621,233,561,211,488,224,432,268,394,328,378,419,406,476,422,564,432,649,397,706,315,699,224,633,123,545,54,444,16,321,9,227,28,151,101,139,173,164,239,217,306,284,362,324,381,532,432,611,485,665,529,671,586,646,633,608,658,510,680,397,668]]],"9":[532,[[576,454,454,422,353,406,249,400,167,416,120,447,117,498,145,558,239,630,340,662,435,671,495,643,542,595,573,523,570,400,545,302,504,205,444,107,375,47,318,19]]],":":[161,[[120,343,142,340],[164,117,183,117]]],";":[91,[[94,331,110,331],[117,60,91,-57,72,-110,50,-151]]],"<":[504,[[463,441,265,284,195,224,268,167,391,117,438,98,476,79]]],"=":[498,[[132,299,438,337],[139,158,334,186,460,208]]],">":[498,[[158,419,268,378,346,343,460,306,410,258,331,198,268,151,176,82]]],"?":[517,[[94,646,195,668,306,680,384,680,466,655,520,621,536,576,529,526,485,482,428,438,321,365,214,315,236,290,299,277,353,277],[321,19,346,19]]],"@":[1137,[[718,472,639,485,513,447,457,391,441,346,447,296,491,271,567,293,646,346,690,387,718,435,756,378,810,346,879,356,936,387,951,425,945,501,901,580,838,630,706,680,551,684,419,646,321,589,249,523,189,432,142,337,126,224,167,117,265,47,387,13,513,-3,662,9,825,38,958,79,1062,135,1137,205]]],"A":[674,[[107,3,227,318,302,526,356,671,372,668,432,570,520,391,583,233,639,94,687,9],[195,243,312,268,447,309,561,331,668,356]]],"B":[756,[[135,655,139,369,151,192,173,6,334,19,504,57,639,110,734,170,750,230,728,293,639,343,545,356,438,369,315,359,180,346,372,397,495,450,580,501,608,551,602,605,570,630,491,665,378,684,265,687,94,677]]],"C":[747,[[580,646,542,680,447,693,328,655,220,580,154,485,120,403,104,312,101,217,151,129,214,63,290,28,391,16,513,35,611,85,696,151,756,202]]],"D":[684,[[123,674,126,0,217,13,328,47,444,107,539,173,614,249,674,337,693,410,684,491,617,570,507,630,400,658,290,665,208,655,126,636]]],"E":[621,[[539,668,129,655,126,309,548,356,129,309,142,22,627,54]]],"F":[734,[[759,662,542,649,394,624,258,611,154,589,135,680,167,529,195,372,195,284,132,255,252,302,482,340,693,375,249,302,195,277,192,9]]],"G":[747,[[548,680,457,671,359,624,287,561,230,501,170,394,129,280,123,176,142,101,189,47,280,9,375,25,488,79,561,132,617,186,630,211,636,403,331,350,743,419,639,400,639,-44]]],"H":[602,[[154,677,142,343,142,189,164,0,145,328,91,309,220,334,365,350,548,359,548,674,545,280,558,129,573,50,592,13]]],"I":[107,[[129,671,126,410,123,277,126,164,126,22]]],"J":[548,[[532,671,539,309,532,173,510,88,479,44,416,19,340,22,268,35,183,63,126,107,88,145,82,173]]],"K":[605,[[142,655,126,422,123,268,123,9],[595,665,428,536,315,450,198,387,145,346,126,265,239,220,387,154,498,101,586,44,627,19]]],"L":[617,[[148,671,148,665,151,391,151,227,142,85,139,28,340,28,627,22]]],"M":[841,[[113,28,145,346,170,573,192,662,211,668,255,636,331,482,410,331,479,189,523,252,639,469,743,671,765,655,788,564,810,410,835,246,860,13]]],"N":[655,[[120,28,129,243,132,428,132,627,148,658,255,542,381,378,545,167,633,47,636,164,636,391,633,677]]],"O":[693,[[403,677,321,662,233,605,164,520,110,410,104,280,148,145,217,79,293,38,400,28,532,41,639,113,706,230,709,350,693,466,630,564,592,617,532,652,460,677,403,677]]],"P":[677,[[145,28,145,205,154,450,161,551,189,621,277,665,413,687,548,684,665,639,699,602,696,526,655,463,564,406,450,372,343,356,151,350]]],"Q":[762,[[633,107,677,158,712,265,724,403,702,523,627,611,510,668,403,665,306,624,239,558,173,463,139,353,113,246,145,117,217,50,302,6,403,-9,488,3,561,32,643,98,747,32,586,142,441,274,422,277]]],"R":[693,[[123,665,132,353,139,22,148,422,129,605,230,665,350,684,447,671,523,668,580,655,614,621,624,580,573,539,482,504,397,466,302,435,145,387,139,362,255,299,346,236,485,154,699,13,721,9]]],"S":[674,[[630,665,501,643,369,608,249,573,198,532,173,501,164,472,189,428,321,384,444,340,570,290,639,252,680,217,677,183,624,120,501,57,356,9,249,3,173,13,129,35,113,66]]],"T":[652,[[76,671,268,662,438,652,605,652,684,671],[331,652,309,337,299,170,299,28]]],"U":[580,[[148,655,110,441,91,277,91,173,129,85,176,32,290,22,400,72,488,154,542,306,567,438,561,662,561,25]]],"V":[633,[[85,662,365,44,403,38,526,350,668,671]]],"W":[1017,[[110,671,372,32,450,211,598,551,639,510,709,400,819,176,895,35,945,176,989,369,1040,662]]],"X":[639,[[104,668,284,422,510,186,665,44],[649,684,419,391,261,202,132,35,123,32]]],"Y":[536,[[110,671,180,608,274,501,416,346,536,671,567,699,539,671,403,299,315,19]]],"Z":[658,[[123,668,684,671,602,545,384,284,192,57,173,35,274,9,384,6,709,25]]],"[":[450,[[375,847,123,788,139,328,170,-63,438,-22]]],"\\":[517,[[85,589,277,315,416,132,523,13]]],"]":[576,[[101,765,249,794,422,816,479,822,488,510,498,296,507,57,513,-50,416,-72,299,-85,205,-91]]],"^":[293,[[104,340,129,391,217,454,274,419,340,346]]],"_":[740,[[142,3,306,32,479,44,731,66]]],"`":[142,[[104,605,170,551]]],"a":[532,[[536,277,479,151,387,66,321,28,258,6,170,16,123,47,110,145,158,243,220,337,321,406,397,441,454,441,523,428,536,381,548,3]]],"b":[589,[[145,671,151,41,198,22,280,38,403,88,554,208,614,312,636,394,617,438,570,457,460,447,362,381,255,306,158,167]]],"c":[602,[[536,416,504,444,410,454,309,416,224,353,132,233,104,107,164,35,287,-3,419,3,513,25,614,79]]],"d":[558,[[554,652,539,387,532,217,539,79,542,19,536,183,444,85,296,19,192,13,120,54,98,161,151,265,280,353,397,372,485,359,542,299]]],"e":[532,[[139,296,265,299,410,302,504,318,520,353,507,387,425,460,321,460,227,425,161,365,113,243,98,170,94,120,148,50,236,6,337,13,444,38,520,76,548,110]]],"f":[602,[[611,542,523,636,419,684,350,690,268,636,230,551,230,460,246,375,280,183,293,25,268,255,82,227,435,274,598,296]]],"g":[551,[[554,261,488,148,369,54,239,6,148,6,120,54,158,173,252,315,359,403,428,438,498,428,554,384,570,-63,558,-214,523,-309,479,-372,438,-406,384,-416,343,-419,230,-416]]],"h":[517,[[139,668,129,356,139,6,164,271,243,372,334,428,416,425,472,378,529,271,539,167,542,28]]],"i":[252,[[180,636,198,636],[205,447,214,44,233,25]]],"j":[167,[[72,633,88,655],[94,491,94,312,107,104,117,-195,107,-312,76,-359,38,-372,9,-372,-72,-353,-123,-312]]],"k":[501,[[91,674,110,293,110,13,117,246,205,321,432,472,126,258,246,170,517,22]]],"l":[202,[[167,690,176,249,183,41]]],"m":[847,[[123,463,129,3,167,318,230,413,340,460,406,463,450,435,485,350,472,3,507,324,583,410,690,460,781,460,838,435,850,356,854,208,860,13]]],"n":[485,[[91,450,94,19,91,324,208,400,321,454,394,460,447,454,482,416,507,306,504,9]]],"o":[554,[[346,469,220,413,154,318,110,224,132,98,173,28,306,6,416,35,529,107,592,224,570,369,520,425,463,460,346,469]]],"p":[517,[[107,441,113,-378,110,378,224,441,353,469,498,447,545,378,536,271,491,198,400,120,306,72,117,25]]],"q":[517,[[526,406,498,454,428,463,302,413,211,328,148,227,117,135,126,50,208,3,299,9,406,57,463,113,501,180,529,353,545,-406]]],"r":[523,[[129,469,117,16,148,271,224,369,321,425,400,457,435,460,539,450,551,441]]],"s":[466,[[501,428,469,460,375,460,268,438,170,387,129,321,129,249,170,217,261,217,359,236,422,233,472,214,504,186,495,139,397,63,271,28,198,0,167,3]]],"t":[419,[[277,671,293,6,284,378,91,378,450,381]]],"u":[501,[[135,460,110,315,101,148,139,50,217,9,350,19,425,66,466,85,507,142,536,202,513,472,545,13]]],"v":[539,[[123,466,337,57,362,16,425,167,561,450]]],"w":[775,[[110,460,180,236,249,98,296,25,315,38,403,312,419,372,460,343,621,47,662,22,806,457]]],"x":[485,[[104,447,321,214,523,13,315,214,485,447,321,211,195,69,126,3]]],"y":[589,[[113,425,438,-38,617,435,290,-425]]],"z":[504,[[120,454,132,454,520,450,539,435,438,321,255,158,145,50,135,19,239,19,532,19,558,9]]],"{":[350,[[419,822,369,819,312,788,280,731,271,655,277,526,271,507,189,438,161,403,158,362,176,318,255,258,299,220,302,94,321,-13,365,-69,416,-98,463,-104]]],"|":[139,[[139,715,148,-38]]],"}":[413,[[154,822,233,803,284,753,299,621,287,498,369,447,425,400,438,356,406,331,284,236,287,139,277,25,239,-41,192,-76,110,-101]]],"~":[450,[[110,284,148,343,192,375,227,375,280,337,346,284,397,293,438,309,491,387]]]}</script>
 <script type="module">
-// ---------------------------------------------------------------------------------------------------------------
-// Lumen Board prototype. Everything is a pure function of the clock: parse → build marks → schedule → draw(t).
-// Same idea as Studiolo's scenes (a frame is computed from t alone), so seeking, stills and video export all work.
-// ---------------------------------------------------------------------------------------------------------------
+// Lumen prototype: Studiolo's player and creation surfaces, with board slides. Every frame is a pure function of the
+// clock, as in the real player: parse → timeline (says end to end, word timings) → slide at t → draw.
 const GLYPHS = JSON.parse(document.getElementById("glyphs").textContent);
 const W = 1280, H = 720, SAFE = { x0: 64, y0: 64, x1: 1216, y1: 600 };
 const CAP = 800;                 // EMS Tech units per drawn line height (its lowercase is nearly cap height)
@@ -403,25 +711,6 @@ const SHAPES = {
 const KEYWORDS = new Set([...Object.keys(ROLE), ...Object.keys(SIZES), ...FLAGS, "bend", "size"]);
 
 function parseAttrs(s) { const o = {}; for (const m of s.matchAll(/(\w+)\s*=\s*"([^"]*)"/g)) o[m[1]] = m[2]; return o; }
-
-function parseSource(src) {
-  const problems = [], boards = [];
-  const lineOf = (i) => src.slice(0, i).split("\n").length;
-  const re = /<item\s+([^>]*)>([\s\S]*?)<\/item>|<say>([\s\S]*?)<\/say>/g;
-  let m;
-  while ((m = re.exec(src))) {
-    if (m[1] !== undefined) {
-      const a = parseAttrs(m[1]);
-      if (a.type !== "board") { problems.push({ err: false, line: lineOf(m.index), msg: `Skipped an item of type "${a.type || "?"}": this player only draws boards.` }); continue; }
-      boards.push({ id: a.id || `b${boards.length + 1}`, title: a.title || "", body: m[2], bodyLine: lineOf(m.index + m[0].indexOf(">") + 1), says: [] });
-    } else if (!boards.length) problems.push({ err: true, line: lineOf(m.index), msg: "A say comes before any board. Put the board item first." });
-    else boards[boards.length - 1].says.push({ raw: m[3].trim(), line: lineOf(m.index) });
-  }
-  if (!boards.length) problems.push({ err: true, line: 1, msg: 'No board found. Start with <item id="b1" type="board" title="…">.' });
-  for (const b of boards) parseBoard(b, problems);
-  return { boards, problems };
-}
-
 function parseBoard(b, problems) {
   const lines = b.body.split("\n");
   const sep = lines.findIndex((l) => l.trim() === "---");
@@ -684,8 +973,6 @@ function pointOn(s, frac) {
   const seg = s.cum[i] - s.cum[i - 1] || 1, u = clamp((want - s.cum[i - 1]) / seg, 0, 1);
   return { i, p: lerp2(s.pts[i - 1], s.pts[i], u) };
 }
-
-// ---------------------------------------------------------------- narration, word timings and the pen's schedule
 const REF = /\[\[([\w-]+)(?:\.([\w-]+))?\]\]/g;
 function estimateWords(text) {
   const words = []; let ms = 0;
@@ -698,42 +985,6 @@ function estimateWords(text) {
   return { words, durationMs: words.length ? words[words.length - 1].endMs + 120 : 0 };
 }
 function wordAtChar(words, c) { let k = 0; for (let i = 0; i < words.length; i++) { if (words[i].c <= c) k = i; else break; } return k; }
-
-function buildTimeline(parsed) {
-  const { boards, problems } = parsed;
-  const segs = []; let clock = 0;
-  boards.forEach((b, bi) => {
-    buildBoard(b, problems);
-    b.startMs = clock;
-    clock += bi > 0 ? WIPE : 300;
-    const drawFrom = clock;
-    b.segs = [];
-    for (const say of b.says) {
-      let text = "", last = 0; const refs = [];
-      for (const m of say.raw.matchAll(REF)) {
-        text += say.raw.slice(last, m.index); last = m.index + m[0].length;
-        if (m[1] !== b.id) { problems.push({ err: true, line: say.line, msg: `[[${m[1]}${m[2] ? "." + m[2] : ""}]] points at another board; refs in a say point at its own board (${b.id}).` }); continue; }
-        if (m[2] && !b.byId.has(m[2])) { problems.push({ err: true, line: say.line, msg: `[[${b.id}.${m[2]}]] names a mark that isn't on the board.` }); continue; }
-        refs.push({ c: text.length, mark: m[2] || null });
-      }
-      text = (text + say.raw.slice(last)).replace(/\s+/g, " ").trim();
-      const est = estimateWords(text);
-      const seg = { bi, text, words: est.words, startMs: clock, durationMs: est.durationMs, refs: [] };
-      for (const r of refs) {
-        const w = est.words[wordAtChar(est.words, Math.min(r.c, Math.max(0, text.length - 1)))];
-        seg.refs.push({ mark: r.mark, timeMs: clock + (w ? w.startMs : 0) });
-      }
-      if (!refs.length) problems.push({ err: false, line: say.line, msg: "This say has no ref, so nothing on the board reacts to it." });
-      segs.push(seg); b.segs.push(seg);
-      clock += est.durationMs + SAY_GAP;
-    }
-    const drawEnd = scheduleBoard(b, drawFrom);
-    b.endMs = Math.max(clock, drawEnd + TAIL);
-    clock = b.endMs;
-  });
-  return { boards, segs, total: clock, problems };
-}
-
 function scheduleBoard(b, t0) {
   const cue = new Map(), again = [];
   for (const seg of b.segs) for (const r of seg.refs) {
@@ -818,7 +1069,7 @@ const STYLES = {
 };
 let getStroke = null;
 import("https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs")
-  .then((mod) => { getStroke = mod.getStroke; pathCache.clear(); requestDraw(); })
+  .then((mod) => { getStroke = mod.getStroke; pathCache.clear(); onTheme(); })
   .catch(() => { /* plain round-capped strokes are the fallback */ });
 
 const pathCache = new Map();
@@ -854,7 +1105,7 @@ function drawMark(ctx, b, m, p, style) {
   const v = p >= 1 ? Infinity : p * m.D;
   m.strokes.forEach((s, si) => {
     if (v <= s.a) return;
-    const key = `${b.id}:${m.id}:${si}`;
+    const key = `${b.key || b.id}:${m.id}:${si}`;
     if (v >= s.b) return inkStroke(ctx, s, s.pts, true, key, style);
     const { i, p: tip } = pointOn(s, (v - s.a) / (s.b - s.a));
     inkStroke(ctx, s, [...s.pts.slice(0, i), tip], false, key, style);
@@ -884,212 +1135,507 @@ function drawDot(ctx, dot, style) {
   ctx.restore();
 }
 
-// ---------------------------------------------------------------- player state
-const canvas = document.getElementById("board"), ctx = canvas.getContext("2d");
-const $ = (id) => document.getElementById(id);
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let TL = null, clock = 0, playing = false, themePick = "auto", needDraw = true, showDot = true, scale = 1;
-const finals = new Map();
+// ---------------------------------------------------------------- theme
 const darkQuery = matchMedia("(prefers-color-scheme: dark)");
-/** The stage follows the app's theme (an explicit data-theme wins over the system setting) unless the viewer picks one. */
 function themeName() {
-  if (themePick !== "auto") return themePick;
   const t = document.documentElement.getAttribute("data-theme");
   return t === "dark" || t === "light" ? t : darkQuery.matches ? "dark" : "light";
 }
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
-function finalFrame(b, style) {
-  const key = `${b.id}:${themeName()}:${b.endMs}`;
-  if (finals.has(key)) return finals.get(key);
-  const off = document.createElement("canvas"); off.width = W; off.height = H;
-  const o = off.getContext("2d");
-  drawBoardAt(o, b, Infinity, style, false);
-  finals.set(key, off);
-  return off;
+// ---------------------------------------------------------------- Lumen source → slides and says
+const NODE = /<item\s+([^>]*)>([\s\S]*?)<\/item>|<say>([\s\S]*?)<\/say>|<followup>([\s\S]*?)<\/followup>/g;
+const TYPED = new Set(["intro", "ul", "ol", "cards", "table", "board"]);
+const ANCHOR = /^\[([\w-]{1,32})\]\s*(.*)$/;
+
+function parseLumen(src) {
+  const problems = [], nodes = [];
+  const lineOf = (i) => src.slice(0, i).split("\n").length;
+  for (const m of src.matchAll(NODE)) {
+    if (m[1] !== undefined) {
+      const a = parseAttrs(m[1]);
+      nodes.push({ kind: "item", id: a.id || `s${nodes.length + 1}`, type: a.type || "?", title: a.title || "", body: m[2], line: lineOf(m.index), bodyLine: lineOf(m.index + m[0].indexOf(">") + 1) });
+    } else if (m[3] !== undefined) nodes.push({ kind: "say", raw: m[3].trim(), line: lineOf(m.index) });
+    else nodes.push({ kind: "followup", text: m[4].trim() });
+  }
+  if (!nodes.some((n) => n.kind === "item")) problems.push({ err: true, line: 1, msg: "No items found. Start with an intro or a board item." });
+  return { nodes, problems };
 }
 
-function boardIndexAt(t) { if (!TL || !TL.boards.length) return -1; let k = 0; TL.boards.forEach((b, i) => { if (t >= b.startMs) k = i; }); return k; }
+function typedSlide(n, problems) {
+  const lines = n.body.split("\n").map((l) => l.trim()).filter(Boolean);
+  const s = { id: n.id, type: n.type, title: n.title, anchors: new Set(), line: n.line };
+  const anchorOf = (text) => { const m = text.match(ANCHOR); if (m) { s.anchors.add(m[1]); return { anchor: m[1], text: m[2] }; } return { anchor: null, text }; };
+  if (n.type === "intro") { s.heading = lines[0] || n.title; s.question = lines[1] || ""; }
+  else if (n.type === "ul" || n.type === "ol") s.items = lines.filter((l) => l.startsWith("- ")).map((l) => anchorOf(l.slice(2)));
+  else if (n.type === "cards") {
+    s.cards = [];
+    for (const l of lines) { if (l.startsWith("## ")) s.cards.push({ ...anchorOf(l.slice(3)), body: "" }); else if (s.cards.length) s.cards[s.cards.length - 1].body += (s.cards[s.cards.length - 1].body ? " " : "") + l; }
+  } else if (n.type === "table") {
+    const rows = lines.filter((l) => l.includes("|") && !/^[\s|:-]+$/.test(l)).map((l) => l.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()));
+    s.header = rows[0] || [];
+    s.rows = rows.slice(1).map((r) => { const a = anchorOf(r[0] || ""); return { anchor: a.anchor, cells: [a.text, ...r.slice(1)] }; });
+  } else if (n.type === "board") {
+    const b = { id: n.id, title: n.title, body: n.body, bodyLine: n.bodyLine };
+    parseBoard(b, problems);
+    buildBoard(b, problems);
+    Object.assign(s, { board: b });
+    for (const m of b.marks) s.anchors.add(m.id);
+  } else problems.push({ err: false, line: n.line, msg: `This prototype doesn't draw "${n.type}" slides; it shows a placeholder.` });
+  return s;
+}
+
+/** A say's spoken text, with its refs, citations and General knowledge ranges as offsets into that text. */
+const SAY_TOKEN = /\[\[beyond\]\]|\[\[\/beyond\]\]|\[\[([\w-]+)(?:\.([\w-]+))?\]\]|\[([^\[\]]+)\]\(src:([^)\s]+)(?:\s+'[^']*')?\)/g;
+function readSay(raw) {
+  let text = "", last = 0, open = -1;
+  const refs = [], cites = [], beyond = [];
+  for (const m of raw.matchAll(SAY_TOKEN)) {
+    text += raw.slice(last, m.index); last = m.index + m[0].length;
+    if (m[0] === "[[beyond]]") open = text.length;
+    else if (m[0] === "[[/beyond]]") { if (open > -1) beyond.push({ start: open, end: text.length }); open = -1; }
+    else if (m[1] !== undefined) refs.push({ c: text.length, slide: m[1], anchor: m[2] || null });
+    else { const start = text.length; text += m[3]; const p = m[4].match(/#p(\d+)/); cites.push({ start, end: text.length, tag: p ? `P. ${p[1]}` : "Source" }); }
+  }
+  text += raw.slice(last);
+  return { text, refs, cites, beyond };
+}
+
+/** Caption phrases: up to about twelve words, broken after punctuation once a phrase has five words. */
+function phrases(words, text) {
+  const out = []; let start = 0;
+  words.forEach((w, i) => {
+    const word = text.slice(w.c, w.c + w.len), n = i - start + 1;
+    if (i === words.length - 1 || n >= 12 || (n >= 5 && /[,.;:?!]$/.test(word))) { out.push([start, i]); start = i + 1; }
+  });
+  return out;
+}
+
+function buildLumen(def) {
+  const { nodes, problems } = parseLumen(def.src);
+  const slides = [], segs = [], followups = [];
+  let clock = 0, cur = null;
+  const close = () => {
+    if (!cur) return;
+    if (!cur.segs.length) clock += 2500;
+    if (cur.type === "board") {
+      cur.board.key = `${def.id}:${cur.id}`;
+      cur.board.segs = cur.segs.map((s) => ({ refs: s.refs.filter((r) => r.slide === cur.id && r.anchor).map((r) => ({ mark: r.anchor, timeMs: r.timeMs })) }));
+      const end = scheduleBoard(cur.board, cur.startMs + 250);
+      clock = Math.max(clock, end + 700);
+    }
+    cur.endMs = clock;
+  };
+  for (const n of nodes) {
+    if (n.kind === "item") {
+      close();
+      cur = typedSlide(n, problems); cur.startMs = clock; cur.segs = []; cur.index = slides.length; slides.push(cur);
+    } else if (n.kind === "say") {
+      if (!cur) { problems.push({ err: true, line: n.line, msg: "A say comes before any item." }); continue; }
+      const r = readSay(n.raw), est = estimateWords(r.text);
+      const seg = { slide: cur.index, text: r.text, words: est.words, startMs: clock, durationMs: est.durationMs, cites: r.cites, beyond: r.beyond, refs: [] };
+      for (const ref of r.refs) {
+        const target = slides.find((s) => s.id === ref.slide);
+        if (!target) { problems.push({ err: true, line: n.line, msg: `[[${ref.slide}${ref.anchor ? "." + ref.anchor : ""}]] points at a slide that hasn't appeared yet.` }); continue; }
+        if (ref.anchor && !target.anchors.has(ref.anchor)) { problems.push({ err: true, line: n.line, msg: `[[${ref.slide}.${ref.anchor}]] names an anchor that isn't on that slide.` }); continue; }
+        const wi = wordAtChar(est.words, Math.min(ref.c, Math.max(0, r.text.length - 1)));
+        seg.refs.push({ ...ref, word: wi, timeMs: clock + (est.words[wi] ? est.words[wi].startMs : 0) });
+      }
+      seg.phrases = phrases(seg.words, seg.text);
+      segs.push(seg); cur.segs.push(seg);
+      clock += est.durationMs + SAY_GAP;
+    } else followups.push(n.text);
+  }
+  close();
+  for (const s of slides) {
+    s.reachAt = new Map();
+    for (const seg of segs) for (const r of seg.refs) if (r.slide === s.id && r.anchor && !s.reachAt.has(r.anchor)) s.reachAt.set(r.anchor, r.timeMs);
+  }
+  const words = segs.reduce((n, s) => n + s.words.length, 0);
+  return { def, slides, segs, followups, total: clock + 600, problems, words };
+}
+
+// ---------------------------------------------------------------- slide DOM, shared by the stage, thumbnails and posters
+function slideEl(L, s, { thumb = false } = {}) {
+  const root = el("section", "xp-slide");
+  root.dataset.type = s.type;
+  const hl = (node, anchor) => { if (anchor) { node.classList.add("xp-hl"); node.dataset.anchor = anchor; node.dataset.lit = "false"; node.dataset.reached = thumb ? "true" : "false"; } return node; };
+  if (s.type === "intro") {
+    root.classList.add("xp-tc");
+    const brand = el("div", "xp-tc-brand"); brand.append(Object.assign(el("span", "xp-mark xp-tc-mark", "S")), el("span", "xp-tc-kicker", "Studiolo explainer"));
+    const block = el("div", "xp-tc-block"), text = el("div", "xp-tc-text");
+    text.append(el("h2", "xp-tc-title", s.heading), el("p", "xp-tc-question", s.question));
+    const meta = el("div", "xp-tc-meta"); meta.append(el("span", "xp-tc-subject", L.def.subject), el("span", "xp-tc-length", `${fmt(L.total)} · narrated`));
+    block.append(text, meta); root.append(brand, block);
+    return root;
+  }
+  if (s.type === "board") {
+    root.classList.add("xp-board");
+    const c = el("canvas"); c.width = 1280; c.height = 720; root.append(c); root._canvas = c;
+    return root;
+  }
+  if (s.title) root.append(el("h2", "xp-title", s.title));
+  const body = el("div", "xp-body"); root.append(body);
+  if (s.type === "ul" || s.type === "ol") {
+    const list = el(s.type, "xp-list");
+    for (const it of s.items) list.append(hl(el("li", null, it.text), it.anchor));
+    body.append(list);
+  } else if (s.type === "cards") {
+    const g = el("div", "xp-cards"); g.dataset.count = String(s.cards.length); g.style.setProperty("--xp-cols", String(Math.min(s.cards.length, 4)));
+    for (const c of s.cards) { const card = hl(el("div", "xp-card"), c.anchor); card.append(el("h3", null, c.text), el("p", null, c.body)); g.append(card); }
+    body.append(g);
+  } else if (s.type === "table") {
+    const t = el("table", "xp-table"), head = el("tr");
+    for (const h of s.header) head.append(el("th", null, h));
+    t.append(head);
+    for (const r of s.rows) { const tr = hl(el("tr"), r.anchor); r.cells.forEach((c) => tr.append(el("td", null, c))); t.append(tr); }
+    body.append(t);
+  } else body.append(el("p", "xp-tc-question", `A ${s.type} slide would be drawn here.`));
+  return root;
+}
+
+const finished = new Map();
+function finishedBoard(s, size) {
+  const key = `${s.board.key}:${themeName()}:${size}`;
+  if (finished.has(key)) return finished.get(key);
+  const c = document.createElement("canvas"); c.width = size; c.height = Math.round(size * 9 / 16);
+  const x = c.getContext("2d"); x.scale(size / W, size / W);
+  drawBoardAt(x, s.board, Infinity, STYLES[themeName()], false);
+  finished.set(key, c);
+  return c;
+}
+
+/** A small, still copy of a slide: the finished drawing for a board, the slide fully built for anything else. */
+function miniSlide(L, s, width) {
+  const box = el("div", "mini");
+  if (s.type === "board") {
+    const img = finishedBoard(s, Math.min(640, Math.round(width * 2)));
+    const c = el("canvas", "poster"); c.width = img.width; c.height = img.height; c.getContext("2d").drawImage(img, 0, 0);
+    box.append(c);
+  } else {
+    const stage = el("div", "xp-stage"); stage.style.transform = `scale(${width / W})`;
+    stage.append(slideEl(L, s, { thumb: true }));
+    if (s.type !== "intro") { const wm = el("div", "xp-watermark"); wm.append(el("span", "xp-mark", "S")); stage.append(wm); }
+    box.append(stage);
+    new ResizeObserver(([e]) => { stage.style.transform = `scale(${e.contentRect.width / W})`; }).observe(box);
+  }
+  return box;
+}
+
+// ---------------------------------------------------------------- the player
+const P = { L: null, clock: 0, playing: false, mode: "proposed", cc: true, speed: 1, shown: -1, slideNode: null, scale: 1, lastPointer: null, ended: false };
+const stage = $("stage"), stageBox = $("stageBox"), pointer = $("pointer");
+
+function setMode(mode) {
+  P.mode = mode;
+  document.body.dataset.mode = mode;
+  $("mode-today").setAttribute("aria-pressed", String(mode === "today"));
+  $("mode-proposed").setAttribute("aria-pressed", String(mode === "proposed"));
+  $("modeHint").textContent = mode === "today"
+    ? "Today: slides appear whole, captions show the whole line, cursor flies in from the corner. Board slides are still shown so you can compare."
+    : "Proposed: slides build with the voice, board slides draw as they are named, phrase captions, crossfades and chapter titles.";
+  P.shown = -1; renderLearn(); dirty();
+}
+
+function openLumen(def, { autoplay = true, at = 0 } = {}) {
+  finished.clear(); pathCache.clear();
+  P.L = buildLumen(def); P.clock = at; P.shown = -1; P.ended = false;
+  const L = P.L;
+  $("crumbTitle").textContent = def.title;
+  $("metaTitle").textContent = def.title;
+  $("metaSource").innerHTML = "";
+  if (def.source) { $("metaSource").append("From "); const i = el("i", null, def.source.title); $("metaSource").append(i, ` · ${def.source.pages}`); }
+  else $("metaSource").textContent = `From your map · ${def.area}`;
+  const boards = L.slides.filter((s) => s.type === "board").length;
+  $("metaLine").textContent = `${fmt(L.total)} · ${plural(L.slides.length, "slide")} · ${boards} drawn · ${L.words} words · ${def.made || "made today"}`;
+  $("asks").replaceChildren(...L.followups.map(askChip));
+  $("endAsks").replaceChildren(...L.followups.map(askChip));
+  buildTicks(); buildTranscript(); buildThumbs();
+  go("player");
+  setPlaying(autoplay && !reduceMotion);
+  if (reduceMotion) P.clock = at;
+  dirty();
+}
+
+function askChip(q) {
+  const b = el("button", "xp-ask-chip", q);
+  b.onclick = (e) => { e.stopPropagation(); setPlaying(false); go("graph"); $("cpInput").value = q; $("cpInput").focus(); };
+  return b;
+}
+
+function slideAt(t) { const L = P.L; let k = 0; L.slides.forEach((s, i) => { if (t >= s.startMs) k = i; }); return k; }
+function segAt(t) { return P.L.segs.findIndex((s) => t >= s.startMs && t < s.startMs + s.durationMs + SAY_GAP * 0.6); }
+
+function swapSlide(i) {
+  const L = P.L, s = L.slides[i], old = P.slideNode;
+  const node = slideEl(L, s);
+  if (P.mode === "proposed" && s.type !== "intro") node.classList.add("xp-stagger");
+  stage.insertBefore(node, $("watermark"));
+  if (old) {
+    if (P.mode === "proposed" && !reduceMotion) { old.classList.add("xp-leaving"); setTimeout(() => old.remove(), 330); }
+    else old.remove();
+  }
+  P.slideNode = node; P.shown = i;
+  $("watermark").hidden = s.type === "intro";
+  if (P.mode === "proposed") pointer.dataset.jump = "true";
+  if (s.type === "board") sizeBoardCanvas();
+  const b = s.board;
+  $("legend").replaceChildren(...(b ? b.legend : []).map((l) => { const sp = el("span"), sw = el("i"); sw.style.background = STYLES[themeName()].roles[l.role]; sp.append(sw, l.meaning); return sp; }));
+  [...$("thumbs").children].forEach((t, k) => t.dataset.current = String(k === i));
+}
+
+function sizeBoardCanvas() {
+  const c = P.slideNode && P.slideNode._canvas; if (!c) return;
+  const k = clamp(P.scale * (window.devicePixelRatio || 1), 0.5, 2);
+  c.width = Math.round(W * k); c.height = Math.round(H * k); c._k = k;
+}
+
+/** The anchor the cursor points at: the latest ref of the current say at most three words ahead of the voice. */
+function pointerTarget(t) {
+  const si = segAt(t); if (si < 0) return null;
+  const seg = P.L.segs[si], local = t - seg.startMs;
+  let now = 0; seg.words.forEach((w, i) => { if (w.startMs <= local) now = i; });
+  let best = null;
+  for (const r of seg.refs) if (r.word <= now + 3 && (!best || r.word >= best.word)) best = r;
+  return best;
+}
+
+function placePointer(s, t) {
+  const target = pointerTarget(t);
+  const visible = !!(target && target.anchor && target.slide === s.id && s.type !== "board" && s.type !== "intro");
+  if (!visible) {
+    pointer.dataset.visible = "false";
+    // Today the hidden cursor falls back to the stage's corner, so its next appearance springs in from there.
+    if (P.mode === "today") { pointer.style.transform = "translate(0px, 0px)"; P.lastPointer = null; }
+    return;
+  }
+  const node = P.slideNode.querySelector(`[data-anchor="${CSS.escape(target.anchor)}"]`);
+  if (!node) return;
+  const sr = stage.getBoundingClientRect(), r = node.getBoundingClientRect(), k = P.scale || 1;
+  const x = (r.left - sr.left) / k + Math.min((r.width / k) * 0.5, 180), y = (r.top - sr.top) / k + (r.height / k) * 0.72;
+  const key = `${Math.round(x)},${Math.round(y)}`;
+  if (P.lastPointer !== key) {
+    if (pointer.dataset.jump === "true" && P.lastPointer !== null) { /* first point on a new slide: jump, no spring */ }
+    pointer.style.transform = `translate(${x}px, ${y}px)`;
+    P.lastPointer = key;
+    requestAnimationFrame(() => { pointer.dataset.jump = "false"; });
+  }
+  pointer.dataset.visible = "true";
+}
 
 function render() {
-  const style = STYLES[themeName()];
-  ctx.setTransform(scale, 0, 0, scale, 0, 0);
-  drawBackground(ctx, style);
-  if (!TL || !TL.boards.length) return;
-  const bi = boardIndexAt(clock), b = TL.boards[bi];
-  if (bi > 0) {
-    const prev = TL.boards[bi - 1], u = (clock - b.startMs) / WIPE;
-    if (u < 1) {
-      const sweep = ease(clamp(u, 0, 1)) * (W + 240) - 120;
-      ctx.drawImage(finalFrame(prev, style), 0, 0);
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, Math.max(0, sweep), H); ctx.clip();
-      drawBackground(ctx, style); ctx.globalAlpha = style.ghost * 1.6; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.restore();
-      const edge = ctx.createLinearGradient(sweep, 0, sweep + 120, 0);
-      edge.addColorStop(0, style.bg); edge.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = edge; ctx.fillRect(sweep, 0, 120, H);
-      return;
+  const L = P.L; if (!L) return;
+  const t = P.clock, i = slideAt(t), s = L.slides[i];
+  if (i !== P.shown) swapSlide(i);
+  if (s.type === "board") {
+    const c = P.slideNode._canvas, x = c.getContext("2d"), k = c._k || 1;
+    x.setTransform(k, 0, 0, k, 0, 0); x.clearRect(0, 0, W, H);
+    const style = STYLES[themeName()];
+    drawBoardAt(x, s.board, t, style, reduceMotion);
+    if (!reduceMotion) drawDot(x, penAt(s.board, t), style);
+  } else if (s.type !== "intro") {
+    const lit = pointerTarget(t);
+    for (const node of P.slideNode.querySelectorAll("[data-anchor]")) {
+      const a = node.dataset.anchor, at = s.reachAt.get(a);
+      node.dataset.lit = String(!!(lit && lit.slide === s.id && lit.anchor === a));
+      node.dataset.reached = String(P.mode === "today" || at === undefined ? true : at - 350 <= t);
     }
-    ctx.globalAlpha = style.ghost; ctx.drawImage(finalFrame(prev, style), 0, 0); ctx.globalAlpha = 1;
   }
-  drawBoardAt(ctx, b, clock, style, reduceMotion);
-  if (showDot && !reduceMotion) drawDot(ctx, penAt(b, clock), style);
+  placePointer(s, t);
+  renderCaption(t);
+  // chrome
+  $("time").textContent = `${fmt(t)} / ${fmt(L.total)}`;
+  const pct = L.total ? (t / L.total) * 100 : 0;
+  $("scrubFill").style.width = `${pct}%`; $("scrubKnob").style.left = `${pct}%`;
+  $("scrub").setAttribute("aria-valuenow", String(Math.round(t / 1000)));
+  const si = segAt(t);
+  [...$("txBody").children].forEach((n, k) => n.dataset.current = String(k === si));
+  $("pausedGlyph").hidden = !(P.mode === "proposed" && !P.playing && t > 0 && t < L.total - 1);
+  $("endbox").hidden = !P.ended;
 }
 
-function updateCaption() {
-  const cap = $("caption");
-  if (!TL) { cap.textContent = ""; return; }
-  const seg = TL.segs.find((s) => clock >= s.startMs && clock < s.startMs + s.durationMs + SAY_GAP * 0.6);
-  if (!seg) { cap.textContent = ""; return; }
-  const local = clock - seg.startMs; let now = -1;
-  seg.words.forEach((w, i) => { if (w.startMs <= local) now = i; });
-  const line = document.createElement("span");
-  seg.words.forEach((w, i) => {
-    const span = document.createElement("span");
-    span.className = i < now ? "w-done" : i === now ? "w-now" : "";
-    span.textContent = seg.text.slice(w.c, w.c + w.len);
-    line.append(span, i < seg.words.length - 1 ? " " : "");
-  });
-  cap.replaceChildren(line);
+function renderCaption(t) {
+  const cap = $("caption"), si = segAt(t);
+  if (!P.cc || si < 0) { cap.dataset.visible = "false"; return; }
+  const seg = P.L.segs[si], local = t - seg.startMs;
+  let now = -1; seg.words.forEach((w, i) => { if (w.startMs <= local) now = i; });
+  let [a, b] = [0, seg.words.length - 1];
+  if (P.mode === "proposed") { const ph = seg.phrases.find(([p, q]) => now <= q) || seg.phrases[seg.phrases.length - 1]; [a, b] = ph; }
+  const said = el("b"), rest = el("span");
+  for (let k = a; k <= b; k++) { const w = seg.words[k], word = seg.text.slice(w.c, w.c + w.len) + (k < b ? " " : ""); (k <= now ? said : rest).append(word); }
+  cap.replaceChildren(said, rest);
+  cap.dataset.visible = "true";
 }
-const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-function updateChrome() {
-  $("time").textContent = `${fmt(clock)} / ${fmt(TL ? TL.total : 0)}`;
-  $("scrub").value = String(Math.round(clock));
-  updateCaption();
-  const b = TL && TL.boards[boardIndexAt(clock)];
-  const style = STYLES[themeName()];
-  $("legend").replaceChildren(...(b ? b.legend : []).map((l) => {
-    const span = document.createElement("span"), sw = document.createElement("i");
-    sw.style.background = style.roles[l.role]; span.append(sw, l.meaning); return span;
-  }));
-}
-function requestDraw() { needDraw = true; }
 
+function dirty() { P.dirty = true; }
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(100, now - last); last = now;
-  if (playing && TL) {
-    let next = clock + dt * +$("speed").value;
+  if (P.playing && P.L) {
+    let next = P.clock + dt * P.speed;
     if (voice.active && voice.holdUntil !== null) next = Math.min(next, voice.holdUntil);
-    clock = Math.min(next, TL.total);
-    if (clock >= TL.total) setPlaying(false);
+    P.clock = Math.min(next, P.L.total);
+    if (P.clock >= P.L.total) { setPlaying(false); P.ended = true; }
     voiceTick();
-    needDraw = true;
+    P.dirty = true;
   }
-  if (needDraw) { render(); updateChrome(); needDraw = false; }
+  if (P.dirty && !$("screen-player").hidden) { render(); P.dirty = false; }
+  mini.tick(dt);
   requestAnimationFrame(frame);
 }
 
 function setPlaying(on) {
-  playing = on && !!TL;
-  if (playing && TL && clock >= TL.total - 1) clock = 0;
-  $("play").setAttribute("aria-label", playing ? "Pause" : "Play");
-  $("playIcon").innerHTML = playing ? '<path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"/>' : '<path d="M4 2.5v11l9-5.5z" fill="currentColor"/>';
-  if (!playing) voiceStop();
-  needDraw = true;
+  if (!P.L) return;
+  if (on && P.clock >= P.L.total - 1) P.clock = 0;
+  P.playing = on; if (on) P.ended = false;
+  $("playBtn").setAttribute("aria-label", on ? "Pause" : "Play");
+  $("playIcon").innerHTML = on ? '<path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"/>' : '<path d="M4 2.5v11l9-5.5z" fill="currentColor"/>';
+  if (!on) voiceStop();
+  dirty();
 }
-function seek(ms) { clock = clamp(ms, 0, TL ? TL.total : 0); voiceStop(); needDraw = true; }
+function seek(ms) { if (!P.L) return; P.clock = clamp(ms, 0, P.L.total); P.ended = false; voiceStop(); dirty(); }
+function stepSlide(d) { const L = P.L; if (!L) return; const i = clamp(slideAt(P.clock) + d, 0, L.slides.length - 1); seek(L.slides[i].startMs + 1); }
 
-function resize() {
-  const css = canvas.getBoundingClientRect().width || W;
-  const next = clamp(((window.devicePixelRatio || 1) * css) / W, 1, 2);
-  if (Math.abs(next - scale) > 0.05 || canvas.width !== Math.round(W * next)) {
-    scale = next; canvas.width = Math.round(W * scale); canvas.height = Math.round(H * scale); needDraw = true;
-  }
+function fitStage() {
+  const w = stageBox.getBoundingClientRect().width || W;
+  P.scale = w / W; stage.style.transform = `scale(${P.scale})`;
+  sizeBoardCanvas(); dirty();
 }
-new ResizeObserver(resize).observe(canvas);
+new ResizeObserver(fitStage).observe(stageBox);
 
-// ---------------------------------------------------------------- voice (browser speech, re-synced on word boundaries)
+function buildTicks() {
+  const L = P.L;
+  $("scrubTicks").replaceChildren(...L.slides.slice(1).map((s) => { const k = el("span", "k"); k.style.left = `${(s.startMs / L.total) * 100}%`; return k; }));
+  $("scrub").setAttribute("aria-valuemax", String(Math.round(L.total / 1000)));
+}
+function scrubTo(e) { const r = $("scrub").getBoundingClientRect(); return clamp((e.clientX - r.left) / r.width, 0, 1) * P.L.total; }
+$("scrub").addEventListener("pointerdown", (e) => { if (!P.L) return; $("scrub").setPointerCapture(e.pointerId); seek(scrubTo(e)); });
+$("scrub").addEventListener("pointermove", (e) => {
+  if (!P.L) return;
+  if (e.buttons) seek(scrubTo(e));
+  const tip = $("scrubTip");
+  if (P.mode !== "proposed") { tip.hidden = true; return; }
+  const t = scrubTo(e), s = P.L.slides[slideAt(t)], r = $("scrub").getBoundingClientRect();
+  tip.textContent = `${s.index + 1}. ${s.type === "intro" ? s.heading : s.title || s.type} · ${fmt(t)}`;
+  tip.style.left = `${clamp(e.clientX - r.left, 40, r.width - 40)}px`; tip.hidden = false;
+});
+$("scrub").addEventListener("pointerleave", () => { $("scrubTip").hidden = true; });
+$("scrub").addEventListener("keydown", (e) => { if (e.key === "ArrowRight") seek(P.clock + 5000); if (e.key === "ArrowLeft") seek(P.clock - 5000); });
+
+function buildTranscript() {
+  const L = P.L;
+  $("txBody").replaceChildren(...L.segs.map((seg) => {
+    const b = el("button", "xp-sec"); b.onclick = () => seek(seg.startMs + 1);
+    const head = el("span", "xp-sec-head"); head.append(el("b", null, `Slide ${seg.slide + 1}`), el("span", null, fmt(seg.startMs)));
+    const text = el("span", "xp-sec-text");
+    let pos = 0;
+    for (const r of [...seg.beyond].sort((p, q) => p.start - q.start)) { text.append(seg.text.slice(pos, r.start)); text.append(el("span", "xp-gk", seg.text.slice(r.start, r.end))); pos = r.end; }
+    text.append(seg.text.slice(pos));
+    b.append(head, text);
+    const tags = [...new Set(seg.cites.map((c) => c.tag))];
+    if (tags.length || seg.beyond.length) { const cs = el("span", "xp-cites"); tags.forEach((t) => cs.append(el("span", "xp-cite", t))); if (seg.beyond.length) cs.append(el("span", "xp-cite", "General knowledge")); b.append(cs); }
+    return b;
+  }));
+}
+function buildThumbs() {
+  const L = P.L;
+  $("thumbs").replaceChildren(...L.slides.map((s) => {
+    const b = el("button", "xp-thumb"); b.setAttribute("aria-label", `Slide ${s.index + 1}`);
+    b.onclick = () => seek(s.startMs + 1);
+    b.append(miniSlide(L, s, 150));
+    return b;
+  }));
+}
+
+// ---------------------------------------------------------------- voice (browser speech as a stand-in for ElevenLabs)
 const voice = { active: false, seg: -1, token: 0, holdUntil: null };
-function voiceStop() { voice.token++; voice.seg = -1; voice.holdUntil = null; try { speechSynthesis.cancel(); } catch { /* no speech */ } }
+function voiceStop() { voice.token++; voice.seg = -1; voice.holdUntil = null; try { speechSynthesis.cancel(); } catch { /* no speech here */ } }
 function voiceTick() {
-  if (!voice.active || !TL || !("speechSynthesis" in window)) return;
-  const si = TL.segs.findIndex((s) => clock >= s.startMs && clock < s.startMs + s.durationMs);
+  if (!voice.active || !P.L || !("speechSynthesis" in window)) return;
+  const segs = P.L.segs, si = segs.findIndex((s) => P.clock >= s.startMs && P.clock < s.startMs + s.durationMs);
   if (si < 0 || si === voice.seg) return;
-  const seg = TL.segs[si], local = clock - seg.startMs;
-  const wi = Math.max(0, seg.words.findIndex((w) => w.endMs > local));
-  const off = seg.words[wi] ? seg.words[wi].c : 0;
+  const seg = segs[si], local = P.clock - seg.startMs, wi = Math.max(0, seg.words.findIndex((w) => w.endMs > local)), off = seg.words[wi] ? seg.words[wi].c : 0;
   speechSynthesis.cancel();
   const token = ++voice.token;
   voice.seg = si; voice.holdUntil = seg.startMs + seg.durationMs - 20;
   const u = new SpeechSynthesisUtterance(seg.text.slice(off));
-  u.lang = "en-GB"; u.rate = +$("speed").value;
-  u.onboundary = (e) => {
-    if (token !== voice.token || (e.name && e.name !== "word")) return;
-    const k = wordAtChar(seg.words, off + e.charIndex);
-    clock = Math.max(clock - 400, seg.startMs + seg.words[k].startMs);
-  };
-  const done = () => { if (token !== voice.token) return; voice.holdUntil = null; if (clock < seg.startMs + seg.durationMs) clock = seg.startMs + seg.durationMs; };
+  u.lang = "en-GB"; u.rate = P.speed;
+  u.onboundary = (e) => { if (token !== voice.token || (e.name && e.name !== "word")) return; const k = wordAtChar(seg.words, off + e.charIndex); P.clock = Math.max(P.clock - 400, seg.startMs + seg.words[k].startMs); };
+  const done = () => { if (token !== voice.token) return; voice.holdUntil = null; if (P.clock < seg.startMs + seg.durationMs) P.clock = seg.startMs + seg.durationMs; };
   u.onend = done; u.onerror = done;
   setTimeout(() => { if (token === voice.token && !speechSynthesis.speaking) done(); }, 1500);
   speechSynthesis.speak(u);
 }
 
-// ---------------------------------------------------------------- loading a source
-let currentExample = null;
-function load(src, { autoplay = false } = {}) {
-  const parsed = parseSource(src);
-  const tl = buildTimeline(parsed);
-  finals.clear(); pathCache.clear();
-  TL = tl.boards.length && tl.boards.some((b) => b.marks.length) ? tl : null;
-  $("scrub").max = String(Math.round(TL ? TL.total : 0));
-  $("ticks").replaceChildren(...(TL ? TL.boards.slice(1) : []).map((b) => { const s = document.createElement("span"); s.style.left = `${(b.startMs / TL.total) * 100}%`; return s; }));
-  showProblems(tl.problems, tl);
-  seek(0);
-  if (TL && reduceMotion) clock = Math.min(TL.total, TL.boards[0].endMs - 1);
-  setPlaying(autoplay && !!TL);
+// ---------------------------------------------------------------- controls
+$("playBtn").onclick = () => setPlaying(!P.playing);
+$("screenBox").onclick = (e) => { if (!e.target.closest(".xp-endbox")) setPlaying(!P.playing); };
+$("backBtn").onclick = () => seek(P.clock - 10000);
+$("fwdBtn").onclick = () => seek(P.clock + 10000);
+$("replayBtn").onclick = (e) => { e.stopPropagation(); seek(0); setPlaying(true); };
+const SPEEDS = [1, 1.25, 1.5, 0.75];
+$("speedBtn").onclick = () => { P.speed = SPEEDS[(SPEEDS.indexOf(P.speed) + 1) % SPEEDS.length]; $("speedBtn").textContent = `${P.speed}×`; voiceStop(); };
+$("ccBtn").onclick = () => { P.cc = !P.cc; $("ccBtn").dataset.on = String(P.cc); dirty(); };
+$("txBtn").onclick = () => { const on = $("txPanel").hidden; $("txPanel").hidden = !on; $("txBtn").dataset.on = String(on); };
+$("fsBtn").onclick = () => { $("screenBox").requestFullscreen?.().catch(() => {}); };
+$("voiceBtn").onclick = () => {
+  voice.active = !voice.active && "speechSynthesis" in window; voiceStop();
+  $("voiceBtn").dataset.on = String(voice.active);
+  $("voiceIcon").innerHTML = voice.active ? '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" stroke-linecap="round"/>' : '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="m17 9 4 6m0-6-4 6" stroke-linecap="round"/>';
+};
+if (!("speechSynthesis" in window)) $("voiceBtn").hidden = true;
+for (const [id, other, body, otherBody] of [["tab-tx", "tab-sl", "txBody", "slBody"], ["tab-sl", "tab-tx", "slBody", "txBody"]]) {
+  $(id).onclick = () => { $(id).setAttribute("aria-selected", "true"); $(other).setAttribute("aria-selected", "false"); $(body).hidden = false; $(otherBody).hidden = true; };
 }
-function showProblems(problems, tl) {
-  const list = $("problems");
-  const items = problems.slice(0, 30).map((p) => { const li = document.createElement("li"); li.className = p.err ? "err" : ""; li.textContent = `Line ${p.line}: ${p.msg}`; return li; });
-  if (!problems.length) { const li = document.createElement("li"); li.className = "ok"; li.textContent = "No problems found."; items.push(li); }
-  list.replaceChildren(...items);
-  const marks = tl.boards.reduce((n, b) => n + (b.marks ? b.marks.length : 0), 0);
-  $("scriptStat").textContent = `${tl.boards.length} board${tl.boards.length === 1 ? "" : "s"} · ${marks} marks · ${fmt(tl.total)}`;
-}
-function applyStyleVars() {
-  const s = STYLES[themeName()], box = $("stageBox");
-  box.style.setProperty("--board-bg", s.bg); box.style.setProperty("--board-ink", s.captionInk); box.style.setProperty("--board-rule", s.rule);
-  box.style.setProperty("--board-muted", s.captionMuted); box.style.setProperty("--board-accent", s.roles.emphasis);
-  requestDraw();
-}
+$("shareBtn").onclick = () => toast("Sharing isn't wired in this prototype.", 1800);
+document.addEventListener("keydown", (e) => {
+  if ($("screen-player").hidden || e.target.closest("textarea, input, select") || !$("dlg").hidden) return;
+  if (e.code === "Space") { e.preventDefault(); setPlaying(!P.playing); }
+  else if (e.key === "ArrowRight" || e.key === "l") seek(P.clock + (e.key === "l" ? 10000 : 5000));
+  else if (e.key === "ArrowLeft" || e.key === "j") seek(P.clock - (e.key === "j" ? 10000 : 5000));
+  else if (e.key === "c") $("ccBtn").click();
+  else if (P.mode === "proposed" && (e.key === "," || e.key === ".")) stepSlide(e.key === "," ? -1 : 1);
+});
+$("mode-today").onclick = () => setMode("today");
+$("mode-proposed").onclick = () => setMode("proposed");
 
-// ---------------------------------------------------------------- examples
-const EXAMPLES = [
-  { title: "Reading a building", line: "Architecture · a section, then how air moves through it (2 boards)", src: `<item id="b1" type="board" title="Reading a building section">
-roles: emphasis = structure; fourth = weather; third = insulation
----
-ground ground 90 470 1190
-found  box 330 470 64 72 emphasis hatch
-found2 box 886 470 64 72 emphasis hatch
-slab   box 330 446 620 24 emphasis hatch
-lwall  box 340 250 34 196 emphasis
-rwall  box 906 250 34 196 emphasis
-roof   poly 300,252 640,92 980,252 emphasis
-wx     arrow 140,120 330,200 fourth "rain, wind, sun"
-insul  curve 388,266 400,292 388,318 400,344 388,370 400,396 388,422 third
-ins    text 418 344 "insulation" small third
-</item>
-<say>A section is a building cut open, like slicing a cake. Start with the [[b1.ground]]ground line, and what sits below it: the [[b1.found]]foundations.</say>
-<say>On them rests the ground floor [[b1.slab]]slab, and the [[b1.lwall]]walls rise from it.</say>
-<say>The [[b1.roof]]roof closes the top. Its first job is to keep the [[b1.wx]]weather out.</say>
-<say>Just inside the wall, a layer of [[b1.insul]]insulation keeps the heat in. Read any section from the bottom up: [[b1.found]]foundations, then [[b1.lwall]]structure, then the [[b1.roof]]skin.</say>
-<item id="b2" type="board" title="Why warm air leaves at the top">
-roles: emphasis = cool air; fourth = warm air
----
-ground ground 90 520 1190
-shell  poly 340,520 340,262 640,112 940,262 940,520
-low    box 330 420 22 60 emphasis
-cool   arrow 150,450 318,450 emphasis "cool air in"
-warm   text 560 470 "warmed: lighter" small fourth
-rise   curve 390,450 520,420 610,330 690,230 790,196 fourth dash arrow
-vent   box 838 188 30 34 fourth
-out    arrow 878,190 1060,120 fourth "out at the top"
-</item>
-<say>Now watch the air moving through the same house. [[b2.cool]]Cool air slips in low, through an [[b2.low]]opening near the floor.</say>
-<say>Inside, it is [[b2.warm]]warmed by people and sunlight, becomes lighter, and [[b2.rise]]rises towards the roof.</say>
-<say>It escapes through a [[b2.vent]]vent up high and [[b2.out]]flows out at the top, pulling fresh air in behind it. That is the stack effect: ventilation without a fan.</say>` },
+// ---------------------------------------------------------------- screens, theme, toast
+function go(screen) {
+  for (const s of ["learn", "player", "library", "graph", "lab"]) $(`screen-${s}`).hidden = s !== screen;
+  const railKey = screen === "player" ? "learn" : screen;
+  document.querySelectorAll(".rb[data-go]").forEach((b) => { if (b.dataset.go === railKey) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  if (screen !== "player") { setPlaying(false); }
+  if (screen === "player") requestAnimationFrame(fitStage);
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
+$("themeBtn").onclick = () => { document.documentElement.setAttribute("data-theme", themeName() === "dark" ? "light" : "dark"); };
+function onTheme() { finished.clear(); renderLearn(); if (P.L) { buildThumbs(); P.shown = -1; } mini.redraw(); dirty(); }
+darkQuery.addEventListener("change", onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+let toastTimer = 0;
+function toast(text, ms) { $("toastText").textContent = text; $("toast").hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; }, ms); }
 
-  { title: "Who is bound to whom", line: "Contracts · the parties on a building project and the missing link", src: `<item id="c1" type="board" title="Who is bound to whom on a building project">
+// ---------------------------------------------------------------- Lumens, written in the author's markup
+const CONTRACTS = `<item id="s1" type="intro">
+Who is bound to whom
+On a building project, who can the client actually hold to account?
+</item>
+<say>Who can the client actually hold to account on a [[s1]]project?</say>
+<item id="s2" type="ol" title="Four parties, four jobs">
+- [client] The client pays for it and sets the brief
+- [arch] The architect designs it and runs the contract
+- [main] The main contractor builds it
+- [sub] Subcontractors build parts of it
+</item>
+<say>Start with who is involved. On even a modest project there are at least four parties. The [[s2.client]]client pays for the building and decides what it must do.</say>
+<say>The [[s2.arch]]architect designs it and, on many projects, [administers the contract for the client](src:ITEM#p12.1 'administers the Contract on behalf of the Employer').</say>
+<say>The [[s2.main]]main contractor builds it, and hands whole packages of work to [[s2.sub]]subcontractors: the steel frame, the windows, the lifts.</say>
+<item id="s3" type="board" title="The web of contracts">
 roles: ink = a contract; fourth = no contract; third = a warranty that bridges the gap
 ---
 client  box 520 80 240 84 emphasis "Client"
@@ -1104,13 +1650,114 @@ nolink  text 96 315 "no contract" fourth small
 cw      curve 764,494 900,420 900,250 772,150 third dash arrow
 cwl     text 924 335 "collateral warranty" small third
 </item>
-<say>On a typical project, the [[c1.client]]client, the one paying, sits at the top. They hire an [[c1.arch]]architect under an [[c1.appoint]]appointment. That is one contract.</say>
-<say>Separately, the client signs with a [[c1.main]]main contractor: the [[c1.build]]building contract. That is a second contract.</say>
-<say>The main contractor hands part of the work to a [[c1.sub]]subcontractor, under a [[c1.subk]]subcontract of its own.</say>
-<say>Now notice what is missing. There is [[c1.gap]]no contract between the client and the subcontractor, so if the work is poor, the client [[c1.nolink]]can't sue them directly.</say>
-<say>That gap is why clients ask for a [[c1.cw]]collateral warranty: a direct promise from the subcontractor that [[c1.cwl]]bridges it.</say>` },
+<say>Now draw the contracts between them. The [[s3.client]]client sits at the top, and hires the [[s3.arch]]architect under an [[s3.appoint]]appointment. That is one contract.</say>
+<say>Separately, the client signs with a [[s3.main]]main contractor. [That is the building contract](src:ITEM#p13.2 'between the Employer and the Contractor'), a [[s3.build]]second, separate agreement.</say>
+<say>The main contractor then lets part of the work to a [[s3.sub]]subcontractor, under a [[s3.subk]]subcontract of its own. On a large building there may be dozens of these, each with its own terms.</say>
+<say>Now notice what is missing. There is [[s3.gap]]no contract between the client and the subcontractor. [[beyond]]Lawyers call this privity of contract[[/beyond]], and it means the client [[s3.nolink]]cannot sue the subcontractor for breach.</say>
+<say>That gap is why clients ask for a [[s3.cw]]collateral warranty: [a direct promise from the subcontractor](src:ITEM#p16.1 'a direct contractual link between') that [[s3.cwl]]bridges it.</say>
+<item id="s4" type="table" title="Three contracts, three pairs">
+| Contract | Between | Covers |
+|---|---|---|
+| [appt] Appointment | Client and architect | Design and inspections |
+| [bc] Building contract | Client and contractor | The works, the price, the time |
+| [sk] Subcontract | Contractor and subcontractor | One package of the work |
+</item>
+<say>So there are three contracts, and each one binds only its own two parties. Nobody else can enforce it, and nobody else is bound by it. The [[s4.appt]]appointment covers the design and the inspections.</say>
+<say>The [[s4.bc]]building contract covers the works themselves, [the price and the completion date](src:ITEM#p14.3 'the Contract Sum and the Completion Date'). The [[s4.sk]]subcontract covers one package, and binds only those two firms.</say>
+<item id="s5" type="cards" title="When the windows leak">
+## [chain] Down the chain
+The client claims against the contractor, who claims against the subcontractor.
+## [direct] Straight across
+With a warranty, the client claims against the subcontractor directly.
+## [broken] When the chain breaks
+If the contractor fails, only the warranty still reaches the subcontractor.
+</item>
+<say>Picture the new windows leaking a year after handover. The client did not hire the window installer, so who pays? Without a warranty, the claim goes [[s5.chain]]down the chain: client to contractor, then contractor to subcontractor. Each step takes time, and each one can be disputed.</say>
+<say>With a warranty, the client can go [[s5.direct]]straight to the firm that fitted the windows. And if the main contractor has [[s5.broken]]gone out of business, [that direct route may be the only one left](src:ITEM#p17.2 'in the event of the insolvency of the Contractor').</say>
+<item id="s6" type="board" title="Get the warranty before work starts">
+roles: neutral = the chain of contracts; third = the warranty
+---
+client box 140 120 230 84 emphasis "Client"
+sub    box 910 400 240 84 ink "Subcontractor"
+main   box 520 260 240 84 neutral "Main contractor"
+c1     arrow client main neutral
+c2     arrow main sub neutral
+wty    curve 1030,392 1030,190 400,150 third dash arrow
+wl     text 640 112 "warranty" third
+when   text 140 470 "signed before work starts" third
+ok     underline when third
+</item>
+<say>So, who can the client hold to account? Only those it has a contract with: the [[s6.main]]main contractor, through the [[s6.c1]]building contract.</say>
+<say>And anyone who has signed it a [[s6.wty]]warranty. That is why the warranty is [[s6.when]]signed before work starts, while the client still has leverage. [[s6.ok]]Ask for it early.</say>
+<followup>What exactly does a collateral warranty promise?</followup>
+<followup>How does design and build change who designs?</followup>`;
 
-  { title: "Where the eye goes", line: "Graphic design · rule of thirds, then visual hierarchy (2 boards)", src: `<item id="g1" type="board" title="The rule of thirds">
+const SECTION = `<item id="s1" type="intro">
+Reading a building section
+What does a section show that a plan cannot?
+</item>
+<say>What does a section show that a plan [[s1]]cannot?</say>
+<item id="s2" type="ul" title="What a section shows">
+- [cut] A cut through the building, seen from the side
+- [layers] The layers inside every wall, floor and roof
+- [heights] Heights: floors, ceilings and the ground line
+</item>
+<say>A plan looks down on a building from above. A section [[s2.cut]]slices it open and looks from the side, like a cake cut in half.</say>
+<say>That cut shows two things a plan hides: the [[s2.layers]]layers inside each wall and roof, and the [[s2.heights]]heights of everything, measured from the ground. A building is not flat, and what happens between the floors matters as much as the rooms.</say>
+<item id="s3" type="board" title="Reading a section from the ground up">
+roles: emphasis = structure; fourth = weather; third = insulation
+---
+ground ground 90 470 1190
+found  box 330 470 64 72 emphasis hatch
+found2 box 886 470 64 72 emphasis hatch
+slab   box 330 446 620 24 emphasis hatch
+lwall  box 340 250 34 196 emphasis
+rwall  box 906 250 34 196 emphasis
+roof   poly 300,252 640,92 980,252 emphasis
+wx     arrow 140,120 330,200 fourth "rain, wind, sun"
+insul  curve 388,266 400,292 388,318 400,344 388,370 400,396 388,422 third
+ins    text 418 344 "insulation" small third
+</item>
+<say>Read a section from the bottom up. Start with the [[s3.ground]]ground line, and what sits below it: the [[s3.found]]foundations.</say>
+<say>Foundations spread the weight of everything above into the soil, which is why they are wider than the walls they carry. There is [[s3.found2]]one under every wall.</say>
+<say>On them rests the ground floor [[s3.slab]]slab, and the [[s3.lwall]]walls rise from it, carrying the floors and the roof down to the foundations.</say>
+<say>The [[s3.roof]]roof closes the top. Its first job is to keep the [[s3.wx]]weather out: rain, wind, and the summer sun.</say>
+<say>Just inside the wall, a layer of [[s3.insul]]insulation keeps the heat in. Notice that it wraps the rooms, not the structure, so the walls stay on the cold side.</say>
+<item id="s4" type="cards" title="Three jobs of the outer skin">
+## [water] Keep water out
+Roofs and walls shed rain before it reaches the structure.
+## [heat] Keep heat in
+Insulation slows the heat leaving in winter.
+## [air] Let air move
+Openings let stale air out and fresh air in.
+</item>
+<say>Every outer layer you just saw does three jobs at once. It [[s4.water]]keeps the weather out, and it [[s4.heat]]keeps the heat in.</say>
+<say>And it has to [[s4.air]]let air move, which is the hardest of the three, because the other two want the building sealed. Get any one of them wrong and you notice: damp, cold rooms, or stale air.</say>
+<item id="s5" type="board" title="Why warm air leaves at the top">
+roles: emphasis = cool air; fourth = warm air
+---
+ground ground 90 520 1190
+shell  poly 340,520 340,262 640,112 940,262 940,520
+low    box 330 420 22 60 emphasis
+cool   arrow 150,450 318,450 emphasis "cool air in"
+warm   text 560 470 "warmed: lighter" small fourth
+rise   curve 390,450 520,420 610,330 690,230 790,196 fourth dash arrow
+vent   box 838 188 30 34 fourth
+out    arrow 878,190 1060,120 fourth "out at the top"
+</item>
+<say>Here is something only a section can show. [[s5.cool]]Cool air slips in low, through an [[s5.low]]opening near the floor.</say>
+<say>Inside, it is [[s5.warm]]warmed by people and sunlight, becomes lighter, and [[s5.rise]]rises towards the roof.</say>
+<say>It escapes through a [[s5.vent]]vent up high and [[s5.out]]flows out at the top, pulling fresh air in behind it. That is the stack effect: ventilation without a fan, and you can only see it in section.</say>
+<say>The taller the building, the stronger the pull, which is why a stairwell or an atrium makes such a good [[s5.rise]]chimney. A section shows you that at a glance; a plan never will.</say>
+<followup>How do you size the openings for the stack effect?</followup>
+<followup>What does a wall section show about thermal bridges?</followup>`;
+
+const DESIGN = `<item id="s1" type="intro">
+Where the eye goes
+Why do some layouts guide your eye, and others leave it wandering?
+</item>
+<say>Why do some layouts guide your eye, and others [[s1]]don't?</say>
+<item id="s2" type="board" title="The rule of thirds">
 roles: fourth = the weak choice; emphasis = the stronger one
 ---
 frame  box 300 86 680 450 ink
@@ -1124,11 +1771,20 @@ moved  circle 753 236 38 emphasis hatch
 spot   ring moved third
 x1     cross mid fourth
 </item>
-<say>Here is a [[g1.frame]]photograph, with the subject placed [[g1.mid]]dead centre. It's balanced, but it [[g1.dull]]feels static.</say>
-<say>Now divide the frame into thirds: [[g1.v1]]two lines down, and [[g1.h1]]two across.</say>
-<say>Put the subject on one of the [[g1.moved]]crossings instead. The eye lands there first, and the empty space gives it [[g1.spot]]room to breathe.</say>
-<say>So the [[g1.x1]]centred version loses. Off centre, the picture starts to tell a story.</say>
-<item id="g2" type="board" title="Visual hierarchy: what you read first">
+<say>Start with placement, the simplest lever of all. Here is a [[s2.frame]]photograph, with the subject placed [[s2.mid]]dead centre. It's balanced, but it [[s2.dull]]feels static.</say>
+<say>Now divide the frame into thirds: [[s2.v1]]two lines down, and [[s2.h1]]two across.</say>
+<say>Put the subject on one of the [[s2.moved]]crossings instead. The eye lands there first, and the empty space gives it [[s2.spot]]room to breathe. The [[s2.x1]]centred version loses.</say>
+<say>Painters and photographers have used this for centuries, because an off-centre subject gives the picture a [[s2.moved]]direction to travel in.</say>
+<item id="s3" type="ol" title="Four levers of hierarchy">
+- [size] Size: the biggest thing is read first
+- [weight] Weight: bold pulls before light
+- [contrast] Colour and contrast: what differs most wins
+- [space] Space: room around a thing makes it matter
+</item>
+<say>Placement is one lever. Designers have four more. [[s3.size]]Size: the eye reads the biggest thing first, which is why headlines are big. [[s3.weight]]Weight: bold pulls before light, even at the same size.</say>
+<say>[[s3.contrast]]Colour and contrast: whatever differs most from its surroundings wins. And [[s3.space]]space: the more room around something, the more it seems to matter.</say>
+<say>You rarely need all four at once. Strong layouts pick one or two levers, like [[s3.size]]size and contrast, and keep everything else quiet, so nothing competes.</say>
+<item id="s4" type="board" title="Visual hierarchy: what you read first">
 roles: emphasis = reading order; fourth = colour and contrast
 ---
 poster   box 430 76 420 510 ink
@@ -1146,63 +1802,229 @@ l3       line 470,452 720,452 neutral
 n4       circle 386 426 22 emphasis "4"
 last     text 880 426 "small, grey: last" small neutral
 </item>
-<say>A [[g2.poster]]poster has a few seconds to work, so the designer decides what you see first.</say>
-<say>The [[g2.head]]headline is read first, [[g2.n1]]number one, because of its [[g2.sz]]size.</say>
-<say>Next the eye drops to the [[g2.img]]image, [[g2.n2]]number two.</say>
-<say>Then the [[g2.button]]button, [[g2.n3]]three. It is small, but [[g2.contrast]]colour and contrast pull the eye to it.</say>
-<say>The [[g2.l1]]body text, small and grey, is read [[g2.n4]]last. That planned order is visual hierarchy.</say>` },
+<say>Now watch the levers at work on one [[s4.poster]]poster, the kind you pass in a second on the street. The [[s4.head]]headline is read first, [[s4.n1]]number one, because of its [[s4.sz]]size.</say>
+<say>Next the eye drops to the [[s4.img]]image, [[s4.n2]]number two. Pictures are read almost as fast as headlines, so they make a natural second step.</say>
+<say>Then the [[s4.button]]button, [[s4.n3]]three. It is small, but [[s4.contrast]]colour and contrast pull the eye to it.</say>
+<say>The [[s4.l1]]body text, small and grey, is read [[s4.n4]]last. That planned order is visual hierarchy, and it is why the layout feels calm.</say>
+<say>So when a layout feels flat, ask what should be read first, second and third, and give each one a lever. That one question does most of the work on any [[s4.poster]]page.</say>
+<followup>How does a grid support visual hierarchy?</followup>
+<followup>Why do designers often use only two typefaces?</followup>`;
 
-  { title: "Why a cache makes reads fast", line: "Software · boxes, arrows, a ring and a note", src: `<item id="b1" type="board" title="Why a cache makes reads fast">
-roles: fourth = the slow trip; third = the fast trip
+const SHORT_SRC = `<item id="d1" type="board" title="How a collateral warranty bridges the gap">
+roles: ink = a contract; fourth = no contract; third = the warranty
 ---
-head   text 96 112 "Reading the same data twice" big
-app    box 120 250 200 110 ink "App"
-db     cyl 960 220 200 170 ink "Database"
-slow   arrow app db fourth bend 0.22 "every read: ~80 ms"
-cache  box 540 420 200 110 emphasis hatch "Cache"
-check  arrow app cache emphasis "ask first"
-fill   arrow db cache neutral dash "copy on a miss"
-hit    ring cache third
-fast   text 790 562 "hit: ~1 ms" third
-win    underline fast third
+client box 140 120 230 84 emphasis "Client"
+main   box 525 270 230 84 ink "Main contractor"
+c1     arrow client main ink bend 0.12 "building contract"
+sub    box 910 420 240 84 ink "Subcontractor"
+c2     arrow main sub ink "subcontract"
+gap    curve 200,216 300,520 896,470 fourth dash
+nolink text 330 566 "no contract" fourth small
+wty    curve 1030,412 1080,220 384,150 third dash arrow
+wl     text 640 112 "collateral warranty" small third
 </item>
-<say>Suppose your [[b1.app]]app needs the same record again and again. Each time, it goes all the way to the [[b1.db]]database, and that [[b1.slow]]round trip costs around eighty milliseconds.</say>
-<say>So we put a small, fast store in between: a [[b1.cache]]cache. Now the app [[b1.check]]asks the cache first.</say>
-<say>If the record isn't there, it is fetched once and [[b1.fill]]copied into the cache. Every later read is a [[b1.hit]]hit, served from memory in about [[b1.fast]]one millisecond.</say>
-<say>That is the whole trick: pay for the [[b1.slow]]slow trip once, then [[b1.win]]reuse the answer.</say>` },
+<say>The [[d1.client]]client has one contract with the [[d1.main]]main contractor: the [[d1.c1]]building contract.</say>
+<say>The main contractor has its own [[d1.c2]]subcontract with the [[d1.sub]]subcontractor. Between the client and the subcontractor, there is [[d1.gap]]nothing at all.</say>
+<say>A collateral warranty [[d1.wty]]draws that missing line: the subcontractor promises the client, directly, that its work is sound. [[d1.wl]]That promise is the bridge. Ask for it before the subcontractor starts, while you still have leverage.</say>`;
 
-  { title: "Why compound growth bends upward", line: "Finance · axes, two curves, a highlight", src: `<item id="b1" type="board" title="Why compound growth bends upward">
-roles: neutral = simple interest; emphasis = compound interest
----
-rule   text 150 96 "growth = rate × what you already have"
-ax     axes 150 160 820 370 "years" "money"
-simple line 150,530 970,410 neutral "simple"
-comp   curve 150,530 400,510 620,458 800,362 970,200 emphasis "compound"
-gap    line 970,402 970,216 fourth dash
-extra  text 990 296 "interest on" fourth small
-extra2 text 990 328 "interest" fourth small
-mark   highlight rule
-</item>
-<say>One rule explains everything on this sketch. Put [[b1.ax]]time along the bottom and money up the side.</say>
-<say>With [[b1.simple]]simple interest you earn the same amount every year, so the line is straight.</say>
-<say>With [[b1.comp]]compound interest, each year's interest is added to the pile, and next year you earn on the bigger pile, so the curve bends upward.</say>
-<say>After enough years the difference is large, and all of it is [[b1.gap]]interest earned on [[b1.extra]]earlier interest.</say>
-<say>That is the rule: [[b1.mark]]growth equals the rate times what you already have. The pile grows, so the growth grows, and the curve [[b1.comp]]keeps steepening.</say>` },
+const LUMENS = [
+  { id: "contracts", title: "Who is bound to whom", subject: "From your library", area: "Construction Law", source: { title: "JCT Design and Build 2024: a practical guide", pages: "pp. 12–18" }, made: "made today", src: CONTRACTS },
+  { id: "section", title: "Reading a building section", subject: "Your map", area: "Building Physics", made: "made yesterday", src: SECTION },
+  { id: "design", title: "Where the eye goes", subject: "Your map", area: "Graphic Design", made: "made today", src: DESIGN },
 ];
+const SHORT = { id: "short", title: "How a collateral warranty bridges the gap", subject: "Draw it", area: "Construction Law", made: "drawn in the copilot", src: SHORT_SRC };
+const extra = [];
+const builtCache = new Map();
+function built(def) { const k = `${def.id}:${def.src.length}`; if (!builtCache.has(k)) builtCache.set(k, buildLumen(def)); return builtCache.get(k); }
 
-function renderExamples() {
-  $("pane-ex").replaceChildren(...EXAMPLES.map((ex, i) => {
-    const btn = document.createElement("button");
-    btn.className = "btn ex"; btn.setAttribute("aria-current", String(i === currentExample));
-    const t = document.createElement("b"); t.textContent = ex.title;
-    const s = document.createElement("span"); s.textContent = ex.line;
-    btn.append(t, s);
-    btn.onclick = () => { currentExample = i; $("script").value = ex.src; load(ex.src, { autoplay: true }); renderExamples(); };
-    return btn;
+// ---------------------------------------------------------------- Learn list
+function renderLearn() {
+  const defs = [...LUMENS, ...extra];
+  $("learnList").replaceChildren(...defs.map((def) => {
+    const L = built(def), card = el("button", "ll-card");
+    const poster = P.mode === "proposed" ? (L.slides.find((s) => s.type === "board") || L.slides[0]) : L.slides[0];
+    const boards = L.slides.filter((s) => s.type === "board").length;
+    card.append(miniSlide(L, poster, 300), el("h3", null, def.title), el("p", null, `${fmt(L.total)} · ${plural(L.slides.length, "slide")}${boards ? ` · ${boards} drawn` : ""} · ${def.made}`));
+    card.onclick = () => openLumen(def);
+    return card;
   }));
+  $("posterNote").textContent = P.mode === "proposed" ? "Posters show the first drawn slide (proposed)." : "Posters show the title card (today).";
 }
 
-// ---------------------------------------------------------------- Sketch with Claude (the page's sample capability)
+// ---------------------------------------------------------------- Library and the Explain dialog
+const ITEMS = [
+  { kind: "pdf", title: "JCT Design and Build 2024: a practical guide", meta: "PDF · 4 MB", desc: "Course reader, chapters 2–4.", topic: "Construction Law", lumen: 0, pages: true, note: "Studiolo will read pages 12–18 and cite them as it explains." },
+  { kind: "note", title: "Section through the studio house", text: "Ground, slab, walls, roof, and where the insulation runs.", meta: "Note", topic: "Building Physics", lumen: 1, note: "Studiolo will read this note and cite it as it explains." },
+  { kind: "note", title: "Hierarchy is a set of levers", text: "Size, weight, colour, space.", meta: "Quote · Design notes", topic: "Graphic Design", lumen: 2, note: "Studiolo will read this quote and cite it as it explains." },
+  { kind: "photo", title: "Arcade and bay rhythm", meta: "Photo", desc: "The repeated arcade makes the wider central bay legible.", topic: "Islamic architecture", lumen: null, note: "Studiolo can't read this item's text yet, so it will explain the subject from general knowledge." },
+];
+function renderLibrary() {
+  $("libGrid").replaceChildren(...ITEMS.map((it) => {
+    const card = el("article", "lib-card"), cover = el("div", `lib-cover ${it.kind}`);
+    if (it.kind === "pdf") { const pg = el("div", "pg"); for (let k = 0; k < 9; k++) pg.append(el("i")); cover.append(pg); }
+    if (it.kind === "note") cover.textContent = it.text;
+    const acts = el("div", "lib-acts"), btn = el("button", "button button-quiet button-sm", "Explain…");
+    btn.onclick = () => openDialog(it);
+    acts.append(btn, el("span", "lib-kind", `○ ${it.topic}`));
+    card.append(cover, el("span", "lib-kind", it.meta), el("h3", null, it.title));
+    if (it.desc) card.append(el("p", null, it.desc));
+    card.append(acts);
+    return card;
+  }));
+}
+let dlgItem = null, dlgReturn = null;
+function openDialog(it) {
+  dlgItem = it; dlgReturn = document.activeElement;
+  $("dlgTitle").textContent = `Explain ${it.title}`;
+  $("dlgNote").textContent = it.note;
+  $("dlgPagesField").hidden = !it.pages;
+  $("dlgFocus").value = "";
+  $("dlgScrim").hidden = false; $("dlg").hidden = false; $("dlgFocus").focus();
+}
+function closeDialog() { $("dlgScrim").hidden = true; $("dlg").hidden = true; dlgReturn?.focus?.(); }
+$("dlgCancel").onclick = closeDialog;
+$("dlgScrim").onclick = closeDialog;
+$("dlg").addEventListener("keydown", (e) => { if (e.key === "Escape") closeDialog(); });
+$("dlgDraw").onchange = (e) => { $("dlgDrawOpt").dataset.on = String(e.target.checked); };
+$("dlgGo").onclick = () => {
+  const it = dlgItem, drawn = $("dlgDraw").checked;
+  closeDialog();
+  if (it.lumen === null) { toast("Not in this prototype: try the PDF, the note or the quote.", 2600); return; }
+  toast(drawn ? "Writing the explainer, with a board hint… the first slide is about 15 seconds away." : "Writing the explainer… the author still decides whether to draw.", 1700);
+  const base = LUMENS[it.lumen];
+  const def = it.lumen === 0 ? base : { ...base, subject: "From your library", source: { title: it.title, pages: it.kind === "note" ? "your note" : "your quote" } };
+  setTimeout(() => openLumen(def), 1700);
+};
+
+// ---------------------------------------------------------------- Graph and copilot
+function drawMap() {
+  const svg = $("mapSvg"), ns = "http://www.w3.org/2000/svg", cx = 300, cy = 230;
+  const add = (tag, attrs, text) => { const n = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text) n.textContent = text; svg.append(n); return n; };
+  const topics = ["Procurement", "Contracts", "Warranties", "Disputes", "Insurance", "Planning law"];
+  topics.forEach((t, i) => {
+    const a = (i / topics.length) * Math.PI * 2 - Math.PI / 2, x = cx + Math.cos(a) * 150, y = cy + Math.sin(a) * 150;
+    add("line", { x1: cx, y1: cy, x2: x, y2: y, stroke: "var(--line)", "stroke-width": 1.5 });
+    add("circle", { cx: x, cy: y, r: 9, fill: i === 1 || i === 2 ? "var(--status-1, #c9d4f1)" : "var(--panel)", stroke: "var(--ink)", "stroke-width": 1.5 });
+    add("text", { x: x + (Math.cos(a) >= 0 ? 16 : -16), y: y + 5, "text-anchor": Math.cos(a) >= 0 ? "start" : "end", "font-size": 15 }, t);
+  });
+  add("circle", { cx, cy, r: 16, fill: "var(--panel)", stroke: "var(--ink)", "stroke-width": 2 });
+  add("text", { x: cx, y: cy + 44, "text-anchor": "middle", "font-size": 17 }, "Construction Law");
+}
+const button = (label, quiet) => el("button", quiet ? "button button-quiet" : "button", label);
+function msgUser(text) { const m = el("div", "msg user"); m.append(el("p", null, text)); return m; }
+function msgAi(paras, card) {
+  const m = el("div", "msg ai"), who = el("p", "who"), txt = el("div", "txt");
+  who.append(el("span", "avs", "S"), "Studiolo");
+  paras.forEach((p) => txt.append(el("p", null, p)));
+  m.append(who, txt); if (card) m.append(card);
+  return m;
+}
+function kicker(text, tag) { const k = el("span", "cp-kicker"); k.append(text); if (tag) k.append(el("span", "cp-tag", tag)); return k; }
+function offerCard() {
+  const c = el("section", "cp-card"), acts = el("div", "acts"), make = button("Make it"), no = button("Not now", true);
+  const note = el("p", "note", "Proposed: the copilot can pass a board hint, so the author sketches the parties and the links. The hint never changes the request you see.");
+  acts.append(make, no);
+  c.append(kicker("Short explainer · Construction Law", "With sketches"), el("p", "cp-req", "Explain how the contracts on a building project relate, and where the gaps are"), acts, note);
+  make.onclick = () => {
+    acts.remove(); note.remove();
+    const bar = el("div", "cp-bar"), line = el("p", "note", "Writing the explainer… you can keep working.");
+    bar.append(el("i")); c.append(bar, line);
+    setTimeout(() => {
+      bar.remove(); line.remove();
+      const L = built(LUMENS[0]), t = el("p", "note"); t.append(el("b", null, LUMENS[0].title), ` · ${fmt(L.total)}`);
+      const a2 = el("div", "acts"), play = button("▶ Play"); play.onclick = () => openLumen(LUMENS[0]);
+      a2.append(play); c.append(t, a2);
+    }, 2300);
+  };
+  no.onclick = () => { acts.remove(); note.textContent = "Not now. Ask again any time."; };
+  return c;
+}
+function drawCard() {
+  const c = el("section", "cp-card"), acts = el("div", "acts"), draw = button("Draw it"), no = button("Not now", true);
+  const note = el("p", "note", "A short: one board and three lines of narration, no title card. It still asks first, like every step that costs money.");
+  acts.append(draw, no);
+  c.append(kicker("Draw it · Construction Law · about 30 s", "Proposed"), el("p", "cp-req", "Draw how a collateral warranty bridges the gap"), acts, note);
+  draw.onclick = () => {
+    const box = el("div", "cp-mini"); c.insertBefore(box, acts);
+    const open = button("Open in Learn"), full = button("Make a full Lumen", true);
+    open.onclick = () => { if (!extra.includes(SHORT)) { extra.push(SHORT); renderLearn(); } openLumen(SHORT); };
+    full.onclick = () => openLumen(LUMENS[0]);
+    acts.replaceChildren(open, full);
+    note.textContent = "Tap the sketch to pause or replay.";
+    mini.start(SHORT, box);
+  };
+  no.onclick = () => { acts.remove(); note.textContent = "Not now."; };
+  return c;
+}
+function planCard() {
+  const c = el("section", "cp-card"), ul = el("ul", "plan");
+  const parts = [["0", "The whole topic", "overview", null, true], ["1", "Who is bound to whom", "sub-topic", "drawn"], ["2", "Design and build or traditional", "sub-topic", null], ["3", "Warranties and bonds", "focus", "drawn"], ["4", "Your guide: JCT Design and Build 2024", "from your library", null]];
+  for (const [n, title, kind, tag, locked] of parts) {
+    const li = el("li"), box = el("input"); box.type = "checkbox"; box.checked = true; box.disabled = !!locked; box.setAttribute("aria-label", title);
+    const b = el("b", null, title); if (tag) { b.append(" "); b.append(el("span", "cp-tag", tag)); }
+    li.append(box, el("span", "n", n), b, el("span", "k", kind)); ul.append(li);
+  }
+  const acts = el("div", "acts"), start = button("Start the course"), no = button("Not now", true);
+  start.onclick = () => { toast("Courses aren't wired here. Part 1 opens as a Lumen.", 1800); setTimeout(() => openLumen(LUMENS[0]), 900); };
+  no.onclick = () => acts.remove();
+  acts.append(start, no);
+  c.append(kicker("Course plan · Construction Law"), el("p", "plan-title", "Building contracts: who carries the risk"), el("p", "plan-sub", "Part 0 + 4 parts · each part is made when you open it"), ul, acts,
+    el("p", "note", "Proposed: the planner can mark a part to be drawn. The mark travels as a hint with that part, not in its title."));
+  return c;
+}
+function renderThread() {
+  const th = $("thread");
+  th.append(
+    msgUser("How do all the contracts on a building project fit together?"),
+    msgAi(["Short version: the client holds separate contracts with the architect and the main contractor, and subcontractors are tied only to the main contractor. That leaves a gap, and warranties exist to close it.", "This is easier to see than to read. I can make a short explainer that sketches it."], offerCard()),
+    msgUser("Can you just draw how a collateral warranty closes that gap?"),
+    msgAi(["Yes: a quick sketch with narration, about thirty seconds."], drawCard()),
+    msgUser("Plan me a short course on building contracts."),
+    msgAi(["Here is a plan. Two parts are best explained by drawing them."], planCard()),
+  );
+  const comp = el("div", "composer"), input = el("input", "field-control"), send = button("Send");
+  input.id = "cpInput"; input.placeholder = "Ask the copilot…"; input.setAttribute("aria-label", "Message the copilot");
+  const ask = () => {
+    const q = input.value.trim(); if (!q) return;
+    input.value = "";
+    comp.before(msgUser(q), /draw|sketch/i.test(q) ? msgAi(["Here is a quick sketch to start from."], drawCard()) : msgAi(["In Studiolo the copilot answers here. In this prototype, the cards above show what changes."]));
+  };
+  send.onclick = ask; input.addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+  comp.append(input, send); th.append(comp);
+}
+
+/** The small player inside a copilot card: one board, drawn with its narration as captions. */
+const mini = {
+  L: null, clock: 0, playing: false, box: null, canvas: null, cap: null, k: 1,
+  start(def, host) {
+    this.L = buildLumen(def); this.clock = 0; this.playing = !reduceMotion; if (reduceMotion) this.clock = this.L.total;
+    const b = el("div", "xp-box"), c = el("canvas"), ov = el("div", "xp-overlay"), cap = el("div", "xp-caption");
+    b.style.background = "var(--panel)"; b.style.cursor = "pointer";
+    c.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
+    cap.dataset.visible = "false"; ov.append(cap); b.append(c, ov); host.replaceChildren(b);
+    Object.assign(this, { box: b, canvas: c, cap });
+    b.onclick = () => { if (this.clock >= this.L.total) this.clock = 0; this.playing = !this.playing; };
+    new ResizeObserver(() => this.resize()).observe(b);
+  },
+  resize() { if (!this.canvas) return; const w = this.box.getBoundingClientRect().width || 320; this.k = clamp((w * (window.devicePixelRatio || 1)) / W, 0.3, 2); this.canvas.width = Math.round(W * this.k); this.canvas.height = Math.round(H * this.k); this.redraw(); },
+  tick(dt) { if (!this.playing || !this.L) return; this.clock = Math.min(this.L.total, this.clock + dt); if (this.clock >= this.L.total) this.playing = false; this.redraw(); },
+  redraw() {
+    if (!this.L || !this.canvas) return;
+    const x = this.canvas.getContext("2d"), s = this.L.slides[0], st = STYLES[themeName()];
+    x.setTransform(this.k, 0, 0, this.k, 0, 0); x.clearRect(0, 0, W, H);
+    drawBoardAt(x, s.board, this.clock, st, reduceMotion);
+    if (!reduceMotion) drawDot(x, penAt(s.board, this.clock), st);
+    const seg = this.L.segs.find((g) => this.clock >= g.startMs && this.clock < g.startMs + g.durationMs + SAY_GAP * 0.6);
+    if (!seg) { this.cap.dataset.visible = "false"; return; }
+    const local = this.clock - seg.startMs; let now = -1; seg.words.forEach((w, i) => { if (w.startMs <= local) now = i; });
+    const [a, b] = seg.phrases.find(([, q]) => now <= q) || seg.phrases[seg.phrases.length - 1];
+    const said = el("b"), rest = el("span");
+    for (let k = a; k <= b; k++) { const w = seg.words[k]; (k <= now ? said : rest).append(seg.text.slice(w.c, w.c + w.len) + (k < b ? " " : "")); }
+    this.cap.replaceChildren(said, rest); this.cap.dataset.visible = "true";
+  },
+};
+
+// ---------------------------------------------------------------- Board lab and Sketch with Claude
 const SPEC = `You write one "board" for Studiolo Lumen: a whiteboard sketch that is drawn stroke by stroke while a calm voice explains an idea to an adult learner. Reply with ONLY the board source, no commentary and no code fences.
 
 FORMAT
@@ -1239,69 +2061,63 @@ Each say is plain spoken English, two or three sentences. Put a ref [[b1.id]] ri
 
 EXAMPLE
 `;
-
+const LAB = [...LUMENS, SHORT];
+let labCount = 0;
+function initLab() {
+  $("labPick").replaceChildren(...LAB.map((d, i) => { const o = el("option", null, d.title); o.value = String(i); return o; }));
+  $("labPick").onchange = () => { $("labSrc").value = LAB[+$("labPick").value].src; checkLab(); };
+  $("labSrc").value = LAB[0].src; checkLab();
+  $("labPlay").onclick = () => { const def = labDef(); const L = checkLab(); if (L.slides.length) openLumen(def); };
+}
+function labDef(src = $("labSrc").value) {
+  const first = src.match(/<item\s+[^>]*title="([^"]*)"/), intro = src.match(/<item[^>]*type="intro"[^>]*>\s*([^\n]+)/);
+  return { id: `lab-${++labCount}`, title: (intro && intro[1].trim()) || (first && first[1]) || "Board lab", subject: "Board lab", area: "Lab", made: "from the board lab", src };
+}
+function checkLab() {
+  const L = buildLumen({ id: "check", title: "", subject: "", area: "", src: $("labSrc").value });
+  const items = L.problems.slice(0, 30).map((p) => { const li = el("li", p.err ? "err" : "", `Line ${p.line}: ${p.msg}`); return li; });
+  if (!L.problems.length) items.push(el("li", "ok", "No problems found."));
+  $("labProblems").replaceChildren(...items);
+  $("labStat").textContent = `${plural(L.slides.length, "slide")} · ${L.slides.filter((s) => s.type === "board").length} drawn · ${L.words} words · ${fmt(L.total)}`;
+  return L;
+}
 const sampleReady = window.claude?.use ? window.claude.use("sample").catch(() => null) : Promise.resolve(null);
 let askCtl = null;
 sampleReady.then((sample) => {
-  const btn = $("ask"), status = $("askStatus");
-  if (!sample) { status.textContent = "Sketching with Claude works when this page is opened in Claude. The examples and the script editor work everywhere."; return; }
-  btn.disabled = false; status.textContent = "Ready. Claude writes the script; you'll see it appear in the Script tab.";
+  const btn = $("askBtn"), status = $("askStatus");
+  if (!sample) { status.textContent = "Drawing with Claude works when this page is opened in Claude. Everything else works everywhere."; return; }
+  btn.disabled = false; status.textContent = "Ready. Claude writes the board; it appears in the Lumen source and plays in Learn.";
   btn.onclick = async () => {
     const idea = $("idea").value.trim();
-    if (!idea) { status.textContent = "Write the idea you want explained first."; return; }
+    if (!idea) { status.textContent = "Write the idea you want drawn first."; return; }
     askCtl = new AbortController();
-    btn.disabled = true; $("stop").hidden = false; status.textContent = "Thinking…";
-    const prompt = `${SPEC}${EXAMPLES[0].src}\n\nNow write the board for this idea:\n${idea}`;
+    btn.disabled = true; $("stopBtn").hidden = false; status.textContent = "Thinking…";
     try {
-      const { text, truncated } = await sample(prompt, {
+      const { text, truncated } = await sample(`${SPEC}${SHORT_SRC.replaceAll("d1", "b1")}\n\nNow write the board for this idea:\n${idea}`, {
         signal: askCtl.signal, cache: false,
-        onText: ({ text }) => { status.textContent = "Writing the board…"; $("script").value = text; },
+        onText: ({ text }) => { status.textContent = "Writing the board…"; $("labSrc").value = text; },
       });
       const start = text.indexOf("<item"), end = text.lastIndexOf("</say>");
       const src = start > -1 && end > start ? text.slice(start, end + 6) : text;
-      $("script").value = src; currentExample = null; renderExamples();
-      load(src, { autoplay: true });
-      const errs = TL ? 0 : 1;
-      status.textContent = truncated ? "The answer was cut short; the board may be incomplete." : errs ? "Claude's board had problems; see the Script tab." : "Drawn. Open the Script tab to see or edit what Claude wrote.";
+      $("labSrc").value = src;
+      const L = checkLab();
+      if (L.slides.length) { const def = labDef(src); extra.push(def); renderLearn(); openLumen(def); }
+      status.textContent = truncated ? "The answer was cut short; the board may be incomplete." : L.slides.length ? "Drawn. It is also in Learn now." : "Claude's board had problems; see the list on the left.";
     } catch (e) {
       const code = e && e.code;
-      status.textContent = code === "cancelled" ? "Stopped." : code === "not_granted" || code === "sampling_disabled" ? "Claude isn't allowed for this page, so sketching is off." : code === "rate_limited" ? "Too many requests just now. Try again in a minute." : code === "refused" ? "Claude declined this idea. Try wording it differently." : "Something went wrong reaching Claude. Try again.";
+      status.textContent = code === "cancelled" ? "Stopped." : code === "not_granted" || code === "sampling_disabled" ? "Claude isn't allowed for this page, so drawing is off." : code === "rate_limited" ? "Too many requests just now. Try again in a minute." : code === "refused" ? "Claude declined this idea. Try wording it differently." : "Something went wrong reaching Claude. Try again.";
       if (code === "not_granted" || code === "sampling_disabled") btn.hidden = true;
-    } finally {
-      btn.disabled = false; $("stop").hidden = true;
-    }
+    } finally { btn.disabled = false; $("stopBtn").hidden = true; }
   };
-  $("stop").onclick = () => askCtl?.abort();
+  $("stopBtn").onclick = () => askCtl?.abort();
 });
 
-// ---------------------------------------------------------------- wiring
-$("play").onclick = () => setPlaying(!playing);
-$("scrub").oninput = (e) => seek(+e.target.value);
-$("theme").onchange = (e) => { themePick = e.target.value; applyStyleVars(); };
-darkQuery.addEventListener("change", applyStyleVars);
-new MutationObserver(applyStyleVars).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-$("dot").onchange = (e) => { showDot = e.target.checked; requestDraw(); };
-$("speed").onchange = () => voiceStop();
-$("voice").onchange = (e) => { voice.active = e.target.checked && "speechSynthesis" in window; voiceStop(); };
-if (!("speechSynthesis" in window)) $("voice").closest("label").hidden = true;
-$("draw").onclick = () => { currentExample = null; renderExamples(); load($("script").value, { autoplay: true }); };
-document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => {
-  document.querySelectorAll(".tab").forEach((t) => { const on = t === tab; t.setAttribute("aria-selected", String(on)); $(t.getAttribute("aria-controls")).hidden = !on; });
-}));
-document.addEventListener("keydown", (e) => {
-  if (e.target.closest("textarea, input, select")) return;
-  if (e.code === "Space") { e.preventDefault(); setPlaying(!playing); }
-  if (e.code === "ArrowRight") seek(clock + 5000);
-  if (e.code === "ArrowLeft") seek(clock - 5000);
-});
-
-currentExample = 0;
-renderExamples();
-$("script").value = EXAMPLES[0].src;
-applyStyleVars();
-load(EXAMPLES[0].src);
-// Open on a finished board so the first view shows what this does; Play draws it from the start.
-clock = TL ? TL.boards[0].endMs - 1 : 0;
-resize();
+// ---------------------------------------------------------------- start: the contracts Lumen, paused on its finished board
+setMode("proposed");
+renderLibrary(); renderThread(); drawMap(); initLab();
+openLumen(LUMENS[0], { autoplay: false });
+P.clock = P.L.slides[2].endMs - 300;
+dirty();
 requestAnimationFrame(frame);
+
 </script>
