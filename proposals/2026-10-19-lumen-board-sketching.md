@@ -2,7 +2,7 @@
 
 Status: investigation and working prototype, for the owner's decision · 19 Oct 2026
 
-Prototype: [`prototypes/lumen-board/index.html`](../prototypes/lumen-board/index.html) (open it in a browser; it also runs as a claude.ai artifact, where "Sketch with Claude" works).
+Prototype: [`prototypes/lumen-board/`](../prototypes/lumen-board/README.md) (open `index.html` in a browser; it also runs as a claude.ai artifact, where "Draw it with Claude" works). Since 20 Oct it mocks Studiolo's own Learn, player, Library and copilot screens; see [`2026-10-19-lumen-quality-and-board-integration.md`](2026-10-19-lumen-quality-and-board-integration.md).
 
 ## 1. Summary
 
@@ -91,20 +91,22 @@ To *write* text stroke by stroke you need **single-line fonts**, whose glyphs ar
 
 ## 4. The prototype
 
-`prototypes/lumen-board/index.html` is a single page with no build step. It loads perfect-freehand from jsDelivr and falls back to plain round strokes if that fails; the font data is inline.
+`prototypes/lumen-board/index.html` is a single page with no build step. It loads perfect-freehand from jsDelivr and falls back to plain round strokes if that fails; the font data is inline. Since 20 Oct 2026 it is styled from `studiolo` @ `4b4ee63` (tokens, explainer, copilot, graph and shell CSS), so boards appear inside Studiolo's own screens.
 
 What it does:
 
-- **Five test examples**, chosen to see whether one format covers different fields:
-  - **Reading a building** (architecture, 2 boards): a section drawn from the ground up (ground, foundations, slab, walls, roof, weather, insulation), then the stack effect (cool air in low, warm air rising and leaving through a high vent).
-  - **Who is bound to whom** (contracts): client, architect, main contractor and subcontractor, each contract drawn as it is named, the missing client–subcontractor link in red, and the collateral warranty that bridges it.
-  - **Where the eye goes** (graphic design, 2 boards): the rule of thirds (centred subject crossed out, thirds grid, subject moved to a crossing), then visual hierarchy on a poster with the reading order numbered 1–4.
-  - **Why a cache makes reads fast** (software) and **Why compound growth bends upward** (finance).
-- **Script editor**: edit the board source and press Draw. A problems list shows parse errors, unknown refs, marks outside the drawing area and overlapping shapes. These play the same role as the scene checks in `scene/checks/`.
-- **Sketch with Claude**: in claude.ai, the page asks Claude to write a board for any idea, streams the script into the editor and draws it. The prompt is the `SPEC` constant in the page, which is a first draft of the contract section.
-- **Player**: play/pause, scrubbing, board ticks on the scrubber, speed control, captions with the current word underlined, a colour legend from the `roles:` line, and a theme switch (match the app, light or dark).
-- **Read aloud** uses the browser's own voice. The clock re-syncs on word-boundary events and waits for the voice at the end of each say. This is only a stand-in for ElevenLabs audio.
-- Reduced motion shows finished marks with no drawing dot; keyboard controls are Space and ← →.
+- **Learn**: Lumen cards. Posters show a finished board under the proposed player.
+- **Player**: the real stage, title card, list, table and cards slides, cursor, captions, controls, and the Transcript and Slides panel, plus board slides drawn by the ink dot.
+  - A **Today / Proposed** switch compares the current player with the proposed changes in the quality plan.
+- **Three full Lumens in the author's markup**, chosen to see whether one format covers different fields:
+  - **Who is bound to whom** (contracts, from a library PDF, with page citations and a General knowledge run): the parties, the web of contracts drawn as each is named, the missing client–subcontractor link, the collateral warranty, and an answer board.
+  - **Reading a building section** (architecture): a section drawn from the ground up, then the stack effect.
+  - **Where the eye goes** (graphic design): the rule of thirds, the four levers of hierarchy, and a poster with its reading order numbered.
+- **Library**: the Explain dialog with a proposed "Draw it as it explains" hint.
+- **Copilot**: an offer card with a sketch hint, an inline **Draw it** short (one board, about 30 s), and a course plan with parts marked to be drawn.
+- **Board lab**: edit any Lumen's markup and play it, with checks. **Draw it with Claude** writes a new board from an idea (the prompt is the page's `SPEC`, a first draft of the contract section).
+- **Narration**: the speaker button reads aloud with the browser's own voice, as a stand-in for ElevenLabs. The clock re-syncs on word-boundary events.
+- **Reduced motion and keys**: reduced motion shows finished marks with no drawing dot. Keys are Space, ← →, J/L, C, and , and . to step between slides.
 
 ### 4.1 The board format (draft)
 
@@ -143,7 +145,7 @@ hit    ring cache third
 
 ### 4.3 How it was checked
 
-- The page was rendered in headless Chromium for all five examples, at the end of every board and part-way through, in both light and dark, and at 420 px width.
+- The page was rendered in headless Chromium on every screen, at the end of boards and part-way through, under Today and Proposed, in light and dark, and at 390 px width.
 - There were no console errors, all examples report "No problems found", and the page has no horizontal scroll at phone width.
 - While the new examples were being written, the checker caught two mark ids that clash with option words (`center` and `big`) and a label running past the drawing area. The contract should list the reserved words, and these checks belong in the repair loop.
 - Screenshots from that run were used to adjust label placement, text size and the layout of the examples.

@@ -1,0 +1,949 @@
+<title>Lumen Boards Spec</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: a Studiolo reading page. A contents rail on the left, one reading column, Studiolo's paper and ink. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --hover: #ecece6; --amber: #8a5a00; --amber-paper: #fbf3df;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --accent: #9db0f3; --accent-soft: #263156; --hover: #2a353f; --amber: #e8c27a; --amber-paper: #33291a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --accent: #9db0f3; --accent-soft: #263156; --hover: #2a353f; --amber: #e8c27a; --amber-paper: #33291a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--ui); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; align-items: start; }
+.toc { position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow: auto; font-size: 13px; padding-right: 4px; }
+.toc .mark { width: 30px; height: 30px; border-radius: 7px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 19px/1 var(--read); margin-bottom: 18px; }
+.toc p { margin: 18px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc a { display: block; padding: 4px 8px; border-radius: 4px; color: var(--ink-2); text-decoration: none; line-height: 1.35; }
+.toc a:hover { background: var(--hover); color: var(--ink); }
+.toc a.on { background: var(--accent-soft); color: var(--ink); }
+main { min-width: 0; max-width: 760px; }
+.doc-body, .lede { overflow-wrap: break-word; }
+.doc-body a { overflow-wrap: anywhere; }
+header.doc { display: grid; gap: 10px; padding-bottom: 22px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+h1 { margin: 0; font: 400 clamp(32px, 5vw, 44px)/1.08 var(--read); letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0; font: 400 19px/1.5 var(--read); color: var(--ink-2); max-width: 62ch; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 14px; border-radius: 2px; background: var(--accent); color: var(--panel); font-weight: 500; font-size: 13.5px; text-decoration: none; }
+.btn.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.part { padding-top: 34px; }
+.part > .partlabel { margin: 0 0 4px; }
+.part > h2.parttitle { margin: 0 0 6px; font: 400 30px/1.15 var(--read); letter-spacing: -0.005em; text-wrap: balance; }
+.doc-body h2 { margin: 40px 0 10px; font: 400 25px/1.2 var(--read); text-wrap: balance; scroll-margin-top: 16px; }
+.doc-body h3 { margin: 28px 0 8px; font: 500 19px/1.3 var(--read); }
+.doc-body p { margin: 0 0 12px; }
+.doc-body ul, .doc-body ol { margin: 0 0 14px; padding-left: 22px; }
+.doc-body li { margin: 3px 0; }
+.doc-body li > ul, .doc-body li > ol { margin: 4px 0 4px; }
+.doc-body strong { font-weight: 600; }
+.doc-body code { font: 0.86em var(--mono); background: var(--hover); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+.doc-body pre { margin: 0 0 16px; padding: 14px 16px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; overflow-x: auto; font: 12.5px/1.55 var(--mono); }
+.doc-body pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.doc-body pre.mermaid { background: var(--panel); text-align: center; }
+.tbl { overflow-x: auto; margin: 0 0 18px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.doc-body table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.5; min-width: 560px; }
+.doc-body th, .doc-body td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+.doc-body tr:last-child td { border-bottom: 0; }
+.doc-body th { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); background: color-mix(in srgb, var(--hover) 60%, transparent); }
+.doc-body del { color: var(--ink-3); }
+.status { display: inline-block; padding: 2px 9px; border-radius: 10px; background: var(--amber-paper); color: var(--amber); font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.mobile-toc { display: none; }
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .toc { display: none; }
+  .mobile-toc { display: block; margin: 14px 0 0; padding: 10px 14px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; font-size: 14px; }
+  .mobile-toc summary { cursor: pointer; font-weight: 500; }
+  .mobile-toc ol { margin: 8px 0 0; padding-left: 18px; }
+  .doc-body table { min-width: 520px; }
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <div class="mark" aria-hidden="true">S</div>
+    <p>Part 1 · Better Lumens</p>
+    <ol><li><a href="#a-1-summary">1. Summary</a></li><li><a href="#a-2-how-a-lumen-is-made-today-short-version">2. How a Lumen is made today (short version)</a></li><li><a href="#a-3-what-the-evidence-says">3. What the evidence says</a></li><li><a href="#a-4-enhancements-for-better-lumens">4. Enhancements for better Lumens</a></li><li><a href="#a-5-the-board-inside-the-system">5. The board inside the system</a></li><li><a href="#a-6-plan">6. Plan</a></li><li><a href="#a-7-decisions-for-you">7. Decisions for you</a></li><li><a href="#a-sources">Sources</a></li></ol>
+    <p>Part 2 · The board slide</p>
+    <ol><li><a href="#b-1-summary">1. Summary</a></li><li><a href="#b-2-where-it-fits-in-todays-lumen">2. Where it fits in today&#x27;s Lumen</a></li><li><a href="#b-3-research-findings">3. Research findings</a></li><li><a href="#b-4-the-prototype">4. The prototype</a></li><li><a href="#b-5-limits-of-the-prototype">5. Limits of the prototype</a></li><li><a href="#b-6-proposed-integration-into-studiolo-for-whoever-works-on-the-main-app">6. Proposed integration into studiolo (for whoever works on the main app)</a></li><li><a href="#b-7-open-questions-for-the-owner">7. Open questions for the owner</a></li><li><a href="#b-8-rough-effort">8. Rough effort</a></li><li><a href="#b-sources">Sources</a></li></ol>
+  </nav>
+  <main>
+    <header class="doc">
+      <span class="kicker">Studiolo · Lumen · Spec <span class="status">For decision</span></span>
+      <h1>Lumen boards, and better Lumens</h1>
+      <p class="lede">A review of how Lumens are made today, what holds their quality back, and how a hand-drawn board slide fits into every way a Lumen is created: the Explain button, a library item, the copilot and courses.</p>
+      <div class="links">
+        <a class="btn" href="https://claude.ai/artifact/DBmQmkn7ai2n4X4PUNriey" target="_blank" rel="noopener">Open the prototype</a>
+        <a class="btn quiet" href="https://github.com/ahmedste/Studiolo_Manage/tree/claude/serene-franklin-bif1cg/proposals" target="_blank" rel="noopener">Source in Studiolo_Manage</a>
+      </div>
+      <details class="mobile-toc"><summary>Contents</summary>
+        <p class="kicker" style="margin:10px 0 0">Part 1 · Better Lumens</p><ol><li><a href="#a-1-summary">1. Summary</a></li><li><a href="#a-2-how-a-lumen-is-made-today-short-version">2. How a Lumen is made today (short version)</a></li><li><a href="#a-3-what-the-evidence-says">3. What the evidence says</a></li><li><a href="#a-4-enhancements-for-better-lumens">4. Enhancements for better Lumens</a></li><li><a href="#a-5-the-board-inside-the-system">5. The board inside the system</a></li><li><a href="#a-6-plan">6. Plan</a></li><li><a href="#a-7-decisions-for-you">7. Decisions for you</a></li><li><a href="#a-sources">Sources</a></li></ol>
+        <p class="kicker" style="margin:10px 0 0">Part 2 · The board slide</p><ol><li><a href="#b-1-summary">1. Summary</a></li><li><a href="#b-2-where-it-fits-in-todays-lumen">2. Where it fits in today&#x27;s Lumen</a></li><li><a href="#b-3-research-findings">3. Research findings</a></li><li><a href="#b-4-the-prototype">4. The prototype</a></li><li><a href="#b-5-limits-of-the-prototype">5. Limits of the prototype</a></li><li><a href="#b-6-proposed-integration-into-studiolo-for-whoever-works-on-the-main-app">6. Proposed integration into studiolo (for whoever works on the main app)</a></li><li><a href="#b-7-open-questions-for-the-owner">7. Open questions for the owner</a></li><li><a href="#b-8-rough-effort">8. Rough effort</a></li><li><a href="#b-sources">Sources</a></li></ol>
+      </details>
+    </header>
+
+    <section class="part" id="a-top" aria-labelledby="a-title">
+      <p class="kicker partlabel">Part 1</p>
+      <h2 class="parttitle" id="a-title">Proposal: better Lumens, and where the board fits</h2>
+      <div class="doc-body"><p>Status: review and plan, for the owner's decision · 19 Oct 2026
+Builds on: <a href="#b-top"><code>2026-10-19-lumen-board-sketching.md</code></a> and the <a href="https://claude.ai/artifact/DBmQmkn7ai2n4X4PUNriey" target="_blank" rel="noopener">board prototype</a>
+Prototype for this plan: <a href="https://claude.ai/artifact/DBmQmkn7ai2n4X4PUNriey" target="_blank" rel="noopener"><code>prototypes/lumen-board/</code></a>. It mocks the real player, Learn, Library and Explain dialog, and the copilot, with a Today / Proposed switch covering §4.2, the board slide (§5.2), the dialog hint, copilot offer, Draw it short and course-part hint (§5.3, §5.5), and posters.
+Evidence: <code>studiolo</code> @ <code>c7d39da</code> (main, 19 Oct; read only), its run evidence and specs, and the Craft Studilo space (read only).</p>
+<h2 id="a-1-summary">1. Summary</h2>
+<p>Lumens work, but they are <strong>short, visually static and checked mostly by the prompt itself</strong>.</p>
+<ul>
+<li><strong>Length.</strong> The 40 tuned runs (AI tune-up, run 3) have a median of <strong>315 narration words, about 2.0 minutes</strong>. 17 of 40 are under 2 minutes, none reach 3, and none has more than 8 slides. The contract asks for 2–6 minutes, "most near the middle", and 6–12 slides.</li>
+<li><strong>Visuals.</strong> They are the weakest-scored dimension. The judge's means are visual use 3.13 and visual polish 3.10, against 3.9–4.0 for accuracy, story, clarity and pacing. 139 of 211 recorded faults are visual: empty halves of the frame, scenes that haven't started, and diagrams that look like stock Mermaid.</li>
+<li><strong>Static slides.</strong> Eight of the eleven slide types appear all at once, and the voice never builds them. Only infographics and animations move with the narration.</li>
+<li><strong>Untested promises.</strong> Several contract rules have no check behind them: the length floor, the answer-slide type, "every slide has a say", and counts that must match the screen. Warnings are never sent to repair.</li>
+</ul>
+<p>The board fits <strong>as one more slide type written in the same author pass</strong>. Every creation path ends in the same function (<code>generateQuick</code>), so adding it to the contract and ingest makes it available to the topic Explain button, library items, the copilot, course parts and onboarding at once. The paths only differ in whether they <em>hint</em> that a board would help. Boards also address three of the problems above: they build with the narration by nature, they fill the frame, and they break up the run of tables and animations.</p>
+<p><strong>Recommended order:</strong></p>
+<ol>
+<li><strong>Now:</strong> six small fixes that raise every Lumen (§4.1).</li>
+<li><strong>Next:</strong> "build with the voice" for every typed slide (§4.2).</li>
+<li><strong>Then:</strong> the board as a slide type with a light hint from each entry point (§5).</li>
+<li><strong>Later:</strong> a short board-only "draw it for me" from the copilot (§5.5).</li>
+</ol>
+<h2 id="a-2-how-a-lumen-is-made-today-short-version">2. How a Lumen is made today (short version)</h2>
+<pre class="mermaid">flowchart LR
+  A[Topic Explain button] --&gt; G
+  B[Library item Explain] --&gt; G
+  C[Copilot offer card: Make it] --&gt; G
+  D[Course part opened] --&gt; G
+  E[Onboarding first Lumen] --&gt; G
+  G[generateQuick: gate, row, brief context] --&gt; W[Trigger job runGenerate]
+  W --&gt; S[Sources: item text, BM25 when large]
+  S --&gt; P[Brief + cached contract 1.4]
+  P --&gt; O[Opus 5.5 low effort, streamed]
+  O --&gt; I[Ingest: validate each block]
+  I --&gt; R[Repair: reject tier only, 2 rounds]
+  I --&gt; V[Scene checks in QuickJS]
+  I --&gt; T[Speech: one ElevenLabs job per say]
+  T --&gt; PL[Player: draws slides live with word timings]
+</pre>
+<ul>
+<li><strong>One entry point.</strong> <code>generateQuick</code> is the only one (<code>src/features/explainers/service.ts:245-250, 278-411</code>).</li>
+<li><strong>Brief.</strong> Depth is always "overview", and there is no length or format field (<code>contract/brief.ts:57-59, 147-161, 196</code>).</li>
+<li><strong>Models.</strong> The author is Opus 5.5 at low effort with 32k tokens; repair is Opus at medium (<code>features/ai/purposes.ts:34-36</code>).</li>
+<li><strong>Slide types.</strong> Only the author picks them, from contract §3 (<code>contract/text.ts:52-70</code>). No path hints at a type.</li>
+<li><strong>Copilot.</strong> The conversation never reaches the author: only the request and focus strings do (<code>copilot/tools/explain.ts:17-42</code>, <code>prompt/system.ts:263-268</code>).</li>
+<li><strong>Library items.</strong></li>
+<li>An item is grounded <code>strict</code> when its text can be read: PDF native text, a link, or a note or quote body.</li>
+<li>Citations live only in narration. Item bodies may not carry them (<code>text.ts:113</code>, <code>ingest/types.ts:50-62</code>).</li>
+</ul>
+<h2 id="a-3-what-the-evidence-says">3. What the evidence says</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Narration length, tuned runs</td>
+<td>median 315 words (≈2.0 min at 155 wpm), max 432; 17/40 under 2 min</td>
+<td>recomputed from <code>docs/superpowers/evidence/ai-tune-up-2026-10-16/runs/T1</code> (40 runs)</td>
+</tr>
+<tr>
+<td>Slides per Lumen</td>
+<td>median 7 including the intro, max 8</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Slide-type mix</td>
+<td>animation 74, table 52, diagram 36, math 26, cards 20, ul 9, code 6, infographic 3, ol 2, diff 1</td>
+<td>same</td>
+</tr>
+<tr>
+<td>Weakest judge dimensions</td>
+<td>visual use 3.13 and visual polish 3.10, others 3.9–4.0; 139/211 faults are visual; 58 mention empty halves</td>
+<td>judgements in the same evidence folder; <code>scripts/lab/judge.ts:22-36</code></td>
+</tr>
+<tr>
+<td>Item faithfulness</td>
+<td>33/40, below the bar</td>
+<td><code>project-docs/implementation/ai.md:467-478</code></td>
+</tr>
+<tr>
+<td>First slide</td>
+<td>1 in 3 take 14–34 s</td>
+<td>Craft <em>Explainers</em> (known issues)</td>
+</tr>
+<tr>
+<td>Phones</td>
+<td>body text about 8 px at 390 px wide</td>
+<td><code>docs/superpowers/specs/2026-10-16-mobile-responsive-mockups</code> (after/learn-player--390)</td>
+</tr>
+<tr>
+<td>Feedback</td>
+<td>1–5 ratings and problem reports are stored; nothing reads them</td>
+<td><code>features/explainers/feedback.ts:157-180</code></td>
+</tr>
+<tr>
+<td>Owner calibration</td>
+<td>your 12 ratings are pending, so judge-vs-you agreement is unknown</td>
+<td>Craft <em>AI Lab &amp; Test Results</em></td>
+</tr>
+</tbody>
+</table></div>
+<p>Two causes stand out:</p>
+<ul>
+<li><strong>The length problem is partly self-inflicted.</strong> The first-call instruction says <em>"Do not plan the whole explainer before you start… plan each next slide as you go"</em> (<code>contract/prompt.ts:32</code>). Contract §9 says <em>"Plan the whole story before you write the first tag"</em> (<code>text.ts:245</code>). No check enforces a lower bound on length.</li>
+<li><strong>The examples lean one way.</strong> 11 of the 12 worked examples are about building and architecture (<code>contract/examples.ts</code>). The voice director still says "for architects" (<code>speech/direction.ts:38</code>). The audience is law, engineering, business, medicine and more (Craft <em>Settings &amp; Onboarding</em>).</li>
+</ul>
+<h2 id="a-4-enhancements-for-better-lumens">4. Enhancements for better Lumens</h2>
+<p>Sizes: S = up to a day, M = 2–4 days, L = a week or more. The estimates are mine, not measured.</p>
+<h3 id="a-41-now-small-fixes-with-a-large-effect">4.1 Now: small fixes with a large effect</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Change</th>
+<th>Why</th>
+<th>Where</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Fix planning and set a length floor.</strong> Rewrite <code>INTRO_FIRST</code> to "decide the question and the slide list silently, then write the intro at once". Add a <code>length_short</code> signal at ingest finish (under about 300 words or under 6 slides) that goes to repair as "add the missing step". Pass a target length in the brief.</td>
+<td>17/40 are under 2 min, and the two instructions contradict each other</td>
+<td><code>prompt.ts:32</code>, <code>text.ts:241-245</code>, <code>ingest/ingest.ts</code> finish, <code>brief.ts:57</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Repair chosen warnings when a round is left:</strong> <code>say_without_ref</code>, <code>scene_one_colour</code>, soft over-limit.</td>
+<td>33 one-colour scenes and 20 says without a ref in 40 runs, none repaired</td>
+<td><code>author.ts:119</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Add whole-Lumen structure checks:</strong> intro first; every item has a say; the answer slide is not ul/ol/cards; spoken counts match the screen; no duplicate slides.</td>
+<td>These are contract promises with no check</td>
+<td><code>ingest.ts</code> finish</td>
+<td>S</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Fix tables:</strong> strip header anchors (the judge saw literal "[B]" on screen) and render maths in cells.</td>
+<td>A visible defect</td>
+<td><code>ingest/items.ts:276-290</code>, <code>player/stage/table-slide.tsx</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Fix the pointer:</strong> keep its last position while hidden and jump rather than spring on a new slide. Today it flies in from the stage's top-left, because the hidden transform falls back to <code>translate(0,0)</code>. This is inferred from the code.</td>
+<td>It looks broken</td>
+<td><code>player/stage/pointer.tsx:75-91</code>, <code>explainer.css:489</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Remove the domain tilt:</strong> vary the worked examples' subjects (law, health, business, design), make <code>direction.ts</code> field-neutral, and extend <code>pronounce.ts</code>. That file's comment says "£500" is read "pounds 500", which is the wrong order.</td>
+<td>Most of the audience is not architects</td>
+<td><code>examples.ts</code>, <code>speech/direction.ts:38</code>, <code>speech/pronounce.ts</code></td>
+<td>S</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-42-next-make-slides-build-with-the-voice">4.2 Next: make slides build with the voice</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Change</th>
+<th>Why</th>
+<th>Where</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td><strong>Build with the voice on every typed slide.</strong> Generalise <code>reachedQuadrants</code> into a list of reached anchors for all types. Parts not yet spoken sit dimmed, and spoken ones get a quiet "said" mark. Lists, cards, table rows, maths lines and diagram nodes appear as they are named.</td>
+<td>Eight of eleven types are static; "show before you tell" is the contract's own rule (<code>text.ts:48</code>)</td>
+<td><code>player/view.ts:521</code>, <code>stage-slide.tsx:30-45</code>, <code>explainer.css</code></td>
+<td>M</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Draw diagrams on in Studiolo's look:</strong> edges reveal with a stroke dash in ref order, 2 px borders, 26–28 px labels and role tints. Validate Mermaid and KaTeX <strong>on the server</strong> so a broken one goes to repair instead of <code>console.warn</code>.</td>
+<td>Stock Mermaid look; diagrams arrive late and empty</td>
+<td><code>player/stage/diagram-slide.tsx:42-145</code>, <code>ingest/items.ts:347-363</code></td>
+<td>M</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Fill the frame:</strong> centre and scale sparse typed slides, and stagger the slide's own parts as it enters. Crossfade between slides, keeping the outgoing slide for about 300 ms; the mockup already did this.</td>
+<td>58 faults mention empty halves; the hard cut looks cheap</td>
+<td><code>player.tsx:690</code>, <code>slide-frame.tsx</code>, <code>explainer.css:37-49</code></td>
+<td>M</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Add a motion check for scenes:</strong> warn or reject when the frames at 10/50/90% are equal, or when nothing has changed by the first pinned moment.</td>
+<td>24 faults are about stills where nothing has happened yet</td>
+<td><code>scene/checks/frames.ts</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Make captions a phrase window:</strong> at most about 12 words around the current word and two lines, with their own dark-theme tokens.</td>
+<td>Today a whole say covers the slide</td>
+<td><code>player/captions.tsx</code>, <code>tokens.css:101-103</code></td>
+<td>S</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Make phones watchable:</strong> captions on under 560 px, a CSS "watch" mode instead of the Fullscreen API on iPhone, and a compact <code>FIT_LIMITS</code> profile.</td>
+<td>Body text is about 8 px on a phone</td>
+<td><code>player.tsx:454-457</code>, <code>explainer.css:1666-1708</code>, brand kit</td>
+<td>M</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-43-then-make-quality-measurable">4.3 Then: make quality measurable</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Change</th>
+<th>Why</th>
+<th>Where</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>13</td>
+<td><strong>Add the stills reviewer (S20b):</strong> after repair, one low-effort call looks at rendered stills and flags at most one slide for one fix.</td>
+<td>Visuals are the weakest dimension, and judges only see light-theme stills today</td>
+<td>after <code>author.ts:504</code>; needs headless render of typed slides</td>
+<td>L</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Run a consistency pass:</strong> a cheap call checks numbers and claims across slides and narration, and sends contradictions to repair.</td>
+<td>The judge found contradictions (COP 3 vs 4; −5 °C called "freezing")</td>
+<td>new step after <code>author.ts:437</code></td>
+<td>M</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>Improve item faithfulness:</strong> run item Lumens at medium effort, or judge the cited lines.</td>
+<td>33/40 is below the bar</td>
+<td><code>purposes.ts:34</code></td>
+<td>S–M</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>Close the loop:</strong> build 3B-5a (golden Lumens, CI stamp), add a weekly query over <code>explainer_feedback</code> and issue codes, and <strong>give your 12 calibration ratings</strong>.</td>
+<td>Without your ratings nobody knows whether the judge agrees with you</td>
+<td><code>scripts/lab</code>, <code>feedback.ts</code></td>
+<td>M</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-44-learning-value-after-the-above">4.4 Learning value, after the above</h3>
+<ul>
+<li><strong>Misconceptions.</strong> Add a rule to contract §11: for "tricky" topics, name the common misconception and correct it on screen. 17/40 eval requests are tagged tricky; the existing rule only covers false premises (<code>text.ts:297</code>).</li>
+<li><strong>Check yourself.</strong> Add an optional "check yourself" question as a third follow-up kind. This starts toward your "readings and quizzes under the video" idea (Craft <em>Features &amp; Ideas</em>).</li>
+<li><strong>Kickers and step markers.</strong> Bring back the mockup's eyebrow and card kicker so a viewer always knows where they are. This needs a contract field.</li>
+</ul>
+<h2 id="a-5-the-board-inside-the-system">5. The board inside the system</h2>
+<h3 id="a-51-principles">5.1 Principles</h3>
+<ol>
+<li><strong>Same author, same pass.</strong> The lab found that splitting writer and drawer always loses quality (E25–27, Craft <em>AI Lab &amp; Test Results</em>). The board is written by the explainer author inside the same stream as the narration, as data: one line per mark (see the prototype format). It is not code, so it needs no QuickJS sandbox.</li>
+<li><strong>Same timing system.</strong> Narration refs already pin animation moments (<code>ingest/refs.ts:113-123</code>). A board uses the same refs: <code>[[s4.cache]]</code> starts drawing <code>cache</code> as the word is spoken, and a second ref points back at it.</li>
+<li><strong>Same look.</strong> The board uses Studiolo's light and dark stage values and role colours, which the prototype now does. No pen is shown: a small ink dot does the drawing and stands in for the pointer.</li>
+<li><strong>Grounded like everything else.</strong> Citations stay in narration. In strict mode, board labels are checked against the cited spans (§5.4).</li>
+</ol>
+<h3 id="a-52-core-change-enables-every-path-at-once">5.2 Core change (enables every path at once)</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Change</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contract 1.5</td>
+<td>Add a <code>board</code> type and rules for when to use it (§5.6), the shape list, limits (≤16 marks, labels ≤4 words, ≤3 roles) and one worked example in a non-architecture subject</td>
+<td><code>contract/text.ts</code> §3, §4, §8; <code>examples.ts</code>; <code>CONTRACT_VERSION</code> (<code>types.ts</code>); golden hash test</td>
+</tr>
+<tr>
+<td>Types and limits</td>
+<td><code>board</code> in <code>AUTHOR_TYPES</code>, <code>ITEM_TYPES</code> and <code>FIT_LIMITS</code></td>
+<td><code>ingest/types.ts:10</code>, <code>brand-kit/stage.ts:1-24</code></td>
+</tr>
+<tr>
+<td>Ingest</td>
+<td>Board parser (port the prototype's parser). Mark ids become anchors (<code>payloadAnchors</code>), and moment pinning is generalised from animation to board marks</td>
+<td><code>ingest/items.ts:33-43, 188, 387-430</code>, <code>refs.ts:113-123</code>, <code>view.ts:459</code></td>
+</tr>
+<tr>
+<td>Checks</td>
+<td>Out of the safe area or caption band, the watermark corner, overlaps (frames may contain marks), labels on lines and ids that clash with keywords. Failures go to the existing repair path as a cheap item rewrite</td>
+<td>new <code>scene/checks/board.ts</code></td>
+</tr>
+<tr>
+<td>Player</td>
+<td><code>BoardSlide</code> on the <code>AnimationSlide</code> pattern (canvas or SVG, anchors as 1×1 spans), timed through <code>sceneTimeMap</code>, <code>sceneTime</code> and <code>settledTime</code>, with <code>host: null</code> so no worker starts. Hide the cursor on board slides, as is done for the infographic camera, and draw the ink dot</td>
+<td><code>stage-slide.tsx:30-45</code>, <code>animation-slide.tsx</code>, <code>player.tsx:404-423, 693</code>, <code>moments.ts</code></td>
+</tr>
+<tr>
+<td>Stills and sharing</td>
+<td>Thumbnails and the Learn poster default to the finished board, not <code>sceneTime: 0</code>, which would be blank. Add a <code>board</code> case to the share strip, whose default <code>return null</code> would otherwise drop board slides from public pages</td>
+<td><code>stage-slide.tsx:27</code>, <code>transcript.tsx:29</code>, <code>sharing/strip.ts:93</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The contract prefix is cached and byte-identical (<code>prompt.ts:1-4</code>), so the bump costs one cache rewrite for every explainer, once.</p>
+<h3 id="a-53-per-creation-path">5.3 Per creation path</h3>
+<p>A board hint is a new optional brief field, for example <code>visual: "board"</code>, rendered in the user message as "A board would suit this request." It needs plumbing through <code>GenerateQuickInput</code>, <code>fitJobInput</code>, <code>readBriefContext</code> and the create-key check <code>sameRequest</code>, so that existing keys don't change (<code>service.ts:184-205</code>). <strong>It never goes into <code>focus</code></strong>, which would pollute the stored request and break the copilot's no-added-framing rule.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>What changes</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Topic Explain button</strong> (graph, <code>explain-dialog.tsx</code>)</td>
+<td>Nothing required: the author picks a board when the idea suits one. Optionally add an "Explain with sketches" toggle in the dialog that sets the hint</td>
+<td>The dialog already sends <code>request</code> and <code>focus</code>; the toggle sits beside the focus field</td>
+</tr>
+<tr>
+<td><strong>Library item</strong> (<code>explain-item-button.tsx</code>, item page, library wall)</td>
+<td>Nothing required. Under strict grounding a board can draw relationships named in the sources: parties and duties in a contract, the parts of a building section from a specification, the steps of a process. It must not draw what the text never states</td>
+<td>Mermaid-style text cannot describe an unprocessed figure; the scope says "Do not claim to understand an unprocessed diagram from surrounding text alone" (<code>product/mvp-scope.md:135</code>). Once 3C image descriptions land, a described figure can become a board</td>
+</tr>
+<tr>
+<td><strong>Copilot</strong> (<code>explain</code> tool)</td>
+<td>Add an optional <code>visual</code> parameter, stored on <code>ExplainerOffer</code> and passed on by <code>decideOffer</code>. The prompt gets one line: offer a board when the learner asks to see how parts relate or asks for a sketch. Bump the prompt and tool versions</td>
+<td>Stays a costly tool with a confirm card; the registry and A11 require this (<code>copilot/tools/registry.ts:86-87</code>)</td>
+</tr>
+<tr>
+<td><strong>Course parts</strong> (<code>plan_course</code>)</td>
+<td>An optional per-part hint on <code>partSchema</code> and <code>CoursePart</code> (jsonb, no migration). The planner can mark the part that introduces a structure ("How the parties relate") as a board part</td>
+<td>Keeps course parts varied; the course's own <code>&lt;series&gt;</code> block is unchanged</td>
+</tr>
+<tr>
+<td><strong>Onboarding</strong> first Lumen</td>
+<td>No change</td>
+<td>The free Lumen is a plain topic explainer; the author can still choose a board</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-54-grounding-and-citations-for-boards">5.4 Grounding and citations for boards</h3>
+<ul>
+<li><strong>Today.</strong> A board mark is grounded only through the say that refs it. Citations attach to narration spans (<code>refs.ts:243-277</code>).</li>
+<li><strong>Proposed check, strict mode only.</strong> At ingest, every board label containing a number or a proper name must appear in a cited span or in the say that draws it. Otherwise it gets <code>board_label_unsupported</code>, a warning sent to repair. This stops a board from showing a figure the sources don't contain.</li>
+<li><strong>Viewer link (optional).</strong> A mark drawn in the same say as a citation could show that citation when tapped. Both carry offsets in the clean say text (<code>ingest/types.ts:45, 62</code>), so the link costs no extra model work.</li>
+</ul>
+<h3 id="a-55-a-short-board-on-its-own-draw-it-for-me">5.5 A short board on its own ("Draw it for me")</h3>
+<p>A one-board answer in the copilot is attractive: a 30–60 second sketch with voice, for "how do these relate?".</p>
+<ul>
+<li><strong>What it would reuse:</strong> <code>generateQuick</code>, the gate, the job, ingest, speech, the player and citations.</li>
+<li><strong>What would be new:</strong></li>
+<li>A <strong>short mode</strong> of the contract: no intro, one board, 2–4 says and one follow-up. The contract currently requires an intro, 6–12 slides and two follow-ups (<code>text.ts:76, 113, 247</code>).</li>
+<li>An embedded player in the copilot card.</li>
+<li>A decision on where shorts live in Learn and whether they can be shared.</li>
+<li><strong>Cost and latency.</strong> My estimate is about US$0.02–0.05 and a first stroke within a few seconds; this is not measured. A short still takes one of the two-at-once slots.</li>
+<li><strong>Naming.</strong> "Sketch" is taken: the onboarding map uses it. Use "Draw it" or "Board" in the interface.</li>
+<li><strong>Sketch a highlighted passage.</strong> "Explain this" on a highlighted PDF passage was explicitly out of scope in 3B-4 (spec §12). The hook exists (<code>library/select-to-quote.tsx:24-40</code>): saving the selection as a quote already gives a strict-grounded note with a page. That makes it a natural second step once shorts exist.</li>
+</ul>
+<h3 id="a-56-when-to-use-a-board-a-diagram-or-an-animation-proposed-contract-wording">5.6 When to use a board, a diagram or an animation (proposed contract wording)</h3>
+<ul>
+<li><strong>Board:</strong> an idea explained by building a picture one piece at a time, in the order it is spoken: relationships between parties, a cause and its effect, a before and after, an annotated graph, a labelled section. The value is in the order of the build and in pointing back at parts.</li>
+<li><strong>Diagram:</strong> a flow, hierarchy or state machine whose final shape matters more than the order it was built in.</li>
+<li><strong>Animation:</strong> motion over time, or precise geometry, such as a plan, a section, load paths in 3D, or a growing quantity.</li>
+<li><strong>Mix.</strong> In a 6–10 slide Lumen, use at most two boards, and never two boards in a row.</li>
+</ul>
+<h3 id="a-57-how-boards-help-the-quality-problems">5.7 How boards help the quality problems</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Problem (§3)</th>
+<th>How a board helps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Static typed slides</td>
+<td>A board is drawn with the voice by nature</td>
+</tr>
+<tr>
+<td>Empty halves of the frame</td>
+<td>Boards are laid out on the whole 1280×720 stage, and the checks flag empty or overflowing layouts</td>
+</tr>
+<tr>
+<td>Run of tables and animations</td>
+<td>A third visual mode, cheap to render and with no sandbox</td>
+</tr>
+<tr>
+<td>Scene stills with nothing happening yet</td>
+<td>A board starts drawing on the first ref; there is no blank first tenth to reject</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Boards are data, not code: no kit, no QuickJS run, and repairs are small</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="a-6-plan">6. Plan</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Content</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>§4.1 fixes 1–6</td>
+<td>about 4 days</td>
+</tr>
+<tr>
+<td>2</td>
+<td>§4.2 items 7–12</td>
+<td>2–3 weeks</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Board core (§5.2) and contract 1.5 with evals: 30 runs, half of them non-architecture</td>
+<td>6–9 days (from the board proposal)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Board hints: dialog toggle, copilot parameter, course-part hint (§5.3)</td>
+<td>2–3 days</td>
+</tr>
+<tr>
+<td>5</td>
+<td>§4.3 quality loop (stills reviewer, consistency pass, 3B-5a)</td>
+<td>2–3 weeks</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Short board in the copilot and on a highlighted passage (§5.5), after the owner decides</td>
+<td>1–2 weeks</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="a-7-decisions-for-you">7. Decisions for you</h2>
+<ol>
+<li><strong>Order.</strong> Fixes first (steps 1–2) and then the board? Or the board first, because it addresses the visual problems directly?</li>
+<li><strong>Length target.</strong> Hold the contract's 2–6 minutes and enforce a floor of about 2.5 minutes? Or accept short Lumens and change the contract to 1.5–4 minutes?</li>
+<li><strong>Brand.</strong> A hand-drawn board with handwriting departs from S19 ("type from the stage library") and the prototype-fidelity rule. Approve it as an exception for board slides only?</li>
+<li><strong>Hints.</strong> Is a dialog toggle ("Explain with sketches") wanted, or should the author always decide?</li>
+<li><strong>Shorts.</strong> Should one-board answers exist in the copilot, and where do they live in Learn?</li>
+<li><strong>Highlighted passage.</strong> Should "Draw it" on a highlighted passage come back into scope? It was excluded in 3B-4.</li>
+<li><strong>Calibration.</strong> When can you give the 12 explainer ratings? Every quality change after this one needs them to be judged fairly.</li>
+</ol>
+<h2 id="a-sources">Sources</h2>
+<ul>
+<li><code>studiolo</code> @ <code>c7d39da</code> (read only):</li>
+<li><code>src/features/explainers/{service,run,author,brief,feedback}.ts</code></li>
+<li><code>src/features/explainers/contract/{text,prompt,examples,brief}.ts</code></li>
+<li><code>src/features/explainers/ingest/{items,refs,types,ingest}.ts</code></li>
+<li><code>src/features/explainers/scene/checks/frames.ts</code></li>
+<li><code>src/features/explainers/speech/{direction,pronounce}.ts</code></li>
+<li><code>src/features/explainers/player/{player.tsx,view.ts,captions.tsx,stage/*}</code></li>
+<li><code>src/features/explainers/sharing/strip.ts</code></li>
+<li><code>src/features/copilot/{tools/explain.ts,tools/registry.ts,prompt/system.ts}</code></li>
+<li><code>src/features/ai/purposes.ts</code>, <code>src/features/brand-kit/*</code>, <code>src/styles/{explainer,tokens}.css</code></li>
+<li><code>src/components/explainers/explain-dialog.tsx</code>, <code>src/components/library/select-to-quote.tsx</code></li>
+<li><code>docs/superpowers/specs/</code>: stage-3, 3B-2, 3B-2b, 3B-3, 3B-4, 3B-5, AI tune-up, course planning, mobile and web mockups</li>
+<li><code>docs/superpowers/evidence/ai-tune-up-2026-10-16/</code> (runs and judgements)</li>
+<li><code>project-docs/{implementation/ai.md,product/mvp-scope.md,design/interface.md,architecture/course-engine.md}</code></li>
+<li>Craft, Studilo space (read 19 Oct 2026):</li>
+<li><em>Explainers</em>, <em>Courses</em>, <em>Copilot</em>, <em>Library - polishment Phase</em>, <em>Settings &amp; Onboarding</em></li>
+<li><em>Vision &amp; Principles</em>, <em>Logo &amp; Visual Identity</em></li>
+<li><em>AI Lab &amp; Test Results</em>, <em>Pricing &amp; Unit Costs</em>, <em>Features &amp; Ideas</em>, <em>Changelog</em>, <em>Decisions</em>, <em>Founder Home</em></li>
+<li>Craft has very little feedback in the owner's own words; the Inbox and the weekly review are empty.</li>
+<li>Board prototype and the earlier proposal in this repo.</li>
+</ul></div>
+    </section>
+
+    <section class="part" id="b-top" aria-labelledby="b-title">
+      <p class="kicker partlabel">Part 2</p>
+      <h2 class="parttitle" id="b-title">Investigation: board slides for Lumen (sketching on a whiteboard)</h2>
+      <div class="doc-body"><p>Status: investigation and working prototype, for the owner's decision · 19 Oct 2026</p>
+<p>Prototype: <a href="https://claude.ai/artifact/DBmQmkn7ai2n4X4PUNriey" target="_blank" rel="noopener"><code>prototypes/lumen-board/</code></a> (open <code>index.html</code> in a browser; it also runs as a claude.ai artifact, where "Draw it with Claude" works). Since 20 Oct it mocks Studiolo's own Learn, player, Library and copilot screens; see <a href="#a-top"><code>2026-10-19-lumen-quality-and-board-integration.md</code></a>.</p>
+<h2 id="b-1-summary">1. Summary</h2>
+<p>A <strong>board</strong> is a new kind of Lumen slide. A rough, coloured sketch is drawn on Studiolo's stage, in the app's usual light or dark theme, while the voice explains it, the way a person explains an idea at a whiteboard. Boxes, arrows, circles, handwritten labels, underlines and highlights appear <strong>as the voice says the word that names them</strong>. No pen or hand is shown: a small, plain dot of ink moves along each stroke as it is drawn. When the narration comes back to something already drawn, the dot goes back and rests on it.</p>
+<p>The prototype shows this works with the pipeline Lumen already has:</p>
+<ul>
+<li>The author model (Claude) writes a board as <strong>data, not code</strong>: one line per mark, such as <code>cache box 540 420 200 110 emphasis hatch "Cache"</code>.</li>
+<li>Narration uses the refs Lumen already has (<code>[[b1.cache]]</code> before a word) to say when each mark is drawn.</li>
+<li>Word timings come from ElevenLabs <code>with-timestamps</code>, which <code>studiolo</code> already calls (<code>src/features/explainers/speech/elevenlabs.ts</code>).</li>
+<li>Every frame is a pure function of the time <code>t</code>, like today's animation scenes. Seeking, stills, thumbnails, reduced motion and any later video export all work the same way.</li>
+</ul>
+<p><strong>Recommendation.</strong> Add <code>board</code> as an item type in contract 1.5, using the prototype's renderer as the starting point. Leave whiteboard libraries such as tldraw and Excalidraw out of the player. Use a small in-house renderer (about 700 lines) with two MIT/OFL pieces: perfect-freehand for marker strokes, and the EMS Tech single-line font for handwriting. Estimated effort: about 6–9 days (§8).</p>
+<h2 id="b-2-where-it-fits-in-todays-lumen">2. Where it fits in today's Lumen</h2>
+<p>References are to <code>studiolo</code> @ <code>c7d39da</code> (read only; nothing there was changed).</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Today</th>
+<th>Board slide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Item types: intro, ul/ol, cards, table, code, diff, math, <code>diagram</code> (Mermaid), infographic, <code>animation</code> (JS scene) (<code>src/features/explainers/ingest/items.ts</code>)</td>
+<td>Adds <code>board</code>. Its body is a header, <code>---</code>, then one mark per line. It is plain data with no code, so nothing has to run in the QuickJS sandbox.</td>
+</tr>
+<tr>
+<td>A ref <code>[[s5.rise]]</code> pins an animation moment to a word and moves the pointer (<code>contract/text.ts</code> §4, <code>player/timeline.ts</code> <code>pointerTarget</code>)</td>
+<td>The same syntax. The first ref to a mark starts drawing it; a later ref sends the drawing dot back to point at it.</td>
+</tr>
+<tr>
+<td>The pointer moves to an anchor <code>leadWords</code> ahead of the voice (<code>player/stage/pointer.tsx</code>)</td>
+<td>On a board slide the drawing dot <em>is</em> the pointer. It draws, fades when the board is quiet, and comes back to rest on a mark the voice names again.</td>
+</tr>
+<tr>
+<td>An animation scene is <code>draw(s, t, k)</code>, a pure function of t (<code>scene/runtime.ts</code>)</td>
+<td>A board is also a pure function of t: <code>marks + schedule → frame(t)</code>.</td>
+</tr>
+<tr>
+<td>Diagram slides are Mermaid, and the contract says "never imitate a drawing with a diagram"</td>
+<td>Boards cover the space between the two: an explained sketch with spatial layout and annotation, with no code for the author to write.</td>
+</tr>
+<tr>
+<td>Role colours: emphasis, second, third, fourth, neutral, ink (<code>scene/role-palette.ts</code>)</td>
+<td>The same role names and the same light and dark values (colour set "series", stage surface <code>--surface-panel</code>), so the contract's "roles" legend line and colour rules carry over and boards follow the app theme like every other slide.</td>
+</tr>
+<tr>
+<td>ElevenLabs with-timestamps gives word timings, with estimated timings as the fallback (<code>speech/elevenlabs.ts</code>, <code>speech-estimate.ts</code>)</td>
+<td>The prototype estimates timings at 160 wpm. In the app the real word timings slot straight in (§6).</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="b-when-to-use-a-board-versus-a-diagram-or-an-animation-proposed-contract-wording">When to use a board versus a diagram or an animation (proposed contract wording)</h3>
+<ul>
+<li><strong>Board</strong>: an idea explained by building a picture one piece at a time, such as a mechanism, a cause and its effect, a before/after, a worked sketch or an annotated graph. The value is in the order of the build and in pointing back at parts.</li>
+<li><strong>Diagram</strong>: a flow, hierarchy or state machine whose shape matters more than the order it is built in.</li>
+<li><strong>Animation</strong>: motion over time, or a precise spatial or 3D drawing.</li>
+</ul>
+<h2 id="b-3-research-findings">3. Research findings</h2>
+<p>Versions and licences were checked on npm on 19 Oct 2026. A few vendor sites could not be fetched from the sandbox; those points come from search summaries and are marked "(via search)".</p>
+<h3 id="b-31-drawing-the-hand-drawn-look">3.1 Drawing the hand-drawn look</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Licence</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>perfect-freehand</strong> 1.2.x</td>
+<td>MIT</td>
+<td><strong>Used.</strong> Turns a centreline into a pressure-shaped marker outline. 3.7 KB, no dependencies.</td>
+</tr>
+<tr>
+<td><strong>rough.js</strong> 4.6.6</td>
+<td>MIT</td>
+<td>Good alternative for sketchy shapes and hachure fills (Excalidraw uses it). It draws whole shapes, so for progressive pen drawing we would still need its path data. The prototype's own wobble functions do the same job in about 100 lines.</td>
+</tr>
+<tr>
+<td><strong>rough-notation</strong> 0.5.1</td>
+<td>MIT</td>
+<td>Underline, box, circle, highlight, strike and bracket annotations. A good reference; the prototype has the same set built in.</td>
+</tr>
+<tr>
+<td><strong>Excalidraw</strong> 0.18.x (+ <code>convertToExcalidrawElements</code>, <code>@excalidraw/mermaid-to-excalidraw</code>)</td>
+<td>MIT</td>
+<td>A full editor. Worth it later if learners should <em>edit</em> a board (§9). Too heavy for playback.</td>
+</tr>
+<tr>
+<td><strong>excalidraw-animate</strong> (dai-shi)</td>
+<td>npm lists no licence</td>
+<td>A reference for "scene → stroke reveal". Don't depend on it.</td>
+</tr>
+<tr>
+<td><strong>tldraw</strong> 5.x</td>
+<td>Own licence; production needs a key; the commercial licence removes the watermark (via search)</td>
+<td><strong>Avoid.</strong> Licence cost, and it is an editor rather than a player.</td>
+</tr>
+<tr>
+<td>GSAP + DrawSVG</td>
+<td>Free, but the standard licence restricts no-code visual animation builders (via search)</td>
+<td>Avoid until legal has looked at it. It isn't needed.</td>
+</tr>
+<tr>
+<td>Vivus, anime.js v4</td>
+<td>MIT</td>
+<td>SVG dash-offset reveal. Not needed with a canvas renderer.</td>
+</tr>
+<tr>
+<td>Rive / Lottie</td>
+<td>MIT runtimes</td>
+<td>A poor fit, because every asset must be hand-authored.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="b-32-handwriting-the-labels">3.2 Handwriting the labels</h3>
+<p>To <em>write</em> text stroke by stroke you need <strong>single-line fonts</strong>, whose glyphs are pen paths rather than filled outlines.</p>
+<ul>
+<li><strong>EMS Tech</strong> (Hershey/EMS set in the <code>hersheytext</code> npm package, MIT; the font itself is SIL OFL). It is a single-line version of <em>Architects Daughter</em>, an architect's hand, which suits Studiolo's audience. <strong>Used in the prototype</strong>: 95 ASCII glyphs, about 10 KB of stroke data.</li>
+<li><strong>Tegaki</strong> (kurtgokhan/tegaki, MIT): stroke-by-stroke handwriting from <em>any</em> font, with harfbuzz shaping, so Arabic and right-to-left text work. It is the upgrade path if Lumen needs non-Latin labels.</li>
+<li><strong>Relief SingleLine</strong> (OFL): a cleaner technical-pen style.</li>
+<li>Fallback approach: a handwriting outline font (Caveat, Kalam, Excalifont) revealed with a left-to-right wipe. It is cheaper but looks less like real writing.</li>
+</ul>
+<h3 id="b-33-getting-an-llm-to-produce-diagrams">3.3 Getting an LLM to produce diagrams</h3>
+<ul>
+<li>The most reliable pattern is <strong>structured data with coordinates</strong> (a DSL or Excalidraw skeleton JSON) that a renderer checks and draws. Asking the model for raw SVG tends to break the layout. Asking it for code is what animation scenes already do, at the cost of the sandbox and repair loops.</li>
+<li>Prior art: Excalidraw's AI diagrams go through Mermaid; <code>cristianodabc/narrated-explainers</code> (MIT) has the LLM write a story JSON that is rendered to SVG and video. Its "data only, never code" rule is the right security model for boards as well.</li>
+<li>No academic paper turned up on LLM-generated whiteboard explainers specifically.</li>
+</ul>
+<h3 id="b-34-syncing-to-the-voice">3.4 Syncing to the voice</h3>
+<ul>
+<li>ElevenLabs <code>POST /v1/text-to-speech/{voice}/with-timestamps</code> returns per-character times. Studiolo already turns these into word timings (<code>alignmentToWords</code>). <code>POST /v1/forced-alignment</code> exists for audio made elsewhere.</li>
+<li>The pattern: strip the <code>[[…]]</code> refs before speech, keep their character offsets, map each offset to a word's start time, then schedule the drawing from those times. Drive the frame from the audio clock, never from timers.</li>
+</ul>
+<h3 id="b-35-existing-skills-and-mcp-servers">3.5 Existing skills and MCP servers</h3>
+<ul>
+<li><code>excalidraw/excalidraw-mcp</code> (official, MIT): Claude draws Excalidraw diagrams in chat.</li>
+<li><code>yctimlin/mcp_excalidraw</code>: an MCP server for a live canvas, plus a Claude Code skill.</li>
+<li>Excalidraw diagram skills: <code>coleam00/excalidraw-diagram-skill</code> (renders with Playwright so the agent can check its own drawing), <code>garrytan/gstack</code> <em>diagram</em> (recommends at most 15 nodes per scene), <code>axtonliu/excalidraw-diagram</code>, and awesome-copilot's <em>excalidraw-diagram-generator</em>.</li>
+<li><code>anthropics/skills</code> has no whiteboard or Excalidraw skill. The user's claude.ai skill catalogue returned nothing for whiteboard, Excalidraw, sketch or tldraw.</li>
+<li>None of these produce <em>narrated, time-synced</em> drawing. They are useful as references for prompting and for the self-check loop.</li>
+</ul>
+<h3 id="b-36-exporting-video-if-lumens-are-ever-downloaded-as-mp4">3.6 Exporting video (if Lumens are ever downloaded as MP4)</h3>
+<ul>
+<li><strong>Remotion</strong> 4.x renders React frames as a pure function of the frame number. It fits a board component directly. Free for teams of up to 3; company licence above that (via search).</li>
+<li>Free alternative: headless Chromium with a virtual clock (puppeteer-capture), then FFmpeg to mux in the narration MP3.</li>
+<li>Motion Canvas (MIT) works but would be a second rendering stack.</li>
+</ul>
+<h2 id="b-4-the-prototype">4. The prototype</h2>
+<p><code>prototypes/lumen-board/index.html</code> is a single page with no build step. It loads perfect-freehand from jsDelivr and falls back to plain round strokes if that fails; the font data is inline. Since 20 Oct 2026 it is styled from <code>studiolo</code> @ <code>4b4ee63</code> (tokens, explainer, copilot, graph and shell CSS), so boards appear inside Studiolo's own screens.</p>
+<p>What it does:</p>
+<ul>
+<li><strong>Learn</strong>: Lumen cards. Posters show a finished board under the proposed player.</li>
+<li><strong>Player</strong>: the real stage, title card, list, table and cards slides, cursor, captions, controls, and the Transcript and Slides panel, plus board slides drawn by the ink dot.</li>
+<li>A <strong>Today / Proposed</strong> switch compares the current player with the proposed changes in the quality plan.</li>
+<li><strong>Three full Lumens in the author's markup</strong>, chosen to see whether one format covers different fields:</li>
+<li><strong>Who is bound to whom</strong> (contracts, from a library PDF, with page citations and a General knowledge run): the parties, the web of contracts drawn as each is named, the missing client–subcontractor link, the collateral warranty, and an answer board.</li>
+<li><strong>Reading a building section</strong> (architecture): a section drawn from the ground up, then the stack effect.</li>
+<li><strong>Where the eye goes</strong> (graphic design): the rule of thirds, the four levers of hierarchy, and a poster with its reading order numbered.</li>
+<li><strong>Library</strong>: the Explain dialog with a proposed "Draw it as it explains" hint.</li>
+<li><strong>Copilot</strong>: an offer card with a sketch hint, an inline <strong>Draw it</strong> short (one board, about 30 s), and a course plan with parts marked to be drawn.</li>
+<li><strong>Board lab</strong>: edit any Lumen's markup and play it, with checks. <strong>Draw it with Claude</strong> writes a new board from an idea (the prompt is the page's <code>SPEC</code>, a first draft of the contract section).</li>
+<li><strong>Narration</strong>: the speaker button reads aloud with the browser's own voice, as a stand-in for ElevenLabs. The clock re-syncs on word-boundary events.</li>
+<li><strong>Reduced motion and keys</strong>: reduced motion shows finished marks with no drawing dot. Keys are Space, ← →, J/L, C, and , and . to step between slides.</li>
+</ul>
+<h3 id="b-41-the-board-format-draft">4.1 The board format (draft)</h3>
+<pre><code class="language-text">&lt;item id=&quot;b1&quot; type=&quot;board&quot; title=&quot;Why a cache makes reads fast&quot;&gt;
+roles: fourth = the slow trip; third = the fast trip
+---
+app    box 120 250 200 110 ink &quot;App&quot;
+db     cyl 960 220 200 170 ink &quot;Database&quot;
+slow   arrow app db fourth bend 0.22 &quot;every read: ~80 ms&quot;
+cache  box 540 420 200 110 emphasis hatch &quot;Cache&quot;
+check  arrow app cache emphasis &quot;ask first&quot;
+hit    ring cache third
+&lt;/item&gt;
+&lt;say&gt;Suppose your [[b1.app]]app needs the same record again and again. Each time it goes to the [[b1.db]]database, and that [[b1.slow]]round trip costs around eighty milliseconds.&lt;/say&gt;
+&lt;say&gt;So we put a small, fast store in between: a [[b1.cache]]cache. Now the app [[b1.check]]asks the cache first, and every later read is a [[b1.hit]]hit.&lt;/say&gt;
+</code></pre>
+<ul>
+<li><strong>Shapes</strong>: box, circle, ellipse, diamond, poly (a closed outline such as a roof or a building), cyl, person, text, arrow, line, curve, axes, ground.</li>
+<li><strong>Annotations</strong>: underline, ring, highlight, cross, tick.</li>
+<li><strong>Options</strong>: a colour role; <code>hatch</code>, <code>dash</code>, <code>arrow</code>, <code>bend n</code>, <code>small</code>, <code>big</code>, <code>title</code>, <code>size n</code>, <code>center</code>; a quoted label.</li>
+<li><strong>Positions</strong>: on the 1280 × 720 stage, inside the safe area x 64–1216, y 64–600. These are the same numbers as the scene contract.</li>
+<li><strong>Arrow ends</strong>: an id or a point. An arrow between two marks attaches to their outlines automatically.</li>
+</ul>
+<h3 id="b-42-how-a-frame-is-made">4.2 How a frame is made</h3>
+<ol>
+<li><strong>Parse</strong> the source into mark specs. Ids must be declared before they are referenced, the same rule as refs.</li>
+<li><strong>Build</strong> each mark's centrelines. The wobble is seeded from <code>boardId:markId</code>, so a mark looks the same on every render. Labels are written with the single-line font, and each mark records its box, outline, anchor and stroke lengths.</li>
+<li><strong>Time the words.</strong> The prototype estimates them; the app will use measured timings. A ref's time is the start of its word.</li>
+<li><strong>Schedule the drawing.</strong>
+   - A mark starts 140 ms before its word. A mark with no ref follows the mark declared before it, and a mark never starts before the marks it connects.
+   - Drawing time comes from stroke length divided by drawing speed: shapes about 900 px/s, handwriting 560 px/s, hatching 2,400 px/s. It is squeezed to as little as 40% when the next cue is close.
+   - The dot travels between marks at about 1,900 px/s, plus small lifts between strokes.
+   - A later ref to a mark already drawn becomes a "point" event when the dot is free.</li>
+<li><strong>Draw at t.</strong> Finished strokes are cached as <code>Path2D</code> and only the stroke in progress is recomputed each frame. Then the drawing dot is drawn in the ink's colour. It is a plain dot with no glow or shadow (about 8 px across on the 1280 px stage while drawing), smaller and fainter while moving between marks, and it fades out about a second after the board goes quiet. No pen, hand or eraser is shown. Between boards a soft wipe clears the old board and leaves a faint ghost, the way a real whiteboard does.</li>
+</ol>
+<h3 id="b-43-how-it-was-checked">4.3 How it was checked</h3>
+<ul>
+<li>The page was rendered in headless Chromium on every screen, at the end of boards and part-way through, under Today and Proposed, in light and dark, and at 390 px width.</li>
+<li>There were no console errors, all examples report "No problems found", and the page has no horizontal scroll at phone width.</li>
+<li>While the new examples were being written, the checker caught two mark ids that clash with option words (<code>center</code> and <code>big</code>) and a label running past the drawing area. The contract should list the reserved words, and these checks belong in the repair loop.</li>
+<li>Screenshots from that run were used to adjust label placement, text size and the layout of the examples.</li>
+<li><strong>Not yet tried</strong>: how reliably Claude follows the format. "Sketch with Claude" is wired up, but nobody has run a set of topics through it yet (§7).</li>
+</ul>
+<h2 id="b-5-limits-of-the-prototype">5. Limits of the prototype</h2>
+<ul>
+<li>Narration timing is estimated; the browser voice is a stand-in for ElevenLabs.</li>
+<li>The handwriting covers ASCII only (EMS Tech): no Arabic or other scripts. Tegaki is the route to them.</li>
+<li>Layout is entirely the author's coordinates. There is no auto-layout, so a careless board can overlap. The checker warns about overlaps but doesn't fix them.</li>
+<li>Hatching is only clean on convex shapes: box, circle, ellipse, diamond and the body of a cylinder.</li>
+<li>There is no undo, no learner editing, and no MP4 export.</li>
+</ul>
+<h2 id="b-6-proposed-integration-into-studiolo-for-whoever-works-on-the-main-app">6. Proposed integration into <code>studiolo</code> (for whoever works on the main app)</h2>
+<ol>
+<li><strong>Contract 1.5</strong> (<code>contract/text.ts</code>, <code>examples.ts</code>, <code>CONTRACT_VERSION</code>):
+   - Add the board type and the "when to use a board" rule (§2).
+   - Add the shape and option list (adapted from the prototype's <code>SPEC</code>) and one worked example.
+   - Add limits: at most 16 marks, labels of at most 4 words, at most 3 colours.</li>
+<li><strong>Ingest</strong> (<code>ingest/items.ts</code>): parse the board body into a <code>BoardPayload { title, roles, marks[] }</code> using the prototype's parser. Each mark id is an anchor, so existing ref validation covers <code>[[b1.cache]]</code>.</li>
+<li><strong>Checks</strong> (<code>scene/checks/</code>):
+   - Reuse the prototype's out-of-area and overlap checks, and add label-on-line and label-overlap checks.
+   - Failures go through the existing repair path. Because a board is data, a repair is a cheap rewrite of the item, and nothing needs the sandbox.</li>
+<li><strong>Player</strong> (<code>player/stage/board-slide.tsx</code>):
+   - A canvas slide like <code>animation-slide.tsx</code>, fed <code>slideTime</code> from the timeline.
+   - It builds its schedule from the say segments' measured <code>words</code> and <code>refs</code>, so it needs nothing new from speech.
+   - On board slides, hide the DOM pointer and draw the drawing dot instead. Stills and thumbnails are <code>frame(Infinity)</code>.</li>
+<li><strong>Brand</strong>:
+   - Map roles to the existing role palette, giving light and dark themes for free. The prototype uses exactly these values.
+   - Add the EMS Tech glyphs, or a Tegaki-built font, to the brand kit.</li>
+<li><strong>Evals</strong>: run 20–30 topics through the author model with the new contract and score layout problems, ref coverage and the pacing of narration against drawing.</li>
+</ol>
+<h2 id="b-7-open-questions-for-the-owner">7. Open questions for the owner</h2>
+<ol>
+<li>Should a board be its <strong>own slide type</strong> (proposed), or a style on top of the existing <code>diagram</code> type?</li>
+<li>~~<strong>Look</strong>~~ Decided 19 Oct 2026: Studiolo's usual light and dark stage, following the app theme.</li>
+<li>~~<strong>Pen</strong>: a visible marker or a hand?~~ Decided 19 Oct 2026: no pen or hand. Only a small ink dot shows where the drawing is happening.</li>
+<li><strong>Handwriting</strong>: is EMS Tech (Architects Daughter) the right voice for Studiolo? Are non-Latin labels needed soon (then Tegaki)?</li>
+<li><strong>Learner editing</strong>: should a learner be able to open a board and change it? That points to Excalidraw (MIT) as the editor, with this renderer kept for playback.</li>
+<li><strong>Eval budget</strong>: about 30 author runs to tune the contract text before release.</li>
+</ol>
+<h2 id="b-8-rough-effort">8. Rough effort</h2>
+<p>These are estimates, not measured.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contract text, examples and the version bump</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Ingest parser, payload type and ref validation (port from the prototype)</td>
+<td>1–1.5</td>
+</tr>
+<tr>
+<td>Board slide renderer and drawing dot in the player (port from the prototype, React and theming)</td>
+<td>2–3</td>
+</tr>
+<tr>
+<td>Checks and repair messages</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Author evals and tuning</td>
+<td>1–2</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>6–9</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="b-sources">Sources</h2>
+<ul>
+<li><code>studiolo</code> @ <code>c7d39da</code> (read only):</li>
+<li><code>src/features/explainers/contract/text.ts</code></li>
+<li><code>src/features/explainers/ingest/items.ts</code></li>
+<li><code>src/features/explainers/player/timeline.ts</code></li>
+<li><code>src/features/explainers/player/stage/{animation-slide,pointer}.tsx</code></li>
+<li><code>src/features/explainers/scene/{runtime,role-palette}.ts</code></li>
+<li><code>src/features/explainers/speech/elevenlabs.ts</code></li>
+<li><code>src/styles/tokens.css</code></li>
+<li>Craft, Studilo space: a search for "whiteboard" and "sketch" found no earlier notes on this idea (19 Oct 2026).</li>
+<li>Libraries:</li>
+<li>rough.js: https://github.com/rough-stuff/rough</li>
+<li>rough-notation: https://github.com/rough-stuff/rough-notation</li>
+<li>perfect-freehand: https://github.com/steveruizok/perfect-freehand</li>
+<li>roughViz: https://github.com/jwilber/roughViz</li>
+<li>Vara: https://github.com/akzhy/Vara</li>
+<li>anime.js drawable: https://animejs.com/documentation/svg/createdrawable</li>
+<li>Excalidraw:</li>
+<li>Element skeleton: https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton</li>
+<li>Mermaid to Excalidraw: https://docs.excalidraw.com/docs/@excalidraw/mermaid-to-excalidraw/installation</li>
+<li>Excalifont: https://plus.excalidraw.com/excalifont</li>
+<li>excalidraw-animate: https://github.com/dai-shi/excalidraw-animate</li>
+<li>tldraw licence: https://tldraw.dev/legal/tldraw-license and https://tldraw.dev/sdk-features/license-key</li>
+<li>GSAP licence: https://gsap.com/community/standard-license/ and https://webflow.com/updates/gsap-becomes-free</li>
+<li>Handwriting and fonts:</li>
+<li>Tegaki: https://github.com/kurtgokhan/tegaki</li>
+<li>Relief SingleLine: https://github.com/isdat-type/Relief-SingleLine</li>
+<li>hersheytext: https://npmjs.com/package/hersheytext</li>
+<li>EMS fonts: https://www.evilmadscientist.com/tag/hershey/</li>
+<li>ElevenLabs:</li>
+<li>With-timestamps: https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps</li>
+<li>Forced alignment: https://elevenlabs.io/docs/capabilities/forced-alignment</li>
+<li>Prior art:</li>
+<li>https://github.com/cristianodabc/narrated-explainers</li>
+<li>https://smcleod.net/2024/10/generating-diagrams-with-with-ai-/-llms/</li>
+<li>https://tldraw.dev/blog/make-real-the-story-so-far</li>
+<li>MCP servers and skills:</li>
+<li>https://github.com/excalidraw/excalidraw-mcp</li>
+<li>https://mcpservers.org/fr/servers/yctimlin/mcp_excalidraw</li>
+<li>https://www.mintlify.com/coleam00/excalidraw-diagram-skill/installation</li>
+<li>https://hackernoon.com/skills/garrytan-diagram</li>
+<li>https://github.com/anthropics/skills/tree/main/skills</li>
+<li>Video export:</li>
+<li>Remotion pricing: https://www.remotion.dev/docs/license/pricing</li>
+<li>Motion Canvas: https://github.com/motion-canvas/motion-canvas</li>
+<li>puppeteer-capture: https://cdn.jsdelivr.net/npm/puppeteer-capture@1.58.0/README.md</li>
+</ul></div>
+    </section>
+  </main>
+</div>
+
+<script>
+// Highlight the section being read in the contents rail.
+(() => {
+  const links = [...document.querySelectorAll(".toc a")];
+  const heads = [...document.querySelectorAll(".doc-body h2[id]")];
+  if (!("IntersectionObserver" in window) || !heads.length) return;
+  const seen = new Set();
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) { if (e.isIntersecting) seen.add(e.target.id); else seen.delete(e.target.id); }
+    const first = heads.find((h) => seen.has(h.id));
+    if (!first) return;
+    for (const a of links) a.classList.toggle("on", a.getAttribute("href") === "#" + first.id);
+  }, { rootMargin: "0px 0px -70% 0px" });
+  heads.forEach((h) => io.observe(h));
+})();
+</script>
+
