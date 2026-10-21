@@ -1,0 +1,135 @@
+/* Live Lumens prototype: the voice layer. Everything here is NEW UI proposed by
+   docs/superpowers/specs/2026-10-21-live-lumens-voice-design.md. It is drawn only with the app's own tokens
+   (tokens.css) and reuses the app's classes (.cp-comp, .cp-card, .button, .icb, .xp-*) wherever a part already exists. */
+
+#vx-app { min-height: 100%; }
+
+/* Rail: "Talk" sits under Capture, as a navigation-link. */
+.vx-rail-talk { all: unset; box-sizing: border-box; cursor: pointer; }
+.vx-rail-talk[data-on="true"] { color: var(--accent); }
+.vx-rail-talk[data-on="true"] svg { animation: xp-breathe 1.4s ease-in-out infinite; }
+
+/* A mic beside Send in the copilot composer (C23). */
+.cp-comp .vx-mic-inline { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.cp-comp .vx-mic-inline:hover { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cp-comp .vx-mic-inline:focus-visible { outline: var(--focus-ring); }
+
+/* Player: Ask, in the control row. */
+.xp-ctrl .xp-ib.vx-ask { width: auto !important; height: 30px; padding: 0 10px 0 8px; gap: 5px; display: inline-flex; align-items: center; border-radius: 15px; font: inherit; font-size: 12.5px; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); background: var(--accent-soft); }
+.xp-ctrl .xp-ib.vx-ask svg { flex: none; width: 15px; height: 15px; }
+.xp-ctrl .vx-ask:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* The Live pill in the player head, and the Board tag on narrator-drawn slides. */
+.vx-live { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 1px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--warn); background: var(--warn-soft); }
+.vx-live .xp-dot { width: 6px; height: 6px; }
+.vx-board-tag { position: absolute; top: 26px; right: 84px; z-index: 6; font: 600 18px/1 var(--ui); letter-spacing: 0.08em; text-transform: uppercase; color: var(--stage-ink-muted); padding: 7px 12px; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--stage-rule); background: var(--stage-surface); }
+.vx-rev-tag { position: absolute; top: 26px; right: 84px; z-index: 6; font: 600 18px/1 var(--ui); letter-spacing: 0.06em; color: var(--stage-accent); padding: 7px 12px; border-radius: 4px; background: var(--stage-accent-soft); }
+.xp-card.vx-choice { cursor: pointer; pointer-events: auto; }
+.xp-card.vx-choice[data-picked="right"] { box-shadow: inset 0 0 0 3px var(--stage-positive); }
+.xp-card.vx-choice[data-picked="wrong"] { box-shadow: inset 0 0 0 3px var(--stage-caution); }
+
+/* Explain dialog: the live option. */
+.vx-explain-live { margin: 14px 0 0; padding: 12px 14px; border-radius: 4px; background: var(--surface-board); box-shadow: inset 0 0 0 1px var(--rule); display: grid; gap: 8px; }
+.vx-explain-live p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.45; }
+.vx-explain-live b { color: var(--text); font-weight: 600; }
+.vx-explain-live .vx-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.vx-cost { font-size: 12px; color: var(--text-muted); }
+
+/* The voice dock: a floating layer (surface-float + shadow-float, as menus and toasts), bottom right where the copilot
+   composer sits on the Graph, so speaking takes the place of typing. */
+.vx-dock { position: fixed; z-index: 120; right: calc(24px + env(safe-area-inset-right, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: min(420px, calc(100vw - var(--t-rail) - 32px)); max-height: calc(100vh - 48px); display: flex; flex-direction: column; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 6px; overflow: hidden; animation: toast-in var(--dur-standard) var(--ease-entrance); }
+.vx-dock[hidden] { display: none; }
+.vx-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 8px 14px; }
+.vx-orb { position: relative; width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; grid-auto-flow: column; place-content: center; gap: 2px; background: var(--accent-soft); color: var(--accent); }
+.vx-orb i { display: block; width: 3px; height: 5px; border-radius: 2px; background: currentColor; transition: height var(--dur-quick) var(--ease-standard); }
+.vx-dock[data-state="speaking"] .vx-orb { background: var(--accent); color: var(--on-accent); }
+.vx-dock[data-state="speaking"] .vx-orb i { animation: vx-bar 0.9s ease-in-out infinite; }
+.vx-dock[data-state="speaking"] .vx-orb i:nth-child(2) { animation-delay: -0.3s; }
+.vx-dock[data-state="speaking"] .vx-orb i:nth-child(3) { animation-delay: -0.6s; }
+.vx-dock[data-state="listening"] .vx-orb::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); opacity: 0.5; animation: vx-ring 1.6s ease-out infinite; }
+.vx-dock[data-state="hearing"] .vx-orb { background: var(--accent-soft); }
+.vx-dock[data-state="hearing"] .vx-orb i { animation: vx-bar 0.5s ease-in-out infinite; }
+.vx-dock[data-state="hearing"] .vx-orb i:nth-child(2) { animation-delay: -0.2s; }
+.vx-dock[data-state="thinking"] .vx-orb i { animation: xp-breathe 1s ease-in-out infinite; }
+.vx-dock[data-state="thinking"] .vx-orb i:nth-child(2) { animation-delay: 0.2s; }
+.vx-dock[data-state="thinking"] .vx-orb i:nth-child(3) { animation-delay: 0.4s; }
+.vx-dock[data-state="paused"] .vx-orb, .vx-dock[data-state="ended"] .vx-orb { background: var(--surface-board); color: var(--ink-3); }
+@keyframes vx-bar { 0%, 100% { height: 5px; } 50% { height: 14px; } }
+@keyframes vx-ring { from { transform: scale(0.85); opacity: 0.6; } to { transform: scale(1.25); opacity: 0; } }
+.vx-who { min-width: 0; flex: 1; display: grid; line-height: 1.25; }
+.vx-state { font-size: 13px; font-weight: 600; color: var(--text); }
+.vx-anchor { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vx-mins { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vx-head .icb { all: unset; cursor: pointer; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); }
+.vx-head .icb:hover { background: var(--hover-fill); color: var(--ink); }
+.vx-head .icb:focus-visible { outline: var(--focus-ring); }
+.vx-head .icb[aria-pressed="false"] { color: var(--ink-3); }
+.vx-end { font-size: 12.5px !important; padding: 4px 10px !important; min-height: 0 !important; }
+
+.vx-body { overflow-y: auto; min-height: 0; padding: 0 14px 10px; display: grid; gap: 8px; }
+.vx-caption { margin: 0; font-family: var(--read); font-size: 17px; line-height: 1.45; color: color-mix(in srgb, var(--text) 45%, transparent); }
+.vx-caption b { color: var(--text); font-weight: 400; }
+.vx-caption[data-who="you"] { font-family: var(--ui); font-size: 14px; color: var(--text-muted); font-style: italic; }
+.vx-caption[data-who="you"]::before { content: "You: "; font-style: normal; font-weight: 600; color: var(--text); }
+.vx-caption:empty { display: none; }
+.vx-trace { display: grid; gap: 2px; }
+.vx-trace:empty { display: none; }
+.vx-trace .steps { all: unset; font-size: 12px; color: var(--text-muted); display: flex; gap: 6px; align-items: baseline; }
+.vx-trace .steps i { font-style: normal; color: var(--ink-3); }
+.vx-trace .steps code { font: 11px/1.4 ui-monospace, Menlo, monospace; color: var(--ghost-ink); }
+.vx-cards:empty { display: none; }
+.vx-dock .vx-cards.cp-body { flex: none; overflow: visible; padding: 0; }
+.vx-recap { margin: 0; display: grid; gap: 2px; font-size: 13px; }
+.vx-recap dt { font-weight: 600; margin-top: 6px; }
+.vx-recap dt:first-child { margin-top: 0; }
+.vx-recap dd { margin: 0; color: var(--text-muted); }
+.vx-cards .cp-card { margin: 0; }
+.vx-guard { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 6px 0 0; font-size: 11.5px; color: var(--text-muted); }
+.vx-guard span::before { content: "✓ "; color: var(--ok); }
+.vx-guard span[data-ok="false"]::before { content: "✕ "; color: var(--warn); }
+
+.vx-dock .cp-comp { padding: 8px 12px 12px; }
+.vx-dock .cp-comp .prompts { flex-wrap: wrap; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+.vx-dock .cp-comp .prompts button[data-kind="interrupt"] { color: var(--accent); background: var(--accent-soft); box-shadow: none; }
+.vx-dock .cp-comp textarea { min-height: 22px; }
+.vx-talk { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); touch-action: none; user-select: none; -webkit-user-select: none; transition: transform var(--dur-instant) ease; }
+.vx-talk:active, .vx-talk[data-held="true"] { transform: scale(0.92); box-shadow: 0 0 0 5px var(--accent-soft); }
+.vx-talk:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+
+/* In the copilot panel, in place of the composer. */
+.vx-dock.in-panel { position: relative; right: auto; bottom: auto; width: auto; max-height: 62%; flex: none; box-shadow: none; border-radius: 0; border-top: 1px solid var(--rule); animation: none; z-index: auto; }
+.vx-dock.in-panel .vx-caption { font-size: 15px; }
+.vx-dock.in-panel .vx-trace .steps:not(:last-child) { display: none; }
+.vx-dock.in-panel .cp-comp .prompts { flex-wrap: nowrap; overflow-x: auto; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+.vx-dock.in-panel .vx-tip { font-size: 0; }
+.vx-dock.in-panel .vx-body { gap: 4px; padding-bottom: 6px; }
+.vx-dock.in-panel .vx-head { padding-top: 9px; }
+
+/* Minimised: one line. */
+.vx-dock[data-min="true"] .vx-body, .vx-dock[data-min="true"] .cp-comp { display: none; }
+
+/* Voice turns in the copilot thread. */
+.cp-thread .msg.user.vx-said p::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: currentColor; opacity: 0.55; -webkit-mask: var(--vx-mic) center / contain no-repeat; mask: var(--vx-mic) center / contain no-repeat; }
+:root { --vx-mic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='9' y='3' width='6' height='11' rx='3'/%3E%3Cpath d='M5 11a7 7 0 0 0 14 0M12 18v3'/%3E%3C/svg%3E"); }
+.vx-reading { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); border-radius: 3px; }
+.mcard.vx-touched { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* The prototype bar (the specimens' own .td-proto). */
+.td-proto.vx-proto { left: calc(var(--t-rail) + 16px); z-index: 125; flex-wrap: wrap; max-width: calc(100vw - var(--t-rail) - 32px); }
+.td-proto.vx-proto select { font: inherit; font-size: 12px; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 3px; padding: 3px 6px; }
+.td-proto.vx-proto button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent); padding: 2px 4px; }
+.td-proto.vx-proto button:focus-visible { outline: var(--focus-ring); }
+.vx-hint { font-size: 12px; color: var(--text-muted); max-width: 46ch; }
+
+@media (max-width: 1279px) {
+  .td-proto.vx-proto { left: auto; right: 16px; bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); }
+  .vx-hint { display: none; }
+}
+@media (max-width: 760px) {
+  .vx-dock { left: 8px; right: 8px; width: auto; bottom: calc(var(--m-tabs) + 8px); max-height: 62vh; }
+  .td-proto.vx-proto { left: 8px; bottom: auto; top: calc(8px + env(safe-area-inset-top, 0px)); }
+  .vx-hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vx-dock, .vx-orb i, .vx-orb::after, .vx-rail-talk svg { animation: none !important; }
+}
