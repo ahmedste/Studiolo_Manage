@@ -1,0 +1,372 @@
+<title>Live Lumens & the Narrator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap">
+<style>
+/* Layout: a single reading column (Studiolo "paper") with wide figure bands for diagrams; tokens from studiolo-design-concept.html */
+:root{
+  --paper:#F3F3EF; --panel:#FBFBF9; --line:#DBDBD3; --board:#E7E7E1;
+  --ink:#22303A; --ink-2:#5D6C77; --ink-3:#98A3AB;
+  --s1:#C9D4F1; --s2:#6E86D0; --accent:#1E3E9E;
+  --live:#B4441F; --live-soft:#F6E2D9; --ok:#2F7A4E; --ok-soft:#DDEEE3;
+  --ui:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --read:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#151B20; --panel:#1C242B; --line:#2E3A43; --board:#25303A;
+  --ink:#E6EAEC; --ink-2:#A6B2BA; --ink-3:#6E7C86;
+  --s1:#2A3A66; --s2:#8FA4E6; --accent:#9DB2F5;
+  --live:#F0916B; --live-soft:#3A2620; --ok:#7CC79A; --ok-soft:#1F3328; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#151B20; --panel:#1C242B; --line:#2E3A43; --board:#25303A;
+  --ink:#E6EAEC; --ink-2:#A6B2BA; --ink-3:#6E7C86;
+  --s1:#2A3A66; --s2:#8FA4E6; --accent:#9DB2F5;
+  --live:#F0916B; --live-soft:#3A2620; --ok:#7CC79A; --ok-soft:#1F3328; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1040px;margin:0 auto}
+.col{max-width:68ch}
+h1,h2,h3{font-family:var(--read);font-weight:500;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.08}
+h2{font-size:clamp(1.5rem,3vw,2rem);line-height:1.15}
+h3{font-size:1.2rem}
+p{margin:0}
+.eyebrow{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.lede{font-family:var(--read);font-size:1.25rem;line-height:1.5;color:var(--ink)}
+.muted{color:var(--ink-2)}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--board);padding:.08em .35em;border-radius:4px}
+section{padding-block:44px;border-top:1px solid var(--line);display:grid;gap:20px}
+header{padding-block:48px 36px;display:grid;gap:18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.85rem;color:var(--ink-2)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink-2);white-space:nowrap}
+.pill.live{color:var(--live);border-color:var(--live);background:var(--live-soft)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.pill.acc{color:var(--accent);border-color:var(--s2)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.live .dot{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.live .dot{animation:none}}
+
+/* hero stage mock */
+.stage{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.slide{padding:28px;display:grid;gap:14px;background:var(--panel);min-width:0;border-right:1px solid var(--line)}
+.slide .st{font-family:var(--read);font-size:1.5rem}
+.beam{position:relative;height:120px;border-radius:8px;background:var(--board);overflow:hidden}
+.beam .b{position:absolute;left:8%;right:8%;top:38px;height:16px;background:var(--s2);border-radius:3px}
+.beam .c1,.beam .c2{position:absolute;top:54px;width:16px;height:52px;background:var(--ink-3);border-radius:2px}
+.beam .c1{left:12%}.beam .c2{right:12%}
+.beam .arrow{position:absolute;left:47%;top:4px;font-size:1.3rem;color:var(--live)}
+.pointer{position:absolute;left:calc(12% - 6px);top:104px;width:28px;height:4px;border-radius:2px;background:var(--accent)}
+.cap{font-size:.92rem;color:var(--ink-2);font-family:var(--read);font-style:italic}
+.cap b{color:var(--ink);font-style:normal;font-weight:500;background:var(--s1);border-radius:3px;padding:0 2px}
+.talk{padding:20px;display:grid;gap:10px;align-content:start;min-width:0;background:var(--paper)}
+.bub{padding:9px 12px;border-radius:10px;font-size:.9rem;max-width:95%}
+.bub.n{background:var(--panel);border:1px solid var(--line)}
+.bub.l{background:var(--s1);justify-self:end}
+.bub .who{display:block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:600;margin-bottom:2px}
+.tool{font-family:var(--mono);font-size:.78rem;color:var(--accent);padding-left:12px;border-left:2px solid var(--s2)}
+@media (max-width:720px){.stage{grid-template-columns:1fr}.slide{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* grids & cards */
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:820px){.grid3,.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .k{font-family:var(--mono);font-size:.75rem;color:var(--ink-2)}
+.lvl{font-family:var(--read);font-size:2.2rem;line-height:1;color:var(--accent)}
+
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:640px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);font-weight:600;background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* architecture */
+.arch{display:grid;gap:12px}
+.lane{border:1px dashed var(--line);border-radius:12px;padding:14px;display:grid;gap:10px}
+.lane > .eyebrow{margin-bottom:2px}
+.boxes{display:flex;flex-wrap:wrap;gap:8px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.84rem;min-width:0}
+.box b{display:block;font-weight:600}
+.box span{color:var(--ink-2);font-size:.78rem}
+.box.hl{border-color:var(--s2);box-shadow:inset 3px 0 0 var(--s2)}
+.box.new{border-color:var(--live)}
+.box.new b::after{content:" new";font-size:.66rem;color:var(--live);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.wire{font-family:var(--mono);font-size:.76rem;color:var(--ink-2);text-align:center}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px}
+@media (max-width:820px){.split{grid-template-columns:1fr}}
+
+/* simulator */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px}
+@media (max-width:820px){.sim{grid-template-columns:1fr}}
+.utter{display:flex;flex-wrap:wrap;gap:8px;align-content:start}
+.utter button{font:inherit;font-size:.88rem;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;text-align:left}
+.utter button:hover{border-color:var(--s2)}
+.utter button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.utter button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.trace{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;min-height:220px;align-content:start}
+.step{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;font-size:.88rem}
+.step .t{font-family:var(--mono);font-size:.74rem;color:var(--ink-2);padding-top:2px}
+.step .tool{border-left:0;padding-left:0}
+
+pre.mermaid{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;overflow-x:auto;margin:0;font-size:.85rem}
+.note{font-size:.84rem;color:var(--ink-2)}
+ol.plain,ul.plain{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.road{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.road{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.road{grid-template-columns:1fr}}
+.road .card .k{color:var(--accent);font-weight:600}
+footer{padding-top:28px;border-top:1px solid var(--line);font-size:.82rem;color:var(--ink-2);display:grid;gap:6px}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Studiolo · Design proposal · 21 Oct 2026 · draft for owner review</span>
+  <h1>Live Lumens and the narrator</h1>
+  <p class="lede col">One live voice, the copilot speaking, that the learner can reach from anywhere in the app. It narrates a Lumen and lets the learner cut in at any point. It answers questions in the middle of a recorded Lumen. And it acts on the graph and the library under the same rules as the text copilot.</p>
+  <div class="meta"><span>Grounded in <code>studiolo @ e8ad3c7</code> (read-only) and the Craft Studilo space</span><span>Real-time voice: ElevenLabs Agents</span><span>Full spec: <code>docs/superpowers/specs/2026-10-21-live-lumens-voice-design.md</code></span></div>
+
+  <div class="stage" aria-label="Illustration: a Live Lumen in progress">
+    <div class="slide">
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span class="pill live"><span class="dot"></span>Live Lumen · Load paths</span><span class="pill">Beat 3 of 8 · rev 2 · analogy</span></div>
+      <div class="st">Where the weight goes</div>
+      <div class="beam" aria-hidden="true"><span class="arrow">↓</span><div class="b"></div><div class="c1"></div><div class="c2"></div><div class="pointer"></div></div>
+      <p class="cap">“Think of it like a court case passing up the chain: the beam hands the load to <b>the columns</b>, and the columns hand it to the ground…”</p>
+    </div>
+    <div class="talk">
+      <div class="bub n"><span class="who">Narrator</span>…so the beam carries the load sideways to each support.</div>
+      <div class="bub l"><span class="who">Learner</span>Wait, can you explain that another way?</div>
+      <div class="tool">rework_beat("s3", "from_my_field")</div>
+      <div class="bub n"><span class="who">Narrator</span>Sure. Since you work in law, try this…</div>
+      <div class="tool">present_beat("s3", rev 2)</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <span class="eyebrow">01 · The framework</span>
+  <h2>Where does the conversation live?</h2>
+  <p class="col">Everywhere, one session at a time. The session belongs to the <b>app shell</b> rather than to any one page, so it carries on while you navigate, like the Graph's “Now playing” dock does today. It always has an <b>anchor</b>: the thing the conversation is about. Each surface does three jobs. It offers a way in with a sensible anchor, it keeps the narrator updated on what's on screen, and it receives the results where they belong.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Surface</th><th>How it starts</th><th>Anchor</th><th>Narrator leads with</th><th>Results land in</th></tr></thead>
+    <tbody>
+      <tr><td>Lumen player</td><td><b>Ask</b> · hold Space · tap mic, mid-playback</td><td>Lumen + slide + playhead</td><td>Q&amp;A, then “back to it”</td><td>Q&amp;A pinned to the transcript</td></tr>
+      <tr><td>Graph topic / Explain dialog</td><td><b>Explain live</b>, next to “Make it”</td><td>Topic (+ focus)</td><td>Live Lumen</td><td>Topic's Lumens lane + Learn</td></tr>
+      <tr><td>Graph map chat</td><td>Mic in the copilot composer (C23)</td><td>Map / area / topic chat</td><td>Conversation</td><td>Same copilot thread</td></tr>
+      <tr><td>Library item</td><td>“Talk it through”</td><td>Item (strict grounding)</td><td>Live Lumen or Q&amp;A</td><td>Lumen + captured notes</td></tr>
+      <tr><td>Library wall</td><td>“Help me sort this”</td><td>Wall query / collection</td><td>Organising</td><td>Library change-plan card + Undo</td></tr>
+      <tr><td>Today</td><td>“Plan my session”</td><td>My Focus, Continue, week</td><td>Coaching</td><td>Today rows, Continue card</td></tr>
+      <tr><td>Anywhere</td><td>Rail mic / push-to-talk</td><td>Current page's scope</td><td>Conversation</td><td>Cards on the page + recap</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div class="card"><h3>Session ≠ connection</h3><p class="muted">ElevenLabs bills every minute a connection is open, silence included. So when the learner says “stop”, or after 30 seconds of quiet, the connection closes. The <i>session</i> keeps the anchor, the position in the deck, the transcript and any pending cards. Resume opens a new connection seeded with that state.</p></div>
+    <div class="card"><h3>Every ending makes a recap</h3><p class="muted">A session ends when the learner says “that's all” or presses End, after an idle timeout, at the cap, or when the Lumen finishes. Then a Recap card shows what we covered, what was saved, what changed (with Undo), the suggestions still waiting, and “pick up here”, which feeds Today's Continue card.</p></div>
+  </div>
+<pre class="mermaid">
+stateDiagram-v2
+  direction LR
+  [*] --> Gating: start(anchor)
+  Gating --> Connecting: allowed + hold placed
+  Gating --> [*]: refused (cap / access)
+  Connecting --> Live
+  state Live {
+    direction LR
+    Listening --> Thinking
+    Thinking --> Speaking
+    Thinking --> Acting: tool call
+    Acting --> Speaking
+    Speaking --> Listening: done / barge-in
+  }
+  Live --> Presenting: present_beat
+  Presenting --> Live: deck ends / leave stage
+  Live --> Paused: stop · 30–40 s idle
+  Presenting --> Paused: stop · idle
+  Paused --> Connecting: resume
+  Paused --> Ending: 10 min
+  Live --> Ending: end · cap · tab hidden 2 min
+  Ending --> Recap
+  Recap --> [*]
+</pre>
+</section>
+
+<section>
+  <span class="eyebrow">02 · Build order</span>
+  <h2>Three levels, one assistant</h2>
+  <div class="grid3">
+    <div class="card"><span class="lvl">L1</span><h3>Ask the Lumen</h3><p class="muted">Any recorded Lumen can be interrupted. The recording pauses and the narrator answers from the slide on screen, sometimes sketching a quick board slide. Then the recording resumes where it stopped.</p><span class="k">New generation work: none · works on every existing Lumen</span></div>
+    <div class="card"><span class="lvl">L2</span><h3>Live Lumen</h3><p class="muted">The narrator <i>performs</i> the Lumen live. The learner can cut in any time with “another way”, “deeper”, “skip”, “back” or “test me”, and the beat is rewritten in about 6 seconds.</p><span class="k">New: <code>explainer_beat</code> rework call · live driver</span></div>
+    <div class="card"><span class="lvl">L3</span><h3>Narrator actions</h3><p class="muted">The same voice proposes map changes, sorts the library, suggests what to learn next and starts Lumens or courses, always with Propose → Confirm → Undo.</p><span class="k">New tools: <code>read_library</code> · <code>propose_library_plan</code> · <code>suggest_next</code> · <code>navigate</code> · <code>capture_note</code></span></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">03 · Live Lumens</span>
+  <h2>A Live Lumen is a Lumen whose say lines are performed live</h2>
+  <p class="col">Contract 1.4 already gives a live deck everything it needs: ordered <code>&lt;item&gt;</code> slides, <code>&lt;say&gt;</code> speaker notes, <code>[[s3.anchor]]</code> pointer refs, checked citations and two follow-ups. So the new part is not the content type. It is only <b>who voices the say lines</b>. With <code>generateQuick(…, voice:"live")</code>, the author run skips the per-line TTS jobs and the narrator performs each line instead. Afterwards the deck is an ordinary Lumen in Learn. The author still writes slide and narration together, which avoids the “splitting writer and drawer loses quality” trap (AI Lab E25–27).</p>
+  <div class="grid3">
+    <div class="card"><span class="k">0 s</span><h3>Talk starts at once</h3><p class="muted">The narrator frames the topic and asks one warm-up question while the author writes. The answer goes to the author as a focus hint.</p></div>
+    <div class="card"><span class="k">≈ 3–8 s</span><h3>Board slide</h3><p class="muted">An instant title or list slide that the narrator draws itself from simple types only. It is never cited. This is FS-3's instant title card.</p></div>
+    <div class="card"><span class="k">≈ 26 s</span><h3>First authored beat</h3><p class="muted">It arrives over the existing Trigger Realtime stream. If the narrator reaches the ready edge first, it asks a check question.</p></div>
+  </div>
+
+  <h3>Try an interruption</h3>
+  <p class="note">Pick something the learner says during beat 3. The trace shows what the system does in response. This is an illustration, not a live demo.</p>
+  <div class="sim">
+    <div class="utter" role="group" aria-label="Learner interruptions" id="utter"></div>
+    <div class="trace" id="trace" aria-live="polite"></div>
+  </div>
+
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor L as Learner
+  participant E as ElevenLabs Agent
+  participant B as Browser (VoiceProvider)
+  participant S as Studiolo API
+  E-->>L: narrating beat s3…
+  L->>E: "Explain that another way"
+  E-->>B: onInterruption → stage freezes, pointer holds
+  E->>B: client tool rework_beat(s3, analogy, words)
+  B->>S: POST /api/voice/beats/rework (session cookie)
+  E-->>L: "Let me try it with an analogy…" (bridges)
+  S-->>B: new s3 revision (ingest + kit checks)
+  B-->>E: tool result: notes for s3 rev 2
+  E->>B: present_beat(s3, rev 2)
+  E-->>L: performs new notes · pointer follows cue words
+</pre>
+</section>
+
+<section>
+  <span class="eyebrow">04 · System design</span>
+  <h2>The browser is the tool hub; Studiolo keeps the brain</h2>
+  <div class="arch">
+    <div class="lane"><span class="eyebrow">Surfaces</span>
+      <div class="boxes"><div class="box"><b>Player Ask</b></div><div class="box"><b>Explain live</b></div><div class="box"><b>Copilot mic</b></div><div class="box"><b>Library</b></div><div class="box"><b>Today</b></div><div class="box"><b>Rail mic</b></div></div></div>
+    <div class="wire">start(anchor) ↓ ↑ cards · stage · dock</div>
+    <div class="lane"><span class="eyebrow">Browser · VoiceProvider in AppShell</span>
+      <div class="boxes"><div class="box new"><b>Session machine</b><span>session ≠ connection</span></div><div class="box new"><b>Context publisher</b><span>sendContextualUpdate · get_screen</span></div><div class="box new hl"><b>Tool hub</b><span>all client tools · cookie auth</span></div><div class="box new"><b>Confirm guard</b><span>visible ≥1.5 s + explicit yes</span></div><div class="box new"><b>Live stage</b><span>PlaybackDriver: Audio | Live</span></div><div class="box"><b>Card bridge</b><span>existing copilot cards</span></div><div class="box new"><b>VoiceTransport</b><span>ElevenLabs SDK · WebRTC · eu-residency</span></div></div></div>
+    <div class="split">
+      <div class="lane"><span class="eyebrow">ElevenLabs Agents</span>
+        <div class="boxes"><div class="box"><b>ASR + turn-taking</b><span>barge-in, eagerness</span></div><div class="box"><b>TTS</b><span>house voice, flash/turbo</span></div><div class="box"><b>LLM</b><span>P0–1: hosted Claude · P2: custom LLM → Studiolo</span></div></div></div>
+      <div class="lane"><span class="eyebrow">Studiolo · Vercel fra1</span>
+        <div class="boxes"><div class="box new"><b>/api/voice/session</b><span>gate · hold · token · vars</span></div><div class="box new hl"><b>/api/voice/tools/[name]</b><span>same copilot tool impls</span></div><div class="box new"><b>/api/voice/beats/rework</b><span>explainer_beat → ingest</span></div><div class="box new"><b>/api/voice/llm</b><span>Phase 2 · callModel</span></div><div class="box new"><b>/end · webhook</b><span>recap · settle minutes</span></div><div class="box"><b>Domain</b><span>topics/steps · LibraryGateway · explainers · courses · usage · spend cap</span></div></div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Design rules</h3><ol class="plain">
+      <li><b>All tools are client tools.</b> They act on the UI or call Studiolo with the learner's own session. The model can only do what the learner's UI can do.</li>
+      <li><b>One registry.</b> Voice calls the same tool implementations as the text copilot: same action kinds, same 8 KB cap, same read-back strings.</li>
+      <li><b>The brain moves home in Phase 2.</b> The custom LLM path runs through <code>callModel</code>, which brings back the 1-hour cache, usage rows, evals and the EU-controlled prompt.</li>
+      <li><b>Voice turns are copilot messages</b>, stored with <code>channel='voice'</code>. Voice is an input method (A7).</li>
+      <li><b>Swappable transport.</b> OpenAI Realtime, Gemini Live or a DIY Scribe → Claude → TTS pipeline can replace ElevenLabs.</li>
+    </ol></div>
+    <div class="card"><h3>Confirming by voice</h3>
+      <div style="display:grid;gap:8px;font-size:.88rem">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>Read · navigate · show</span><span class="pill ok">just do it</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>Keep ghost topics / notes</span><span class="pill ok">voice yes</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>Graph / library plan ≤ 5 steps</span><span class="pill acc">voice yes + card ≥1.5 s</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>Start a Lumen / course</span><span class="pill acc">voice yes after cost said</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>Merge · delete · plans &gt; 5 steps</span><span class="pill live">tap only</span></div>
+      </div>
+      <p class="note">The guard runs in the client, not in the prompt. If the card wasn't visible, or there was no explicit yes, the tool returns “needs a tap”.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">05 · Tools</span>
+  <h2>The voice's view of the one registry</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Tool</th><th>Kind</th><th>Status</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>read_map</code> · <code>read_topic</code> · <code>find_topics</code> · <code>read_branch</code></td><td>read</td><td>exists</td><td>Unchanged copilot reads</td></tr>
+      <tr><td><code>get_screen</code></td><td>read</td><td>new · client</td><td>Route, anchor, selection, beat, playhead</td></tr>
+      <tr><td><code>read_library</code> · <code>read_learning</code></td><td>read</td><td>new</td><td>Titles, kinds, collections, reading state · Lumens watched, statuses, My Focus</td></tr>
+      <tr><td><code>present_beat</code> · <code>go_to_beat</code> · <code>show_board</code> · <code>player_control</code></td><td>UI</td><td>new · client</td><td>Live stage and recorded player</td></tr>
+      <tr><td><code>show_on_map</code> · <code>navigate</code></td><td>UI</td><td>exists / new</td><td>Never changes data</td></tr>
+      <tr><td><code>propose_topics</code> · <code>capture_note</code></td><td>propose</td><td>exists / new</td><td>Ghosts, kept or dismissed</td></tr>
+      <tr><td><code>suggest_next</code></td><td>propose</td><td>new</td><td>1–3 cards with reasons. Rule-based ranking, model phrasing. Feeds Today T3/T6.</td></tr>
+      <tr><td><code>propose_changes</code></td><td>change</td><td>exists</td><td>Graph change plan; Apply / Undo</td></tr>
+      <tr><td><code>propose_library_plan</code></td><td>change</td><td>new</td><td>Create collection, move, tag, reading state. No delete in v1.</td></tr>
+      <tr><td><code>explain</code> · <code>start_live_lumen</code> · <code>plan_course</code></td><td>costly</td><td>exists / new</td><td>Card that shows the cost</td></tr>
+      <tr><td><code>rework_beat</code></td><td>in session</td><td>new</td><td>1–2 slides rewritten. Covered by the session hold, at most 4.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <span class="eyebrow">06 · Cost (estimates; P0 measures them)</span>
+  <h2>Roughly a dollar for a live six minutes</h2>
+  <div class="grid3">
+    <div class="card"><span class="k">L1 · 2-min question</span><span class="lvl num">$0.20–0.45</span><p class="muted">Agent minutes plus the LLM</p></div>
+    <div class="card"><span class="k">L2 · 6-min Live Lumen, 2 reworks</span><span class="lvl num">$0.75–1.60</span><p class="muted">For comparison: a recorded 3-minute Lumen's voice alone is estimated at $0.65–0.80</p></div>
+    <div class="card"><span class="k">L3 · 3-min library sort</span><span class="lvl num">$0.30–0.70</span><p class="muted">Most of it is minutes</p></div>
+  </div>
+  <p class="note col">Inputs: ElevenLabs Agents at $0.08 per minute beyond the plan's included minutes, plus the LLM passed through at roughly $0.02–0.15 per minute (prompt caching decides where in that range). A rework costs $0.02–0.05 and an author run about $0.13 with no TTS. 20 testers × 60 minutes is about 1,200 minutes, close to what the Pro plan includes and within its 20 concurrent calls. Confirm the price on the live pricing page before deciding. Spend cap: a new <code>voice_session</code> start with a per-minute hold, settled by the post-call webhook.</p>
+</section>
+
+<section>
+  <span class="eyebrow">07 · Prototype</span>
+  <h2>Built in Studiolo_Manage, against fixtures, with a $40 cap</h2>
+  <p class="col muted">A standalone Next.js app at <code>prototypes/live-lumens/</code>. It uses one exported Lumen, a mock map and a mock library, with real ElevenLabs Agents and real Claude. It never touches <code>studiolo</code>. The port into the main app is a separate HIGH-tier spec.</p>
+  <div class="road">
+    <div class="card"><span class="k">P0 · 2–3 days</span><h3>Ask the Lumen</h3><p class="muted">Audio driver, Ask / hold Space, board slides. <b>Exit:</b> first word ≤ 1.2 s at p50, barge-in ≤ 300 ms, real cost per minute.</p></div>
+    <div class="card"><span class="k">P1 · 4–5 days</span><h3>Live Lumen</h3><p class="muted">Live driver, warm-up question, rework, cue-word pointer, pause by disconnecting. <b>Exit:</b> rework ≤ 6 s, pointer right ≥ 80% of the time.</p></div>
+    <div class="card"><span class="k">P2 · 4–5 days</span><h3>Narrator actions</h3><p class="muted">Map and library plans, suggest next, confirm guard, recap. <b>Exit:</b> 20 scripted utterances pass, no change applied without the guard.</p></div>
+    <div class="card"><span class="k">P3 · 1–2 days</span><h3>Port spec</h3><p class="muted"><code>VOICE_ACCESS</code> switch, migrations, the <code>voice_session</code> cap, <code>/api/voice/*</code>, an <code>ai.md</code> update, evals. <b>Owner approval.</b></p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">08 · Decisions for the owner</span>
+  <h2>What needs a yes before P0</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td>V-D1</td><td>ElevenLabs Agents as a paid service, EU residency</td><td>Yes, smallest plan for the prototype; Pro when testers start</td></tr>
+      <tr><td>V-D2</td><td>Where the brain runs</td><td>Hosted Claude Sonnet 5.5 for the prototype; custom LLM via <code>callModel</code> for production</td></tr>
+      <tr><td>V-D3</td><td>Who voices a Live Lumen</td><td>The live narrator; TTS jobs skipped; recorded pipeline unchanged</td></tr>
+      <tr><td>V-D4</td><td>Voice confirmation rules</td><td>As above; merge, delete and plans of more than 5 steps need a tap</td></tr>
+      <tr><td>V-D5</td><td>Limits</td><td>10 min per session · 60 min per tester per month · 30 s idle disconnect · 4 reworks</td></tr>
+      <tr><td>V-D6</td><td>What is saved</td><td>Recap and deck always; transcript only if kept; no audio anywhere</td></tr>
+      <tr><td>V-D7</td><td>Library tools in v1</td><td>Sort, tag, file, reading state; no delete</td></tr>
+      <tr><td>V-D8</td><td>Entry points first</td><td>Player Ask → Explain live → rail mic</td></tr>
+      <tr><td>V-D9</td><td>Live voice model</td><td>House voice on v4 Turbo or Flash; compare against v4 in P0</td></tr>
+      <tr><td>V-D10</td><td>Prototype budget</td><td>$40 cap, tracked in the cost dashboard</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note col">This also depends on decisions already open: G-D1–9 (graph actions), VD-2–4 (voice model, streaming TTS, warm machines), FS-3 (instant title card) and Legal L1–L6 (ElevenLabs and Anthropic data terms). The legal ones block testers but not the prototype.</p>
+</section>
+
+<footer>
+  <span>Sources: <code>studiolo @ e8ad3c7</code> (read-only), files cited in the full spec · Craft Studilo space (Vision &amp; Principles, Explainers, Copilot, Graph actions, Course engine, Pricing &amp; Unit Costs, Legal &amp; Data Terms) · type definitions in <code>@elevenlabs/react@1.19.0</code> and <code>@elevenlabs/client@1.29.0</code> · elevenlabs.io pricing (search snippets).</span>
+  <span>Nothing here is approved or built. Cost figures are estimates until P0 measures them.</span>
+</footer>
+</div>
+
+<script>
+const U=[
+ {say:"Stop. Hold on.",steps:[["ASR","Barge-in: the narrator stops mid-word"],["client","onInterruption → stage freezes at s3, word 41"],["tool","pause_presentation()"],["narrator","“Sure, I'll wait.”"],["+30 s","Connection closes. The session is paused and its state kept. Billing stops."]]},
+ {say:"Explain that another way.",steps:[["client","stage freezes · position saved"],["tool","rework_beat(\"s3\", \"from_my_field\", words)"],["narrator","“Let me try it from your side, in law…” (bridging)"],["server","explainer_beat → ingest + kit checks → s3 rev 2 (~4–6 s)"],["tool","present_beat(\"s3\", rev 2)"],["narrator","Performs the new notes; the pointer follows cue words"]]},
+ {say:"Why does the column need to be that thick?",steps:[["context","sendContextualUpdate: beat s3, slide 'Where the weight goes'"],["narrator","Answers in speech, grounded in the beat's notes"],["tool","show_board(kind:\"ul\", 3 points)  · never cited"],["narrator","“Shall I carry on from where we were?”"],["tool","resume_presentation(s3, from sentence start)"]]},
+ {say:"I know this, skip.",steps:[["tool","go_to_beat(\"s4\")"],["context","Skip noted in the session (candidate evidence: “assumed”)"],["narrator","Picks up at beat 4"]]},
+ {say:"Test me.",steps:[["tool","show_board(kind:\"cards\", quiz: 3 options)"],["narrator","Asks the question and waits (turn eagerness: patient)"],["learner","Answers aloud"],["narrator","Gives feedback; the result goes into the recap as candidate evidence"]]},
+ {say:"Show me this on my map.",steps:[["tool","show_on_map(topic: Load paths)"],["client","Dock shrinks; the Graph focuses the topic"],["narrator","“The map now shows Load paths, under Structures.”"]]},
+ {say:"Make a topic for this and file my beam notes under it.",steps:[["tool","propose_topics(parent: Structures, [Load paths])  → ghost"],["tool","read_library(q:\"beam\") → 3 notes"],["tool","propose_library_plan([tag ×3 → Load paths])  → card"],["narrator","Reads out: “One new topic, and three notes tagged. Shall I?”"],["learner","“Yes, do it.”"],["guard","Card visible 2.1 s · explicit yes · ≤5 steps → allowed"],["server","Keep + apply via LibraryGateway · Undo toast"]]}
+];
+const ut=document.getElementById('utter'),tr=document.getElementById('trace');
+function show(i){
+  [...ut.children].forEach((b,j)=>b.setAttribute('aria-pressed',String(i===j)));
+  tr.replaceChildren();
+  const h=document.createElement('div');h.className='bub l';h.innerHTML='<span class="who">Learner, during beat s3</span>';h.append(U[i].say);tr.append(h);
+  U[i].steps.forEach(([t,x])=>{const r=document.createElement('div');r.className='step';const a=document.createElement('span');a.className='t';a.textContent=t;const b=document.createElement('span');if(t==='tool')b.className='tool';b.textContent=x;r.append(a,b);tr.append(r);});
+}
+U.forEach((u,i)=>{const b=document.createElement('button');b.type='button';b.id='u'+i;b.textContent='“'+u.say+'”';b.onclick=()=>show(i);ut.append(b);});
+show(1);
+</script>
