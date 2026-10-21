@@ -1,0 +1,144 @@
+/* The Studiolo dock (prototype, direction 2). One assistant, one conversation, docked at the bottom centre of every
+   page. NEW UI proposed for the app, drawn only with the app's tokens (tokens.css) and its own classes wherever a part
+   already exists: the thread is the copilot's (.cp-body .cp-thread .msg), cards are .cp-card / .cp-change, the quick
+   Lumen is the Graph player (.gp-panel, .xp-*), toasts are .vtoast. */
+
+#vx-app { min-height: 100%; }
+:root { --dock-w: 600px; --dock-left: var(--t-rail); --dock-right: 0px; }
+
+/* ---------- the dock ---------- */
+.dk { position: fixed; z-index: 130; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: calc(var(--dock-left) + (100vw - var(--dock-left) - var(--dock-right)) / 2); transform: translateX(-50%); width: min(var(--dock-w), calc(100vw - var(--dock-left) - var(--dock-right) - 32px)); display: flex; flex-direction: column; transition: left var(--dur-move) var(--ease-standard), width var(--dur-move) var(--ease-standard); }
+.dk-sheet { display: none; flex-direction: column; max-height: min(58vh, 560px); margin-bottom: 8px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; overflow: hidden; animation: dk-up var(--dur-standard) var(--ease-entrance); }
+.dk[data-open="true"] .dk-sheet { display: flex; }
+@keyframes dk-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.dk-shead { display: flex; align-items: center; gap: 10px; padding: 10px 12px 8px 16px; border-bottom: 1px solid var(--rule); }
+.dk-shead b { font-size: 13px; font-weight: 600; }
+.dk-shead span { font-size: 11.5px; color: var(--text-muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-shead .icb { all: unset; cursor: pointer; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); }
+.dk-shead .icb:hover { background: var(--hover-fill); color: var(--ink); }
+.dk-shead .icb:focus-visible { outline: var(--focus-ring); }
+.dk .cp-body { flex: 1 1 auto; overflow-y: auto; padding: 4px 16px 14px; overscroll-behavior: contain; }
+.dk .cp-body .cp-card { max-width: 100%; }
+.dk-mark { display: flex; align-items: center; gap: 8px; margin: 14px 0 2px; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.dk-mark::before, .dk-mark::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.dk-mark svg { flex: none; }
+.dk-bridge { margin: 6px 0 0; font-size: 12px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
+.dk-bridge::before { content: "↳"; color: var(--accent); }
+.dk-bridge a { color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+/* The bar: always there. */
+.dk-bar { display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 8px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 26px; min-height: 52px; }
+.dk-orb { all: unset; box-sizing: border-box; cursor: pointer; position: relative; width: 36px; height: 36px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--on-ink); font-family: var(--read); font-size: 18px; line-height: 1; }
+.dk-orb:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.dk-orb .dk-bars { display: none; grid-auto-flow: column; gap: 2px; align-items: center; }
+.dk-orb .dk-bars i { display: block; width: 3px; height: 5px; border-radius: 2px; background: currentColor; }
+.dk[data-voice="true"] .dk-orb { background: var(--accent); color: var(--on-accent); }
+.dk[data-voice="true"] .dk-orb .dk-s { display: none; }
+.dk[data-voice="true"] .dk-orb .dk-bars { display: grid; }
+.dk[data-state="speaking"] .dk-orb .dk-bars i { animation: dk-bar 0.9s ease-in-out infinite; }
+.dk[data-state="speaking"] .dk-orb .dk-bars i:nth-child(2) { animation-delay: -0.3s; }
+.dk[data-state="speaking"] .dk-orb .dk-bars i:nth-child(3) { animation-delay: -0.6s; }
+.dk[data-state="listening"][data-voice="true"] .dk-orb::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; box-shadow: 0 0 0 2px var(--accent); animation: dk-ring 1.6s ease-out infinite; }
+.dk[data-state="thinking"] .dk-orb .dk-bars i { animation: xp-breathe 1s ease-in-out infinite; }
+.dk[data-state="thinking"] .dk-orb .dk-bars i:nth-child(2) { animation-delay: 0.2s; }
+.dk[data-state="thinking"] .dk-orb .dk-bars i:nth-child(3) { animation-delay: 0.4s; }
+.dk[data-state="thinking"]:not([data-voice="true"]) .dk-orb .dk-s { animation: xp-breathe 1s ease-in-out infinite; }
+@keyframes dk-bar { 0%, 100% { height: 5px; } 50% { height: 14px; } }
+@keyframes dk-ring { from { transform: scale(0.85); opacity: 0.6; } to { transform: scale(1.25); opacity: 0; } }
+
+.dk-ctx { flex: none; max-width: 190px; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; padding: 3px 9px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-ctx b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.dk-mid { flex: 1; min-width: 0; position: relative; }
+.dk-mid input { width: 100%; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--ink); padding: 6px 2px; }
+.dk-mid input::placeholder { color: var(--ink-2); }
+.dk-live { display: none; margin: 0; font-family: var(--read); font-size: 15px; line-height: 1.3; color: color-mix(in srgb, var(--text) 45%, transparent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.dk-live span { direction: ltr; unicode-bidi: isolate; }
+.dk-live b { color: var(--text); font-weight: 400; }
+.dk-live[data-who="you"] { font-family: var(--ui); font-size: 13.5px; font-style: italic; color: var(--text-muted); }
+.dk[data-captioning="true"] .dk-live { display: block; }
+.dk[data-captioning="true"] .dk-mid input { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.dk-btn { all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); }
+.dk-btn:hover { background: var(--hover-fill); color: var(--ink); }
+.dk-btn:focus-visible { outline: var(--focus-ring); }
+.dk-mic { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); }
+.dk[data-voice="true"] .dk-mic { background: var(--accent); color: var(--on-accent); box-shadow: none; }
+.dk-send { background: var(--ink); color: var(--on-ink); width: 32px; height: 32px; }
+.dk-send:hover { background: var(--ink); color: var(--on-ink); opacity: 0.85; }
+.dk-mins { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; display: none; }
+.dk[data-voice="true"] .dk-mins { display: inline; }
+
+/* Suggestions sit just above the bar, for this page. */
+.dk-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 8px; }
+.dk-chips button { all: unset; cursor: pointer; font-size: 12.5px; padding: 5px 11px; border-radius: 14px; background: var(--surface-float); color: var(--ink-2); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--rule); }
+.dk-chips button:hover { color: var(--ink); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--ink-3); }
+.dk-chips button:focus-visible { outline: var(--focus-ring); }
+.dk-chips button[data-kind="interrupt"] { color: var(--accent); background: var(--accent-soft); box-shadow: none; }
+.dk-chips:empty { display: none; }
+
+/* Now playing: a quick Lumen tucked into the dock. */
+.dk-np { all: unset; cursor: pointer; display: none; align-items: center; gap: 6px; flex: none; font-size: 12px; color: var(--accent); padding: 4px 10px 4px 8px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--accent-soft); white-space: nowrap; }
+.dk-np[data-on="true"] { display: inline-flex; }
+.dk-np .xp-dot { width: 6px; height: 6px; }
+
+/* ---------- the quick Lumen pop-up: the Graph player's own panel, floating ---------- */
+.ql { position: fixed; z-index: 125; left: calc(var(--dock-left) + (100vw - var(--dock-left) - var(--dock-right)) / 2); top: 50%; width: min(680px, calc(100vw - var(--dock-left) - var(--dock-right) - 40px)); transform: translate(-50%, calc(-50% - 52px)); animation: ql-in var(--dur-move) var(--ease-entrance); }
+.ql[hidden] { display: none; }
+@keyframes ql-in { from { opacity: 0; transform: translate(-50%, calc(-50% - 40px)) scale(0.98); } to { opacity: 1; transform: translate(-50%, calc(-50% - 52px)); } }
+.ql .gp-wrap { position: static !important; inset: auto !important; width: 100% !important; height: auto !important; pointer-events: auto !important; display: block !important; padding: 0 !important; }
+.ql .gp-panel { position: static !important; inset: auto !important; width: 100% !important; max-width: none !important; height: auto !important; max-height: none !important; transform: none !important; margin: 0; }
+.ql .gp-surface { height: auto !important; }
+.ql .xp-screen-fit { flex: none !important; display: block !important; }
+.ql .xp-screen-stage { width: 100% !important; }
+.ql-live { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 1px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--warn); background: var(--warn-soft); }
+.ql-src { position: absolute; z-index: 6; left: 96px; top: 30px; font: 600 17px/1 var(--ui); letter-spacing: 0.05em; text-transform: uppercase; color: var(--stage-ink-muted); }
+.ql-src b { color: var(--stage-accent); font-weight: 600; }
+.ql-tag { position: absolute; top: 26px; right: 84px; z-index: 6; font: 600 18px/1 var(--ui); letter-spacing: 0.06em; color: var(--stage-accent); padding: 7px 12px; border-radius: 4px; background: var(--stage-accent-soft); }
+.ql-end { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 6px 0 0; }
+.ql-end[hidden] { display: none; }
+.xp-card.ql-choice { cursor: pointer; }
+.xp-card.ql-choice[data-picked="right"] { box-shadow: inset 0 0 0 3px var(--stage-positive); }
+.xp-card.ql-choice[data-picked="wrong"] { box-shadow: inset 0 0 0 3px var(--stage-caution); }
+
+/* ---------- page touches ---------- */
+.pdf-page.ql-page { background: var(--page-paper); color: var(--page-ink); padding: 56px 64px; box-sizing: border-box; font-family: var(--read); text-align: left; overflow: hidden; }
+.ql-page h2 { font-family: var(--read); font-weight: 500; font-size: 25px; margin: 0 0 4px; color: var(--page-ink); }
+.ql-page .k { font-family: var(--ui); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--page-ink-2); margin: 0 0 18px; }
+.ql-page p { font-size: 15.5px; line-height: 1.6; margin: 0 0 12px; }
+.ql-page h3 { font-family: var(--ui); font-size: 13px; font-weight: 600; margin: 18px 0 6px; }
+.ql-page .fig { margin: 14px 0; padding: 12px 14px; border: 1px solid #d9d9d2; font-family: var(--ui); font-size: 12.5px; color: var(--page-ink-2); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.ql-page .fig b { display: block; font-size: 19px; color: var(--page-ink); font-family: var(--read); font-weight: 500; }
+.ql-page .fn { position: absolute; bottom: 26px; left: 64px; right: 64px; font-family: var(--ui); font-size: 11px; color: var(--page-ink-2); display: flex; justify-content: space-between; }
+.ql-page mark { background: var(--page-mark); color: inherit; }
+.dk-touched { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.dk-reading { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); border-radius: 3px; }
+.cp-thread .msg.user.dk-said p::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: currentColor; opacity: 0.55; -webkit-mask: var(--dk-mic) center / contain no-repeat; mask: var(--dk-mic) center / contain no-repeat; }
+.cp-thread .msg.dk-from .who::after { content: "from the dock"; margin-left: 8px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ghost-ink); background: var(--ghost-soft); padding: 1px 7px; border-radius: 9px; }
+:root { --dk-mic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='9' y='3' width='6' height='11' rx='3'/%3E%3Cpath d='M5 11a7 7 0 0 0 14 0M12 18v3'/%3E%3C/svg%3E"); }
+.cp .cp-body { padding-bottom: 96px; }
+
+/* ---------- the 3D graph (proposed view; not in the app yet) ---------- */
+.g3 { position: relative; height: calc(100vh - 150px); min-height: 420px; margin-top: 8px; }
+.g3 canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.g3 canvas:active { cursor: grabbing; }
+.g3-note { position: absolute; left: 0; top: 0; font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; align-items: center; }
+.g3-note .tag { font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ghost-ink); background: var(--ghost-soft); padding: 2px 8px; border-radius: 10px; }
+.g3-legend { position: absolute; left: 0; bottom: 0; display: flex; gap: 14px; font-size: 12px; color: var(--ink-2); }
+.g3-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+
+/* ---------- prototype bar (the specimens' own .td-proto) ---------- */
+.td-proto.dk-proto { left: auto; right: max(16px, env(safe-area-inset-right, 0px)); bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); z-index: 140; flex-wrap: wrap; max-width: min(460px, calc(100vw - var(--t-rail) - 32px)); }
+.td-proto.dk-proto button { all: unset; cursor: pointer; font-size: 12px; color: var(--accent); padding: 2px 4px; }
+.td-proto.dk-proto button:focus-visible { outline: var(--focus-ring); }
+.td-proto.dk-proto .hint { max-width: 52ch; }
+
+@media (max-width: 760px) {
+  :root { --dock-left: 0px; --dock-right: 0px !important; }
+  .dk { bottom: calc(var(--m-tabs) + 8px); }
+  .dk-ctx { display: none; }
+  .ql { top: 42%; }
+  .td-proto.dk-proto { left: 8px; }
+  .td-proto.dk-proto .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dk *, .ql, .dk-sheet { animation: none !important; transition: none !important; }
+}

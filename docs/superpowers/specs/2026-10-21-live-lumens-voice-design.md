@@ -2,6 +2,45 @@
 
 Status: **draft for owner review**, 21 October 2026. Nothing here is approved, built or changed in `studiolo`. The decisions in §12 are the agent's recommendations and are waiting on the owner.
 
+> **Direction 2 (owner, 21 Oct): the Studiolo dock.** The owner chose one central dock that stays with the learner on every page, rather than separate entry points per surface. §0 below describes it and overrides §3.1 where they differ. The rest of the design stands: Live Lumens, tools, confirm rules, cost, privacy and the prototype path. Prototype: `prototypes/live-lumens/` (built on the app's real screens from `studiolo` @ `48412aa`).
+
+## 0. The Studiolo dock (direction 2)
+
+**One assistant, one conversation, one place.** A dock sits at the bottom centre of every page, owned by the app shell. It never closes when you navigate: Today, the Library, a PDF, the 2D map, a proposed 3D map, Learn and courses all show the same dock and the same conversation.
+
+| Part | What it is |
+|---|---|
+| **Bar** (always visible) | Studiolo mark, a chip naming what it can see (for example "Climate and Architecture · p. 2"), a text field, a mic and Send. While Studiolo speaks, the field becomes a live caption. |
+| **Suggestions** | Three or so chips above the bar for *this* page, such as "Explain this page", "Put this on my map" or "Fly to …". They become interrupt chips (Stop, Another way, Test me) while a Lumen plays. |
+| **Conversation sheet** | Opens upward from the bar. It holds one continuous thread with page markers ("You opened Library · Everything") and the copilot's own cards (proposals, change plans, offers). It uses the same message and card components as the copilot panel. |
+| **Quick Lumen pop-up** | The Graph player's panel, floating over whatever page you're on and narrated live. It is made from what's on screen (a PDF page, a topic, a course part). It isn't saved unless you keep it. When you move to another page it tucks into the bar as "Now playing" and keeps going. |
+| **Voice** | The mic opens the line, and it stays open as you move round the app. It closes after 30 s of quiet (§3.2 still applies). Text works the same, and voice is just a way of typing (A7). |
+
+**What it can do, page by page.** These are the prototype's suggestion chips; the tools are in §5.3.
+
+| Page | Examples |
+|---|---|
+| Today | Pick up where I left off (opens the PDF at the right page); "What should I learn today?" (suggestion card); open the 3D map |
+| Library | Open an item; sort a set of saves (a Library change plan); find everything on a theme (cards outlined) |
+| PDF reader | **Explain this page** (quick Lumen from that page, cited to it); save the key point as a note (it appears in the reader's Notes); **put this on my map** (goes to the topic and proposes sub-topics) |
+| Graph, 2D | What's missing here (ghost topics); keep or dismiss by voice; explain this topic live; show it in 3D |
+| Graph, 3D (proposed; the app has none yet) | Fly to a topic; light up My Focus; show which areas are thin |
+| Course | Explain this part another way (quick Lumen); quiz me; save the key idea |
+
+**The copilot bridge.** The copilot is not a second assistant. It is the Graph's *view* of the same conversation:
+- **Graph → copilot.** On the Graph, every exchange in the dock is also written to the open topic's copilot chat. It is marked "from the dock", and its cards (ghost proposals, change plans) live there, beside the map they change.
+- **Copilot → dock.** What you type in the copilot panel's composer lands in the dock's thread too.
+- **From elsewhere to the Graph.** An exchange about a topic, started on another page ("put this on my map" from a PDF), is filed in that topic's chat and leaves a line in the dock: "Also in the copilot panel, in the Climate-responsive design chat".
+- **Data.** The dock owns a global, account-wide conversation (`copilot_conversations.scope = 'dock'`, a new value). Each dock message carries the page it was said on and an optional `topic_id`. Messages with a topic are also linked into that topic's chat (one row, shown in two threads: `copilot_message_links(message_id, conversation_id)`), so nothing is duplicated. Voice turns keep `channel = 'voice'` (§6).
+- **Context.** Each page publishes a small context object to the dock: the page, the anchor, the selection, the PDF page, the playing Lumen and its slide. It goes to the model as `studiolo_context` (and to ElevenLabs as a contextual update), replacing today's topic-only scope (§2).
+
+**Shell changes (for the port).**
+- `VoiceProvider` from §5.1 becomes `DockProvider` in `AppShell`. It holds the conversation, the page context, the transport and the quick-Lumen player.
+- Pages register a `useDockContext({...})` and their own chips and tools.
+- The copilot panel keeps its place on the Graph and subscribes to the dock's conversation for its topic.
+- The phone layout puts the dock above the tab bar.
+
+
 Sources:
 - `studiolo` @ `e8ad3c7`, read-only. Files are cited inline.
 - Craft, Studilo space: *Vision & Principles*, *Explainers*, *Courses*, *Course engine*, *Copilot*, *Graph actions*, *Learner context & Memory*, *Features & Ideas*, *Pricing & Unit Costs*, *Stack & Architecture*, *Legal & Data Terms*, *Changelog* (read 21 Oct 2026).

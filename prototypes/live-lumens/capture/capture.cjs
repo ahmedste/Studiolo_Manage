@@ -8,20 +8,17 @@ const STUDIOLO = process.env.STUDIOLO || '/home/user/studiolo';
 const { chromium } = require(path.join(STUDIOLO, 'node_modules/playwright'));
 const BASE = process.env.BASE || 'http://localhost:3311';
 const IA = '00000000-0000-4000-8000-000000000003'; // Islamic architecture
-const FS = '00000000-0000-4000-8000-00000000001d'; // Facade systems
-const DC = '00000000-0000-4000-8000-000000000012'; // Design & Composition
+const CRD = '00000000-0000-4000-8000-00000000000f'; // Climate-responsive design
 const graph = (q) => `/dev/specimens?graph=map&${q}`;
 const SCREENS = [
-  { name: 'graph', url: graph(`copilot=empty&xp=1&explain=1&topic=${IA}`) },
-  { name: 'player', url: graph(`copilot=empty&xp=1&explain=1&topic=${IA}`), steps: [['click', 840, 806], ['wait', 800]], slides: true },
-  { name: 'explain', url: graph(`copilot=empty&xp=1&explain=1&topic=${IA}`), steps: [['text', 'Explain']] },
-  { name: 'facade', url: graph(`copilot=empty&topic=${FS}`) },
-  { name: 'ghosts', url: graph(`copilot=ghosts&topic=${FS}`) },
-  { name: 'ghostsKept', url: graph(`copilot=ghosts&topic=${FS}`), steps: [['text', 'Keep all'], ['wait', 1200]] },
-  { name: 'tidy', url: graph(`copilot=tidy&topic=${DC}`) },
-  { name: 'tidyApplied', url: graph(`copilot=tidy&topic=${DC}`), steps: [['text', 'Apply 3 changes'], ['wait', 1500]] },
-  { name: 'library', url: '/dev/specimens?library=wall' },
   { name: 'today', url: '/dev/specimens?today=active' },
+  { name: 'library', url: '/dev/specimens?library=wall' },
+  { name: 'pdf', url: '/dev/specimens?library=pdf&media=1', wait: 4000 },
+  { name: 'graphHome', url: graph('copilot=empty&xp=1') },
+  { name: 'climate', url: graph(`copilot=empty&xp=1&explain=1&topic=${CRD}`) },
+  { name: 'islamic', url: graph(`copilot=empty&xp=1&explain=1&topic=${IA}`) },
+  { name: 'player', url: graph(`copilot=empty&xp=1&explain=1&topic=${IA}`), steps: [['click', 840, 806], ['wait', 800]], slides: true },
+  { name: 'course', url: '/dev/specimens?course=watching', wait: 3000 },
 ];
 async function inlineImages(p) {
   await p.evaluate(async () => {
@@ -39,7 +36,7 @@ async function inlineImages(p) {
   for (const s of SCREENS) {
     const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
     await p.goto(BASE + s.url, { waitUntil: 'networkidle', timeout: 120000 });
-    await p.waitForTimeout(2000);
+    await p.waitForTimeout(s.wait || 2000);
     for (const [kind, a, c] of s.steps || []) {
       if (kind === 'click') await p.mouse.click(a, c);
       if (kind === 'text') await p.getByText(a, { exact: true }).first().click();
@@ -55,6 +52,8 @@ async function inlineImages(p) {
     }
     await p.screenshot({ path: path.join(__dirname, `shots/${s.name}.png`) });
     await inlineImages(p);
+    // Canvases (drawn slides, PDF pages) don't survive as markup: swap each for a picture of itself.
+    await p.evaluate(() => { for (const c of document.querySelectorAll('canvas')) { try { const img = document.createElement('img'); img.src = c.toDataURL('image/png'); img.className = c.className; img.style.cssText = c.style.cssText; img.width = c.width; img.height = c.height; c.replaceWith(img); } catch {} } });
     const snap = await p.evaluate(() => {
       const sheets = [...document.styleSheets].map((sh) => sh.href).filter(Boolean);
       document.querySelectorAll('script, next-route-announcer, nextjs-portal, link, template, .td-proto').forEach((e) => e.remove());

@@ -1,32 +1,35 @@
-# Live Lumens: interactive prototype
+# Studiolo dock: interactive prototype
 
-A clickable prototype of the voice narrator in `docs/superpowers/specs/2026-10-21-live-lumens-voice-design.md`,
-built on **Studiolo's real screens**. It isn't a redraw: the screens are the app's own rendered DOM and compiled CSS.
+A clickable prototype of **direction 2** in `docs/superpowers/specs/2026-10-21-live-lumens-voice-design.md` (§0): one assistant, docked at the bottom centre of every page. Its conversation follows you round the app, it acts on the page you're on, it pops quick Lumens over what you're reading, and on the Graph it is the same conversation as the copilot.
 
-Open `dist/live-lumens-prototype.html` in a browser. The bar at the bottom left switches between five scenarios:
+It's built on **Studiolo's real screens**, captured read-only from `studiolo` @ `48412aa`: the app's own rendered pages and compiled styles, not redrawn copies.
 
-| # | Scenario | What it shows |
-|---|---|---|
-| 1 | Ask the Lumen | A recorded Lumen plays. **Ask** (or holding Space) pauses it, the narrator answers, draws a board slide, saves a note, then hands back. |
-| 2 | Live Lumen | Explain → **Explain live**. The narrator performs the slides and you cut in: Stop (the line closes so silence isn't billed), Explain that another way (the slide is rewritten as a campus analogy), Go deeper, Test me, Skip. |
-| 3 | Voice on the map | The mic beside Send. Spoken topic proposals and a spoken change plan, with the **confirm check** (card on screen, clear yes, 5 steps or fewer). Deletes need a tap. |
-| 4 | Sort the Library | **Sort by voice**: a Library sort plan (a new tool), applied with Undo. |
-| 5 | Plan my session | Today → **Plan my session**: three ranked ideas, then jump into one. |
+Open `dist/studiolo-dock-prototype.html` in a browser.
 
-Every session ends with a **recap** (covered, saved, changed, for review). The transcript is kept only if you choose.
+## Try it
+
+Use the suggestions above the dock, or type. Move between pages with the sidebar; the dock and the conversation stay.
+
+1. **Today** → "Pick up my lecture notes": opens the PDF reader at page 2.
+2. **PDF** → "Explain this page": a quick Lumen pops up over the page and is narrated. Cut in with "Explain that another way" (the slide is redrawn as a bath analogy), Stop, Test me or Skip. Go to another page and it tucks into the dock as *Now playing*.
+3. **PDF** → "Put this on my map": goes to Climate-responsive design. Three dashed topics appear on the map, and the proposal lands in the **copilot panel** marked *from the dock*. Say "Keep all three".
+4. "Show me in 3D" → a **proposed** 3D view of the whole map (not in the app yet). "Fly to Climate-responsive design".
+5. **Library** → "Sort my Sultan Hassan saves" (a plan that asks first). **Learn** → a course part: "Explain this part another way", "Quiz me".
+6. The **mic** opens a voice line that stays open across pages. **S** opens the whole conversation.
 
 ## Limits
 
-- No microphone and no network. You pick a suggestion, type, or hold the mic, which "hears" the first suggestion.
-- Your browser's built-in voice stands in for the ElevenLabs narrator. Mute it in the voice dock. Without a voice, captions follow a reading clock.
-- The screens are fixed snapshots. Only the voice parts and the sidebar react. Built for desktop first.
+- No microphone and no network. Your browser's built-in voice stands in for the ElevenLabs narrator; mute it in the conversation sheet.
+- The screens are fixed snapshots. The dock, the sidebar, links between these pages, the copilot composer and the changes Studiolo makes all respond. Other controls don't.
+- The PDF page text is written for the prototype; the specimen PDF only says "Page 2". The 3D map is a new, proposed view drawn from the specimen map's 104 topics.
 
 ## How it's made
 
-1. `capture/capture.cjs` loads studiolo's `/dev/specimens` pages from a **local, read-only** run of the app. These use in-memory fixtures: no database, no AI.
-2. It saves each screen's DOM, the compiled stylesheet and the Latin fonts to `capture/snap.json`.
-3. Nothing in `studiolo` is changed. It was captured from `studiolo @ e8ad3c7`.
-4. `src/voice.css` and `src/voice.js` are the proposed voice layer. They reuse the app's own classes (`.cp-comp`, `.cp-card`, `.cp-change`, `.vtoast`, `.xp-*`, `.graph-dialog`, `.td-proto`) and tokens.
-5. `node build.mjs` bundles everything into `dist/live-lumens-prototype.html`.
+1. `capture/capture.cjs` loads studiolo's `/dev/specimens` pages from a **local, read-only** run of the app. These use in-memory fixtures: no database, no AI. It saves each screen's DOM, the compiled stylesheet and the Latin fonts to `capture/snap.json`. Nothing in `studiolo` is changed.
+2. `capture/graph.json` is the specimen map (`src/dev/graph-sample.ts`) as data, for the 3D view.
+3. `src/dock.css` and `src/dock.js` are the proposed dock. They reuse the app's own classes (`.cp-body .cp-thread .msg`, `.cp-card`, `.cp-change`, `.gp-wrap .gp-panel`, `.xp-*` slides, `.vtoast`, `.graph-dialog`, `.td-proto`) and tokens.
+4. `node build.mjs` bundles everything into `dist/studiolo-dock-prototype.html`.
 
-To refresh the screens, start a local studiolo checkout with `npx next dev -p 3311`. Then run `STUDIOLO=/path/to/studiolo node capture/capture.cjs && node build.mjs`.
+To refresh the screens:
+1. In a local studiolo checkout, run `npm ci`, then `node scripts/copy-pdfjs-assets.mjs`, then `npx next dev -p 3311`.
+2. Run `STUDIOLO=/path/to/studiolo node capture/capture.cjs && node build.mjs`.
