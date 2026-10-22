@@ -201,7 +201,7 @@
     $$("[title], [aria-label]", root).forEach((el) => ["title", "aria-label"].forEach((k) => { const v = el.getAttribute(k); if (NAMES[v]) el.setAttribute(k, NAMES[v]); }));
   }
   const main = () => $("main", root);
-  const wide = () => matchMedia("(min-width: 1000px)").matches;
+  const wide = () => matchMedia("(min-width: 1100px)").matches; // the live app docks Loci from 1100px; below, a sheet
   const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
       <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
       <button class="cp-reopen pl-ask" type="button" data-copilot aria-expanded="${S.panel}" aria-controls="pl-in"><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
@@ -217,7 +217,7 @@
     const focused = cpw.contains(document.activeElement) ? document.activeElement : null;
     const docked = S.panel && wide();
     const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
-    layout(days);
+    fitHours(days);
     main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
       <aside class="pl-side" aria-label="${docked ? "Ask Loci" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
       <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div></section></div></div>`;
@@ -227,6 +227,19 @@
     main().scrollTop = keep.main;
     if (keep.thread != null) $(".cp-body", cpw).scrollTop = keep.thread;
     if (focused?.isConnected) focused.focus({ preventScroll: true });
+  }
+  /** The hour height fills the calendar box on framed (wider) screens, between 56 and 112 px; stacked screens use 56.
+      It only changes when the window does, so switching views or opening Loci never moves the axis. */
+  function fitHours(days) {
+    const framed = matchMedia("(min-width: 981px)").matches, box = $(".pl-calscroll", root);
+    H = 64; layout(days);
+    if (framed) {
+      const avail = (box ? box.clientHeight : innerHeight - 270) - 64;
+      const n = FOLDED.filter((f) => !f).length, k = runs().length;
+      H = Math.max(56, Math.min(112, Math.floor((avail - k * FOLD - 6) / n)));
+      if (!box) requestAnimationFrame(() => render()); // measure the real box once, on the first paint
+    } else H = 56;
+    layout(days);
   }
   function placePanel() {
     cpw.hidden = !S.panel;
@@ -1183,7 +1196,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   input.addEventListener("input", () => { sendBtn.disabled = !input.value.trim() || S.busyAI; });
   input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
   let wasWide = wide();
-  window.addEventListener("resize", () => { if (wide() !== wasWide) { wasWide = wide(); render(); } });
+  let rz = 0;
+  window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { wasWide = wide(); if (S.view !== "read") render(); else placePanel(); }, 120); });
   document.addEventListener("keydown", (e) => {
     if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") && !dlg) { e.preventDefault(); if (S.panel) input.focus(); else openPanel(); }
   });

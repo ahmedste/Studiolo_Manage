@@ -90,11 +90,11 @@ body { background: var(--surface-page); }
 /* ------------------------------------------------------------------ one fixed frame: head, side column, calendar */
 /* Nothing moves when you switch Day and Week or open the copilot: the head is fixed, the copilot takes the side
    column's place, and Day and Week share one hour axis inside the same calendar box. */
-.pl-frame { height: calc(100dvh - 88px); min-height: 560px; display: flex; flex-direction: column; max-width: 1480px; }
+.pl-frame { height: calc(100dvh - 88px); min-height: 560px; display: flex; flex-direction: column; }
 .pl-frame > .td-head { flex: none; margin: 0 0 18px; }
 /* The calendar on the left; Next up, My Focus and the Big Picture on the right, where the copilot also opens,
    as it does on the Graph. Side first in the source, so it reads first and stacks on top on narrow screens. */
-.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "cal side"; gap: 0; }
+.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--t-panel); grid-template-areas: "cal side"; gap: 0; }
 .pl-body > .pl-side { grid-area: side; }
 .pl-body > .pl-cal { grid-area: cal; }
 /* The side column is divided from the calendar by one hairline; its first head sits on the calendar toolbar's line. */
@@ -136,7 +136,7 @@ body { background: var(--surface-page); }
 .pl-bp p { margin: 0; font: 400 15.5px/1.55 var(--read); color: var(--ink); }
 .pl-bp em { color: var(--accent); }
 .pl-bp .sub { margin-top: 8px; font: 12px/1.4 var(--ui); color: var(--ink-2); }
-.pl-calnav { flex: none; display: flex; align-items: center; gap: 8px; min-height: 34px; margin: 0 0 8px; }
+.pl-calnav { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; row-gap: 6px; min-height: 34px; margin: 0 0 8px; }
 .pl-calnav h2 { margin: 0 0 0 4px; font-size: 15px; font-weight: 600; white-space: nowrap; }
 .pl-calnav h2 span { color: var(--ink-2); font-weight: 400; }
 .pl-calnav .icb { box-shadow: inset 0 0 0 1px var(--line); }
@@ -159,7 +159,7 @@ body { background: var(--surface-page); }
 .pl-key2 .av { background: var(--pl-avail); box-shadow: inset 0 0 0 1px var(--line); }
 .pl-key2 .bz { background: repeating-linear-gradient(135deg, var(--ink-3) 0 2px, transparent 2px 4px); }
 .pl-calscroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
-.pl-grid { display: grid; grid-template-columns: 44px repeat(var(--cols), minmax(84px, 1fr)); min-width: calc(44px + var(--cols) * 84px); }
+.pl-grid { --colmin: 72px; display: grid; grid-template-columns: 44px repeat(var(--cols), minmax(var(--colmin), 1fr)); min-width: calc(44px + var(--cols) * var(--colmin)); }
 .pl-gh { position: sticky; top: 0; z-index: 6; height: 62px; box-sizing: border-box; background: var(--surface-page); border-bottom: 1px solid var(--line); }
 .pl-wd { all: unset; box-sizing: border-box; position: sticky; top: 0; z-index: 6; height: 62px; cursor: pointer; padding: 6px 6px 8px; background: var(--surface-page); border-bottom: 1px solid var(--line); display: grid; align-content: start; gap: 1px; font-size: 11.5px; color: var(--ink-2); }
 .pl-wd:hover { background: var(--hover-fill); }
@@ -391,7 +391,7 @@ body { background: var(--surface-page); }
 
 /* ------------------------------------------------------------------ prototype bar */
 .pl-proto { display: block; max-width: calc(100vw - var(--t-rail) - 470px); }
-@media (max-width: 999.98px) { .pl-proto { max-width: calc(100vw - var(--t-rail) - 32px); } }
+@media (max-width: 1099.98px) { .pl-proto { max-width: calc(100vw - var(--t-rail) - 32px); } }
 .pl-proto .row { display: flex; align-items: center; gap: 10px; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
 .pl-proto .ai { color: var(--ink-2); }
 .pl-proto .ai[data-on="true"] { color: var(--ok); }
@@ -407,21 +407,29 @@ body { background: var(--surface-page); }
   .pl-cal .pl-conn { display: none; }
   .pl-cal .pl-conn + .pl-key2 { margin-left: auto; padding-left: 0; border-left: 0; }
 }
-@media (max-width: 1280px) {
-  .pl-body { grid-template-columns: minmax(0, 1fr) 340px; }
+/* The live app's breakpoints (studiolo src/styles): wide from 1100px, where Loci docks; tablets 700–1099px, where
+   Loci is a bottom sheet; Today's columns stack at 980px; phones under 700px. The side column is Loci's own width,
+   --t-panel = clamp(360px, 32vw, 420px), on wide screens. */
+@media (max-width: 1099.98px) {
+  .pl-body { grid-template-columns: minmax(0, 1fr) 300px; }
   .pl-cal { padding-right: 20px; }
   .pl-side { padding-left: 20px; }
-}
-/* Below 1000px the frame flows: side column above the calendar, and the copilot is a bottom sheet. */
-@media (max-width: 999.98px) {
-  .pl-frame { height: auto; min-height: 0; }
-  .pl-body { display: flex; flex-direction: column; gap: 28px; }
-  .pl-side { overflow: visible; padding: 0; border-left: 0; }
-  .pl-cal { padding-right: 0; }
-  .pl-calscroll { overflow-x: auto; overflow-y: visible; }
-  .pl-gh, .pl-wd { position: static; }
+  .pl-grid { --colmin: 60px; }
+  .pl-cal .pl-key2 { display: none; }
   .pl-cpwrap { left: 0; top: auto; height: min(78dvh, 640px); width: auto !important; }
   .pl-cpwrap .cp { inset: 0 8px 8px; }
+}
+/* Stacked: My Focus and Up next first, then the calendar, then the Big Picture. */
+@media (max-width: 980px) {
+  .pl-frame { height: auto; min-height: 0; }
+  .pl-body { display: flex; flex-direction: column; }
+  .pl-side { display: contents; }
+  .pl-side > .pl-sec:nth-child(1) { order: 1; }
+  .pl-side > .pl-sec:nth-child(2) { order: 2; }
+  .pl-cal { order: 3; padding: 16px 0 24px; border-top: 1px solid var(--line); }
+  .pl-side > .pl-bp { order: 4; }
+  .pl-calscroll { overflow-x: auto; overflow-y: visible; }
+  .pl-gh, .pl-wd { position: static; }
 }
 .pl-sheet .pl-proto { display: none; }
 @media (max-width: 699.98px) {
@@ -433,6 +441,10 @@ body { background: var(--surface-page); }
   .pl-art { font-size: 17.5px; }
   .pl-proto { max-width: none; left: 8px; right: 8px; padding: 5px 8px; }
   .pl-key2 { display: none; }
+  .pl-grid { --colmin: 64px; }
+  .pl-calnav h2 { flex-basis: 100%; order: 3; margin: 2px 0 0; }
+  .pl-strip button { width: 34px; }
+  .pl-strip .sum { display: none; }
   .pl-proto .row { gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {

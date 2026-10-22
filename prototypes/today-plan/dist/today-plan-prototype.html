@@ -25381,11 +25381,11 @@ body { background: var(--surface-page); }
 /* ------------------------------------------------------------------ one fixed frame: head, side column, calendar */
 /* Nothing moves when you switch Day and Week or open the copilot: the head is fixed, the copilot takes the side
    column's place, and Day and Week share one hour axis inside the same calendar box. */
-.pl-frame { height: calc(100dvh - 88px); min-height: 560px; display: flex; flex-direction: column; max-width: 1480px; }
+.pl-frame { height: calc(100dvh - 88px); min-height: 560px; display: flex; flex-direction: column; }
 .pl-frame > .td-head { flex: none; margin: 0 0 18px; }
 /* The calendar on the left; Next up, My Focus and the Big Picture on the right, where the copilot also opens,
    as it does on the Graph. Side first in the source, so it reads first and stacks on top on narrow screens. */
-.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "cal side"; gap: 0; }
+.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--t-panel); grid-template-areas: "cal side"; gap: 0; }
 .pl-body > .pl-side { grid-area: side; }
 .pl-body > .pl-cal { grid-area: cal; }
 /* The side column is divided from the calendar by one hairline; its first head sits on the calendar toolbar's line. */
@@ -25427,7 +25427,7 @@ body { background: var(--surface-page); }
 .pl-bp p { margin: 0; font: 400 15.5px/1.55 var(--read); color: var(--ink); }
 .pl-bp em { color: var(--accent); }
 .pl-bp .sub { margin-top: 8px; font: 12px/1.4 var(--ui); color: var(--ink-2); }
-.pl-calnav { flex: none; display: flex; align-items: center; gap: 8px; min-height: 34px; margin: 0 0 8px; }
+.pl-calnav { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; row-gap: 6px; min-height: 34px; margin: 0 0 8px; }
 .pl-calnav h2 { margin: 0 0 0 4px; font-size: 15px; font-weight: 600; white-space: nowrap; }
 .pl-calnav h2 span { color: var(--ink-2); font-weight: 400; }
 .pl-calnav .icb { box-shadow: inset 0 0 0 1px var(--line); }
@@ -25450,7 +25450,7 @@ body { background: var(--surface-page); }
 .pl-key2 .av { background: var(--pl-avail); box-shadow: inset 0 0 0 1px var(--line); }
 .pl-key2 .bz { background: repeating-linear-gradient(135deg, var(--ink-3) 0 2px, transparent 2px 4px); }
 .pl-calscroll { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; }
-.pl-grid { display: grid; grid-template-columns: 44px repeat(var(--cols), minmax(84px, 1fr)); min-width: calc(44px + var(--cols) * 84px); }
+.pl-grid { --colmin: 72px; display: grid; grid-template-columns: 44px repeat(var(--cols), minmax(var(--colmin), 1fr)); min-width: calc(44px + var(--cols) * var(--colmin)); }
 .pl-gh { position: sticky; top: 0; z-index: 6; height: 62px; box-sizing: border-box; background: var(--surface-page); border-bottom: 1px solid var(--line); }
 .pl-wd { all: unset; box-sizing: border-box; position: sticky; top: 0; z-index: 6; height: 62px; cursor: pointer; padding: 6px 6px 8px; background: var(--surface-page); border-bottom: 1px solid var(--line); display: grid; align-content: start; gap: 1px; font-size: 11.5px; color: var(--ink-2); }
 .pl-wd:hover { background: var(--hover-fill); }
@@ -25682,7 +25682,7 @@ body { background: var(--surface-page); }
 
 /* ------------------------------------------------------------------ prototype bar */
 .pl-proto { display: block; max-width: calc(100vw - var(--t-rail) - 470px); }
-@media (max-width: 999.98px) { .pl-proto { max-width: calc(100vw - var(--t-rail) - 32px); } }
+@media (max-width: 1099.98px) { .pl-proto { max-width: calc(100vw - var(--t-rail) - 32px); } }
 .pl-proto .row { display: flex; align-items: center; gap: 10px; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
 .pl-proto .ai { color: var(--ink-2); }
 .pl-proto .ai[data-on="true"] { color: var(--ok); }
@@ -25698,21 +25698,29 @@ body { background: var(--surface-page); }
   .pl-cal .pl-conn { display: none; }
   .pl-cal .pl-conn + .pl-key2 { margin-left: auto; padding-left: 0; border-left: 0; }
 }
-@media (max-width: 1280px) {
-  .pl-body { grid-template-columns: minmax(0, 1fr) 340px; }
+/* The live app's breakpoints (studiolo src/styles): wide from 1100px, where Loci docks; tablets 700–1099px, where
+   Loci is a bottom sheet; Today's columns stack at 980px; phones under 700px. The side column is Loci's own width,
+   --t-panel = clamp(360px, 32vw, 420px), on wide screens. */
+@media (max-width: 1099.98px) {
+  .pl-body { grid-template-columns: minmax(0, 1fr) 300px; }
   .pl-cal { padding-right: 20px; }
   .pl-side { padding-left: 20px; }
-}
-/* Below 1000px the frame flows: side column above the calendar, and the copilot is a bottom sheet. */
-@media (max-width: 999.98px) {
-  .pl-frame { height: auto; min-height: 0; }
-  .pl-body { display: flex; flex-direction: column; gap: 28px; }
-  .pl-side { overflow: visible; padding: 0; border-left: 0; }
-  .pl-cal { padding-right: 0; }
-  .pl-calscroll { overflow-x: auto; overflow-y: visible; }
-  .pl-gh, .pl-wd { position: static; }
+  .pl-grid { --colmin: 60px; }
+  .pl-cal .pl-key2 { display: none; }
   .pl-cpwrap { left: 0; top: auto; height: min(78dvh, 640px); width: auto !important; }
   .pl-cpwrap .cp { inset: 0 8px 8px; }
+}
+/* Stacked: My Focus and Up next first, then the calendar, then the Big Picture. */
+@media (max-width: 980px) {
+  .pl-frame { height: auto; min-height: 0; }
+  .pl-body { display: flex; flex-direction: column; }
+  .pl-side { display: contents; }
+  .pl-side > .pl-sec:nth-child(1) { order: 1; }
+  .pl-side > .pl-sec:nth-child(2) { order: 2; }
+  .pl-cal { order: 3; padding: 16px 0 24px; border-top: 1px solid var(--line); }
+  .pl-side > .pl-bp { order: 4; }
+  .pl-calscroll { overflow-x: auto; overflow-y: visible; }
+  .pl-gh, .pl-wd { position: static; }
 }
 .pl-sheet .pl-proto { display: none; }
 @media (max-width: 699.98px) {
@@ -25724,6 +25732,10 @@ body { background: var(--surface-page); }
   .pl-art { font-size: 17.5px; }
   .pl-proto { max-width: none; left: 8px; right: 8px; padding: 5px 8px; }
   .pl-key2 { display: none; }
+  .pl-grid { --colmin: 64px; }
+  .pl-calnav h2 { flex-basis: 100%; order: 3; margin: 2px 0 0; }
+  .pl-strip button { width: 34px; }
+  .pl-strip .sum { display: none; }
   .pl-proto .row { gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -25935,7 +25947,7 @@ body { background: var(--surface-page); }
     $$("[title], [aria-label]", root).forEach((el) => ["title", "aria-label"].forEach((k) => { const v = el.getAttribute(k); if (NAMES[v]) el.setAttribute(k, NAMES[v]); }));
   }
   const main = () => $("main", root);
-  const wide = () => matchMedia("(min-width: 1000px)").matches;
+  const wide = () => matchMedia("(min-width: 1100px)").matches; // the live app docks Loci from 1100px; below, a sheet
   const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
       <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
       <button class="cp-reopen pl-ask" type="button" data-copilot aria-expanded="${S.panel}" aria-controls="pl-in"><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
@@ -25951,7 +25963,7 @@ body { background: var(--surface-page); }
     const focused = cpw.contains(document.activeElement) ? document.activeElement : null;
     const docked = S.panel && wide();
     const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
-    layout(days);
+    fitHours(days);
     main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
       <aside class="pl-side" aria-label="${docked ? "Ask Loci" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
       <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div></section></div></div>`;
@@ -25961,6 +25973,19 @@ body { background: var(--surface-page); }
     main().scrollTop = keep.main;
     if (keep.thread != null) $(".cp-body", cpw).scrollTop = keep.thread;
     if (focused?.isConnected) focused.focus({ preventScroll: true });
+  }
+  /** The hour height fills the calendar box on framed (wider) screens, between 56 and 112 px; stacked screens use 56.
+      It only changes when the window does, so switching views or opening Loci never moves the axis. */
+  function fitHours(days) {
+    const framed = matchMedia("(min-width: 981px)").matches, box = $(".pl-calscroll", root);
+    H = 64; layout(days);
+    if (framed) {
+      const avail = (box ? box.clientHeight : innerHeight - 270) - 64;
+      const n = FOLDED.filter((f) => !f).length, k = runs().length;
+      H = Math.max(56, Math.min(112, Math.floor((avail - k * FOLD - 6) / n)));
+      if (!box) requestAnimationFrame(() => render()); // measure the real box once, on the first paint
+    } else H = 56;
+    layout(days);
   }
   function placePanel() {
     cpw.hidden = !S.panel;
@@ -26917,7 +26942,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   input.addEventListener("input", () => { sendBtn.disabled = !input.value.trim() || S.busyAI; });
   input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
   let wasWide = wide();
-  window.addEventListener("resize", () => { if (wide() !== wasWide) { wasWide = wide(); render(); } });
+  let rz = 0;
+  window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { wasWide = wide(); if (S.view !== "read") render(); else placePanel(); }, 120); });
   document.addEventListener("keydown", (e) => {
     if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") && !dlg) { e.preventDefault(); if (S.panel) input.focus(); else openPanel(); }
   });

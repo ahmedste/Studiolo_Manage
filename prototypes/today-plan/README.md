@@ -15,6 +15,19 @@ The copilot here is **Loci**, as it is in the live app (`studiolo` @ `5fbb7f2`).
 - On Today the pill stays put while Loci is open (with a ring to show it's open). Pressing it again puts you in the field, and the fold button puts the panel away. The hairline between the calendar and the side column stays too.
 - The rail and tab bar use the live names: Today, Learn, Commonplace, Loci. "From your Library" sessions now read "From your Commonplace".
 
+## Adaptive, on the live app's breakpoints
+
+The layout uses the same breakpoints as `studiolo`'s styles:
+
+| Width | Layout |
+|---|---|
+| **1100 px and up** | Calendar on the left; the side column is Loci's own width (`--t-panel`, 360–420 px); Loci docks in it. The page fills the screen, and the hour height stretches (56–112 px) to fill the calendar's height. |
+| **981–1099 px** (tablet landscape) | The same two columns with a 300 px side column; Loci opens as a bottom sheet; the legend steps aside. The whole week still fits. |
+| **700–980 px** (tablet portrait) | One column: My Focus, Up next, then the calendar, then the Big Picture; Loci is a bottom sheet. |
+| **Under 700 px** (phone) | The same order, with the app's top bar and tab bar; the week scrolls sideways inside its own box; the toolbar wraps. |
+
+The hour height changes only when the window does, so switching views or opening Loci never moves anything.
+
 ## Calendar connections (coming soon)
 
 **Gmail** and **Outlook** are shown greyed in the calendar toolbar (on screens 1360 px and wider) and under **Learning time → Calendars**. Hovering, focusing or clicking one says "… calendar · coming soon". The busy times in the prototype are sample data. Once connected, Studiolo would read only busy and free, never event titles.
