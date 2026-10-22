@@ -34,7 +34,8 @@ Status: **draft for owner review**, 22 October 2026. This is a design and protot
 ## Screens
 
 ### Learn Home
-1. **Live hero:**
+1. **Live bar (slim):** a one-line title ("Live · What do you want to understand?") with a link to recent sessions, one input bar (hold-to-talk mic and **Explain live**), and one line of ideas. No card. On Home the floating talk bar stays hidden until this bar scrolls out of view.
+   *Earlier draft (replaced):*
    - "What do you want to understand?" with an input, a hold-to-talk mic and **Explain live**.
    - Starter ideas from My Focus, the map and courses.
    - A three-step "how it works" (talk or type, cut in, keep it).

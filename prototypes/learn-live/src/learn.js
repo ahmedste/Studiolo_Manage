@@ -142,30 +142,33 @@
     const parts = C.parts.map((_, i) => `<i class="${i < C.done ? "done" : i === C.now ? "now" : ""}"></i>`).join("");
     return `<article class="lx-card" data-course="${C.id}">${poster({ title: C.title, q: C.q, subject: "Course", meta: `${C.parts.length} parts` }, `<span class="lx-badge">Course · ${C.parts.length} parts</span>`)}<div class="lx-body">
       <h3 class="lx-title"><a class="lx-link" href="#course-${C.id}">${esc(C.title)}</a></h3><div class="ll-parts" aria-label="${C.done} of ${C.parts.length} watched">${parts}</div>
-      <p class="ll-next" style="margin:0">Next: <b>${C.now ? `Part ${C.now}` : "Overview"} · ${esc(C.parts[C.now])}</b></p>
+      <p class="ll-next" style="margin:0">Next: <b>${C.now ? `Part ${C.now} · ${esc(C.parts[C.now])}` : "the overview"}</b></p>
       <div class="lx-ft"><span>${esc(C.by)}</span><b>${C.done} of ${C.parts.length} watched</b></div></div></article>`;
   }
   const sessionRow = (s, compact) => `<article class="ll-srow${compact ? " ll-compact" : ""}">${poster({ title: s.title, q: "", subject: "Live", meta: s.meta })}<div><h4>${esc(s.title)}</h4><p>${esc(s.when)}${compact ? "" : ` · you asked <q>${esc(s.said)}</q>`}</p></div>${compact ? "" : `<span class="tag${s.kept ? " saved" : ""}">${s.kept ? "Kept as a Lumen" : "Nothing kept"}</span>`}</article>`;
 
+  let heroIO = null;
   function renderHome() {
     S.view = "home"; S.tab = "home";
     const starters = [["How do wind catchers actually cool a house?", "Climate-responsive design"], ["Why do four iwans face one court?", "Islamic architecture"], ["Explain thermal mass to me like a builder", "My Focus"], ["What's the golden section really for?", "Proportion and order"]];
     learnShell(`${header("Lumens, courses and live sessions")}
       <section class="ll-hero" aria-labelledby="ll-hero-t">
-        <div><p class="ll-kick"><span class="xp-dot" aria-hidden="true"></span>Live</p>
-          <h2 id="ll-hero-t">What do you want to understand?</h2>
-          <p class="ll-lede">Ask out loud or type. Studiolo makes a Lumen and talks you through it as the slides are drawn. Cut in at any point to ask, go deeper or hear it another way.</p>
-          <form class="ll-ask" data-form="hero"><label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="Ask about anything on your map or in your library…"><button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="button" type="submit" style="border-radius:20px;min-height:0;padding:8px 14px">Explain live</button></form>
-          <div class="ll-starters" role="group" aria-label="Ideas">${starters.map(([t, s]) => `<button type="button" data-start="${esc(t)}">${esc(t)}<small>${esc(s)}</small></button>`).join("")}</div>
-        </div>
-        <div class="ll-hero-side"><div class="ll-how"><div><b>Talk or type</b>Your words appear as you speak.</div><div><b>Cut in</b>Stop, ask, another way, test me.</div><div><b>Keep it</b>Save the version you shaped, questions and all.</div></div>
-          <div class="ll-mini"><p class="ll-h">Recent live sessions<button class="ll-more" type="button" data-tab="sessions">All →</button></p>${SESSIONS.map((s) => sessionRow(s, true)).join("")}</div></div>
+        <div class="ll-hero-top"><h2 id="ll-hero-t"><span class="ll-kick"><span class="xp-dot" aria-hidden="true"></span>Live</span>What do you want to understand?</h2>
+          <button class="ll-more" type="button" data-tab="sessions">${SESSIONS.length} recent sessions →</button></div>
+        <form class="ll-ask" data-form="hero"><label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="Ask, or hold the mic and talk. Cut in any time."><button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">Explain live</button></form>
+        <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
       </section>
       <article class="lx-cont" data-lumen="malqaf">${poster(MALQAF, `<span class="lx-dur">2:48</span><div class="lx-prog"><i style="width:88%"></i></div>`)}<div><p class="lx-lab">Continue</p><h2 class="lx-cont-title"><a class="lx-link" href="#play-malqaf">How a malqaf moves air</a></h2><p class="lx-cont-meta">Stopped at 2:28 of 2:48 · slide 4 · made today</p>
         <div class="lx-row" style="position:relative;z-index:2"><a class="lx-resume" href="#play-malqaf">▶ Resume</a><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live from slide 4</button>${tag(MALQAF)}</div></div></article>
       <section class="ll-sec"><p class="ll-h">Courses <span>${COURSES.length}</span><button class="ll-more" type="button" data-tab="courses">All courses →</button></p><div class="ll-courses">${COURSES.map(courseCard).join("")}</div></section>
       <section class="ll-sec"><p class="ll-h">Recent Lumens <span>${LUMENS.length} this week and earlier</span><button class="ll-more" type="button" data-tab="lumens">All Lumens →</button></p><div class="lx-grid">${LUMENS.slice(0, 6).map(card).join("")}</div></section>`);
     dock({ ctx: "Learn · Home", chips: ["How do wind catchers actually cool a house?", "Go live on How a malqaf moves air", "What should I watch next?"] });
+    // On Home the live bar at the top is the input; the floating talk bar takes over once it scrolls out of view.
+    const ask = $(".ll-ask", root);
+    ld.hidden = true;
+    heroIO?.disconnect();
+    heroIO = new IntersectionObserver(([e]) => { if (S.view === "home") ld.hidden = e.isIntersecting; }, { threshold: 0 });
+    heroIO.observe(ask);
   }
   function renderLumens() {
     S.view = "lumens"; S.tab = "lumens";

@@ -16,30 +16,34 @@
 .ll-sec { margin: 0 0 30px; }
 
 /* ---------- the live hero (Home) ---------- */
-.ll-hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; padding: 22px 22px 20px; margin: 0 0 28px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 2px; }
-.ll-kick { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 8px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
-.ll-kick .xp-dot { width: 6px; height: 6px; color: var(--warn); }
-.ll-hero h2 { margin: 0 0 8px; font-family: var(--read); font-size: 30px; font-weight: 400; line-height: 1.12; text-wrap: balance; }
-.ll-hero p.ll-lede { margin: 0 0 16px; max-width: 54ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
-.ll-ask { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 24px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); margin: 0 0 12px; }
-.ll-ask:focus-within { box-shadow: inset 0 0 0 1px var(--ink-3), var(--shadow-lane); }
-.ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 6px 0; }
+/* Slim: a title line, one input bar, one line of ideas. No card; the bar is the only raised element. */
+.ll-hero { display: grid; gap: 10px; margin: 2px 0 30px; }
+.ll-hero-top { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.ll-hero h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; min-width: 0; font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.2; }
+.ll-kick { display: inline-flex; align-items: center; gap: 6px; flex: none; font-family: var(--ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn); transform: translateY(-2px); }
+.ll-kick .xp-dot { width: 6px; height: 6px; }
+.ll-hero-top .ll-more { all: unset; cursor: pointer; margin-left: auto; flex: none; font-size: 12.5px; color: var(--ink-2); }
+.ll-hero-top .ll-more:hover { color: var(--accent); }
+.ll-hero-top .ll-more:focus-visible { outline: var(--focus-ring); }
+.ll-ask { display: flex; align-items: center; gap: 6px; height: 52px; box-sizing: border-box; padding: 0 6px 0 18px; border-radius: 26px; background: var(--surface-float); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-quick) var(--ease-standard); }
+.ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--ink-3); }
+.ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 0; }
 .ll-ask input::placeholder { color: var(--ink-2); }
+.ll-ask .ll-mic { width: 40px; height: 40px; background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); }
+.ll-ask .ll-mic:hover { background: var(--accent-soft); filter: none; }
+.ll-go { all: unset; box-sizing: border-box; cursor: pointer; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--accent); color: var(--on-accent); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.ll-go:hover { filter: brightness(1.08); }
+.ll-go:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .ll-mic { all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); touch-action: none; user-select: none; -webkit-user-select: none; }
 .ll-mic:hover { filter: brightness(1.08); }
 .ll-mic:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .ll-mic[data-held="true"] { box-shadow: 0 0 0 6px var(--accent-soft); transform: scale(0.95); }
-.ll-starters { display: flex; flex-wrap: wrap; gap: 6px; }
-.ll-starters button, .ll-chip { all: unset; cursor: pointer; font-size: 12.5px; padding: 4px 11px; border-radius: 13px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); color: var(--ink-2); }
-.ll-starters button:hover, .ll-chip:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-3); }
+.ll-starters { display: flex; align-items: center; gap: 4px; padding-left: 18px; overflow-x: auto; scrollbar-width: none; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); }
+.ll-starters::-webkit-scrollbar { display: none; }
+.ll-try { flex: none; font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+.ll-starters button, .ll-chip { all: unset; flex: none; cursor: pointer; font-size: 12.5px; padding: 3px 9px; border-radius: 12px; color: var(--ink-2); }
+.ll-starters button:hover, .ll-chip:hover { color: var(--accent); background: var(--accent-soft); }
 .ll-starters button:focus-visible, .ll-chip:focus-visible { outline: var(--focus-ring); }
-.ll-starters button small { color: var(--ink-3); margin-left: 4px; }
-.ll-hero-side { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.ll-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.ll-how div { padding: 10px; border-radius: 2px; background: var(--surface-board); font-size: 12px; line-height: 1.4; color: var(--ink-2); }
-.ll-how b { display: block; margin: 0 0 3px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
-.ll-mini { display: grid; gap: 6px; }
-.ll-mini .ll-h { margin: 6px 0 2px; }
 
 /* ---------- courses ---------- */
 .ll-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 18px; }
@@ -222,9 +226,11 @@
   .ll-crow .ll-outline { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
-  .ll-hero { grid-template-columns: minmax(0, 1fr); padding: 16px; }
-  .ll-hero h2 { font-size: 25px; }
-  .ll-how { grid-template-columns: minmax(0, 1fr); }
+  .ll-hero h2 { font-size: 19px; }
+  .ll-hero-top .ll-more { display: none; }
+  .ll-ask { padding-left: 14px; }
+  .ll-go { padding: 0 12px; }
+  .ll-starters { padding-left: 0; }
   .ll-crow, .ll-srow { grid-template-columns: minmax(0, 1fr); }
   .ld { --ld-left: 0px; --ld-right: 0px; bottom: calc(var(--m-tabs) + 8px); }
   .ld-ctx, .ld-state { display: none; }

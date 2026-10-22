@@ -25307,30 +25307,34 @@ html.theme-switching::view-transition-new(root) {
 .ll-sec { margin: 0 0 30px; }
 
 /* ---------- the live hero (Home) ---------- */
-.ll-hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; padding: 22px 22px 20px; margin: 0 0 28px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 2px; }
-.ll-kick { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 8px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
-.ll-kick .xp-dot { width: 6px; height: 6px; color: var(--warn); }
-.ll-hero h2 { margin: 0 0 8px; font-family: var(--read); font-size: 30px; font-weight: 400; line-height: 1.12; text-wrap: balance; }
-.ll-hero p.ll-lede { margin: 0 0 16px; max-width: 54ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
-.ll-ask { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 24px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); margin: 0 0 12px; }
-.ll-ask:focus-within { box-shadow: inset 0 0 0 1px var(--ink-3), var(--shadow-lane); }
-.ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 6px 0; }
+/* Slim: a title line, one input bar, one line of ideas. No card; the bar is the only raised element. */
+.ll-hero { display: grid; gap: 10px; margin: 2px 0 30px; }
+.ll-hero-top { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.ll-hero h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; min-width: 0; font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.2; }
+.ll-kick { display: inline-flex; align-items: center; gap: 6px; flex: none; font-family: var(--ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn); transform: translateY(-2px); }
+.ll-kick .xp-dot { width: 6px; height: 6px; }
+.ll-hero-top .ll-more { all: unset; cursor: pointer; margin-left: auto; flex: none; font-size: 12.5px; color: var(--ink-2); }
+.ll-hero-top .ll-more:hover { color: var(--accent); }
+.ll-hero-top .ll-more:focus-visible { outline: var(--focus-ring); }
+.ll-ask { display: flex; align-items: center; gap: 6px; height: 52px; box-sizing: border-box; padding: 0 6px 0 18px; border-radius: 26px; background: var(--surface-float); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-quick) var(--ease-standard); }
+.ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--ink-3); }
+.ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 0; }
 .ll-ask input::placeholder { color: var(--ink-2); }
+.ll-ask .ll-mic { width: 40px; height: 40px; background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); }
+.ll-ask .ll-mic:hover { background: var(--accent-soft); filter: none; }
+.ll-go { all: unset; box-sizing: border-box; cursor: pointer; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--accent); color: var(--on-accent); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.ll-go:hover { filter: brightness(1.08); }
+.ll-go:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .ll-mic { all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); touch-action: none; user-select: none; -webkit-user-select: none; }
 .ll-mic:hover { filter: brightness(1.08); }
 .ll-mic:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .ll-mic[data-held="true"] { box-shadow: 0 0 0 6px var(--accent-soft); transform: scale(0.95); }
-.ll-starters { display: flex; flex-wrap: wrap; gap: 6px; }
-.ll-starters button, .ll-chip { all: unset; cursor: pointer; font-size: 12.5px; padding: 4px 11px; border-radius: 13px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule); color: var(--ink-2); }
-.ll-starters button:hover, .ll-chip:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-3); }
+.ll-starters { display: flex; align-items: center; gap: 4px; padding-left: 18px; overflow-x: auto; scrollbar-width: none; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent); mask-image: linear-gradient(90deg, #000 92%, transparent); }
+.ll-starters::-webkit-scrollbar { display: none; }
+.ll-try { flex: none; font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+.ll-starters button, .ll-chip { all: unset; flex: none; cursor: pointer; font-size: 12.5px; padding: 3px 9px; border-radius: 12px; color: var(--ink-2); }
+.ll-starters button:hover, .ll-chip:hover { color: var(--accent); background: var(--accent-soft); }
 .ll-starters button:focus-visible, .ll-chip:focus-visible { outline: var(--focus-ring); }
-.ll-starters button small { color: var(--ink-3); margin-left: 4px; }
-.ll-hero-side { display: grid; gap: 10px; align-content: start; min-width: 0; }
-.ll-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.ll-how div { padding: 10px; border-radius: 2px; background: var(--surface-board); font-size: 12px; line-height: 1.4; color: var(--ink-2); }
-.ll-how b { display: block; margin: 0 0 3px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
-.ll-mini { display: grid; gap: 6px; }
-.ll-mini .ll-h { margin: 6px 0 2px; }
 
 /* ---------- courses ---------- */
 .ll-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 18px; }
@@ -25513,9 +25517,11 @@ html.theme-switching::view-transition-new(root) {
   .ll-crow .ll-outline { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
-  .ll-hero { grid-template-columns: minmax(0, 1fr); padding: 16px; }
-  .ll-hero h2 { font-size: 25px; }
-  .ll-how { grid-template-columns: minmax(0, 1fr); }
+  .ll-hero h2 { font-size: 19px; }
+  .ll-hero-top .ll-more { display: none; }
+  .ll-ask { padding-left: 14px; }
+  .ll-go { padding: 0 12px; }
+  .ll-starters { padding-left: 0; }
   .ll-crow, .ll-srow { grid-template-columns: minmax(0, 1fr); }
   .ld { --ld-left: 0px; --ld-right: 0px; bottom: calc(var(--m-tabs) + 8px); }
   .ld-ctx, .ld-state { display: none; }
@@ -25672,30 +25678,33 @@ html.theme-switching::view-transition-new(root) {
     const parts = C.parts.map((_, i) => `<i class="${i < C.done ? "done" : i === C.now ? "now" : ""}"></i>`).join("");
     return `<article class="lx-card" data-course="${C.id}">${poster({ title: C.title, q: C.q, subject: "Course", meta: `${C.parts.length} parts` }, `<span class="lx-badge">Course · ${C.parts.length} parts</span>`)}<div class="lx-body">
       <h3 class="lx-title"><a class="lx-link" href="#course-${C.id}">${esc(C.title)}</a></h3><div class="ll-parts" aria-label="${C.done} of ${C.parts.length} watched">${parts}</div>
-      <p class="ll-next" style="margin:0">Next: <b>${C.now ? `Part ${C.now}` : "Overview"} · ${esc(C.parts[C.now])}</b></p>
+      <p class="ll-next" style="margin:0">Next: <b>${C.now ? `Part ${C.now} · ${esc(C.parts[C.now])}` : "the overview"}</b></p>
       <div class="lx-ft"><span>${esc(C.by)}</span><b>${C.done} of ${C.parts.length} watched</b></div></div></article>`;
   }
   const sessionRow = (s, compact) => `<article class="ll-srow${compact ? " ll-compact" : ""}">${poster({ title: s.title, q: "", subject: "Live", meta: s.meta })}<div><h4>${esc(s.title)}</h4><p>${esc(s.when)}${compact ? "" : ` · you asked <q>${esc(s.said)}</q>`}</p></div>${compact ? "" : `<span class="tag${s.kept ? " saved" : ""}">${s.kept ? "Kept as a Lumen" : "Nothing kept"}</span>`}</article>`;
 
+  let heroIO = null;
   function renderHome() {
     S.view = "home"; S.tab = "home";
     const starters = [["How do wind catchers actually cool a house?", "Climate-responsive design"], ["Why do four iwans face one court?", "Islamic architecture"], ["Explain thermal mass to me like a builder", "My Focus"], ["What's the golden section really for?", "Proportion and order"]];
     learnShell(`${header("Lumens, courses and live sessions")}
       <section class="ll-hero" aria-labelledby="ll-hero-t">
-        <div><p class="ll-kick"><span class="xp-dot" aria-hidden="true"></span>Live</p>
-          <h2 id="ll-hero-t">What do you want to understand?</h2>
-          <p class="ll-lede">Ask out loud or type. Studiolo makes a Lumen and talks you through it as the slides are drawn. Cut in at any point to ask, go deeper or hear it another way.</p>
-          <form class="ll-ask" data-form="hero"><label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="Ask about anything on your map or in your library…"><button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="button" type="submit" style="border-radius:20px;min-height:0;padding:8px 14px">Explain live</button></form>
-          <div class="ll-starters" role="group" aria-label="Ideas">${starters.map(([t, s]) => `<button type="button" data-start="${esc(t)}">${esc(t)}<small>${esc(s)}</small></button>`).join("")}</div>
-        </div>
-        <div class="ll-hero-side"><div class="ll-how"><div><b>Talk or type</b>Your words appear as you speak.</div><div><b>Cut in</b>Stop, ask, another way, test me.</div><div><b>Keep it</b>Save the version you shaped, questions and all.</div></div>
-          <div class="ll-mini"><p class="ll-h">Recent live sessions<button class="ll-more" type="button" data-tab="sessions">All →</button></p>${SESSIONS.map((s) => sessionRow(s, true)).join("")}</div></div>
+        <div class="ll-hero-top"><h2 id="ll-hero-t"><span class="ll-kick"><span class="xp-dot" aria-hidden="true"></span>Live</span>What do you want to understand?</h2>
+          <button class="ll-more" type="button" data-tab="sessions">${SESSIONS.length} recent sessions →</button></div>
+        <form class="ll-ask" data-form="hero"><label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="Ask, or hold the mic and talk. Cut in any time."><button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">Explain live</button></form>
+        <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
       </section>
       <article class="lx-cont" data-lumen="malqaf">${poster(MALQAF, `<span class="lx-dur">2:48</span><div class="lx-prog"><i style="width:88%"></i></div>`)}<div><p class="lx-lab">Continue</p><h2 class="lx-cont-title"><a class="lx-link" href="#play-malqaf">How a malqaf moves air</a></h2><p class="lx-cont-meta">Stopped at 2:28 of 2:48 · slide 4 · made today</p>
         <div class="lx-row" style="position:relative;z-index:2"><a class="lx-resume" href="#play-malqaf">▶ Resume</a><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live from slide 4</button>${tag(MALQAF)}</div></div></article>
       <section class="ll-sec"><p class="ll-h">Courses <span>${COURSES.length}</span><button class="ll-more" type="button" data-tab="courses">All courses →</button></p><div class="ll-courses">${COURSES.map(courseCard).join("")}</div></section>
       <section class="ll-sec"><p class="ll-h">Recent Lumens <span>${LUMENS.length} this week and earlier</span><button class="ll-more" type="button" data-tab="lumens">All Lumens →</button></p><div class="lx-grid">${LUMENS.slice(0, 6).map(card).join("")}</div></section>`);
     dock({ ctx: "Learn · Home", chips: ["How do wind catchers actually cool a house?", "Go live on How a malqaf moves air", "What should I watch next?"] });
+    // On Home the live bar at the top is the input; the floating talk bar takes over once it scrolls out of view.
+    const ask = $(".ll-ask", root);
+    ld.hidden = true;
+    heroIO?.disconnect();
+    heroIO = new IntersectionObserver(([e]) => { if (S.view === "home") ld.hidden = e.isIntersecting; }, { threshold: 0 });
+    heroIO.observe(ask);
   }
   function renderLumens() {
     S.view = "lumens"; S.tab = "lumens";
