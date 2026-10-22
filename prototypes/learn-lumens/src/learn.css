@@ -140,7 +140,8 @@
 .ll-anchor { position: static; }
 .ll-studio-head .sp { flex: 1; }
 .ll-studio-head .button { min-height: 0; padding: 6px 12px; font-size: 13px; border-radius: 2px; }
-.ll-studio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 18px; align-items: start; }
+/* The panel beside the stage takes the player page's rule (explainer.css .xp-tx): 280 to 440 px, 20 px from the stage. */
+.ll-studio { display: grid; grid-template-columns: minmax(0, 1fr) clamp(280px, 30%, 440px); gap: 20px; align-items: start; }
 .ll-stagecol { min-width: 0; display: grid; gap: 10px; }
 .ll-stagecol .xp-screen-stage { width: 100% !important; container-type: inline-size; cursor: default; }
 .ll-stagecol .xp-slide-host .xp-hl:not(.ll-choice) { cursor: help; }
@@ -208,7 +209,7 @@
 .ll-src p.note { margin: 0; font-size: 12px; color: var(--ink-2); }
 
 /* ---------- the talk bar (the dock, in Learn and on the Graph) ---------- */
-.ld { position: fixed; z-index: 130; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: calc(var(--ld-left, var(--t-rail)) + (100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px)) / 2); transform: translateX(-50%); width: min(640px, calc(100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px) - 32px)); display: flex; flex-direction: column; transition: left var(--dur-move) var(--ease-standard), width var(--dur-move) var(--ease-standard); }
+.ld { position: fixed; z-index: 130; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: calc(var(--ld-left, var(--rail-w, var(--t-rail))) + (100vw - var(--ld-left, var(--rail-w, var(--t-rail))) - var(--ld-right, 0px)) / 2); transform: translateX(-50%); width: min(640px, calc(100vw - var(--ld-left, var(--rail-w, var(--t-rail))) - var(--ld-right, 0px) - 32px)); display: flex; flex-direction: column; transition: left var(--dur-move) var(--ease-standard), width var(--dur-move) var(--ease-standard); }
 .ld[hidden] { display: none; }
 .ld-chips { display: flex; flex-wrap: nowrap; gap: 6px; margin: 0 0 8px; padding: 2px 2px 4px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); }
 .ld-chips::-webkit-scrollbar { display: none; }
@@ -271,13 +272,17 @@
 .td-proto.ll-proto .ai { font-size: 11px; color: var(--ink-2); }
 .td-proto.ll-proto .ai[data-on="true"] { color: var(--ok); }
 
-@media (max-width: 1100px) {
-  .ll-studio { grid-template-columns: minmax(0, 1fr); }
-  .ll-tx { position: static; max-height: 420px; }
+/* Breakpoints are the app's (mobile and tablet designs, M-D10 / T-D1): compact under 700 px, medium 700-1099, wide
+   from 1100; the player's panel goes under the stage below 1024 px (explainer.css); touch sizes follow the pointer. */
+@media (max-width: 1099.98px) {
   .ll-crow { grid-template-columns: minmax(0, 200px) minmax(0, 1fr); }
   .ll-crow .ll-outline { grid-column: 1 / -1; }
 }
-@media (max-width: 760px) {
+@media (max-width: 1023px) {
+  .ll-studio { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .ll-tx { position: static; max-height: 420px; }
+}
+@media (max-width: 699.98px) {
   .ll-hero h2 { font-size: 19px; }
   .ll-hero-top .ll-more { display: none; }
   .ll-hero-top { flex-wrap: wrap; }
@@ -387,9 +392,9 @@
 .lf-toc ol { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--ink-2); }
 .lf-toc li[aria-current="true"] { font-weight: 500; color: var(--ink); }
 .lf-article h2 { margin: 0 0 12px; font-family: var(--read); font-size: 22px; font-weight: 400; }
-.lf-article p { margin: 0 0 16px; font-family: var(--read); font-size: 18px; line-height: 1.65; color: var(--ink); }
+.lf-article p { margin: 0 0 14px; font-family: var(--read); font-size: 18px; line-height: 1.56; color: var(--ink); }
 .lf-article .lf-stub { padding: 12px 14px; border-radius: 3px; background: var(--board); font-family: var(--ui); font-size: 13px; line-height: 1.5; color: var(--ink-2); }
-@media (max-width: 760px) {
+@media (max-width: 699.98px) {
   .lf-read { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .lf-toc { position: static; }
   .lf-under { padding-left: 0; }
@@ -453,7 +458,7 @@ a.lf-ntitle:hover { color: var(--accent); }
 .lf-nmake { all: unset; box-sizing: border-box; cursor: pointer; grid-column: 2; grid-row: 1 / span 3; padding: 5px 12px; border-radius: 2px; font-size: 12.5px; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
 .lf-nmake:hover { box-shadow: inset 0 0 0 1px var(--accent); }
 .lf-nmake:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
-@media (max-width: 760px) {
+@media (max-width: 699.98px) {
   .lf-prow { grid-template-columns: 88px minmax(0, 1fr); }
   .lf-pacts { grid-column: 1 / -1; }
   .lf-under { padding-left: 0; }
@@ -465,7 +470,7 @@ a.lf-ntitle:hover { color: var(--accent); }
 .ll-page { --lf-gx: 44px; --lf-pt: 36px; }
 .lf-lhead { display: contents; } /* the title row sticks for the whole page, not just its own head */
 .lf-trow { position: sticky; top: calc(-1 * var(--lf-pt)); z-index: 30; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 52px; margin: -10px calc(-1 * var(--lf-gx)) 0; padding: 8px var(--lf-gx); background: var(--paper); box-shadow: 0 1px 0 var(--line); }
-.lf-trow h1 { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--read); font-size: 26px; font-weight: 400; line-height: 1.2; }
+.lf-trow h1 { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--read); font-size: 24px; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; } /* the player title's size (.xp-meta h1) */
 .lf-tr { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .lf-share { all: unset; box-sizing: border-box; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; font-size: 13px; color: var(--ink-2); }
 .lf-share svg { width: 15px; height: 15px; }
@@ -488,14 +493,25 @@ a.lf-ntitle:hover { color: var(--accent); }
 @keyframes lf-in { from { opacity: 0; transform: translateY(var(--enter-travel)); } }
 @media (prefers-reduced-motion: reduce) { .lf-body { animation: none; } }
 @media (max-width: 980px) { .ll-page { --lf-gx: 24px; --lf-pt: 28px; } }
+/* Under 1024 px (as the player's title): the title gets its own line and the switcher the next, both pinned. */
+@media (max-width: 1023px) {
+  .lf-trow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .lf-trow h1 { font-size: 20px; }
+  .lf-tr { justify-content: space-between; }
+}
+/* Touch: 44 px targets (interface.md, T-3); a switcher slot keeps its width, only its height grows. */
+@media (pointer: coarse) {
+  .lf-switch button, .lf-share { height: var(--m-hit); }
+  .lf-switch { border-radius: 25px; }
+  .lf-switch button { border-radius: 22px; }
+  .lf-share { border-radius: 22px; }
+}
 /* On Lumen pages nothing floats over the pinned row: the prototype banner tucks under it and the mini player moves to the bottom. */
 @media (min-width: 700px) { body:has(.lf-trow) .td-proto.ll-proto { z-index: 20; max-width: none; flex-wrap: nowrap; white-space: nowrap; } /* sits beside the breadcrumb; the pinned row slides over it */
   body:has(.lf-trow) .dl-mini { top: auto; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 264px; } body:has(.lf-trow) .td-proto.ll-proto .ai { display: none; } }
 @media (max-width: 699.98px) {
   .ll-page { --lf-gx: var(--m-gutter); }
-  .lf-trow { top: var(--m-bar); grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px var(--lf-gx) 8px; }
-  .lf-trow h1 { font-size: 20px; }
-  .lf-tr { justify-content: space-between; }
+  .lf-trow { top: var(--m-bar); padding: 8px var(--lf-gx) 8px; }
   .lf-tr .lf-switch { flex: 1; }
   .lf-switch button[data-k] { width: auto; flex: 1; justify-content: center; }
   .lf-share { font-size: 0; gap: 0; padding: 0 11px; } /* icon only; the label stays for screen readers */

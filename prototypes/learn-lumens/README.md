@@ -54,6 +54,16 @@ Open `dist/learn-lumens-prototype.html`. It's published as a claude.ai artifact 
 ## Design notes
 
 - **One frame, three formats.** The crumb and the title row are the same markup in Watch, Listen and Read (`lumenHead` in `learn.js`, used by `listen.js` too). Only the body fades in on a switch, and it doesn't move for reduced motion.
+- **Sizes and breakpoints are the app's** (studiolo `main`; read only):
+  - **Widths:** phone under 700 px, tablet 700 to 1099 px, desktop from 1100 px (the mobile and tablet designs, M-D10 and T-D1). Touch sizes follow the pointer, not the width: on a touch screen, buttons and switcher slots are 44 px and chips 36 px.
+  - **Lumen pages:**
+    - Under 1024 px, the side panel (transcript) goes under the content, as on the explainer player page (`explainer.css`).
+    - Beside the content it's 280 to 440 px wide, 20 px from it, like the player's panel.
+    - The title is 24 px, 20 px under 1024 px, the player title's sizes. Under 1024 px it gets its own line and the switcher the next.
+  - **Read:** the course Reading's measure and type (`courses.css`): 66 characters at 18 / 1.56, 16 / 1.55 on phones. The section list sits beside the article from 1024 px; below that it's a row of chips.
+  - **Lumens list:** the app's own grid and cards (`learn.css`): 330 px cards, one column under 640 px.
+  - **Page edges:** the stage's own padding: 44 px, 24 px at 980 px and below, 16 px on phones.
+  - Checked at 360, 390, 430, 699, 700, 744, 834, 1023, 1024, 1100, 1180, 1280 and 1440 px: nothing scrolls sideways, and the switcher sits in the same place in every format.
 - **Diagrams use the app's own palette:** ink lines, board fills, the accent for cool air and the warn tone for warm air. Nothing else is coloured.
 
 - **Formats are told apart quietly, not by colour.** Each has its icon and its word, a small neutral flag on the poster, and a different kind of poster:

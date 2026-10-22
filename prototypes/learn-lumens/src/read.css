@@ -1,6 +1,8 @@
 /* Learn, slice 2 (prototype): the Read format as a real article. Diagrams take the app's own ink, paper and accent;
    warm air is the app's warn tone, cool air its accent, and nothing else is coloured. Motion stops for reduced motion. */
-.lf-read { grid-template-columns: 190px minmax(0, 68ch); gap: 44px; }
+/* The column and type are the course Reading's (courses.css .cv-rd, .cv-reading): 66 characters, 18 / 1.56, the side
+   column beside it from 1024 px, one column below; 16 / 1.55 on phones. */
+.lf-read { grid-template-columns: 190px minmax(0, 66ch); gap: 40px; }
 .lf-toc { top: 76px; }
 .lf-toc ol { list-style: none; padding: 0; gap: 2px; counter-reset: toc; }
 .lf-toc li { counter-increment: toc; }
@@ -11,7 +13,7 @@
 .lf-toc a:focus-visible { outline: var(--focus-ring); }
 
 .rd-sec { scroll-margin-top: 84px; margin: 0 0 40px; }
-.lf-article .rd-sec h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 25px; line-height: 1.2; }
+.lf-article .rd-sec h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 26px; line-height: 1.15; letter-spacing: -0.005em; }
 .rd-sec h2 span { font-family: var(--ui); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .lf-article .rd-lede { font-size: 22px; line-height: 1.5; color: var(--ink); }
 .lf-article .rd-lede::before { content: ""; display: block; width: 36px; height: 2px; margin: 0 0 14px; background: var(--accent); }
@@ -99,22 +101,33 @@
 .lf-article .rd-srcs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--ui); font-size: 12px; color: var(--ink-3); }
 .rd-srcs > span { margin-right: 4px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 10.5px; }
 
-@media (max-width: 760px) {
+@media (max-width: 1023px) {
   .lf-read { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .rd-sec { scroll-margin-top: 120px; }
   .lf-toc { position: static; margin: 0 calc(-1 * var(--lf-gx)); padding: 0 var(--lf-gx); overflow-x: auto; scrollbar-width: none; }
   .lf-toc p { display: none; }
   .lf-toc ol { display: flex; gap: 6px; width: max-content; }
   .lf-toc a { display: flex; gap: 6px; padding: 5px 11px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
   .lf-toc li[aria-current="true"] a { box-shadow: inset 0 0 0 1px var(--accent); }
+}
+@media (max-width: 699.98px) {
   .rd-hum-ctl label, .rd-out { min-width: 0; }
   .rd-trio-grid { grid-template-columns: minmax(0, 1fr); }
   .rd-mech { grid-template-columns: 120px minmax(0, 1fr); column-gap: 12px; }
   .rd-mech svg { grid-row: span 2; margin: 0; }
   .rd-hum-grid { grid-template-columns: minmax(0, 1fr); }
   .rd-hum-grid > svg { max-width: 200px; justify-self: center; }
+  .lf-article p, .rd-steps li { font-size: 16px; line-height: 1.55; }
+  .lf-article .rd-sec h2 { font-size: 21px; }
   .lf-article .rd-lede { font-size: 19px; }
   .lf-article .rd-pull { font-size: 22px; }
   .rd-fig { padding: 14px; margin-left: -4px; margin-right: -4px; }
+}
+/* Touch: chips at 36 px, the rest at 44 (T-3). */
+@media (pointer: coarse) {
+  .rd-presets button, .rd-seg button { min-height: 36px; display: inline-flex; align-items: center; }
+  .lf-toc a { min-height: 36px; align-content: center; align-items: center; }
+  .rd-reveal { min-height: var(--m-hit); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rd-flow, .rd-wisp, .rd-rays { animation: none; }
