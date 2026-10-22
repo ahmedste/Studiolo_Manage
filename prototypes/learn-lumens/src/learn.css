@@ -326,7 +326,7 @@
 .lf-poster-listen .dl-cover { height: 100%; padding: 0 22px; }
 .lf-poster-listen .dl-cover .dl-disc { width: 44px; height: 44px; font-size: 21px; }
 .lf-poster-read { background: var(--quote-paper); }
-.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 10px; padding: 0 26px; border-left: 4px solid var(--fmt-read); }
+.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 10px; padding: 0 26px; border-left: 4px solid var(--quote-rule); }
 .lf-read-lines { display: grid; gap: 6px; width: 72%; }
 .lf-read-lines i { height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 9%, transparent); }
 .lf-read-lines i:nth-child(2) { width: 88%; }
@@ -401,48 +401,58 @@
   .lf-also { margin-top: -14px; }
 }
 
-/* ---------- format identities: each kind of Lumen reads apart at a glance ----------
-   Watch is the app's accent blue (the player's own), Listen the warm amber of its covers, Read the green of paper and
-   ink, and Live the red of an open line. All app tokens. Anything carrying data-k="…" gets --k and --k-soft. */
-:root {
-  --fmt-watch: var(--accent); --fmt-watch-soft: var(--accent-soft);
-  --fmt-listen: var(--myfocus-ink); --fmt-listen-soft: var(--myfocus-paper);
-  --fmt-read: var(--entity-work); --fmt-read-soft: color-mix(in srgb, var(--entity-work) 13%, var(--panel));
-  --fmt-live: var(--warn); --fmt-live-soft: var(--warn-soft);
-}
-[data-k="watch"], .ll-ask[data-kind="watch"] { --k: var(--fmt-watch); --k-soft: var(--fmt-watch-soft); }
-[data-k="listen"], .ll-ask[data-kind="listen"] { --k: var(--fmt-listen); --k-soft: var(--fmt-listen-soft); }
-[data-k="read"], .ll-ask[data-kind="read"] { --k: var(--fmt-read); --k-soft: var(--fmt-read-soft); }
-[data-k="live"], .ll-ask[data-kind="live"] { --k: var(--fmt-live); --k-soft: var(--fmt-live-soft); }
-/* the flag on every poster */
-.lf-flag { position: absolute; z-index: 1; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 11px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--k); background: var(--k-soft); box-shadow: 0 0 0 1px color-mix(in srgb, var(--k) 28%, transparent); }
+/* ---------- telling formats apart, quietly ----------
+   No colour per format: the icon, the word and the poster's kind do the work (a title slide, the two hosts on the dark
+   cover, a paper title page). Everything stays in the app's ink and accent; only Live keeps its red dot. */
+.lf-flag { position: absolute; z-index: 1; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 11px; font-size: 11px; font-weight: 500; color: var(--ink-2); background: color-mix(in srgb, var(--surface-float) 92%, transparent); box-shadow: 0 0 0 1px var(--rule); }
 .lf-flag svg { width: 13px; height: 13px; }
-.lf-poster-listen .lf-flag { box-shadow: none; }
-/* pills */
-.lf-pill[data-k] svg { color: var(--k); }
-.lf-pill[data-k]:not(.making):hover { box-shadow: inset 0 0 0 1px var(--k); }
-.lf-pill.making[data-k] { background: var(--k-soft); }
-.lf-pill.making[data-k] .ll-wr { color: var(--k); }
-/* the switcher on every Lumen page */
-.lf-switch button[data-k] svg { color: var(--k); }
-.lf-switch button[data-k].add svg { color: var(--ink-3); }
-.lf-switch button[data-k][aria-pressed="true"] { background: var(--k-soft); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 40%, transparent); }
-.lf-switch button[data-k][aria-pressed="true"] small { color: var(--k); }
-/* the Home bar: the chosen format colours the bar's focus, its mic and its button */
-.ll-ask .ll-mode button[aria-checked="true"] svg { color: var(--k); }
-.ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--k, var(--ink-3)); }
-.ll-ask .ll-go { background: var(--k, var(--accent)); transition: background var(--dur-standard) var(--ease-standard); }
-.ll-ask .ll-mic { color: var(--k, var(--accent)); box-shadow: inset 0 0 0 1px var(--k-soft, var(--accent-soft)); }
-.ll-ask .ll-mic:hover { background: var(--k-soft, var(--accent-soft)); }
-/* the Lumens format filter: a chosen format fills with its colour */
-.lf-tools [data-f="fmt"][data-v="watch"] svg { color: var(--fmt-watch); }
-.lf-tools [data-f="fmt"][data-v="listen"] svg { color: var(--fmt-listen); }
-.lf-tools [data-f="fmt"][data-v="read"] svg { color: var(--fmt-read); }
-.lf-tools [data-f="fmt"][data-v="watch"][aria-pressed="true"] { background: var(--fmt-watch); color: var(--on-accent); }
-.lf-tools [data-f="fmt"][data-v="listen"][aria-pressed="true"] { background: var(--fmt-listen); color: var(--on-accent); }
-.lf-tools [data-f="fmt"][data-v="read"][aria-pressed="true"] { background: var(--fmt-read); color: var(--on-accent); }
-.lf-tools [data-f="fmt"][data-v="sessions"][aria-pressed="true"] { background: var(--fmt-live); color: var(--on-accent); }
-.lf-tools [data-f="fmt"][aria-pressed="true"] svg { color: currentColor; }
-/* in progress and making rows */
-.lf-also-row svg { color: var(--fmt-listen); }
-.lf-also-row:hover { box-shadow: inset 0 0 0 1px var(--fmt-listen); }
+.lf-poster-listen .lf-flag { color: var(--cover-ink); background: color-mix(in srgb, var(--cover-ink) 10%, transparent); box-shadow: none; }
+.lf-pill svg, .lf-switch button svg, .lf-ftag svg { color: var(--ink-2); }
+.lf-switch button[aria-pressed="true"] svg { color: var(--ink); }
+.lf-pill.making { background: var(--accent-soft); }
+.lf-pill.making .ll-wr { color: var(--accent); }
+
+/* ---------- Home: ask, pick up, and what's next ---------- */
+.lf-under { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding-left: 18px; }
+.lf-under .ll-hint { flex: 1 1 320px; padding: 0; font-size: 12px; color: var(--ink-3); }
+.lf-golive { font-size: 12px; color: var(--ink-2); }
+.lf-golive .xp-dot { color: var(--warn); }
+.lf-ftag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
+.lf-ftag svg { width: 13px; height: 13px; }
+/* pick up: one compact list, whatever the format */
+.lf-pick { display: grid; border-radius: 3px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.lf-prow { position: relative; display: grid; grid-template-columns: 132px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 10px 12px 10px 10px; }
+.lf-prow + .lf-prow { border-top: 1px solid var(--line); }
+.lf-pthumb { min-width: 0; }
+.lf-pthumb .lx-poster { border: 1px solid var(--line); border-radius: 2px; }
+.lf-pthumb .lf-poster-listen .dl-cover { padding: 0 12px; }
+.lf-pthumb .lf-poster-listen .dl-cover .dl-disc { width: 26px; height: 26px; font-size: 13px; }
+.lf-pthumb .lf-poster-listen .dl-wave { display: none; }
+.lf-pbody { display: grid; gap: 3px; min-width: 0; }
+.lf-pbody h3 { margin: 0; font-family: var(--read); font-size: 18px; font-weight: 400; line-height: 1.2; }
+.lf-pbody h3 a { color: var(--ink); text-decoration: none; }
+.lf-pbody h3 a:hover { color: var(--accent); }
+.lf-pbody p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.lf-pacts { display: flex; gap: 8px; }
+.lf-pacts .button { min-height: 0; padding: 6px 12px; font-size: 12.5px; border-radius: 2px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.lf-pacts .button svg { width: 14px; height: 14px; }
+/* next for your goals: one quiet card per goal */
+.lf-goals { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.lf-goal { padding: 14px 16px 6px; border-radius: 3px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.lf-gh { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0 0 6px; }
+.lf-gh b { font-family: var(--read); font-size: 17px; font-weight: 400; color: var(--ink); }
+.lf-gh span { flex: none; font-size: 11.5px; color: var(--ink-3); }
+.lf-goal ul { list-style: none; margin: 0; padding: 0; }
+.lf-goal li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.lf-goal li .lf-ftag { grid-column: 1; }
+.lf-ntitle { grid-column: 1; font-size: 14px; color: var(--ink); text-decoration: none; }
+a.lf-ntitle:hover { color: var(--accent); }
+.lf-goal li small { grid-column: 1; font-size: 11.5px; color: var(--ink-3); }
+.lf-nmake { all: unset; box-sizing: border-box; cursor: pointer; grid-column: 2; grid-row: 1 / span 3; padding: 5px 12px; border-radius: 2px; font-size: 12.5px; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
+.lf-nmake:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.lf-nmake:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .lf-prow { grid-template-columns: 88px minmax(0, 1fr); }
+  .lf-pacts { grid-column: 1 / -1; }
+  .lf-under { padding-left: 0; }
+}

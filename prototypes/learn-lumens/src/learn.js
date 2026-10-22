@@ -117,7 +117,7 @@
     IWANS,
     { id: "sultan", title: "Reading Sultan Hassan before you go", q: "What should I look for when I stand in Sultan Hassan?", subject: "Islamic architecture", anchor: ["History & Theory", "Islamic architecture"], noWatch: true, listen: "hassan", when: "Yesterday", status: "new", made: "library", area: "History & Theory", goal: "Cairo trip · Mamluk buildings" },
     { id: "kept1", title: "Mass, air and humidity", q: "Why do heavy walls stop working in humid places?", subject: "Climate-responsive design", anchor: ["Culture & Context", "Climate-responsive design"], dur: "5:10", when: "Yesterday", status: "kept", made: "live", area: "Culture & Context", meta: "Live · 2 asides" },
-    { id: "courtyards", title: "Courtyards in hot, humid places", q: "Does a courtyard still help when the air is humid?", subject: "Climate-responsive design", anchor: ["Culture & Context", "Climate-responsive design"], noWatch: true, read: READS.courtyards, when: "This week", status: "watched", made: "topic", area: "Culture & Context" },
+    { id: "courtyards", title: "Courtyards in hot, humid places", q: "Does a courtyard still help when the air is humid?", subject: "Climate-responsive design", anchor: ["Culture & Context", "Climate-responsive design"], noWatch: true, read: READS.courtyards, when: "This week", status: "new", made: "topic", area: "Culture & Context" },
     { id: "light", title: "How light shelves push daylight deeper", q: "How can a shelf throw light into the back of a room?", subject: "Daylight & shading", anchor: ["Environment & Services", "Daylight & shading"], dur: "3:12", when: "This week", status: "new", made: "topic", area: "Environment & Services", meta: "3:12 · narrated" },
     { id: "wind", title: "Wind catchers and the courtyard", q: "How do a tower and a court work together?", subject: "Climate-responsive design", anchor: ["Culture & Context", "Climate-responsive design"], dur: "4:02", when: "This week", status: "watched", made: "copilot", area: "Culture & Context", meta: "4:02 · narrated" },
     { id: "cordoba", title: "Córdoba: three enlargements on one grid", q: "How did one mosque grow three times without breaking?", subject: "From a video", item: "The Great Mosque of Córdoba, plan and extensions", dur: "3:40", when: "This week", status: "new", made: "library", area: "From your library", meta: "3:40 · narrated" },
@@ -199,10 +199,10 @@
   function fmtSwitch(L, cur, { studio } = {}) {
     const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
     const btn = ([k, label, has, meta]) => studio && k === "watch"
-      ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
-      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
+      ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta)}</small></button>`
+      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+"}</small></button>`;
     const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
-    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
+    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b></button></span>`;
   }
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
   const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><b>${esc(L.title)}</b><span class="lf-read-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
@@ -238,18 +238,13 @@
 
   let heroIO = null;
   const HINT = {
-    watch: "<b>Watch</b> · slides and a narrator, 2–6 minutes. Made in the background, ready in about a minute.",
-    listen: "<b>Listen</b> · two voices talk it through, 10–30 minutes, for a walk, a ride or a drive. Starts playing in about half a minute.",
-    read: "<b>Read</b> · a long read, 10–20 minutes, quoting your sources. Made in the background.",
-    live: "<b>Start a live session</b> · Studiolo talks you through it now, drawing slides as it goes. Interrupt any time, and keep it as a Lumen at the end. Uses voice minutes.",
+    watch: "Slides and a narrator · 2–6 min · ready in about a minute",
+    listen: "Two voices · 10–30 min · for a walk or a drive · starts in about 30 s",
+    read: "A long read · 10–20 min · quoting your sources",
+    live: "Studiolo talks it through now, and you can cut in · uses voice minutes",
   };
   const GO = { watch: "Make a Lumen", listen: "Make a Lumen", read: "Make a Lumen", live: '<span class="xp-dot" aria-hidden="true"></span>Start live session' };
   const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or hold the mic and talk" };
-  /** One line under the bar: what the Lumen will be made for and from, with Tailor for the whole brief. */
-  function briefLine() {
-    const q = $("#ll-hero-in", root)?.value || "", el = $("#lf-brief", root); if (!el) return;
-    el.innerHTML = (EXT?.briefPreview?.(q, S.mode2) || "") + '<button class="lf-tailor" type="button" data-tailor>Tailor…</button>';
-  }
   function setKind(k) {
     S.mode2 = k; try { localStorage.setItem("ll-format", k); } catch { /* private */ }
     const f = $('[data-form="hero"]', root); if (!f) return;
@@ -259,7 +254,6 @@
     $("#ll-hero-in", root).placeholder = PH[k];
     $(".ll-hint", root).innerHTML = HINT[k];
     const gl = $(".lf-golive", root); if (gl) gl.hidden = k === "live";
-    briefLine();
   }
   /** Lumens being made from this bar (and ones just finished), right under it, so the result is never out of sight. */
   function worksRows() {
@@ -270,34 +264,58 @@
       : `<div class="ll-work is-ready" data-work="${l.id}"><span class="ok" aria-hidden="true">✓</span><span class="t"><b>Ready · ${FMT[l.fresh]}</b> · ${esc(l.title)}</span><button class="button" type="button" data-fmt="${l.fresh}" data-lumen-id="${l.id}">${I[l.fresh]}${FMT[l.fresh]}</button></div>`).join("")}</div>`;
   }
   const explain = (q) => (S.mode2 === "live" ? startNew(q) : S.mode2 === "listen" && EXT?.quickListen ? EXT.quickListen(q) : S.mode2 === "read" ? makeRead(q) : makeLumen(q));
-  /** Under Continue: what else is half-done, in whichever format it's in. */
-  function alsoInProgress() {
-    const d = EXT?.dialogue?.("cool"); if (!d) return "";
-    return `<div class="lf-also"><span class="lab">Also in progress</span><button type="button" class="lf-also-row" data-fmt="listen" data-lumen-id="cooling">${I.listen}<b>Listen</b> · Cooling without machines <span>chapter ${d.ch} of ${d.chapters} · Resume</span></button><button type="button" class="lf-also-row" data-dl-drive="cool-drive">${EXT.carIcon || ""}<b>Driving?</b> <span>Play its drive edition</span></button></div>`;
+  /* ---------- Home: the desk. Ask, pick up where you were, and what's next for your goals. Lumens is the full list. */
+  const TOPIC_AREA = { "Climate-responsive design": "Culture & Context", "Islamic architecture": "History & Theory", "Natural selection": "Biology" };
+  // Goals come from goal notes in Commonplace. Each offers two next steps: a Lumen you have but haven't finished, or one to make.
+  const NEXT = [
+    { goal: "Thesis · Dubai courtyard house", due: "Due March", topic: "Climate-responsive design", steps: [
+      { open: "courtyards", fmt: "read", why: "Not read yet" },
+      { make: "Night flushing when the nights stay warm", fmt: "listen", why: "Not covered yet" }] },
+    { goal: "Cairo trip · Mamluk buildings", due: "12 December", topic: "Islamic architecture", steps: [
+      { open: "sultan", fmt: "listen", why: "New" },
+      { make: "How to read a Mamluk minaret from the street", fmt: "watch", why: "Not covered yet" }] },
+    { goal: "Finish On the Origin of Species", due: "No date", topic: "Natural selection", steps: [
+      { course: "darwin", why: "Part 2 of 7" },
+      { make: "Is natural selection the same as survival of the fittest?", fmt: "read", why: "A common mix-up" }] },
+  ];
+  const fmtTag = (k, meta, label) => `<span class="lf-ftag">${I[k]}${label || FMT[k]}${meta ? ` · ${esc(meta)}` : ""}</span>`;
+  /** One list of what's half-done, in whatever format it's in. */
+  function pickUp() {
+    const d = EXT?.dialogue?.("cool");
+    const rows = [
+      { L: MALQAF, k: "watch", where: "Stopped at slide 4 of 5 · 20 s left", act: `<button class="button" type="button" data-fmt="watch" data-lumen-id="malqaf">Resume</button><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live</button>` },
+      d && { L: LUMENS.find((x) => x.id === "cooling"), k: "listen", where: `Chapter ${d.ch} of ${d.chapters} · for your thesis`, act: `<button class="button" type="button" data-fmt="listen" data-lumen-id="cooling">Resume</button><button class="button button-quiet ll-live-btn" type="button" data-dl-drive="cool-drive">${EXT.carIcon || ""}Drive edition</button>` },
+      { L: { ...DARWIN, title: "On the Origin of Species", q: "Part 2 · Struggle for existence and natural selection" }, k: "watch", label: "Course", where: "Part 2 of 7 · 2 parts watched", href: "#course-darwin", act: `<a class="button" href="#course-darwin">Continue</a>` },
+    ].filter(Boolean);
+    return `<section class="ll-sec"><p class="ll-h">Pick up where you left off</p><div class="lf-pick">${rows.map(({ L, k, label, where, act, href }) => `<article class="lf-prow" data-lumen="${L.id}"><div class="lf-pthumb">${k === "listen" ? `<div class="lx-poster lf-poster-listen">${EXT.cover(L.listen)}</div>` : poster(L)}</div>
+      <div class="lf-pbody">${fmtTag(k, "", label)}<h3><a href="${href || `#open-${L.id}`}">${esc(L.title)}</a></h3><p>${esc(where)}</p></div><div class="lf-pacts">${act}</div></article>`).join("")}</div></section>`;
+  }
+  /** Each goal's next two steps. Making one uses the bar's defaults; there's no brief to fill in. */
+  function nextSteps() {
+    const step = (n, st) => {
+      if (st.course) return `<li>${fmtTag("watch", "", "Course")}<a class="lf-ntitle" href="#course-${st.course}">Continue Part 2 · Struggle for existence</a><small>${esc(st.why)}</small></li>`;
+      if (st.open) { const L = LUMENS.find((x) => x.id === st.open); const meta = formats(L).find((f) => f[0] === st.fmt)?.[3]; return `<li>${fmtTag(st.fmt, meta)}<a class="lf-ntitle" href="#open-${L.id}">${esc(L.title)}</a><small>${esc(st.why)}</small></li>`; }
+      return `<li>${fmtTag(st.fmt)}<span class="lf-ntitle">${esc(st.make)}</span><small>${esc(st.why)}</small><button class="lf-nmake" type="button" data-next-make="${st.fmt}" data-q="${esc(st.make)}" data-topic="${esc(n.topic)}" data-goal="${esc(n.goal)}">Make</button></li>`;
+    };
+    return `<section class="ll-sec"><p class="ll-h">Next for your goals <span>from your goal notes</span><button class="ll-more" type="button" data-tab="lumens">All Lumens →</button></p>
+      <div class="lf-goals">${NEXT.map((n) => `<article class="lf-goal"><p class="lf-gh"><b>${esc(n.goal)}</b><span>${esc(n.due)}</span></p><ul>${n.steps.map((st) => step(n, st)).join("")}</ul></article>`).join("")}</div></section>`;
   }
   function renderHome() {
     S.view = "home"; S.tab = "home";
     const starters = [["How do wind catchers actually cool a house?", "Climate-responsive design"], ["Why do four iwans face one court?", "Islamic architecture"], ["Explain thermal mass to me like a builder", "My Focus"], ["What's the golden section really for?", "Proportion and order"]];
-    learnShell(`${header("Lumens, courses and live sessions")}
+    learnShell(`${header("Ask, pick up, and what's next")}
       <section class="ll-hero" aria-labelledby="ll-hero-t">
         <div class="ll-hero-top"><h2 id="ll-hero-t">What do you want to understand?</h2>
-          ${lastOpen() ? `<button class="ll-resume-link" type="button" data-resume="${lastOpen().id}">${I.mic}<span>Resume live session · <b>${esc(lastOpen().title)}</b> · slide ${lastOpen().i + 1}</span></button>` : ""}
-          <button class="ll-more" type="button" data-tab="sessions">Live sessions →</button></div>
+          ${lastOpen() ? `<button class="ll-resume-link" type="button" data-resume="${lastOpen().id}">${I.mic}<span>Resume live session · <b>${esc(lastOpen().title)}</b> · slide ${lastOpen().i + 1}</span></button>` : ""}</div>
         <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
           <span class="ll-mode" role="radiogroup" aria-label="Format">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${I[k] || ""}${l}</button>`).join("")}</span>
           <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${PH[S.mode2]}">
           <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
-        <p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p>
-        <div class="lf-under"><p class="lf-brief" id="lf-brief"></p><button class="lf-golive" type="button" data-livego${S.mode2 === "live" ? " hidden" : ""}><span class="xp-dot" aria-hidden="true"></span>Talk it through live instead</button></div>
-        <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+        <div class="lf-under"><p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p><button class="lf-golive" type="button" data-livego${S.mode2 === "live" ? " hidden" : ""}><span class="xp-dot" aria-hidden="true"></span>or talk it through live</button></div>
         ${worksRows()}
       </section>
-      <article class="lx-cont" data-lumen="malqaf">${poster(MALQAF, `<span class="lx-dur">2:48</span><div class="lx-prog"><i style="width:88%"></i></div>`)}<div><p class="lx-lab">Continue</p><h2 class="lx-cont-title"><a class="lx-link" href="#play-malqaf">How a malqaf moves air</a></h2><p class="lx-cont-meta">Stopped at 2:28 of 2:48 · slide 4 · made today</p>
-        <div class="lx-row" style="position:relative;z-index:2"><a class="lx-resume" href="#play-malqaf">▶ Resume</a><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live from slide 4</button>${tag(MALQAF)}</div></div></article>
-      ${alsoInProgress()}
-      <section class="ll-sec"><p class="ll-h">Courses <span>${COURSES.length}</span><button class="ll-more" type="button" data-tab="courses">All courses →</button></p><div class="ll-courses">${COURSES.map(courseCard).join("")}</div></section>
-      <section class="ll-sec"><p class="ll-h">Recent Lumens <span>${LUMENS.length} this week and earlier</span><button class="ll-more" type="button" data-tab="lumens">All Lumens →</button></p><div class="lx-grid">${LUMENS.slice(0, 6).map(card).join("")}</div></section>`);
-    briefLine();
+      ${pickUp()}
+      ${nextSteps()}`);
     dock({ ctx: "Learn · Home", chips: ["How do wind catchers actually cool a house?", "Go live on How a malqaf moves air", "What should I watch next?"] });
     // On Home the live bar at the top is the input; the floating talk bar takes over once it scrolls out of view.
     const ask = $(".ll-ask", root);
@@ -957,6 +975,12 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     if (k === "listen" && L.listen) return EXT?.openDialogue?.(L.listen);
     if (k === "read") return openRead(L.id);
   }
+  /** A missing format, made straight away from the Lumen's own question, topic and goal. */
+  function addFormat(L, k) {
+    if (!L) return;
+    if (k === "listen") return EXT?.listenFor?.(L);
+    return (k === "read" ? makeRead : makeLumen)(L.q, { into: L });
+  }
   const openLumen = (id) => { const L = LUMENS.find((x) => x.id === id); if (L) openFormat(L, primary(L)); };
   function browserNote() {
     return new Promise((resolve) => {
@@ -1011,7 +1035,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     if (S.view === "read") {
       const L = LUMENS.find((x) => x.id === S.readId);
       if (/listen to this/.test(t) && L?.listen) return EXT?.openDialogue?.(L.listen);
-      if (/listen version/.test(t)) return EXT?.compose?.({ lumen: L, format: "listen" });
+      if (/listen version/.test(t)) return EXT?.listenFor?.(L);
       if (/talk it through live/.test(t)) return startNew(L.q, L.anchor?.[1]);
     }
     if (/watch next|haven't i finished|finish first/.test(t)) { toast("Pick up How a malqaf moves air.", "You stopped 20 seconds from the end. Then Part 2 of Origin of Species."); return; }
@@ -1047,8 +1071,8 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     }
     if (b.dataset.tab) return openTab(b.dataset.tab);
     if (b.dataset.fmt && b.dataset.lumenId) { const L = LUMENS.find((x) => x.id === b.dataset.lumenId); if (L) L.fresh = false; return openFormat(L, b.dataset.fmt); }
-    if (b.dataset.addfmt) return EXT?.compose?.({ lumen: LUMENS.find((x) => x.id === b.dataset.lumenId), format: b.dataset.addfmt });
-    if (b.dataset.tailor !== undefined) return EXT?.compose?.({ q: $("#ll-hero-in", root)?.value || "", format: S.mode2 });
+    if (b.dataset.addfmt) return addFormat(LUMENS.find((x) => x.id === b.dataset.lumenId), b.dataset.addfmt);
+    if (b.dataset.nextMake) { const [q, fmt, topic] = [b.dataset.q, b.dataset.nextMake, b.dataset.topic]; const anchor = TOPIC_AREA[topic] ? [TOPIC_AREA[topic], topic] : null; return fmt === "listen" ? EXT?.quickListen?.(q) : fmt === "read" ? makeRead(q, { anchor, goal: b.dataset.goal }) : makeLumen(q, { anchor, goal: b.dataset.goal }); }
     if (b.dataset.livego !== undefined) { const v = $("#ll-hero-in", root)?.value.trim(); return startNew(v || "How do wind catchers actually cool a house?"); }
     if (b.dataset.golive) { const made = LUMENS.find((x) => x.id === b.dataset.golive); if (made?.fresh) made.fresh = false; const L = DECKS[b.dataset.golive] || { ...MALQAF, ...LUMENS.find((x) => x.id === b.dataset.golive), beats: MALQAF.beats }; SES.open(L, { mode: "recorded", from: b.dataset.golive === "malqaf" ? 3 : 1 }); return begin(() => SES.goLive()); }
     if (b.dataset.start) return explain(b.dataset.start);
@@ -1069,7 +1093,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     e.preventDefault();
     if (f) { const v = $("#ll-hero-in", root).value; if (v.trim()) explain(v); else $("#ll-hero-in", root).focus(); }
   });
-  document.addEventListener("input", (e) => { if (e.target.id === "ll-hero-in") briefLine(); if (e.target.id === "ll-q") { S.filter.q = e.target.value; clearTimeout(S.qT); S.qT = setTimeout(() => { renderLumens(); const i = $("#ll-q", root); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); } });
+  document.addEventListener("input", (e) => { if (e.target.id === "ll-q") { S.filter.q = e.target.value; clearTimeout(S.qT); S.qT = setTimeout(() => { renderLumens(); const i = $("#ll-q", root); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); } });
   function playLumen(id) {
     const L = LUMENS.find((x) => x.id === id) || MALQAF;
     if (L.making === "watch") { toast("Still being written.", `“${esc(L.title)}” will be ready to watch in about a minute. Or talk it through live now.`); return; }

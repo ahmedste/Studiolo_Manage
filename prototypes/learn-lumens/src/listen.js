@@ -607,8 +607,6 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
 
   /* ---------- the brief: one screen to make a Lumen in any format, prefilled from context */
   let C = null;
-  const FORMATS = [["watch", "Watch", "Slides and a narrator", "2–6 min"], ["listen", "Listen", "Two voices, for a walk, a ride or a drive", "10–30 min"], ["read", "Read", "A long read, quoting your sources", "10–20 min"]];
-  const LENGTHS = { watch: [[3, "Short", "2–3 min"], [5, "Standard", "4–6 min"]], listen: LENS.map(([m, c]) => [m, `${m} min`, `${c} chapters`]), read: [[8, "Overview", "about 8 min"], [15, "In depth", "about 15 min"]] };
   const DEF_LEN = { watch: 5, listen: 20, read: 15 };
   function detectTopic(q) {
     const t = q.toLowerCase();
@@ -624,61 +622,9 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const lg = lumen?.goal ? GOALS.find((x) => x.short === lumen.goal) : null;
     C = { q, topic, goal: goal || lg?.id || (GOALS.find((x) => x.topic === topic) || GOALS[3]).id, context: context || "any", format, lumen: lumen || null, pair: 0, sources: new Set((LIB[topic] || []).slice(0, 3).map((s) => s[0])), grounding: "mostly", skipKnown: true, len: DEF_LEN[format] };
   }
-  function compose(opts = {}) {
-    A.leaveStudio(); A.S.run++; brief(opts);
-    A.S.view = "compose"; A.S.tab = C.lumen ? "lumens" : "home";
-    A.learnShell(`${A.header(C.lumen ? `Add a format to “${C.lumen.title}”` : "Make a Lumen")}<div class="dl-compose"><div class="dl-c-main"></div><aside class="dl-c-side"></aside></div>`);
-    drawCompose(); window.scrollTo(0, 0);
-    A.dock({ ctx: "Learn · Make a Lumen", chips: [] }); A.ld.hidden = true;
-    const i = $("#dl-q"); if (i && !C.q) i.focus();
-  }
-  /** Home's one-line preview of the brief. */
-  function briefPreview(q, fmt) {
-    if (!q.trim()) return "<span>Made for your goal, from your library, building on what you've already seen.</span>";
-    const topic = detectTopic(q), g = GOALS.find((x) => x.topic === topic) || GOALS[3], n = Math.min(3, (LIB[topic] || []).length), k = (KNOWN[topic] || []).length;
-    return `<span>${fmt === "live" ? "<b>Now</b>, talked through · " : ""}For <b>${esc(g.short)}</b> · under <b>${esc(topic)}</b> · from <b>${n} library item${n === 1 ? "" : "s"}</b>${k ? ` · builds on <b>${k} thing${k === 1 ? "" : "s"} you've seen</b>` : ""}${fmt === "listen" ? " · <b>20 min</b>, two voices" : ""}</span>`;
-  }
   function draft() { return { q: C.q, topic: C.topic, goal: C.goal, format: C.format, pair: pairsFor(C.topic)[C.pair] || pairsFor(C.topic)[0], sources: [...C.sources], grounding: C.grounding, skipKnown: C.skipKnown, len: C.len, context: C.context, chapters: [] }; }
-  function drawCompose() {
-    const main = $(".dl-c-main"); if (!main) return;
-    const pairs = pairsFor(C.topic), lib = LIB[C.topic] || [], known = KNOWN[C.topic] || [], listen = C.format === "listen";
-    const has = C.lumen ? Object.fromEntries(A.formats(C.lumen).map(([k, , made]) => [k, made])) : {};
-    const chips = (name, items, cur) => items.map(([v, l, sub]) => `<button type="button" class="dl-opt" role="radio" aria-checked="${String(cur) === String(v)}" data-dl-c="${name}" data-v="${esc(v)}"><b>${l}</b>${sub ? `<small>${sub}</small>` : ""}</button>`).join("");
-    main.innerHTML = `
-      <div class="dl-field"><label class="dl-l" for="dl-q">What do you want to understand?${C.lumen ? `<span>Another format of a Lumen you have. It's made from the same brief and kept on the same card.</span>` : ""}</label><input id="dl-q" class="dl-q" autocomplete="off" value="${esc(C.q)}" placeholder="A question, an idea, or a claim to test"></div>
-      <div class="dl-field"><p class="dl-l">How do you want to take it in?</p><div class="dl-fmts" role="radiogroup">${FORMATS.map(([k, label, sub, len]) => `<button type="button" class="dl-fmt" role="radio" aria-checked="${C.format === k}" data-dl-c="format" data-v="${k}" ${has[k] ? "disabled" : ""}>${A.I[k]}<b>${label}</b><span>${sub}</span><small>${has[k] ? "Already made" : len}</small></button>`).join("")}</div></div>
-      <div class="dl-field"><p class="dl-l">What is it for?<span>Picked from your goal notes. It decides what it steers toward and how it ends.</span></p><div class="dl-opts" role="radiogroup">${chips("goal", GOALS.map((g) => [g.id, esc(g.short), g.id === "none" ? "No goal" : esc(g.due)]), C.goal)}</div></div>
-      ${listen ? `<div class="dl-field"><p class="dl-l">Where will you listen?<span>Driving changes how it's written and how it plays.</span></p><div class="dl-opts" role="radiogroup">${chips("context", [["any", "Anywhere", "At a desk, on the sofa"], ["walk", "Walking or cycling", "Nothing to look at"], ["drive", "Driving", "Written and played for the road"]], C.context)}</div>
-        ${C.context === "drive" ? `<div class="dl-drive-rules"><p><b>Written for driving.</b> Your eyes and most of your attention are on the road, and you'll miss bits at junctions. So the writer is told:</p><ul>${DRIVE_RULES.map((r) => `<li>${esc(r)}</li>`).join("")}</ul><p>And it plays in Drive mode: no captions, steering-wheel buttons, asking by voice only, and a short recap after a call or a direction.</p></div>` : ""}</div>` : ""}
-      ${C.lumen ? "" : `<div class="dl-field"><p class="dl-l">Where it lives<span>Filed under this topic in Learn and on Loci.</span></p><div class="dl-opts" role="radiogroup">${chips("topic", TOPICS.map(([a, t]) => [t, esc(t), esc(a)]), C.topic)}</div></div>`}
-      ${listen ? `<div class="dl-field"><p class="dl-l">Two voices<span>Two angles on the same idea. They'll disagree at least once.</span></p><div class="dl-pairs" role="radiogroup">${pairs.map((p, i) => `<button type="button" class="dl-pair" role="radio" aria-checked="${C.pair === i}" data-dl-c="pair" data-v="${i}"><b>${esc(p.label)}</b><span><i class="a">${esc(p.A.name[0])}</i>${esc(p.A.name)}, ${esc(p.A.role.toLowerCase())}: ${esc(p.A.lens)}</span><span><i class="b">${esc(p.B.name[0])}</i>${esc(p.B.name)}, ${esc(p.B.role.toLowerCase())}: ${esc(p.B.lens)}</span></button>`).join("")}</div></div>` : ""}
-      <div class="dl-field"><p class="dl-l">From your library<span>Items tagged ${esc(C.topic)}. It names them when it uses them.</span></p>
-        ${lib.length ? `<div class="dl-checks">${lib.map(([id, t, k]) => `<label class="dl-check"><input type="checkbox" data-dl-src="${id}" ${C.sources.has(id) ? "checked" : ""}><span><b>${esc(t)}</b><small>${esc(k)}</small></span></label>`).join("")}</div>` : '<p class="dl-none">Nothing in your library is tagged to this topic yet.</p>'}
-        <div class="dl-opts dl-ground" role="radiogroup" aria-label="How closely to stick to them">${chips("grounding", [["mostly", "Mostly my sources"], ["only", "Only my sources"], ["open", "Open"]], C.grounding)}</div></div>
-      <div class="dl-field"><p class="dl-l">Builds on what you know</p>
-        ${known.length ? `<ul class="dl-known">${known.map(([k, t, s]) => `<li><span class="dl-kind">${esc(k)}</span>${esc(t)}<small>${esc(s)}</small></li>`).join("")}</ul>` : '<p class="dl-none">Nothing on this topic yet: it starts from the basics.</p>'}
-        <label class="dl-check dl-skip"><input type="checkbox" data-dl-skip ${C.skipKnown ? "checked" : ""}><span><b>Skip what I already know</b><small>It refers back to these instead of explaining them again.</small></span></label></div>
-      <div class="dl-field"><p class="dl-l">Length</p><div class="dl-opts" role="radiogroup">${chips("len", LENGTHS[C.format], C.len)}</div></div>`;
-    drawSide();
-  }
-  function drawSide() {
-    const side = $(".dl-c-side"); if (!side) return;
-    const D = draft(), lines = briefLines(D), ok = C.q.trim() ? "" : "disabled";
-    const lo = (C.len * 0.22).toFixed(0), hi = (C.len * 0.27).toFixed(0);
-    const how = {
-      watch: ["Written and voiced in the background; ready in about a minute. You can talk it through live once it's made, or right now instead.", "About $0.13 to write, plus about $0.65–0.80 of voice per 3 minutes (today's Lumen estimates)."],
-      listen: ["Planned in a few seconds; the first chapter starts playing in about half a minute. Written one chapter ahead of you and voiced as you listen, so chapters you never reach are never written or voiced.", `About $${lo}–${hi} of voice at today's Lumen voice rates, about half with a faster voice model, plus a few cents of writing.`],
-      read: ["Written in the background in a minute or two, with your sources quoted and linked.", "A few cents of writing. No voice."],
-    }[C.format];
-    const go = {
-      watch: `<button class="button" type="button" data-dl-make="watch" ${ok}>${A.I.watch}Make it</button><button class="button button-quiet" type="button" data-dl-make="live" ${ok}><span class="xp-dot" aria-hidden="true"></span>Talk it through live instead</button>`,
-      listen: `<button class="button" type="button" data-dl-make="now" ${ok}>${A.I.listen}Make it and listen now</button><button class="button button-quiet" type="button" data-dl-make="later" ${ok}>Make it for later</button>`,
-      read: `<button class="button" type="button" data-dl-make="read" ${ok}>${A.I.read}Make it</button>`,
-    }[C.format];
-    side.innerHTML = `<div class="dl-pack"><p class="dl-pack-h">What the writer gets</p><dl>${lines.map(([k, v, from]) => `<div><dt>${esc(k)}${from ? `<small>${esc(from)}</small>` : ""}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></div>
-      <div class="dl-how"><p><b>How it's made.</b> ${how[0]}</p><p><b>Cost (estimate).</b> ${how[1]}</p></div>
-      <div class="dl-go">${go}</div>`;
-  }
+  /** A Listen version of a Lumen you already have (or its drive edition), made straight away from its own brief. */
+  function listenFor(L, opts = {}) { if (!L) return; brief({ lumen: L, format: "listen", ...opts }); make("now"); }
   function make(how) {
     if (!C?.q.trim()) return;
     const anchor = [areaOf(C.topic), C.topic], g = goalOf({ goal: C.goal }), goal = g.id === "none" ? null : g.short;
@@ -878,9 +824,9 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   /* ================================================================ wiring into Learn */
   function route(text) {
     const listening = A.S.view === "dialogue" || P.walk;
-    if (/^make (a|another) (lumen|dialogue)/i.test(text.trim())) { pause(); closeWalk(); compose({ format: "listen", q: /thesis/i.test(text) ? "Can a house in Dubai stay cool the old way?" : "" }); return true; }
+    if (/^make (a|another) (lumen|dialogue)/i.test(text.trim())) { pause(); closeWalk(); quickListen(/thesis/i.test(text) ? "Night flushing when the nights stay warm" : "Can a house in Dubai stay cool the old way?"); return true; }
     if (!listening) {
-      if (/\bdriv/i.test(text)) { const D = DIALOGUES.find((x) => x.context === "drive" && !x.writing); if (D) openDrive(D); else compose({ format: "listen", context: "drive" }); return true; }
+      if (/\bdriv/i.test(text)) { const D = DIALOGUES.find((x) => x.context === "drive" && !x.writing); if (D) openDrive(D); else { brief({ q: "Can a house in Dubai stay cool the old way?", format: "listen", context: "drive" }); make("now"); } return true; }
       return false;
     }
     focusCur();
@@ -897,7 +843,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     ask(text); return true;
   }
   function onClick(e) {
-    const el = e.target.closest("[data-dl-pp], [data-dl-play], [data-dl-walk], [data-dl-drive], [data-dl-open], [data-dl-new], [data-dl-act], [data-dl-c], [data-dl-make], [data-dl-ch], [data-dl-tab], [data-dl-live], [data-dl-k], .dl-s, a[href^='#dl-']");
+    const el = e.target.closest("[data-dl-pp], [data-dl-play], [data-dl-walk], [data-dl-drive], [data-dl-open], [data-dl-act], [data-dl-ch], [data-dl-tab], [data-dl-live], [data-dl-k], .dl-s, a[href^='#dl-']");
     if (!el) return false;
     const d = el.dataset;
     if (e.target.closest("input, label")) return false;
@@ -906,9 +852,6 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (d.dlPlay) { const D = DIALOGUES.find((x) => x.id === d.dlPlay); if (D.writing && flat(D).length < 2) { D.listenNow = true; openDialogue(D.id); return true; } openDialogue(D.id, { autoplay: !(P.D === D && P.playing) }); return true; }
     if (d.dlWalk) { openWalk(DIALOGUES.find((x) => x.id === d.dlWalk)); return true; }
     if (d.dlDrive) { openDrive(DIALOGUES.find((x) => x.id === d.dlDrive)); return true; }
-    if (d.dlNew !== undefined) { compose({ topic: d.dlNew || undefined, format: "listen" }); return true; }
-    if (d.dlC) { const v = d.v; if (d.dlC === "format") { C.format = v; C.len = DEF_LEN[v]; } else if (d.dlC === "topic") { C.topic = v; C.pair = 0; C.sources = new Set((LIB[v] || []).slice(0, 3).map((s) => s[0])); C.goal = (GOALS.find((g) => g.topic === v) || GOALS[3]).id; } else C[d.dlC] = d.dlC === "pair" || d.dlC === "len" ? +v : v; drawCompose(); return true; }
-    if (d.dlMake) { make(d.dlMake); return true; }
     if (d.dlCh !== undefined) { const D = el.closest("[data-d]") ? DIALOGUES.find((x) => x.id === el.closest("[data-d]").dataset.d) : cur; if (P.D !== D) { if (P.D) stop(); P.D = D; } const k = chStart(D, +d.dlCh); if (k >= 0) { seek(k); if (!P.playing) play(); } return true; }
     if (d.dlK !== undefined) { focusCur(); seek(+d.dlK); if (!P.playing) play(); return true; }
     if (el.classList.contains("dl-s")) { focusCur(); seek(+el.dataset.k); if (!P.playing) play(); return true; }
@@ -920,7 +863,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (["back", "next", "mark"].includes(act)) focusCur();
     if (act === "back") back15(); else if (act === "next") nextCh(); else if (act === "mark") { mark(); if (P.drive) confirmAloud("Marked."); }
     else if (act === "again") sayAgain(); else if (act === "drive-go") driveGo(); else if (act === "call") interrupted();
-    else if (act === "drive-edition") { const D = P.walk ? P.D : cur || P.D; if (P.D) stop(); compose({ q: D.q, topic: D.topic, goal: D.goal, context: "drive", format: "listen", lumen: lumenOf(D) }); }
+    else if (act === "drive-edition") { const D = P.walk ? P.D : cur || P.D; if (P.D) stop(); listenFor(lumenOf(D), { q: D.q, topic: D.topic, goal: D.goal, context: "drive" }); }
     else if (act === "walk") (P.D?.context === "drive" ? openDrive : openWalk)(); else if (act === "walkx") { closeWalk(); paint(); } else if (act === "stop") stop();
     else if (act === "offline") { cur.offline = !cur.offline; renderHead(); if (cur.offline) A.toast("Saved for offline.", `${esc(cur.title)}: about ${Math.max(1, Math.round(lengthOf(cur) / 60))} MB. It plays without a connection, on a plane or underground.`); }
     if (el.matches("[data-dl-speed]")) speed();
@@ -934,22 +877,14 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
       else if (k === "m") { mark(); confirmAloud("Marked."); } else return;
       e.preventDefault();
     } });
-  document.addEventListener("input", (e) => { if (e.target.id === "dl-q" && C) { C.q = e.target.value; drawSide(); } });
-  document.addEventListener("change", (e) => {
-    if (!C) return;
-    if (e.target.dataset.dlSrc) { e.target.checked ? C.sources.add(e.target.dataset.dlSrc) : C.sources.delete(e.target.dataset.dlSrc); drawSide(); }
-    if (e.target.dataset.dlSkip !== undefined) { C.skipKnown = e.target.checked; drawSide(); }
-  });
-  document.addEventListener("keydown", (e) => { if (e.target.id === "dl-q" && e.key === "Enter") { e.preventDefault(); make("now"); } });
 
   window.LearnExt = {
     dialogue: info,
     cover: (id) => { const D = DIALOGUES.find((x) => x.id === id); return D ? cover(D) : ""; },
     carIcon: IC.car,
     openDialogue: (id) => openDialogue(id),
-    compose,
+    listenFor,
     quickListen,
-    briefPreview,
     route,
     onClick,
     onHold: () => { if (A.S.view === "dialogue" || P.walk) pause(); },
