@@ -25617,6 +25617,12 @@ html.theme-switching::view-transition-new(root) {
 .lf-switch button.add small { color: var(--accent); }
 .lf-switch button:disabled { cursor: default; }
 .ll-studio-head .lf-switch { margin-left: 4px; }
+/* Live sits at the end of the switcher, after a rule: it isn't a format you keep, it's talking one through now. */
+.lf-sw-sep { flex: none; width: 1px; margin: 7px 3px; background: var(--line); }
+.lf-switch .lf-sw-live .xp-dot { width: 6px; height: 6px; color: var(--warn); }
+.lf-switch .lf-sw-live[aria-pressed="false"] .xp-dot { animation: none; opacity: 0.6; }
+.lf-switch .lf-sw-live[aria-pressed="true"] { color: var(--warn); }
+.lf-switch .lf-sw-live[aria-pressed="true"] small { color: var(--warn); }
 /* Home: the format in the bar, and one line of brief under it. */
 .ll-mode button svg { width: 14px; height: 14px; }
 .lf-under { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding-left: 18px; }
@@ -25626,6 +25632,7 @@ html.theme-switching::view-transition-new(root) {
 .lf-tailor:hover, .lf-golive:hover { text-decoration: underline; }
 .lf-golive { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--warn); }
 .lf-golive .xp-dot { width: 6px; height: 6px; color: var(--warn); }
+.lf-golive[hidden] { display: none; }
 .lf-also { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: -18px 0 30px; font-size: 13px; }
 .lf-also .lab { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .lf-also-row { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 5px 11px; border-radius: 14px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
@@ -25657,6 +25664,7 @@ html.theme-switching::view-transition-new(root) {
   .lf-toc { position: static; }
   .lf-under { padding-left: 0; }
   .lf-switch button small { display: none; }
+  .ll-ask .ll-mode button .xp-dot { display: inline-block; }
   .lf-switch button { padding: 0 10px; }
   .ll-ask { flex-wrap: wrap; height: auto; row-gap: 6px; padding: 6px 6px 6px 14px; border-radius: 22px; }
   .ll-ask .ll-mode { flex: 1 0 100%; margin: 0 0 0 -8px; }
@@ -26670,7 +26678,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   function briefPreview(q, fmt) {
     if (!q.trim()) return "<span>Made for your goal, from your library, building on what you've already seen.</span>";
     const topic = detectTopic(q), g = GOALS.find((x) => x.topic === topic) || GOALS[3], n = Math.min(3, (LIB[topic] || []).length), k = (KNOWN[topic] || []).length;
-    return `<span>For <b>${esc(g.short)}</b> · under <b>${esc(topic)}</b> · from <b>${n} library item${n === 1 ? "" : "s"}</b>${k ? ` · builds on <b>${k} thing${k === 1 ? "" : "s"} you've seen</b>` : ""}${fmt === "listen" ? " · <b>20 min</b>, two voices" : ""}</span>`;
+    return `<span>${fmt === "live" ? "<b>Now</b>, talked through · " : ""}For <b>${esc(g.short)}</b> · under <b>${esc(topic)}</b> · from <b>${n} library item${n === 1 ? "" : "s"}</b>${k ? ` · builds on <b>${k} thing${k === 1 ? "" : "s"} you've seen</b>` : ""}${fmt === "listen" ? " · <b>20 min</b>, two voices" : ""}</span>`;
   }
   function draft() { return { q: C.q, topic: C.topic, goal: C.goal, format: C.format, pair: pairsFor(C.topic)[C.pair] || pairsFor(C.topic)[0], sources: [...C.sources], grounding: C.grounding, skipKnown: C.skipKnown, len: C.len, context: C.context, chapters: [] }; }
   function drawCompose() {
@@ -26765,7 +26773,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const ed = D.context === "drive" ? (L?.listen && L.listen !== D.id ? `<button class="button button-quiet" type="button" data-dl-open="${L.listen}">${IC.phones}Standard edition</button>` : "")
       : L?.listenDrive ? `<button class="button button-quiet" type="button" data-dl-open="${L.listenDrive}">${IC.car}Drive edition</button>` : `<button class="button button-quiet" type="button" data-dl-act="drive-edition">${IC.car}Make a drive edition</button>`;
     h.innerHTML = `<div class="dl-head-l"><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}${ctxPill(D)}<span>Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}</div></div>
-      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button><button class="button button-quiet" type="button" data-dl-live="${esc(D.q)}"><span class="xp-dot" aria-hidden="true"></span>Talk it through live</button></div></div>`;
+      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button></div></div>`;
   }
   function renderChapters() {
     const D = cur, ol = $(".dl-chapters"), bar = $(".dl-bar"); if (!ol) return;
@@ -27151,8 +27159,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   ];
 
   /* ================================================================ app state */
-  // The Home bar picks the format; Live is its own verb beside it.
-  const MODES = [["watch", "Watch"], ["listen", "Listen"], ["read", "Read"]];
+  // The Home bar picks how: the three formats, and Live (talked through now; the live part of slice 1, unchanged).
+  const MODES = [["watch", "Watch"], ["listen", "Listen"], ["read", "Read"], ["live", '<span class="xp-dot" aria-hidden="true"></span>Live']];
   let mode0 = "watch"; try { mode0 = localStorage.getItem("ll-format") || "watch"; } catch { /* private */ }
   const S = { mode2: MODES.some(([k]) => k === mode0) ? mode0 : "watch", view: "home", tab: "home", ai: null, audio: true, filter: { area: "All", fmt: "all", state: "all", q: "", group: "date" }, journal: [], line: false, secs: 0, run: 0 };
   const BROWSER_OK = (() => { const u = navigator.userAgent; return /Chrome\/|Edg\//.test(u) && !/Mobile|Android|iPhone|iPad|OPR\//.test(u); })();
@@ -27197,10 +27205,15 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
       : L.making === k ? `<span class="lf-pill making">${I[k]}<b>${label}</b><span class="ll-wr">${esc(meta || "Writing")}</span></span>`
       : `<button type="button" class="lf-pill add" data-addfmt="${k}" data-lumen-id="${L.id}" title="Make a ${label.toLowerCase()} version">${I.plus}${label}</button>`).join("")}</span>`;
   }
-  /** The same three formats at the top of every Lumen page. */
-  function fmtSwitch(L, cur) {
-    if (!L) return "";
-    return `<span class="lf-switch" role="group" aria-label="Format">${formats(L).map(([k, label, has, meta]) => `<button type="button" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`).join("")}</span>`;
+  /** The same switcher at the top of every Lumen page: its three formats, then Live (talk it through now).
+   *  On the Watch page, Watch and Live are the player's own modes (recording and live), so one control does both. */
+  function fmtSwitch(L, cur, { studio } = {}) {
+    const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
+    const btn = ([k, label, has, meta]) => studio && k === "watch"
+      ? `<button type="button" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
+      : `<button type="button" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
+    const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
+    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
   }
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
   const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><span class="k">${I.read}Long read</span><b>${esc(L.title)}</b><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
@@ -27237,9 +27250,10 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     watch: "<b>Watch</b> · slides and a narrator, 2–6 minutes. Made in the background, ready in about a minute.",
     listen: "<b>Listen</b> · two voices talk it through, 10–30 minutes, for a walk, a ride or a drive. Starts playing in about half a minute.",
     read: "<b>Read</b> · a long read, 10–20 minutes, quoting your sources. Made in the background.",
+    live: "<b>Start a live session</b> · Studiolo talks you through it now, drawing slides as it goes. Interrupt any time, and keep it as a Lumen at the end. Uses voice minutes.",
   };
-  const GO = { watch: "Make a Lumen", listen: "Make a Lumen", read: "Make a Lumen" };
-  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?" };
+  const GO = { watch: "Make a Lumen", listen: "Make a Lumen", read: "Make a Lumen", live: '<span class="xp-dot" aria-hidden="true"></span>Start live session' };
+  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or hold the mic and talk" };
   /** One line under the bar: what the Lumen will be made for and from, with Tailor for the whole brief. */
   function briefLine() {
     const q = $("#ll-hero-in", root)?.value || "", el = $("#lf-brief", root); if (!el) return;
@@ -27253,6 +27267,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     $(".ll-go", f).innerHTML = GO[k];
     $("#ll-hero-in", root).placeholder = PH[k];
     $(".ll-hint", root).innerHTML = HINT[k];
+    const gl = $(".lf-golive", root); if (gl) gl.hidden = k === "live";
     briefLine();
   }
   /** Lumens being made from this bar (and ones just finished), right under it, so the result is never out of sight. */
@@ -27263,7 +27278,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
       ? `<div class="ll-work" data-work="${l.id}"><span class="lx-dot" aria-hidden="true"></span><span class="t"><b>Making · ${FMT[l.making]}</b> · ${esc(l.title)}</span><span class="ll-wr">${esc(l.writingLabel || "Writing")}</span>${l.making === "watch" ? `<button class="ll-chip" type="button" data-livenow="${l.id}">Talk it through live instead</button>` : ""}</div>`
       : `<div class="ll-work is-ready" data-work="${l.id}"><span class="ok" aria-hidden="true">✓</span><span class="t"><b>Ready · ${FMT[l.fresh]}</b> · ${esc(l.title)}</span><button class="button" type="button" data-fmt="${l.fresh}" data-lumen-id="${l.id}">${I[l.fresh]}${FMT[l.fresh]}</button></div>`).join("")}</div>`;
   }
-  const explain = (q) => (S.mode2 === "listen" && EXT?.quickListen ? EXT.quickListen(q) : S.mode2 === "read" ? makeRead(q) : makeLumen(q));
+  const explain = (q) => (S.mode2 === "live" ? startNew(q) : S.mode2 === "listen" && EXT?.quickListen ? EXT.quickListen(q) : S.mode2 === "read" ? makeRead(q) : makeLumen(q));
   /** Under Continue: what else is half-done, in whichever format it's in. */
   function alsoInProgress() {
     const d = EXT?.dialogue?.("cool"); if (!d) return "";
@@ -27278,11 +27293,11 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
           ${lastOpen() ? `<button class="ll-resume-link" type="button" data-resume="${lastOpen().id}">${I.mic}<span>Resume live session · <b>${esc(lastOpen().title)}</b> · slide ${lastOpen().i + 1}</span></button>` : ""}
           <button class="ll-more" type="button" data-tab="sessions">Live sessions →</button></div>
         <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
-          <span class="ll-mode" role="radiogroup" aria-label="Format">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${I[k]}${l}</button>`).join("")}</span>
+          <span class="ll-mode" role="radiogroup" aria-label="Format">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${I[k] || ""}${l}</button>`).join("")}</span>
           <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${PH[S.mode2]}">
           <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
         <p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p>
-        <div class="lf-under"><p class="lf-brief" id="lf-brief"></p><button class="lf-golive" type="button" data-livego><span class="xp-dot" aria-hidden="true"></span>Talk it through live instead</button></div>
+        <div class="lf-under"><p class="lf-brief" id="lf-brief"></p><button class="lf-golive" type="button" data-livego${S.mode2 === "live" ? " hidden" : ""}><span class="xp-dot" aria-hidden="true"></span>Talk it through live instead</button></div>
         <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
         ${worksRows()}
       </section>
@@ -27570,8 +27585,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     markup() {
       const L = this.L;
       return `<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-        <div class="ll-studio-head"><h1>${esc(L.title)}</h1>${fmtSwitch(LUMENS.find((x) => x.id === L.id), "watch")}<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
-          <span class="ll-seg" role="group" aria-label="Mode"><button type="button" data-mode="recorded" aria-pressed="true">Recording</button><button type="button" data-mode="live" aria-pressed="false">Live</button></span>
+        <div class="ll-studio-head"><h1>${esc(L.title)}</h1>${fmtSwitch(LUMENS.find((x) => x.id === L.id), "watch", { studio: true })}<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
           <button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button></div>
         <div class="ll-studio"><div class="ll-stagecol">
           <div class="xp-screen-stage" data-captions="on" style="position:relative"><div class="xp-box"><div class="xp-stage" role="region" aria-label="Lumen stage" style="${STAGE}"><div class="xp-slide-host"></div><span class="xp-watermark" aria-hidden="true"><span class="xp-mark xp-watermark-mark" aria-hidden="true">S</span></span><span class="xp-pointer" aria-hidden="true" data-visible="false"><svg viewBox="0 0 20 28" width="22" height="30.8"><path d="M2 2 L2 22.5 L7.2 17.8 L11 26 L14.6 24.4 L10.9 16.3 L17.8 16.3 Z"></path></svg></span></div><div class="xp-overlay"><div class="xp-caption" aria-hidden="true" data-visible="false"></div></div></div></div>
@@ -28046,7 +28060,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     if (b.dataset.start) return explain(b.dataset.start);
     if (b.dataset.kind && b.closest(".ll-mode")) return setKind(b.dataset.kind);
     if (b.dataset.resume) { const ss = SESSIONS.find((x) => x.id === b.dataset.resume); if (ss) return SES.resume(ss); return; }
-    if (b.dataset.livenow) { const L = LUMENS.find((x) => x.id === b.dataset.livenow); return startNew(L ? L.q : ""); }
+    if (b.dataset.livenow !== undefined) { const L = LUMENS.find((x) => x.id === b.dataset.livenow); EXT?.pause?.(); return startNew(L ? L.q : "How do wind catchers actually cool a house?", L?.anchor?.[1]); }
     if (b.dataset.area !== undefined) { S.filter.area = b.dataset.area; return renderLumens(); }
     if (b.dataset.f) { S.filter[b.dataset.f] = b.dataset.v; renderLumens(); return window.scrollTo(0, 0); }
     if (b.dataset.mode && S.view === "studio") { if (b.dataset.mode === "live" && SES.mode !== "live") return begin(() => SES.goLive()); if (b.dataset.mode === "recorded" && SES.mode === "live") return begin(() => SES.endLive()); return; }

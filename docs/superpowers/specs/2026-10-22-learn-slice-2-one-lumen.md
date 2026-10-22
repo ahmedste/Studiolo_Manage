@@ -14,7 +14,7 @@ Owner direction (22 Oct): *a Dialogue is a Lumen in itself; a Lumen can be audio
 | **Lumen** | One idea, explained for you, made from one brief: question, goal, topic, sources, what you already know. |
 | **Format** | How you take it in. **Watch** is slides and a narrator, 2–6 min. **Listen** is two voices, 10–30 min (what the Dialogues spec called a Dialogue). **Read** is a long read, 10–20 min. A Lumen has one or more formats. |
 | **Edition** | A variant of a format. Today only Listen has one: the **drive edition**, written and played for the road. |
-| **Live** | Not a format but a way through a Lumen: Studiolo talks it through now and you cut in. Sessions are kept for 30 days and can be kept as a Lumen. |
+| **Live** | Not a format but a way through a Lumen: Studiolo talks it through now and you cut in. Sessions are kept for 30 days and can be kept as a Lumen. The interaction is slice 1's, unchanged (go live, interruptions, asides, written answers, Keep, resume). Slice 2 only changes where it's offered: it's a **first-class choice** in the Home bar (Watch · Listen · Read · ● Live) and at the end of every Lumen page's switcher. |
 | **Course** | A series of Lumens (its parts). Parts can have formats too. |
 
 ## What changed
@@ -25,7 +25,7 @@ Owner direction (22 Oct): *a Dialogue is a Lumen in itself; a Lumen can be audio
 | Making | A Lumen \| Live \| Dialogue switch, plus a separate "New Dialogue" page | One verb, **Make a Lumen**: pick **Watch / Listen / Read** in the bar. **Tailor…** opens one brief whose first question is the format. **Talk it through live** is the alternative. |
 | Adding a format | Making a second, separate thing | **+ Listen** (or + Watch, + Read) on a card or in the page switcher. It's made from the same brief and kept on the same card. |
 | Cards | Lumen cards and Dialogue tiles, different shapes | One card per Lumen, with **format pills**. Made formats open it; missing ones are "+ Format"; Live sits beside them. The poster follows the main format: a slide, an audio cover, or a long read's title page. |
-| Pages | A Watch page and a Dialogue page with different heads | Every Lumen page has the same **Watch · Listen · Read** switcher. Each format keeps its own player. |
+| Pages | A Watch page and a Dialogue page with different heads; a separate Recording \| Live switch on Watch | Every Lumen page has the same **Watch · Listen · Read \| ● Live** switcher. Each format keeps its own player. On the Watch page, Watch and Live are the player's two modes, so one control replaces Recording \| Live. |
 | Finding things | Separate lists per tab | **Lumens** filters by format (All, Watch, Listen, Read, Live sessions), state and area, and groups **by date or by topic**. |
 | Continue | Watch only | The last Lumen, plus **Also in progress** in any format (e.g. Listen at chapter 2, or its drive edition) |
 | Words | "Dialogue", "Long read" | **Listen** and **Read** in the interface. "Dialogue" stays only as a code name. |
@@ -34,6 +34,7 @@ Owner direction (22 Oct): *a Dialogue is a Lumen in itself; a Lumen can be audio
 
 1. **The Home bar.**
    - The format is chosen in the bar, which remembers it; new users start on Watch.
+   - **● Live** is the fourth choice. It turns the button into **Start live session**, and holding the mic starts it as you speak, as in slice 1.
    - Under the bar, one line shows the brief Studiolo will use: "For *Thesis · Dubai courtyard house* · under *Climate-responsive design* · from *3 library items* · builds on *3 things you've seen* · **Tailor…**".
    - **Make a Lumen** uses those defaults:
      - Watch and Read are made in the background, with a "Making · Watch" row and a toast.

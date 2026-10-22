@@ -636,7 +636,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   function briefPreview(q, fmt) {
     if (!q.trim()) return "<span>Made for your goal, from your library, building on what you've already seen.</span>";
     const topic = detectTopic(q), g = GOALS.find((x) => x.topic === topic) || GOALS[3], n = Math.min(3, (LIB[topic] || []).length), k = (KNOWN[topic] || []).length;
-    return `<span>For <b>${esc(g.short)}</b> · under <b>${esc(topic)}</b> · from <b>${n} library item${n === 1 ? "" : "s"}</b>${k ? ` · builds on <b>${k} thing${k === 1 ? "" : "s"} you've seen</b>` : ""}${fmt === "listen" ? " · <b>20 min</b>, two voices" : ""}</span>`;
+    return `<span>${fmt === "live" ? "<b>Now</b>, talked through · " : ""}For <b>${esc(g.short)}</b> · under <b>${esc(topic)}</b> · from <b>${n} library item${n === 1 ? "" : "s"}</b>${k ? ` · builds on <b>${k} thing${k === 1 ? "" : "s"} you've seen</b>` : ""}${fmt === "listen" ? " · <b>20 min</b>, two voices" : ""}</span>`;
   }
   function draft() { return { q: C.q, topic: C.topic, goal: C.goal, format: C.format, pair: pairsFor(C.topic)[C.pair] || pairsFor(C.topic)[0], sources: [...C.sources], grounding: C.grounding, skipKnown: C.skipKnown, len: C.len, context: C.context, chapters: [] }; }
   function drawCompose() {
@@ -731,7 +731,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const ed = D.context === "drive" ? (L?.listen && L.listen !== D.id ? `<button class="button button-quiet" type="button" data-dl-open="${L.listen}">${IC.phones}Standard edition</button>` : "")
       : L?.listenDrive ? `<button class="button button-quiet" type="button" data-dl-open="${L.listenDrive}">${IC.car}Drive edition</button>` : `<button class="button button-quiet" type="button" data-dl-act="drive-edition">${IC.car}Make a drive edition</button>`;
     h.innerHTML = `<div class="dl-head-l"><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}${ctxPill(D)}<span>Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}</div></div>
-      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button><button class="button button-quiet" type="button" data-dl-live="${esc(D.q)}"><span class="xp-dot" aria-hidden="true"></span>Talk it through live</button></div></div>`;
+      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button></div></div>`;
   }
   function renderChapters() {
     const D = cur, ol = $(".dl-chapters"), bar = $(".dl-bar"); if (!ol) return;

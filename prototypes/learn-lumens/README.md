@@ -5,7 +5,7 @@ A **Lumen** is one idea, explained for you. It comes in three formats:
 - **Listen:** two voices, 10–30 minutes, with a drive edition for the road.
 - **Read:** a long read.
 
-**Live** isn't a format: it's talking any Lumen through.
+**Live** isn't a format: it's talking any Lumen through now. It's the live interaction from Learn, Live (slice 1) unchanged, now offered as a first-class choice next to the formats.
 
 Learn has three tabs: **Home · Lumens · Courses**. Everything is made from one brief and kept on one card per Lumen. It's built on **Studiolo's real screens and styles**, captured read-only from `studiolo`. Spec: [`docs/superpowers/specs/2026-10-22-learn-slice-2-one-lumen.md`](../../docs/superpowers/specs/2026-10-22-learn-slice-2-one-lumen.md).
 
@@ -15,14 +15,18 @@ Open `dist/learn-lumens-prototype.html`. It's published as a claude.ai artifact 
 
 1. **Home → the bar.**
    - Pick **Watch, Listen or Read**, type a question, and press **Make a Lumen**.
+   - Or pick **● Live**: the button becomes **Start live session**, and holding the mic (or Space) starts it as you speak, as in Learn, Live.
    - The line under the bar shows what it'll be made for and from: goal, topic, library items, what you've seen. **Tailor…** opens the whole brief.
-   - **Talk it through live instead** starts a live session.
+   - **Talk it through live instead** starts a live session from any of the three formats.
    - Watch and Read are made in the background, with a "Making · Watch" row. Listen starts playing in about half a minute.
 2. **Cards show formats.**
    - *Cooling without machines* has Listen and Read; **+ Watch** makes the missing one, from the same brief, onto the same card.
    - *How a malqaf moves air* has Watch, with **+ Listen** and **+ Read**.
    - **Live** on a watchable card talks it through.
-3. **Every Lumen page has the same switcher:** Watch · Listen · Read. Open *Cooling without machines*: it opens in Listen, and Read is one click away. Its Listen page links to the **drive edition**.
+3. **Every Lumen page has the same switcher:** Watch · Listen · Read | **● Live**.
+   - Open *Cooling without machines*: it opens in Listen, and Read is one click away. Its Listen page links to the **drive edition**.
+   - On the Watch page, Watch and Live are the player's two modes: **Live** goes live from the slide you're on, and **Watch** goes back to the recording. That replaces slice 1's separate Recording | Live switch.
+   - Live from Listen or Read starts a live session on the same question.
 4. **Lumens tab.**
    - Filter by format (All, Watch, Listen, Read, **Live sessions**), by state and by area.
    - Group **by date** or **by topic**.
