@@ -57,7 +57,7 @@ body { background: var(--surface-page); }
 .pl-tools .button { min-height: 32px; padding: 6px 12px; font-size: 13px; }
 /* "✦ Ask Loci /": Loci's own pill (graph.css .cp-reopen), placed in the head; it steps aside while the panel is open. */
 .pl-tools .pl-ask { position: static; animation: none; }
-.pl-tools .pl-ask.is-away { visibility: hidden; }
+.pl-tools .pl-ask[aria-expanded="true"] { box-shadow: var(--shadow-lift), 0 0 0 2px var(--surface-page), 0 0 0 3.5px var(--ink); }
 .pl-ic { width: 15px; height: 15px; flex: none; }
 .pl-linkbtn { all: unset; cursor: pointer; color: var(--accent); }
 .pl-linkbtn:hover { text-decoration: underline; }
@@ -142,6 +142,18 @@ body { background: var(--surface-page); }
 .pl-calnav .icb { box-shadow: inset 0 0 0 1px var(--line); }
 .pl-calnav .icb:disabled { opacity: .35; cursor: default; }
 .pl-calnav .icb:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+/* Calendar connections: greyed until they ship; hover or focus says "coming soon". */
+.pl-conn { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.pl-conn .lbl { margin-right: 2px; }
+.pl-soon { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-3); font-size: 12px; cursor: not-allowed; opacity: .75; }
+.pl-soon .pl-ic { width: 13px; height: 13px; }
+.pl-soon:hover, .pl-soon:focus-visible { opacity: 1; }
+.pl-soon:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.pl-conn.is-lt { margin: 0 0 6px; }
+.pl-soon-note { display: block; color: var(--ink-2); font-size: 12px; }
+.pl-tip { position: fixed; z-index: 90; padding: 5px 9px; border-radius: 4px; background: var(--ink); color: var(--on-ink); font-size: 12px; white-space: nowrap; pointer-events: none; box-shadow: var(--shadow-lift); }
+.pl-tip[hidden] { display: none; }
+.pl-conn + .pl-key2 { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line); }
 .pl-key2 { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
 .pl-key2 i { width: 14px; height: 9px; border-radius: 2px; margin-left: 8px; }
 .pl-key2 .av { background: var(--pl-avail); box-shadow: inset 0 0 0 1px var(--line); }
@@ -230,7 +242,6 @@ body { background: var(--surface-page); }
 .pl-cpwrap.is-docked { position: relative; inset: auto; width: auto; height: 100%; z-index: auto; pointer-events: auto; }
 /* Docked, Loci's own panel card (graph.css .cp) fills the side column: same card, head, thread and composer as on Loci. */
 .pl-cpwrap.is-docked .cp { inset: 0; }
-.pl-side:has(> .pl-cpwrap.is-docked) { border-left-color: transparent; }
 .pl-cpwrap .cp-thread { display: grid; gap: 14px; }
 .pl-cpwrap .cp-comp textarea { width: 100%; box-sizing: border-box; border: 0; background: none; resize: none; font: inherit; font-size: 13.5px; color: var(--ink); outline: none; }
 .pl-cpwrap .cp-comp .tools { display: flex; align-items: center; gap: 8px; }
@@ -391,6 +402,10 @@ body { background: var(--surface-page); }
 @media (max-width: 1180px) {
   .pl-read { grid-template-columns: minmax(0, 1fr); }
   .pl-toc { display: none; }
+}
+@media (max-width: 1360px) {
+  .pl-cal .pl-conn { display: none; }
+  .pl-cal .pl-conn + .pl-key2 { margin-left: auto; padding-left: 0; border-left: 0; }
 }
 @media (max-width: 1280px) {
   .pl-body { grid-template-columns: minmax(0, 1fr) 340px; }

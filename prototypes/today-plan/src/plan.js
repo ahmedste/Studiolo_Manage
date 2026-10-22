@@ -181,6 +181,7 @@
   const I = {
     driving: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
     cycling: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+    cal: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
     walking: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13" cy="4" r="1.6"/><path d="M10 21l2-6 3 3v3M8 12l3-4 3 2 3 2M11 8l-1 5"/></svg>',
     ears: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>',
     spark: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
@@ -203,7 +204,7 @@
   const wide = () => matchMedia("(min-width: 1000px)").matches;
   const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
       <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
-      <button class="cp-reopen pl-ask${S.panel ? " is-away" : ""}" type="button" data-copilot${S.panel ? ' tabindex="-1" aria-hidden="true"' : ""}><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
+      <button class="cp-reopen pl-ask" type="button" data-copilot aria-expanded="${S.panel}" aria-controls="pl-in"><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
       <time>${h12(S.now.m)}</time></div></header>`;
   const shownWeek = () => (S.view === "week" ? S.wk : Math.floor(S.sel / 7));
 
@@ -233,15 +234,17 @@
     if (side) { side.appendChild(cpw); cpw.classList.add("is-docked"); }
     else { if (cpw.parentElement !== document.body) document.body.appendChild(cpw); cpw.classList.remove("is-docked"); }
     document.documentElement.classList.toggle("pl-sheet", S.panel && !side);
-    $$(".pl-ask", root).forEach((b) => { b.classList.toggle("is-away", S.panel); if (S.panel) { b.setAttribute("tabindex", "-1"); b.setAttribute("aria-hidden", "true"); } else { b.removeAttribute("tabindex"); b.removeAttribute("aria-hidden"); } });
+    $$(".pl-ask", root).forEach((b) => b.setAttribute("aria-expanded", String(S.panel)));
   }
+  /** Gmail and Outlook calendars: shown so people know they're coming, greyed and not yet connectable. */
+  const CONNECT = (cls) => `<span class="${cls}" role="group" aria-label="Calendar connections, coming soon"><span class="lbl">Connect</span>${["Gmail", "Outlook"].map((n) => `<button type="button" class="pl-soon" aria-disabled="true" data-soon="${n}" aria-describedby="pl-soon-tip">${I.cal}${n}</button>`).join("")}</span>`;
   function calNav(w) {
     const thisW = Math.floor(S.now.d / 7), wk = S.view === "week";
     const title = wk ? `${w === thisW ? "This week" : "Next week"} <span>${weekRange(w)}</span>` : `${S.sel === S.now.d ? "Today" : DN[wd(S.sel)]} <span>${dateOf(S.sel).getDate()} ${MON[dateOf(S.sel).getMonth()]}</span>`;
     const canPrev = wk ? w > 0 : S.sel > 0, canNext = wk ? w < 1 : S.sel < 13;
     return `<div class="pl-calnav"><div class="pl-seg" role="group" aria-label="Calendar view"><button type="button" data-view="day" aria-pressed="${!wk}">Day</button><button type="button" data-view="week" aria-pressed="${wk}">Week</button></div>
       <button class="icb" type="button" data-step="-1" aria-label="${wk ? "Previous week" : "Previous day"}"${canPrev ? "" : " disabled"}>${I.prev}</button><button class="icb" type="button" data-step="1" aria-label="${wk ? "Next week" : "Next day"}"${canNext ? "" : " disabled"}>${I.next}</button>
-      <h2>${title}</h2><span class="pl-key2"><i class="av"></i>Learning time${S.routines.length ? '<i class="rt"></i>Routine' : ""}${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
+      <h2>${title}</h2>${CONNECT("pl-conn")}<span class="pl-key2"><i class="av"></i>Learning time${S.routines.length ? '<i class="rt"></i>Routine' : ""}${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
   }
   function hoursCol() {
     let h = ""; for (let k = 6; k <= 22; k++) if (!FOLDED[k - 6]) h += `<span style="top:${Y(k * 60)}px">${k}:00</span>`;
@@ -1026,7 +1029,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       <div class="pl-lt">${rows.map(([n, ws]) => `<div class="pl-lt-row"><span>${n}</span><span class="slots">${ws.map(([a, e]) => `<i>${hm(a)}–${hm(e)}</i>`).join("")}</span></div>`).join("")}
         <div class="pl-lt-row"><span>Routines</span><span class="slots">${S.routines.length ? S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)}</i>`).join("") : '<small>None yet. Tell Loci, for example “I drive to work 7:00 to 7:30”. Routines hold audio only and don’t count towards the daily maximum.</small>'}</span></div>
         <div class="pl-lt-row"><span>Each day</span><span><label for="pl-max">At most <select id="pl-max">${[60, 90, 120].map((m) => `<option value="${m}"${m === S.maxDay ? " selected" : ""}>${len(m)}</option>`).join("")}</select></label></span></div>
-        <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times in my calendar<small>Google Calendar, connected (simulated). Studiolo reads only busy and free, never event titles.</small></span></label>
+        <div class="pl-lt-row"><span>Calendars</span><span>${CONNECT("pl-conn is-lt")}<small class="pl-soon-note">Coming soon. Studiolo will read only busy and free, never event titles. The busy times on this calendar are sample data.</small></span></div>
+        <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times<small>Loci keeps sessions out of busy time and moves them when something new lands.</small></span></label>
         <label><input type="checkbox" id="pl-auto"${S.autoMove ? " checked" : ""}><span>When something new lands on a session, move the session to the next free time<small>Otherwise the session stays and is marked as clashing.</small></span></label></div>
       <div class="acts"><button class="button" type="button" data-dx>Done</button></div>`);
     dlg.addEventListener("change", (e) => {
@@ -1108,7 +1112,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       S.view = v.dataset.view; return render();
     }
     const stp = t.closest("[data-step]"); if (stp) { const k = +stp.dataset.step; if (S.view === "week") S.wk = Math.min(1, Math.max(0, S.wk + k)); else S.sel = Math.min(13, Math.max(0, S.sel + k)); return render(); }
-    if (t.closest("[data-copilot]")) return S.panel ? closePanel() : openPanel();
+    if (t.closest("[data-copilot]")) return S.panel ? input.focus() : openPanel();
     if (t.closest("[data-lt]")) return openLT();
     const sel = t.closest("[data-sel]"); if (sel) { S.sel = +sel.dataset.sel; S.view = "day"; return render(); }
     const st = t.closest("[data-start]"); if (st) { e.preventDefault(); return start(st.dataset.start); }
@@ -1128,6 +1132,12 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const blk = t.closest(".pl-b"); if (blk && !blk.classList.contains("is-drag")) { if (popEl && popEl.dataset.for === blk.dataset.b) return hidePop(); showPop(blk.dataset.b, blk, !!blk.dataset.ghost); if (popEl) popEl.dataset.for = blk.dataset.b; return; }
   });
   function openPanelKeepView() { S.panel = true; placePanel(); }
+  const tip = document.createElement("div"); tip.id = "pl-soon-tip"; tip.className = "pl-tip"; tip.setAttribute("role", "tooltip"); tip.hidden = true; document.body.appendChild(tip);
+  const showTip = (el) => { tip.textContent = `${el.dataset.soon} calendar · coming soon`; tip.hidden = false; const r = el.getBoundingClientRect(); tip.style.left = `${Math.max(8, Math.min(innerWidth - tip.offsetWidth - 8, r.left + r.width / 2 - tip.offsetWidth / 2))}px`; tip.style.top = `${r.bottom + 6}px`; };
+  const hideTip = () => { tip.hidden = true; };
+  for (const ev of ["pointerover", "focusin"]) document.addEventListener(ev, (e) => { const el = e.target.closest?.(".pl-soon"); if (el) showTip(el); });
+  for (const ev of ["pointerout", "focusout"]) document.addEventListener(ev, (e) => { if (e.target.closest?.(".pl-soon")) hideTip(); });
+  document.addEventListener("click", (e) => { const el = e.target.closest?.(".pl-soon"); if (el) { e.preventDefault(); e.stopPropagation(); showTip(el); } }, true);
   root.addEventListener("pointerdown", (e) => { const el = e.target.closest(".pl-col .pl-b"); if (el) dragStart(e, el); });
   window.addEventListener("pointermove", dragMove);
   window.addEventListener("pointerup", dragEnd);

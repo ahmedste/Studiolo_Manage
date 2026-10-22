@@ -12,8 +12,12 @@ The copilot here is **Loci**, as it is in the live app (`studiolo` @ `5fbb7f2`).
 
 - The **"✦ Ask Loci /"** pill opens it, and so does the `/` key. Escape leaves the field.
 - Open, it's Loci's own panel card (`graph.css` `.cp`): the "LOCI · TODAY" kicker with the fold button, a serif title, replies signed "✦ Loci", and Loci's composer.
-- The pill steps aside while the panel is open, and the fold button puts the panel away, as on the map.
+- On Today the pill stays put while Loci is open (with a ring to show it's open). Pressing it again puts you in the field, and the fold button puts the panel away. The hairline between the calendar and the side column stays too.
 - The rail and tab bar use the live names: Today, Learn, Commonplace, Loci. "From your Library" sessions now read "From your Commonplace".
+
+## Calendar connections (coming soon)
+
+**Gmail** and **Outlook** are shown greyed in the calendar toolbar (on screens 1360 px and wider) and under **Learning time → Calendars**. Hovering, focusing or clicking one says "… calendar · coming soon". The busy times in the prototype are sample data. Once connected, Studiolo would read only busy and free, never event titles.
 
 ## The layout
 
