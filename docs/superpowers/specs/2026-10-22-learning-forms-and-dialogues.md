@@ -1,6 +1,6 @@
 # Learning forms, and Dialogues (long-form audio)
 
-Status: **draft for owner review**, 22 October 2026. This is a study, a design and a prototype, not approved or built. Nothing has changed in `studiolo`. It builds on [Learn slice 1](2026-10-22-learn-live-slice-1.md) and [the Live Lumens design](2026-10-21-live-lumens-voice-design.md).
+Status: **draft for owner review**, 22 October 2026. **Partly superseded by [Learn slice 2](2026-10-22-learn-slice-2-one-lumen.md):** a Dialogue is now the **Listen** format of a Lumen. The Dialogues tab and the Home "Dialogue" switch are replaced by format choice. The rest of this design (the brief, the player, driving) stands. This is a study, a design and a prototype, not approved or built. Nothing has changed in `studiolo`. It builds on [Learn slice 1](2026-10-22-learn-live-slice-1.md) and [the Live Lumens design](2026-10-21-live-lumens-voice-design.md).
 
 - Prototype: [`prototypes/learn-dialogues/`](../../../prototypes/learn-dialogues/README.md). It's Learn slice 1 plus Dialogues, on the app's captured screens.
 - Sources:
