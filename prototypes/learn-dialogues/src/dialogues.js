@@ -35,6 +35,7 @@
     plus: svg('<path d="M12 5v14M5 12h14"/>'),
     x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
     open: svg('<path d="M14 5h5v5M19 5l-8 8M10 5H5v14h14v-5"/>'),
+    car: svg('<path d="M5 15.5v-4l2-5h10l2 5v4"/><path d="M3.5 15.5h17V19h-17z"/><path d="M5 11.5h14"/><circle cx="7.5" cy="17.2" r=".6" fill="currentColor"/><circle cx="16.5" cy="17.2" r=".6" fill="currentColor"/>'),
   };
 
   /* ================================================================ the learner's context (sample data) */
@@ -157,7 +158,59 @@
     canned: [[/inside|go in|madrasa|visit|open/i, [T("A", "Usually you can look into at least one of the madrasa courts from the main court, but access changes, so ask the guardian at the door. The corner doors are the ones to try."), T("B", "Worth it if you can. Right, back to where we were.")]]],
     askChip: "Can I go inside the madrasas?",
   };
-  const DIALOGUES = [COOL, HASSAN];
+  // The same idea, written for driving (rules below): one idea said three ways, signposted steps, a "where we are" line
+  // opening each chapter, at most one number, nothing to picture in detail, and a recall question only to think about.
+  const DRIVE = {
+    id: "cool-drive", title: "Cooling without machines, for the drive", q: "Can a house in Dubai stay cool the old way?", topic: "Climate-responsive design", goal: "thesis", pair: PAIRS["Climate-responsive design"][0], len: 10, context: "drive",
+    sources: ["notes", "fathy"], grounding: "mostly", skipKnown: true, when: "Today", status: "new", offline: true, at: 0, sample: true,
+    chapters: [
+      { title: "The one idea", point: "in Dubai a wind tower can't make the air colder, but it can make it move", turns: [
+        T("A", "This is the drive edition, so here's the deal. No diagrams, no numbers you need to hold on to, and nothing to look at. One idea, told three ways. I'm Nadia, the engineer."),
+        T("B", "And I'm Karim, the historian. Here's the one idea, so you have it from the start. In Dubai, a wind tower can't make the air colder. But it can make the air move. And moving air is what makes people comfortable."),
+        T("A", "Hold on to that. Moving air, not colder air. We'll take it in three steps. Why humidity changes the rules. What the old houses really did. And what it means for your thesis house."),
+      ] },
+      { title: "Why humidity changes the rules", point: "humid air won't take the water trick, which leaves moving air", turns: [
+        T("B", "Step one: humidity. Think of a hot, dry desert day. You splash water on your arms, and you feel cool straight away. That's the water taking heat with it as it dries."),
+        T("A", "Now think of the same splash on a sticky August day on the coast. It just sits on your skin. The air is already full of water, so there's nowhere for more to go."),
+        T("B", "So the old Egyptian trick, a wet jar at the bottom of the tower, works in dry Cairo, and barely works in humid Dubai."),
+        T("A", "Which leaves us with the one idea. If the water won't cool the air, the tower's job is to move it. A breeze still feels good, even when the air itself isn't any colder."),
+        T("B", "That's step one. Humidity takes away the water trick, and leaves us with moving air."),
+      ] },
+      { title: "What the old houses really did", point: "the tower looked after one room, and the house and the family's habits did the rest", turns: [
+        T("A", "Where we are: in humid air, the tower's job is to move air, not to chill it. Step two is what the old Dubai houses did with that."),
+        T("B", "Imagine walking into one of the old courtyard houses in Al Fahidi. The tower stands over one room, where the family sat through the hottest hours. Not the whole house. One room."),
+        T("A", "And the family moved with the day. The shady courtyard in the morning. The tower room at noon. The roof at night. The house worked because people moved through it."),
+        T("B", "Fathy says it well in the book in your library: these houses are systems, not gadgets. The thick, shaded walls and the deep courtyard did most of the quiet work.", { src: "fathy" }),
+        T("A", "So, step two in one line. The tower looked after one room. The house, and the family's habits, did the rest."),
+      ] },
+      { title: "What it means for your house", point: "shade first, one job for the tower, and a tower you can close", turns: [
+        T("B", "Where we are: humidity leaves us with moving air, and the old houses gave the tower one room to look after. Step three is your thesis house."),
+        T("A", "Start with shade. Always shade first. Then give the tower one job: move air through the main living room, in high and out to the courtyard."),
+        T("B", "And give the tower a door. Close it for the sticky summer months, open it for the cooler ones. When it's closed, ceiling fans keep the air moving."),
+        T("A", "Which is the one idea, a last time. In Dubai, a tower can't make the air colder. It can make it move. And for a good part of the year, that's what makes people comfortable."),
+      ] },
+      { title: "Before you arrive", point: "one question to think over", turns: [
+        T("B", "One question to think over for the rest of your drive. You don't need to say anything."),
+        T("A", "Why does a wet jar at the foot of a wind tower cool the air in Cairo, but hardly at all in Dubai?", { recall: true, think: true, answer: "Cairo's air is dry, so the water can evaporate and take heat with it. Dubai's air is already full of water, so it can't.", learner: "Because Cairo's air is dry and Dubai's is already full of water" }),
+        T("B", "Three things to keep. Moving air, not colder air. One room for the tower. And a tower you can close. Anything you marked is in your Library for when you're parked."),
+      ] },
+    ],
+    canned: [[/air.?condition|\bac\b|heat pump|compressor/i, [T("A", "In August, yes, your house will use it. The point is to need it for fewer months, and in fewer rooms."), T("B", "And when it's off, the tower and the courtyard make the house pleasant. Right, back to where we were.")]]],
+    askChip: "Why not just use air conditioning?",
+  };
+  const DIALOGUES = [COOL, DRIVE, HASSAN];
+  // Where it will be heard changes how it's written. Driving is the strictest: the listener's eyes and most of their
+  // attention belong to the road, so nothing may need a look, a pen or a reply, and any minute may be missed.
+  const CONTEXTS = { any: "Anywhere", walk: "Walking or cycling", drive: "Driving" };
+  const DRIVE_RULES = [
+    "One main idea, said plainly in the first minute, said again in other words in the middle and at the end",
+    "Signposted steps (\"three steps; step one…\"), and every chapter after the first opens with a one-line \"where we are\"",
+    "Each chapter makes sense on its own, so a minute missed at a junction doesn't lose the thread",
+    "At most one number per point, rounded; no lists longer than three; no tables, spellings or diagrams",
+    "Nothing to picture in detail, look at, write down or do; questions are to think about, never to answer",
+    "Short sentences, about 140 words a minute, calm voices: real disagreement, without raised stakes or sudden shifts",
+    "No sound effects or music, and nothing that sounds like a phone, a horn or a car alert",
+  ];
   const MARKS = [];
   const goalOf = (D) => GOALS.find((g) => g.id === D.goal) || GOALS[3];
   const srcOf = (D, id) => (LIB[D.topic] || []).find((s) => s[0] === id);
@@ -239,7 +292,7 @@
       P.k++; D.at = P.k;
       const tn = turnAt(D, it);
       if (it.last && tn?.hold) while (D.asking && tok === P.tok) { P.wait = "Thinking about your question…"; paint(); await sleep(250); }
-      if (it.last && tn?.recall && !tn.answered) { P.playing = false; P.tok++; return askRecall(D, tn); }
+      if (it.last && tn?.recall && !tn.answered) { P.playing = false; P.tok++; return tn.think || P.drive ? thinkRecall(D, tn) : askRecall(D, tn); }
     }
   }
   /** Speaks one sentence in its host's voice, lighting words as they're said. Resolves "done", or "cut" if silenced. */
@@ -331,7 +384,7 @@
       try {
         const heard = F.slice(Math.max(0, P.k - 4), P.k).map((it) => `${hostOf(D, turnAt(D, it)).name}: ${it.text}`).join(" ");
         const got = [];
-        await A.streamLines(`${A.LEARNER}\nThey're listening to a Studiolo Dialogue, "${D.title}", an audio conversation between ${D.pair.A.name} (${D.pair.A.role}) and ${D.pair.B.name} (${D.pair.B.role}). It is audio only.\n${goalLine(D)}\nThey just heard: ${heard}\nThey cut in with a question: "${text}"\nReply with JSON Lines only, 2 turns: {"who":"A" or "B","say":"…"}. The host best placed to answer answers directly in 30 to 60 words. The other adds one angle in under 35 words and ends with a short hand-back such as "Right, back to where we were." Spoken English, no lists, no invented quotations or statistics.`, (o) => { if (o.say) got.push({ who: o.who === "B" ? "B" : "A", say: String(o.say), aside: true }); });
+        await A.streamLines(`${A.LEARNER}\nThey're listening to a Studiolo Dialogue, "${D.title}", an audio conversation between ${D.pair.A.name} (${D.pair.A.role}) and ${D.pair.B.name} (${D.pair.B.role}). It is audio only.\n${goalLine(D)}\nThey just heard: ${heard}\nThey cut in with a question: "${text}"\nReply with JSON Lines only, 2 turns: {"who":"A" or "B","say":"…"}. ${D.context === "drive" || P.drive ? "They are DRIVING: keep each turn under 30 words, no numbers, nothing to picture." : ""} The host best placed to answer answers directly in 30 to 60 words. The other adds one angle in under 35 words and ends with a short hand-back such as "Right, back to where we were." Spoken English, no lists, no invented quotations or statistics.`, (o) => { if (o.say) got.push({ who: o.who === "B" ? "B" : "A", say: String(o.say), aside: true }); });
         if (got.length) turns = got;
       } catch (e) { aiFail(e); }
     }
@@ -360,6 +413,23 @@
     renderTx(); paint();
     A.setChips([tn.learner || tn.answer || "I'm not sure", "Skip the question"]);
     A.setState?.("listening", "Your turn");
+  }
+  /** Driving: the question is only to think about. A quiet pause, then the host gives the answer. Saying it aloud is optional. */
+  function thinkRecall(D, tn) {
+    P.recall = tn; renderTx();
+    A.setChips([tn.learner || tn.answer || "I'm not sure"]);
+    let n = 8;
+    P.wait = `Think it over… ${n}`; paint();
+    clearInterval(P.thinkT);
+    P.thinkT = setInterval(() => {
+      if (P.recall !== tn) return clearInterval(P.thinkT);
+      if (--n > 0) { P.wait = `Think it over… ${n}`; paint(); return; }
+      clearInterval(P.thinkT); P.recall = null; tn.answered = "thought";
+      const ch = D.chapters.find((c) => c.turns.includes(tn)), at = ch.turns.indexOf(tn) + 1;
+      ch.turns.splice(at, 0, { who: tn.who, aside: true, reveal: true, say: `Here's how I'd put it. ${tn.answer}` });
+      touch(D); renderTx(); P.wait = "";
+      P.k = flat(D).findIndex((it) => it.ci === D.chapters.indexOf(ch) && it.ti === at); play();
+    }, 1000);
   }
   async function answerRecall(text) {
     const D = P.D, tn = P.recall; if (!D || !tn) return;
@@ -418,6 +488,8 @@
       ["Sources", srcs.length ? `${srcs.map((s) => s[1]).join("; ")}. ${ground}` : "None chosen: general knowledge, said as such", "Library"],
       ["Already known", known.length ? known.map((k) => `${k[0]}: ${k[1]} (${k[2]})`).join("; ") + ". Don't re-explain; build on it." : D.skipKnown ? "Nothing yet on this topic" : "Not used", "Learn"],
       ["Length", `${D.len} min · ${D.chapters.length || (LENS.find((l) => l[0] === D.len) || LENS[1])[1]} chapters · audio only`, ""],
+      ["Heard", D.context === "drive" ? "Driving: written and played for the road" : CONTEXTS[D.context || "any"], "Your choice"],
+      ...(D.context === "drive" ? [["Written for driving", DRIVE_RULES.join(". ") + ".", "Studiolo"]] : []),
       ["Rules", "No invented quotations, page numbers or statistics; a host says when unsure", "Studiolo"],
     ];
   }
@@ -430,7 +502,8 @@ Filed under: ${areaOf(D.topic)} › ${D.topic}.
 Host A: ${D.pair.A.name}, ${D.pair.A.role}; their angle: ${D.pair.A.lens}.
 Host B: ${D.pair.B.name}, ${D.pair.B.role}; their angle: ${D.pair.B.lens}.
 ${srcs.length ? `Their own sources, from their library: ${srcs.map((s) => `"${s[1]}" (${s[2]})`).join(", ")}. ${ground}` : "No sources chosen: general knowledge, said as such."}
-${known.length ? `They already know (don't re-explain; build on it): ${known.map((k) => `${k[0]} "${k[1]}"`).join(", ")}.` : ""}`;
+${known.length ? `They already know (don't re-explain; build on it): ${known.map((k) => `${k[0]} "${k[1]}"`).join(", ")}.` : ""}
+${D.context === "drive" ? `It will be heard while DRIVING. Write for a listener whose eyes and most of their attention are on the road:\n- ${DRIVE_RULES.join("\n- ")}` : D.context === "walk" ? "It will be heard on a walk or a ride: nothing to look at, and chapters that survive a missed sentence." : ""}`;
   }
   /** Writes the plan, then each chapter, staying one chapter ahead of the listener. */
   async function write(D) {
@@ -441,7 +514,7 @@ ${known.length ? `They already know (don't re-explain; build on it): ${known.map
         await A.streamLines(`${promptHead(D)}
 Plan a Studiolo Dialogue: a ${D.len}-minute audio conversation between the two hosts that this learner will listen to while walking, cycling or driving. It is audio only: never mention slides, screens or diagrams.
 Question: "${D.q}"
-Reply with JSON Lines only, one object per line. First line: {"title":"at most 8 words","takeaway":"what they should come away with, one sentence"}. Then exactly ${nCh} lines, one per chapter: {"chapter":"title, at most 6 words","point":"what this chapter settles, one sentence"}. Chapter 1 frames the question for the goal and says what they already know and will be skipped. The second-to-last chapter applies everything to the goal. The last chapter is short and ends with a recall question.`, (o) => {
+Reply with JSON Lines only, one object per line. First line: {"title":"at most 8 words","takeaway":"what they should come away with, one sentence"}. Then exactly ${nCh} lines, one per chapter: {"chapter":"title, at most 6 words","point":"what this chapter settles, as a short clause a host could say aloud"}.${D.context === "drive" ? " It's for driving: chapter 1 states the one main idea, and every chapter stands on its own." : ""} Chapter 1 frames the question for the goal and says what they already know and will be skipped. The second-to-last chapter applies everything to the goal. The last chapter is short and ends with a recall question.`, (o) => {
           if (o.takeaway !== undefined || (o.title && !o.chapter)) { D.title = String(o.title || D.title); D.takeaway = o.takeaway; refresh(D); return; }
           if (o.chapter) { D.chapters.push({ title: String(o.chapter), point: String(o.point || ""), turns: [], state: "planned" }); touch(D); refresh(D); }
         });
@@ -461,10 +534,10 @@ The question: "${D.q}"
 The plan: ${D.chapters.map((c, i) => `${i + 1}. ${c.title}: ${c.point}`).join(" ")}
 Write chapter ${n + 1}, "${ch.title}": ${ch.point}
 ${prev ? `The previous chapter ended: ${prev}` : "This is the opening: each host says who they are in a few words, and host A frames the question for the goal."}
-Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","src":"exact title of one of their sources, only when this turn draws on it"}. Write ${per} turns of 25 to 70 words each, in natural spoken English with contractions. The hosts bring their different angles, and disagree at least once in a real way before settling it. No stage directions, no lists read aloud, no invented quotations, page numbers or statistics; when unsure, a host says so.${lastCh ? ` This is the last chapter: end with host A asking the listener one recall question in its own turn, written as {"who":"A","say":"the question","recall":true,"answer":"the ideal answer in one sentence"}.` : ""}`, (o) => {
+Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","src":"exact title of one of their sources, only when this turn draws on it"}. Write ${per} turns of ${D.context === "drive" ? "20 to 50" : "25 to 70"} words each, in natural spoken English with contractions.${D.context === "drive" && n ? ' Open with a one-sentence "Where we are:" line.' : ""} The hosts bring their different angles, and disagree at least once in a real way before settling it. No stage directions, no lists read aloud, no invented quotations, page numbers or statistics; when unsure, a host says so.${lastCh ? (D.context === "drive" ? ` This is the last chapter: host A asks one question only to think about (no answer expected), in its own turn, written as {"who":"A","say":"the question","recall":true,"think":true,"answer":"the ideal answer in one or two short sentences"}. Then host B closes with the three things to keep, and says their marks are in their library for when they're parked.` : ` This is the last chapter: end with host A asking the listener one recall question in its own turn, written as {"who":"A","say":"the question","recall":true,"answer":"the ideal answer in one sentence"}.`) : ""}`, (o) => {
           if (!o.say) return;
           const src = o.src ? (LIB[D.topic] || []).find((s) => String(o.src).toLowerCase().includes(s[1].toLowerCase().slice(0, 18)))?.[0] : undefined;
-          ch.turns.push({ who: o.who === "B" ? "B" : "A", say: String(o.say), src, recall: !!o.recall, answer: o.answer ? String(o.answer) : undefined, learner: o.answer ? String(o.answer) : undefined });
+          ch.turns.push({ who: o.who === "B" ? "B" : "A", say: String(o.say), src, recall: !!o.recall, think: !!o.think, answer: o.answer ? String(o.answer) : undefined, learner: o.answer ? String(o.answer) : undefined });
           touch(D); refresh(D);
         });
       } catch (e) { aiFail(e); }
@@ -475,7 +548,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   }
   /** No Claude: the sample Dialogue for that area, arriving at a realistic pace. */
   async function writeSample(D) {
-    const S0 = D.topic === "Islamic architecture" ? HASSAN : COOL;
+    const S0 = D.topic === "Islamic architecture" ? HASSAN : D.context === "drive" ? DRIVE : COOL;
     D.sample = true; D.title = S0.title; D.pair = S0.pair; D.canned = S0.canned; D.askChip = S0.askChip; D.chapters = []; touch(D); refresh(D);
     await sleep(900);
     S0.chapters.forEach((c) => D.chapters.push({ title: c.title, point: c.point, turns: [], state: "planned" }));
@@ -502,6 +575,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   }
 
   /* ================================================================ screens */
+  const ctxPill = (D) => (D.context === "drive" ? `<span class="dl-ctx">${IC.car}For driving</span>` : "");
+  const modeBtn = (D) => (D.context === "drive" ? `<button class="button button-quiet" type="button" data-dl-drive="${D.id}">${IC.car}Drive mode</button>` : `<button class="button button-quiet" type="button" data-dl-walk="${D.id}">${IC.walk}Walk mode</button>`);
   const voicesLine = (D) => `${esc(D.pair.A.name)}, ${esc(D.pair.A.role.toLowerCase())} · ${esc(D.pair.B.name)}, ${esc(D.pair.B.role.toLowerCase())}`;
   const goalPill = (D) => { const g = goalOf(D); return g.id === "none" ? "" : `<span class="dl-goal" title="${esc(g.title)}"><i aria-hidden="true">◎</i>For: ${esc(g.short)}</span>`; };
   const topicTag = (D) => A.tag({ anchor: [areaOf(D.topic), D.topic] });
@@ -518,13 +593,13 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   }
   const playLabel = (D) => (D.status === "in" || (P.D === D && P.k > 0) ? "Resume" : D.writing && flat(D).length < 2 ? "Listen when ready" : "Listen");
   function tile(D) {
-    return `<article class="dl-tile" data-dl-row="${D.id}" data-dl-open="${D.id}">${cover(D)}<div class="dl-tile-b">${topicTag(D)}<h3 class="dl-tile-t"><a class="lx-link" href="#dl-${D.id}" data-dl-open="${D.id}">${esc(D.title)}</a></h3><p class="dl-who">${voicesLine(D)}</p>${goalPill(D)}${progressBar(D)}
+    return `<article class="dl-tile" data-dl-row="${D.id}" data-dl-open="${D.id}">${cover(D)}<div class="dl-tile-b">${topicTag(D)}<h3 class="dl-tile-t"><a class="lx-link" href="#dl-${D.id}" data-dl-open="${D.id}">${esc(D.title)}</a></h3><p class="dl-who">${voicesLine(D)}</p>${goalPill(D)}${ctxPill(D)}${progressBar(D)}
       <div class="dl-tile-ft"><span>${lenLabel(D)} · ${D.chapters.length} chapters${D.offline ? " · offline" : ""}</span>${stateLine(D)}</div>
-      <div class="ll-acts"><button class="button" type="button" data-dl-play="${D.id}">${IC.play}${playLabel(D)}</button><button class="button button-quiet" type="button" data-dl-walk="${D.id}">${IC.walk}Walk mode</button></div></div></article>`;
+      <div class="ll-acts"><button class="button" type="button" data-dl-play="${D.id}">${IC.play}${playLabel(D)}</button>${modeBtn(D)}</div></div></article>`;
   }
   function row(D) {
-    return `<article class="dl-row" data-dl-row="${D.id}" data-dl-open="${D.id}">${cover(D, "sq")}<div class="dl-row-b">${topicTag(D)}<h3 class="dl-tile-t"><a class="lx-link" href="#dl-${D.id}" data-dl-open="${D.id}">${esc(D.title)}</a></h3><p class="dl-who">${voicesLine(D)} · ${lenLabel(D)} · ${D.chapters.length} chapters · ${esc(D.when)}${D.offline ? " · saved offline" : ""}</p>${goalPill(D)}${progressBar(D)}</div>
-      <div class="dl-row-r">${stateLine(D)}<div class="ll-acts"><button class="button" type="button" data-dl-play="${D.id}">${IC.play}${playLabel(D)}</button><button class="button button-quiet" type="button" data-dl-walk="${D.id}">${IC.walk}Walk mode</button></div></div></article>`;
+    return `<article class="dl-row" data-dl-row="${D.id}" data-dl-open="${D.id}">${cover(D, "sq")}<div class="dl-row-b">${topicTag(D)}<h3 class="dl-tile-t"><a class="lx-link" href="#dl-${D.id}" data-dl-open="${D.id}">${esc(D.title)}</a></h3><p class="dl-who">${voicesLine(D)} · ${lenLabel(D)} · ${D.chapters.length} chapters · ${esc(D.when)}${D.offline ? " · saved offline" : ""}</p>${goalPill(D)}${ctxPill(D)}${progressBar(D)}</div>
+      <div class="dl-row-r">${stateLine(D)}<div class="ll-acts"><button class="button" type="button" data-dl-play="${D.id}">${IC.play}${playLabel(D)}</button>${modeBtn(D)}</div></div></article>`;
   }
   function homeSection() {
     const list = DIALOGUES.slice(0, 3), mins = Math.round(list.reduce((s, D) => s + (D.writing ? D.len * 60 : lengthOf(D)), 0) / 60);
@@ -541,7 +616,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
       <div class="ll-tools"><span><span class="ll-label">For</span><span class="ll-seg" role="group">${[["all", "Any goal"], ...goals.map((g) => [g.id, g.short])].map(([v, l]) => `<button type="button" aria-pressed="${F0.goal === v}" data-dl-fgoal="${v}">${esc(l)}</button>`).join("")}</span></span></div>
       <div class="lx-filter"><div aria-label="Areas" class="colls lx-chips" role="group">${areas.map((a) => `<button type="button" aria-pressed="${F0.area === a}" class="${F0.area === a ? "on" : ""}" data-dl-farea="${esc(a)}">${esc(a)}${a === "All" ? "" : ` <span>${DIALOGUES.filter((D) => areaOf(D.topic) === a).length}</span>`}</button>`).join("")}</div></div>
       <div class="dl-rows">${list.length ? list.map(row).join("") : '<div class="lx-empty"><p>No Dialogues here yet. Make one for this area.</p></div>'}</div>`);
-    A.dock({ ctx: "Learn · Dialogues", chips: ["Make a Dialogue for my thesis", "What should I listen to on my walk?"] });
+    A.dock({ ctx: "Learn · Dialogues", chips: ["I'm about to drive for 20 minutes", "Make a Dialogue for my thesis", "What should I listen to on my walk?"] });
   }
 
   /* ---------- the composer: one brief, prefilled from context */
@@ -553,18 +628,18 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (/darwin|species|selection|evolution/.test(t)) return "Natural selection";
     return "Climate-responsive design";
   }
-  function compose({ q = "", topic } = {}) {
+  function compose({ q = "", topic, goal, context } = {}) {
     A.leaveStudio(); A.S.run++;
     topic = topic || (q ? detectTopic(q) : "Climate-responsive design");
     const g = GOALS.find((x) => x.topic === topic) || GOALS[3];
-    C = { q: q || (topic === "Climate-responsive design" ? "Can a house in Dubai stay cool the old way?" : ""), topic, goal: g.id, pair: 0, sources: new Set((LIB[topic] || []).slice(0, 3).map((s) => s[0])), grounding: "mostly", skipKnown: true, len: 20 };
+    C = { q: q || (topic === "Climate-responsive design" ? "Can a house in Dubai stay cool the old way?" : ""), topic, goal: goal || g.id, context: context || "any", pair: 0, sources: new Set((LIB[topic] || []).slice(0, 3).map((s) => s[0])), grounding: "mostly", skipKnown: true, len: 20 };
     A.S.view = "compose"; A.S.tab = "dialogues";
     A.learnShell(`${A.header("New Dialogue")}<div class="dl-compose"><div class="dl-c-main"></div><aside class="dl-c-side"></aside></div>`);
     drawCompose(); window.scrollTo(0, 0);
     A.dock({ ctx: "Learn · New Dialogue", chips: [] }); A.ld.hidden = true;
     const i = $("#dl-q"); if (i && !C.q) i.focus();
   }
-  function draft() { return { q: C.q, topic: C.topic, goal: C.goal, pair: pairsFor(C.topic)[C.pair] || pairsFor(C.topic)[0], sources: [...C.sources], grounding: C.grounding, skipKnown: C.skipKnown, len: C.len, chapters: [] }; }
+  function draft() { return { q: C.q, topic: C.topic, goal: C.goal, pair: pairsFor(C.topic)[C.pair] || pairsFor(C.topic)[0], sources: [...C.sources], grounding: C.grounding, skipKnown: C.skipKnown, len: C.len, context: C.context, chapters: [] }; }
   function drawCompose() {
     const main = $(".dl-c-main"); if (!main) return;
     const pairs = pairsFor(C.topic), lib = LIB[C.topic] || [], known = KNOWN[C.topic] || [];
@@ -572,6 +647,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     main.innerHTML = `
       <div class="dl-field"><label class="dl-l" for="dl-q">What should they talk through?</label><input id="dl-q" class="dl-q" autocomplete="off" value="${esc(C.q)}" placeholder="A question, an idea, or a claim to test"></div>
       <div class="dl-field"><p class="dl-l">What is it for?<span>Picked from your goal notes. It decides what the hosts steer toward and how they end.</span></p><div class="dl-opts" role="radiogroup">${chips("goal", GOALS.map((g) => [g.id, esc(g.short), g.id === "none" ? "No goal" : esc(g.due)]), C.goal)}</div></div>
+      <div class="dl-field"><p class="dl-l">Where will you listen?<span>Driving changes how it's written and how it plays.</span></p><div class="dl-opts" role="radiogroup">${chips("context", [["any", "Anywhere", "At a desk, on the sofa"], ["walk", "Walking or cycling", "Nothing to look at"], ["drive", "Driving", "Written and played for the road"]], C.context)}</div>
+        ${C.context === "drive" ? `<div class="dl-drive-rules"><p><b>Written for driving.</b> Your eyes and most of your attention are on the road, and you'll miss bits at junctions. So the writer is told:</p><ul>${DRIVE_RULES.map((r) => `<li>${esc(r)}</li>`).join("")}</ul><p>And it plays in Drive mode: no captions, steering-wheel buttons, asking by voice only, and a short recap after a call or a direction.</p></div>` : ""}</div>
       <div class="dl-field"><p class="dl-l">Where it lives<span>Filed under this topic in Learn and on Loci, beside its Lumens and long reads.</span></p><div class="dl-opts" role="radiogroup">${chips("topic", TOPICS.map(([a, t]) => [t, esc(t), esc(a)]), C.topic)}</div></div>
       <div class="dl-field"><p class="dl-l">Two voices<span>Two angles on the same idea. They'll disagree at least once.</span></p><div class="dl-pairs" role="radiogroup">${pairs.map((p, i) => `<button type="button" class="dl-pair" role="radio" aria-checked="${C.pair === i}" data-dl-c="pair" data-v="${i}"><b>${esc(p.label)}</b><span><i class="a">${esc(p.A.name[0])}</i>${esc(p.A.name)}, ${esc(p.A.role.toLowerCase())}: ${esc(p.A.lens)}</span><span><i class="b">${esc(p.B.name[0])}</i>${esc(p.B.name)}, ${esc(p.B.role.toLowerCase())}: ${esc(p.B.lens)}</span></button>`).join("")}</div></div>
       <div class="dl-field"><p class="dl-l">From your library<span>Items tagged ${esc(C.topic)}. Hosts name them when they use them.</span></p>
@@ -594,7 +671,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   function make(how) {
     if (!C?.q.trim()) return;
     const d = draft();
-    const D = { id: "d" + A.nextId(), title: C.q.replace(/\?$/, "").slice(0, 70), ...d, when: "Today", status: "making", offline: how === "later", at: 0, writing: true, listenNow: how === "now" };
+    const D = { id: "d" + A.nextId(), title: C.q.replace(/\?$/, "").slice(0, 70), ...d, when: "Today", status: "making", offline: how === "later" || C.context === "drive", at: 0, writing: true, listenNow: how === "now" };
     touch(D); DIALOGUES.unshift(D);
     write(D);
     if (how === "now") return openDialogue(D.id);
@@ -618,7 +695,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
           <div class="dl-bar" data-d="${D.id}"></div>
           <div class="dl-meta-row"><span data-dl-chap="${D.id}"></span><span class="dl-time" data-dl-time="${D.id}"></span></div>
           <div class="dl-ctl"><button class="dl-ib" type="button" data-dl-act="back" aria-label="Back 15 seconds" title="Back 15 seconds">${IC.back}</button><button class="dl-pp" type="button" data-dl-pp="${D.id}" aria-label="Play">${IC.play}</button><button class="dl-ib" type="button" data-dl-act="next" aria-label="Next chapter" title="Next chapter">${IC.next}</button>
-            <span class="sp"></span><button class="dl-txtb" type="button" data-dl-speed>1×</button><button class="dl-txtb" type="button" data-dl-act="mark" title="Save this moment to your Library">${IC.mark}Mark</button><button class="dl-txtb" type="button" data-dl-walk="${D.id}">${IC.walk}Walk mode</button></div>
+            <span class="sp"></span><button class="dl-txtb" type="button" data-dl-speed>1×</button><button class="dl-txtb" type="button" data-dl-act="mark" title="Save this moment to your Library">${IC.mark}Mark</button><button class="dl-txtb" type="button" data-dl-walk="${D.id}">${IC.walk}Walk</button><button class="dl-txtb" type="button" data-dl-drive="${D.id}">${IC.car}Drive</button></div>
         </div>
         <section class="dl-sub"><p class="ll-h">Chapters</p><ol class="dl-chapters" data-d="${D.id}"></ol></section>
         <section class="dl-sub"><p class="ll-h">Other ways into ${esc(D.topic)}</p><div class="dl-ways">${ways(D)}</div></section>
@@ -633,7 +710,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   }
   function renderHead() {
     const D = cur, h = $(".dl-head"); if (!h) return;
-    h.innerHTML = `<div class="dl-head-l"><p class="dl-kick">${IC.phones}Dialogue · two voices${D.sample ? " · sample, abridged" : ""}</p><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}<span>${lenLabel(D)} · ${D.chapters.length || "…"} chapters</span>${stateLine(D)}</div></div>
+    h.innerHTML = `<div class="dl-head-l"><p class="dl-kick">${IC.phones}Dialogue · two voices${D.context === "drive" ? " · drive edition" : ""}${D.sample ? " · sample, abridged" : ""}</p><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}${ctxPill(D)}<span>${lenLabel(D)} · ${D.chapters.length || "…"} chapters</span>${stateLine(D)}</div></div>
       <div class="dl-head-r"><button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button></div>`;
   }
   function renderChapters() {
@@ -654,14 +731,14 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
         const h = hostOf(D, tn), ss = sentences(tn.say);
         const sp = ss.map((s) => { const kk = k++; return `<span class="dl-s${P.D === D && kk < P.k ? " said" : ""}" data-k="${kk}" role="button" tabindex="0">${esc(s)} </span>`; }).join("");
         const src = tn.src && srcOf(D, tn.src);
-        return `<div class="dl-turn ${tn.who === "B" ? "b" : "a"}${tn.aside ? " aside" : ""}${tn.cont ? " cont" : ""}${tn.recall ? " recall" : ""}">${tn.cont ? "" : `<div class="who"><span class="dl-disc ${tn.who === "B" ? "b" : "a"}">${esc(h.name[0])}</span>${esc(h.name)}<small>${esc(h.role)}</small>${tn.aside ? '<em>Answering you</em>' : ""}${tn.recall ? "<em>Recall</em>" : ""}</div>`}<p>${sp}</p>${src ? `<span class="dl-cite">${IC.open}${esc(src[1])}</span>` : ""}</div>`;
+        return `<div class="dl-turn ${tn.who === "B" ? "b" : "a"}${tn.aside ? " aside" : ""}${tn.cont ? " cont" : ""}${tn.recall ? " recall" : ""}">${tn.cont ? "" : `<div class="who"><span class="dl-disc ${tn.who === "B" ? "b" : "a"}">${esc(h.name[0])}</span>${esc(h.name)}<small>${esc(h.role)}</small>${tn.reveal ? "<em>The answer</em>" : tn.aside ? "<em>Answering you</em>" : ""}${tn.recall ? "<em>Recall</em>" : ""}</div>`}<p>${sp}</p>${src ? `<span class="dl-cite">${IC.open}${esc(src[1])}</span>` : ""}</div>`;
       }).join("");
       const pend = c.state === "writing" ? '<p class="dl-pend"><span class="lx-dot" aria-hidden="true"></span>Writing this chapter…</p>' : c.state === "waiting" ? `<p class="dl-pend">Written when you reach chapter ${ci}. Chapters you never reach aren't written or voiced.</p>` : c.state === "planned" && !c.turns.length ? '<p class="dl-pend">Planned</p>' : "";
       return `<h4 class="dl-chh"><span>Chapter ${ci + 1}</span>${esc(c.title)}</h4>${turns}${pend}`;
     }).join("");
     const recall = P.D === D && P.recall ? `<div class="dl-yourturn"><b>Your turn.</b> Answer out loud (hold the mic or Space), type it below, or say “skip”.</div>` : "";
     const tn = D.chapters.flatMap((c) => c.turns).find((t) => t.recall);
-    const recap = D.status === "played" ? `<div class="dl-recap"><p class="dl-recap-h">Finished · ${minLabel(D.total)}</p><ul><li><b>Toward</b> ${esc(goalOf(D).title)}</li><li><b>Recall</b> ${tn?.answered === "right" ? "Answered. Noted as evidence on " + esc(D.topic) + " (retrieved)." : tn?.answered === "partly" ? "Partly. It'll come back in a review." : "Skipped."}</li><li><b>Marks</b> ${MARKS.filter((m) => m.d === D.id).length} saved to your Library</li>${D.asked ? `<li><b>Questions</b> ${D.asked} answered on the way</li>` : ""}</ul></div>` : "";
+    const recap = D.status === "played" ? `<div class="dl-recap"><p class="dl-recap-h">Finished · ${minLabel(D.total)}</p><ul><li><b>Toward</b> ${esc(goalOf(D).title)}</li><li><b>Recall</b> ${tn?.answered === "right" ? "Answered. Noted as evidence on " + esc(D.topic) + " (retrieved)." : tn?.answered === "partly" ? "Partly. It'll come back in a review." : tn?.answered === "thought" ? "Asked to think over while driving; the answer was given. It'll come back in a review." : "Skipped."}</li><li><b>Marks</b> ${MARKS.filter((m) => m.d === D.id).length} saved to your Library</li>${D.asked ? `<li><b>Questions</b> ${D.asked} answered on the way</li>` : ""}</ul></div>` : "";
     body.innerHTML = (html || '<p class="dl-pend"><span class="lx-dot" aria-hidden="true"></span>Planning…</p>') + recall + recap;
     void F;
   }
@@ -698,7 +775,74 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     try { navigator.wakeLock?.request("screen").then((l) => (P.lock = l)).catch(() => {}); } catch { /* not offered */ }
     const F = flat(P.D); showCap(F[Math.min(P.k, F.length - 1)], P.cap.n); paint();
   }
-  function closeWalk() { $$(".dl-walk").forEach((w) => w.remove()); P.walk = false; try { P.lock?.release(); } catch { /* gone */ } P.lock = null; }
+  /* ---------- drive mode: set up before moving, then nothing to read; the wheel's buttons and your voice do the rest */
+  function openDrive(D) {
+    D = D || P.D || cur; if (!D) return;
+    if (P.D !== D) { if (P.D) stop(); P.D = D; P.k = D.at || 0; } else pause();
+    closeWalk(); P.walk = true; P.drive = true;
+    D.offline = true;
+    const fit = D.context === "drive";
+    const w = document.createElement("div"); w.className = "dl-walk dl-drive"; w.dataset.d = D.id; w.setAttribute("role", "dialog"); w.setAttribute("aria-label", "Drive mode");
+    w.innerHTML = `<div class="dl-w-top"><span>${IC.car}Drive mode</span><button class="dl-w-x" type="button" data-dl-act="walkx" aria-label="Close drive mode">${IC.x}</button></div>
+      <div class="dl-d-ready">
+        <p class="dl-w-title">${esc(D.title)}</p>
+        <p class="dl-d-h">Set it up before you move.</p>
+        <ul class="dl-d-list">
+          <li><b>Saved for offline.</b> Tunnels and car parks won't stop it.</li>
+          <li><b>The steering-wheel buttons work.</b> Play pauses, Back says that again, Next skips to the next chapter.</li>
+          <li><b>You won't need the screen.</b> Press the car's voice button and say “Mark that”, or ask the hosts a question. Calls and directions pause it, and it picks up with a one-line recap.</li>
+          ${fit ? "" : '<li class="warn"><b>This one wasn\'t written for driving.</b> It has numbers to hold and things to picture. A drive edition says the same thing in a way that survives a busy junction.</li>'}
+        </ul>
+        <div class="dl-d-go">${fit ? "" : '<button class="dl-w-mark" type="button" data-dl-act="drive-edition">Make a drive edition</button>'}<button class="dl-d-start" type="button" data-dl-act="drive-go">${IC.play}${fit ? "Start" : "Play it anyway"}</button></div>
+      </div>
+      <div class="dl-d-live" hidden>
+        <p class="dl-d-ch" data-dl-chap="${D.id}"></p>
+        <button class="dl-d-pp" type="button" data-dl-pp="${D.id}" aria-label="Play">${IC.play}</button>
+        <p class="dl-w-who" data-dl-speaker="${D.id}"></p>
+        <p class="dl-w-wait" data-dl-wait="${D.id}" hidden></p>
+        <div class="dl-d-row"><button type="button" data-dl-act="again">${IC.back}Say that again</button><button type="button" data-dl-act="mark">${IC.mark}Mark</button><button type="button" data-dl-act="next">${IC.next}Next chapter</button></div>
+        <button class="ll-mic dl-w-mic dl-d-mic" type="button" data-mic="dock" aria-label="Hold to ask the hosts">${A.I.mic}<span>Hold to ask</span></button>
+        <p class="dl-w-note">In the car these are the wheel's buttons and its voice button (in the app, not a web page). Here the keyboard stands in: ← say that again · P play or pause · → next chapter · M mark · hold Space to ask. <button type="button" class="dl-d-call" data-dl-act="call">Simulate a phone call</button></p>
+      </div>`;
+    document.body.appendChild(w);
+    A.setChips([D.askChip || "What's the strongest objection to this?", "Mark that"]);
+    paint();
+  }
+  function driveGo() { const w = $(".dl-drive"); if (!w) return; $(".dl-d-ready", w).hidden = true; $(".dl-d-live", w).hidden = false; play(); try { navigator.wakeLock?.request("screen").then((l) => (P.lock = l)).catch(() => {}); } catch { /* not offered */ } }
+  /** Say that again: back to the start of what's being said, or to the turn before if this one has only just begun. */
+  function sayAgain() {
+    const F = flat(P.D), it = F[Math.min(P.k, F.length - 1)]; if (!it) return;
+    let k = F.findIndex((x) => x.ci === it.ci && x.ti === it.ti);
+    if (k === P.k && P.cap.n < 4 && k > 0) { const prev = F[k - 1]; k = F.findIndex((x) => x.ci === prev.ci && x.ti === prev.ti); }
+    seek(k); if (!P.playing) play();
+  }
+  /** One short spoken line outside the script: confirmations and recaps, so the driver never has to look. */
+  function speakLine(who, text) {
+    return new Promise((res) => {
+      const ms = (text.split(/\s+/).length * 60000) / (WPM * 1.1) + 400;
+      let done = false; const end = () => { if (!done) { done = true; clearTimeout(t); res(); } };
+      const t = setTimeout(end, ms * 2 + 1500);
+      const ok = A.S.audio && utter(text, who, () => {}, (e) => (e && e.error !== "interrupted" && e.error !== "canceled" ? setTimeout(end, ms) : end()));
+      if (!ok) setTimeout(end, ms);
+    });
+  }
+  async function confirmAloud(text) { const was = P.playing; pause(); P.wait = text; paint(); await speakLine("A", text); P.wait = ""; if (was) play(); else paint(); }
+  /** A call or a navigation prompt takes the audio. When it gives it back: the start of the turn that was cut, after one line of bearings. */
+  async function interrupted(reason = "Phone call") {
+    if (!P.D) return;
+    const was = P.playing; pause();
+    const w = $(".dl-drive"); if (w) w.dataset.call = "true";
+    P.wait = `${reason} · paused`; paint();
+    await sleep(3500);
+    if (w) w.dataset.call = "false";
+    const D = P.D, F = flat(D), it = F[Math.min(P.k, F.length - 1)]; if (!D || !it) return;
+    P.k = F.findIndex((x) => x.ci === it.ci && x.ti === it.ti);
+    const ch = D.chapters[it.ci];
+    P.wait = "Welcome back"; paint();
+    await speakLine("B", `Welcome back. We were on ${ch.title.toLowerCase()}: ${String(ch.point || "").replace(/\.$/, "")}. Picking up where we were.`);
+    P.wait = ""; if (was) play(); else paint();
+  }
+  function closeWalk() { $$(".dl-walk").forEach((w) => w.remove()); P.walk = false; P.drive = false; try { P.lock?.release(); } catch { /* gone */ } P.lock = null; }
 
   /* ---------- the mini player: keeps playing while you move round the app */
   const miniEl = document.createElement("div");
@@ -720,6 +864,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const listening = A.S.view === "dialogue" || P.walk;
     if (/^make a dialogue/i.test(text.trim())) { pause(); closeWalk(); compose({ q: /thesis/i.test(text) ? "Can a house in Dubai stay cool the old way?" : "" }); return true; }
     if (!listening) {
+      if (/\bdriv/i.test(text)) { const D = DIALOGUES.find((x) => x.context === "drive" && !x.writing); if (D) openDrive(D); else compose({ context: "drive" }); return true; }
       if (A.S.view === "dialogues" && /listen to on my walk|listen to next/i.test(text)) { A.toast("Try “Cooling without machines”.", "It's for your thesis, about 9 minutes left, and saved for offline. Then “Reading Sultan Hassan” before Cairo."); return true; }
       return false;
     }
@@ -727,7 +872,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const t = text.trim().toLowerCase();
     if (/^(pause|stop|hold on|wait)\b/.test(t)) { pause(); return true; }
     if (/^(play|carry on|go on|continue|resume)\b/.test(t)) { if (/again/.test(t)) P.k = 0; play(); return true; }
-    if (/mark (that|this)|save that/.test(t)) { mark(); return true; }
+    if (/mark (that|this)|save that/.test(t)) { mark(); if (P.drive) confirmAloud("Marked."); return true; }
+    if (/say that again|^again\b/.test(t)) { sayAgain(); return true; }
     if (/next chapter|^skip(?! the question)/.test(t) && !P.recall) { nextCh(); return true; }
     if (/^(go back|back 15|say that again|repeat)/.test(t)) { back15(); return true; }
     if (/^slower/.test(t)) { setSpeed(P.speed > 1 ? 1 : 0.85); return true; }
@@ -736,7 +882,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     ask(text); return true;
   }
   function onClick(e) {
-    const el = e.target.closest("[data-dl-pp], [data-dl-play], [data-dl-walk], [data-dl-open], [data-dl-new], [data-dl-act], [data-dl-c], [data-dl-make], [data-dl-ch], [data-dl-tab], [data-dl-farea], [data-dl-fgoal], [data-dl-read], [data-dl-live], [data-dl-k], .dl-s, a[href^='#dl-']");
+    const el = e.target.closest("[data-dl-pp], [data-dl-play], [data-dl-walk], [data-dl-drive], [data-dl-open], [data-dl-new], [data-dl-act], [data-dl-c], [data-dl-make], [data-dl-ch], [data-dl-tab], [data-dl-farea], [data-dl-fgoal], [data-dl-read], [data-dl-live], [data-dl-k], .dl-s, a[href^='#dl-']");
     if (!el) return false;
     const d = el.dataset;
     if (e.target.closest("input, label")) return false;
@@ -744,6 +890,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (d.dlPp !== undefined) { const D = DIALOGUES.find((x) => x.id === d.dlPp); if (P.D === D && P.playing) pause(); else play(D); return true; }
     if (d.dlPlay) { const D = DIALOGUES.find((x) => x.id === d.dlPlay); if (D.writing && flat(D).length < 2) { D.listenNow = true; openDialogue(D.id); return true; } openDialogue(D.id, { autoplay: !(P.D === D && P.playing) }); return true; }
     if (d.dlWalk) { openWalk(DIALOGUES.find((x) => x.id === d.dlWalk)); return true; }
+    if (d.dlDrive) { openDrive(DIALOGUES.find((x) => x.id === d.dlDrive)); return true; }
     if (d.dlNew !== undefined) { compose({ topic: d.dlNew || undefined }); return true; }
     if (d.dlC) { const v = d.v; if (d.dlC === "topic") { C.topic = v; C.pair = 0; C.sources = new Set((LIB[v] || []).slice(0, 3).map((s) => s[0])); C.goal = (GOALS.find((g) => g.topic === v) || GOALS[3]).id; } else C[d.dlC] = d.dlC === "pair" || d.dlC === "len" ? +v : v; drawCompose(); return true; }
     if (d.dlMake) { make(d.dlMake); return true; }
@@ -759,13 +906,22 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (el.matches("a[href^='#dl-']")) { openDialogue(el.getAttribute("href").slice(4)); return true; }
     const act = d.dlAct;
     if (["back", "next", "mark"].includes(act)) focusCur();
-    if (act === "back") back15(); else if (act === "next") nextCh(); else if (act === "mark") mark();
-    else if (act === "walk") openWalk(); else if (act === "walkx") { closeWalk(); paint(); } else if (act === "stop") stop();
+    if (act === "back") back15(); else if (act === "next") nextCh(); else if (act === "mark") { mark(); if (P.drive) confirmAloud("Marked."); }
+    else if (act === "again") sayAgain(); else if (act === "drive-go") driveGo(); else if (act === "call") interrupted();
+    else if (act === "drive-edition") { const D = P.D; stop(); compose({ q: D.q, topic: D.topic, goal: D.goal, context: "drive" }); }
+    else if (act === "walk") (P.D?.context === "drive" ? openDrive : openWalk)(); else if (act === "walkx") { closeWalk(); paint(); } else if (act === "stop") stop();
     else if (act === "offline") { cur.offline = !cur.offline; renderHead(); if (cur.offline) A.toast("Saved for offline.", `${esc(cur.title)}: about ${Math.max(1, Math.round(lengthOf(cur) / 60))} MB. It plays without a connection, on a plane or underground.`); }
     if (el.matches("[data-dl-speed]")) speed();
     return true;
   }
-  document.addEventListener("keydown", (e) => { const s = e.target.closest?.(".dl-s, .dl-bar i"); if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); s.click(); } if (e.key === "Escape" && P.walk) { closeWalk(); paint(); } });
+  document.addEventListener("keydown", (e) => { const s = e.target.closest?.(".dl-s, .dl-bar i"); if (s && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); s.click(); } if (e.key === "Escape" && P.walk) { closeWalk(); paint(); }
+    // In drive mode the keyboard stands in for the steering-wheel buttons.
+    if (P.drive && $(".dl-drive .dl-d-live:not([hidden])") && !e.target.closest?.("input, textarea") && !e.repeat) {
+      const k = e.key.toLowerCase();
+      if (k === "arrowleft") sayAgain(); else if (k === "arrowright") nextCh(); else if (k === "p" || k === "k") (P.playing ? pause() : play());
+      else if (k === "m") { mark(); confirmAloud("Marked."); } else return;
+      e.preventDefault();
+    } });
   document.addEventListener("input", (e) => { if (e.target.id === "dl-q" && C) { C.q = e.target.value; drawSide(); } });
   document.addEventListener("change", (e) => {
     if (!C) return;

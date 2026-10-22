@@ -139,6 +139,52 @@ It differs from a podcast in three ways:
 | DL-9 | Recall evidence | Kept as candidate evidence on the recap until the Learner Model exists |
 | DL-10 | Goals | Dialogues need the goal record from the learner-context design (L-D decisions). Until it exists, the brief offers My Focus topics as goals. |
 
+### 2.7 Dialogues for driving
+
+**Why driving is its own case.** A driver's eyes and most of their attention belong to the road, and their attention comes and goes: a junction, a merge or a child in the back takes a minute away. They can't look at anything, write anything down or scrub back through a waveform. Calls and navigation prompts take the audio without warning. Connectivity drops in tunnels and car parks. Distraction guidelines for in-car devices (NHTSA's visual-manual guidelines, for example) limit single glances to about 2 seconds and a whole task to about 12 seconds of looking. Learning content has to be designed to need **none**.
+
+So a Dialogue made for driving changes in two places: how it's written, and how it plays. In the prototype this is the **"Where will you listen?"** choice in the brief (Anywhere / Walking or cycling / Driving) and **Drive mode** in the player. *Cooling without machines, for the drive* is the sample.
+
+**How it's written (the writer is told):**
+1. **One main idea**, said plainly in the first minute, said again in other words in the middle and at the end. A driver who misses half still leaves with it.
+2. **Signposted steps** ("three steps; step one…"), and every chapter after the first opens with a one-line **"Where we are"**.
+3. **Each chapter stands on its own**, so a minute missed at a junction doesn't lose the thread.
+4. **At most one number per point, rounded.** No lists longer than three, and no tables, spellings or diagrams.
+5. **Nothing to picture in detail, look at, write down or do.** Questions are to think about, never to answer.
+6. **Short sentences**, about 140 words a minute, and calm voices. The two hosts still disagree, but without raised stakes or sudden shifts. Emotional spikes take attention too.
+7. **No sound effects or music**, and nothing that sounds like a phone, a horn or a car alert.
+8. **The ending** is a recall question to *think* about, a short silence, the answer, and "three things to keep". The marks wait in the Library "for when you're parked".
+
+**How it plays (Drive mode):**
+
+| Moment | What happens |
+|---|---|
+| Before moving | A setup screen: "Set it up before you move." It saves for offline automatically and says which buttons do what. A Dialogue that wasn't written for driving says so, and offers **Make a drive edition** (the same brief, context = driving) or "Play it anyway". |
+| Playing | No captions or text. One play/pause target about 220 px wide, the chapter, who's speaking, and three large buttons: **Say that again**, **Mark**, **Next chapter**. The screen can be off. |
+| Steering-wheel and headphone buttons | Play/pause; Back = **say that again** (to the start of the current turn, or the one before if it has just begun); Next = next chapter. On the web these come through the Media Session API. |
+| Marking and asking | By voice: the car's voice button, then "Mark that" (spoken confirmation: "Marked.") or a question. Answers are shorter while driving: under 30 words a turn, no numbers. |
+| A call or a direction | Calls pause. Navigation prompts should duck the volume rather than pause. When the audio comes back it rewinds to the start of the interrupted turn, after one line of bearings: "Welcome back. We were on *chapter*: *its point*." Those lines can be voiced ahead, one per chapter, so they're instant. |
+| Recall | Asked, then 8 seconds of quiet ("think it over"), then the host gives the answer. Saying it aloud is optional. The recap records "asked to think over while driving" and schedules it for a review. |
+| Arriving | Proposed, not in the prototype: **Fit my drive**. You give the drive time, and it queues chapters (or Dialogues) to end on a chapter boundary. If you arrive mid-chapter, next time starts with the recap line. |
+
+**What a web app can't do, and the native path.**
+- **What the web gets:** played from a phone, a web app reaches the car over Bluetooth. With the Media Session API it gets lock-screen and steering-wheel play, pause, previous and next.
+- **What needs a native app:**
+  - **Showing up on the car's screen.** That means CarPlay, as an audio app using Apple's templates and its CarPlay audio entitlement, or Android Auto, as a media app.
+  - **Taking voice from the car's voice button.** That means App Intents for Siri, or Assistant App Actions on Android, e.g. "Hey Siri, mark that in Studiolo".
+  - **Reliable background playback on iPhone.**
+- **Consequence:** Drive mode is the strongest case for a native shell. Until then, marking and asking in the car need the on-screen button, which is a glance; the setup screen should say so honestly.
+
+**Decisions:**
+
+| # | Decision | Recommendation |
+|---|---|---|
+| DL-11 | Drive editions | A separate edition made from the same brief with context = driving, not a setting on an existing Dialogue. The writing has to change, not only the player. **Make a drive edition** from any Dialogue. |
+| DL-12 | Native shell | Plan CarPlay and Android Auto audio apps, with voice intents, as the first native work if Drive mode tests well. Web plus Media Session until then. |
+| DL-13 | Interruptions | Pause for calls, duck for directions. Resume at the turn's start with a pre-voiced "where we were" line per chapter. |
+| DL-14 | Fit my drive | Yes, after v1: the queue ends on chapter boundaries |
+| DL-15 | Safety | No speed detection and no prompts to touch the screen while moving. Drive mode is the learner's choice, set up before the drive, and the copy never invites screen use on the move. |
+
 ## 3. Other forms worth adding
 
 Ranked by fit with Studiolo (goal, topic, Library, Learner Model) and by cost. The first two close the learning loop. The four existing and proposed forms are mostly *intake*; these make the learner *produce* something, which is what moves a concept from `exposed` to `self_explained` and `retrieved`.
@@ -166,7 +212,8 @@ Ranked by fit with Studiolo (goal, topic, Library, Learner Model) and by cost. T
   - Walk mode and the mini player;
   - recall with feedback and a recap;
   - journal lines on Loci;
-  - "other ways in" across Lumens, long reads and live sessions.
+  - "other ways in" across Lumens, long reads and live sessions;
+  - the drive edition and Drive mode: drive writing rules in the brief, the setup screen, keyboard keys for the wheel's buttons, spoken "Marked.", a simulated call with the "welcome back" recap, the think-only recall, and "Make a drive edition" from a Dialogue not written for driving.
 - **Doesn't:**
   - real ElevenLabs voices (two browser voices stand in);
   - a microphone;
@@ -174,3 +221,5 @@ Ranked by fit with Studiolo (goal, topic, Library, Learner Model) and by cost. T
   - offline storage;
   - real goal records;
   - a long-read reader (it links to one).
+  - CarPlay, Android Auto, Media Session controls or the car's voice button;
+  - Fit my drive.

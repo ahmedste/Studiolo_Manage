@@ -15,12 +15,20 @@ Open `dist/learn-dialogues-prototype.html`. It's published as a claude.ai artifa
 3. **Walk mode:** big controls and nothing to read. Mark the moment, or hold to ask.
 4. **Move round the app** (Home, Library, the Graph). The **mini player** (top right) keeps playing.
 5. **The end:** jump to *Before you go*. Nadia asks a recall question. Answer by holding the mic, typing, or pressing the suggested answer. The recap notes the answer as evidence on the topic.
-6. **Make one:**
+6. **For driving:**
+   - Play *Cooling without machines, for the drive* in **Drive mode**, or press "I'm about to drive for 20 minutes" in the Dialogues tab.
+   - A setup screen comes first ("Set it up before you move"). Then: no captions, one big play/pause, and **Say that again**, **Mark** and **Next chapter**.
+   - The keyboard stands in for the wheel: ← say that again, P play or pause, → next chapter, M mark (with a spoken "Marked."), hold Space to ask.
+   - **Simulate a phone call** to hear the "welcome back" recap.
+   - The ending is a question to think over, then the answer. No reply is needed.
+   - Drive mode on a Dialogue that wasn't written for driving offers **Make a drive edition**.
+7. **Make one:**
    - **New Dialogue** opens the brief, prefilled from your context: the goal it serves, the topic it lives under, two voices, the Library items it draws on, and what you've already seen (so it skips it). The length is 10, 20 or 30 minutes.
    - *What the writer gets* shows the exact brief.
    - **Make it and listen now** starts playing within about half a minute, while later chapters are still being written. **Make it for later** writes the first two chapters; the rest is written as you listen.
+   - **Where will you listen?** Choosing *Driving* shows the driving rules the writer gets, and the result plays in Drive mode.
    - On Home, the bar's **Dialogue** switch plans one from your question.
-7. **Other ways in:** each Dialogue links to the Lumens, long reads and live session on the same topic. Lumen cards on that topic gain a **Dialogue** button.
+8. **Other ways in:** each Dialogue links to the Lumens, long reads and live session on the same topic. Lumen cards on that topic gain a **Dialogue** button.
 
 Everything from Learn, Live still works: Lumen | Live on Home, Go live, live sessions and courses.
 
@@ -31,7 +39,7 @@ Everything from Learn, Live still works: Lumen | Live on Home, Go live, live ses
 - **Simulated:**
   - Two browser speech voices stand in for two ElevenLabs voices. Mute them with the talk bar's speaker; the words still move.
   - There's no microphone: holding the mic "says" the first suggestion.
-  - "Save for offline", lock-screen and headphone controls are described, not real.
+  - "Save for offline", lock-screen and steering-wheel controls, the car's voice button and CarPlay or Android Auto are described, not real.
   - Goals, Library items and Dialogues are sample data. *Cooling without machines* is an abridged 8-minute version of a 20-minute Dialogue.
 
 ## Build
