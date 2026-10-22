@@ -215,9 +215,8 @@
     const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
     layout(days);
     main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
-      <aside class="pl-side" aria-label="${docked ? "Copilot" : "Next up, My Focus and the Big Picture"}">${docked ? "" : `${nextCard()}${focusSec()}${bigPicture()}`}</aside>
-      <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div>
-        <p class="pl-calfoot">Drag a session to move it; it lands on the nearest free time. Click one for details.</p></section></div></div>`;
+      <aside class="pl-side" aria-label="${docked ? "Copilot" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
+      <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div></section></div></div>`;
     placePanel();
     if (keep.cal != null) $(".pl-calscroll", root).scrollTop = keep.cal;
     if (keep.side != null && !docked) $(".pl-side", root).scrollTop = keep.side;
@@ -323,50 +322,48 @@
     const later = S.blocks.filter((b) => b.d > d && b.st === "planned").sort((a, b) => a.d - b.d || a.s - b.s);
     return { b: upcoming[0] || later[0] || null, then: upcoming[1] || null, started: S.blocks.find((b) => b.st === "started" && b.d <= d) || null };
   }
-  function nextCard() {
-    const { b, then, started } = nextUp();
-    if (!b) return `<section class="td-next pl-next"><p class="td-k">Next</p><h2 class="td-n">Nothing planned yet</h2><p class="td-m">Ask the copilot to plan your week around your learning time.</p><div class="td-row"><button class="button" type="button" data-copilot>${I.spark}Plan with the copilot</button></div></section>`;
-    const t = track(b.tr), K = KIND[b.kind];
-    const when = b.d === S.now.d ? hm(b.s) : `${dayRel(b.d)[0].toUpperCase()}${dayRel(b.d).slice(1)} ${hm(b.s)}`;
-    const note = S.notes.filter((n) => n.d <= S.now.d).slice(-1)[0];
-    const after = [
-      then ? `Then ${hm(then.s)}: <a href="#b-${then.id}" data-open="${then.id}">${esc(then.title)}</a> (${len(then.m)})` : "",
-      started && started.id !== b.id ? `${started.d === S.now.d ? "Earlier today" : "Still open"}: <a href="#b-${started.id}" data-start="${started.id}">${esc(started.title)}</a>, ${esc(started.res || "started")} · <button class="pl-linkbtn" type="button" data-start="${started.id}">Continue</button>` : "",
-    ].filter(Boolean);
-    return `<section class="td-next pl-next${b.kind === "plan" ? " is-plan" : ""}" aria-labelledby="pl-next-t" data-tr="${t ? t.tr : "a"}">
-      <p class="td-k"><span>Next · ${esc(when)}</span><span class="pl-kind"${b.kind === "plan" ? ' style="--tr:var(--ghost-ink);--tr-soft:var(--ghost-soft)"' : ""}>${esc(K.k)}</span>${t ? `<span>${esc(t.name)} › ${esc(b.topic)}</span>` : ""}</p>
-      <h2 class="td-n" id="pl-next-t">${esc(b.title)}</h2>
-      <p class="td-m">${len(b.m)} · ${esc(K.noun)}${(() => { const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m); return r ? ` · ${esc(r.name)}, audio only` : ""; })()}${MADE[b.made] ? ` · ${esc(MADE[b.made])}` : ""}${b.also ? ` · counts for ${esc(track(b.also)?.name || "")} too` : ""}</p>
-      <div class="td-row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-quiet" type="button" data-movenext="${b.id}">Next free time</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
-      ${after.length ? `<p class="td-after">${after.join("<br>")}</p>` : ""}
-      ${note ? `<p class="pl-note"><span class="av" aria-hidden="true">S</span><span>${note.text}</span></p>` : ""}
-    </section>`;
-  }
-  function focusList() {
+  /* The side column: My Focus, Up next (with Continue folded in) and the Big Picture, in that order. Each section has
+     the same small head; the first head sits on the calendar's toolbar line, and the copilot's head takes its place. */
+  const secHead = (id, title, meta, top) => `<div class="pl-sh${top ? " is-top" : ""}"><h2 id="${id}">${title}</h2>${meta ? `<span>${meta}</span>` : ""}</div>`;
+  function focusSec() {
     const w = Math.floor(S.now.d / 7);
-    return `<ul class="pl-focus">${S.tracks.map((t) => {
-      const plan = weekMins(w, t.id), done = weekDone(w, t.id), max = Math.max(plan, t.target, 1) * 1.1;
-      const short = plan < t.target ? `<span class="short">${len(t.target - plan)} short</span>` : "";
-      return `<li data-tr="${t.tr}"><span aria-hidden="true" class="td-star${t.goal ? " goal" : ""}">${t.goal ? "◆" : "★"}</span>
-        <span class="nm">${t.goal ? `<span class="goal">${esc(t.name)}</span><small>${esc(t.note)} · ${esc(dayShort(t.until))} ${MON[dateOf(t.until).getMonth()].slice(0, 3)} · ${t.until - S.now.d} days</small>` : `${esc(t.name)}<small>${esc(t.state)}</small>`}</span>
-        <span class="pl-hrs" title="${len(done)} done, ${len(plan)} planned, of ${len(t.target)} a week"><span class="pl-bar" aria-hidden="true"><i class="plnd" style="width:${(plan / max) * 100}%"></i><i style="width:${(done / max) * 100}%"></i><span class="tgt" style="left:${(t.target / max) * 100}%"></span></span><span>${len(plan)} of ${len(t.target)}</span>${short}</span></li>`;
-    }).join("")}</ul>`;
+    const rows = S.tracks.map((t) => {
+      const plan = weekMins(w, t.id), done = weekDone(w, t.id), max = Math.max(plan, t.target, 1);
+      const short = !t.goal && plan < t.target;
+      const right = t.goal ? `${t.until - S.now.d} days` : `${len(plan)} <i>/ ${len(t.target)}</i>`;
+      return `<li class="pl-fr${t.goal ? " is-goal" : ""}" data-tr="${t.tr}" title="${len(done)} done and ${len(plan)} planned of ${len(t.target)} this week${short ? `, ${len(t.target - plan)} short` : ""}">
+        <span class="dot" aria-hidden="true"></span><span class="nm">${esc(t.name)}</span><span class="hr${short ? " short" : ""}">${right}</span>
+        <span class="bar" aria-hidden="true"><i class="plnd" style="width:${Math.min(100, (plan / max) * 100)}%"></i><i style="width:${Math.min(100, (done / max) * 100)}%"></i></span></li>`;
+    }).join("");
+    return `<section class="pl-sec" aria-labelledby="pl-fh">${secHead("pl-fh", "My Focus", "This week", true)}<ul class="pl-focus2">${rows}</ul></section>`;
   }
-  const focusSec = () => `<section aria-labelledby="pl-focus-h" class="td-focus-wrap"><div class="td-h is-plain"><h2 id="pl-focus-h">My Focus</h2><span>This week's time</span></div>${focusList()}</section>`;
+  function upNext() {
+    const { b, started } = nextUp();
+    const cont = started && started.id !== b?.id ? `<p class="pl-cont">Continue <button class="pl-linkbtn" type="button" data-start="${started.id}">${esc(started.title)}</button><span>${esc(started.res || "")}</span></p>` : "";
+    if (!b) return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next")}<p class="pl-empty">Nothing planned yet. Ask the copilot to plan your week.</p>${cont}</section>`;
+    const t = track(b.tr), K = KIND[b.kind];
+    const when = b.d === S.now.d ? "Today" : b.d === S.now.d + 1 ? "Tomorrow" : DN[wd(b.d)];
+    const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m);
+    return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next", `${when} · ${hm(b.s)}`)}
+      <div class="pl-up" data-tr="${t ? t.tr : "a"}"${b.kind === "plan" ? ' style="--tr:var(--ghost);--tr-soft:var(--ghost-soft)"' : ""}>
+        <p class="k"><span class="pl-kind">${esc(K.k)}</span><span>${len(b.m)}${t ? ` · ${esc(b.topic)}` : ""}${r ? ` · ${esc(r.name)}` : ""}</span></p>
+        <h3>${esc(b.title)}</h3>
+        <div class="row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-link" type="button" data-movenext="${b.id}">Later</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
+      </div>${cont}</section>`;
+  }
   function bigPicture() {
     const w = Math.floor(S.now.d / 7);
     const wk = S.blocks.filter((b) => Math.floor(b.d / 7) === w && b.kind !== "plan");
     const done = wk.filter((b) => b.st === "done"), planned = wk.filter((b) => live(b));
     const moved = wk.filter((b) => b.st === "moved" || b.st === "skipped").length;
-    const short = S.tracks.filter((t) => !t.goal && weekMins(w, t.id) < t.target);
+    const short = S.tracks.filter((t) => !t.goal && weekMins(w, t.id) < t.target).sort((a, b) => (b.target - weekMins(w, b.id)) - (a.target - weekMins(w, a.id)));
     const goal = S.tracks.find((t) => t.goal);
     const nxt = S.blocks.filter((b) => Math.floor(b.d / 7) === w + 1 && live(b) && b.kind !== "plan").length;
-    return `<section class="td-compass" aria-labelledby="pl-bp"><div class="td-h"><h2 id="pl-bp">The Big Picture</h2><span>Week of ${weekRange(w)}</span></div>
-      <div class="td-narrative"><p><span>This week you've done </span><em>${done.length} of ${planned.length} planned sessions</em><span> (${len(done.reduce((a, b) => a + b.m, 0))} of ${len(planned.reduce((a, b) => a + b.m, 0))}).</span>
-      ${moved ? `<span> ${moved === 1 ? "One session was" : `${moved} sessions were`} moved to a later day rather than dropped.</span>` : ""}
-      ${short.length ? `<span> </span><em>${esc(short[0].name)}</em><span> is ${len(short[0].target - weekMins(w, short[0].id))} short of its ${len(short[0].target)}.</span>` : "<span> Every topic in My Focus has its time this week.</span>"}
-      ${goal ? `<span> </span><em>${esc(goal.name)}</em><span> is in ${goal.until - S.now.d} days.</span>` : ""}</p>
-      <p class="td-sub">Next week: ${nxt ? `${nxt} session${nxt === 1 ? "" : "s"} planned so far` : "nothing planned yet"} · plan it on Sunday at 17:30, or ask the copilot any time.</p></div></section>`;
+    return `<section class="pl-sec pl-bp" aria-labelledby="pl-bh">${secHead("pl-bh", "The Big Picture")}
+      <p>You've done <em>${done.length} of ${planned.length}</em> sessions this week.${moved ? ` ${moved === 1 ? "One was" : `${moved} were`} moved rather than dropped.` : ""}
+      ${short.length ? ` <em>${esc(short[0].name)}</em> is ${len(short[0].target - weekMins(w, short[0].id))} short.` : " Every topic has its time."}
+      ${goal ? ` <em>${esc(goal.name)}</em> is in ${goal.until - S.now.d} days.` : ""}</p>
+      <p class="sub">Next week: ${nxt ? `${nxt} planned so far` : "nothing yet"} · weekly plan on Sunday</p></section>`;
   }
   /* ================================================================ popover */
   let popEl = null;
@@ -480,8 +477,7 @@
   /* ================================================================ the copilot panel */
   const cpw = document.createElement("div");
   cpw.className = "cpwrap pl-cpwrap"; cpw.hidden = true;
-  cpw.innerHTML = `<section class="cp" aria-label="Copilot: planning" tabindex="-1"><div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Copilot · Planning</span><span style="flex:1"></span><button class="icb" type="button" data-cpx aria-label="Close the copilot">×</button></div>
-    <div class="cp-title"><h2>Your learning plan</h2></div><p class="cp-sub">It sees your week, My Focus, your Lumens and Library, and when you're busy. Nothing changes until you apply a plan.</p></div>
+  cpw.innerHTML = `<section class="cp" aria-label="Copilot: planning" tabindex="-1"><div class="cp-head pl-sh is-top"><h2>${I.spark}Copilot</h2><span>Planning</span><button class="icb" type="button" data-cpx aria-label="Close the copilot">×</button></div>
     <div class="cp-body"><div class="cp-thread" aria-live="polite"></div></div>
     <div class="cp-comp"><div class="prompts"></div><form class="box"><label class="visually-hidden" for="pl-in">Ask the copilot about your plan</label><textarea id="pl-in" rows="2" maxlength="1200" placeholder="Plan my week, or tell me about a deadline…"></textarea><div class="tools"><small id="pl-ai2"></small><span class="grow"></span><button aria-label="Send" class="send" type="submit" disabled>${I.send}</button></div></form></div></section>`;
   document.body.appendChild(cpw);
@@ -505,7 +501,7 @@
   function greet() {
     const w = Math.floor(S.now.d / 7), n = S.blocks.filter((b) => Math.floor(b.d / 7) === w && live(b) && b.kind !== "plan");
     const short = S.tracks.find((t) => !t.goal && weekMins(w, t.id) < t.target);
-    addMsg("ai", `<p>Your week has ${n.length} sessions, about ${len(n.reduce((a, b) => a + b.m, 0))}. I moved <b>Glare</b> from Tuesday to Thursday morning because you missed it.</p>${short ? `<p>${esc(short.name)} is ${len(short.target - weekMins(w, short.id))} short this week. Want me to find time, or is there a deadline I should plan around?</p>` : ""}<p>Tell me about your routines too, like a daily drive or a ride, and I'll plan things to listen to there.</p>`);
+    addMsg("ai", `<p>Your week has ${n.length} sessions, about ${len(n.reduce((a, b) => a + b.m, 0))}. I moved <b>Glare</b> from Tuesday to Thursday morning because you missed it.</p>${short ? `<p>${esc(short.name)} is ${len(short.target - weekMins(w, short.id))} short this week. Want me to find time, or is there a deadline I should plan around?</p>` : ""}<p>Tell me about your routines too, like a daily drive or a ride, and I'll plan things to listen to there. Nothing changes until you apply a plan.</p>`);
     S.msgs.push({ role: "assistant", content: "Greeting: summarised the week." });
   }
 

@@ -11,7 +11,7 @@ Open `dist/today-plan-prototype.html`. It's also published as a claude.ai artifa
 The layout is one fixed frame, and nothing moves around on its own:
 
 - **The head** (Learning time, Plan with the copilot) never moves.
-- **The calendar** is on the left. **The side column** on the right holds Next up, My Focus and the Big Picture, and the copilot opens there too, on the right as it does on the Graph.
+- **The calendar** is on the left. **The side column** on the right, behind one hairline, holds three sections with the same small heading: **My Focus** (a colour key for the calendar: one line per topic with this week's time), **Up next** (drawn like the session on the calendar, with Continue under it) and **The Big Picture**. The copilot opens in the same column, with its heading on the calendar toolbar's line, on the right as it does on the Graph.
 - **The calendar** has a **Day | Week** switch. Both views share one hour axis, so switching only changes the number of columns: the 7:00 line stays at the same height.
 - **Plan with the copilot** puts the copilot *in the side column's place*. The calendar keeps its size, position and view, and the copilot never switches the view for you. A card's **Show on the week** does that when you want it.
 - Scroll positions are kept across every change. Hours fold only around learning time and sessions already on the calendar, never around proposals, so ghosts don't shift the axis.
@@ -20,7 +20,7 @@ The layout is one fixed frame, and nothing moves around on its own:
 ## Try it
 
 1. **Day** (Today as it is now, planned):
-   - **Next up** replaces Continue. It shows the next planned session with **Start**, **Next free time** and **Skip**, and keeps "Earlier today … Continue" underneath.
+   - **Up next** replaces Continue. It shows the next planned session with **Start**, **Later** (the next free time) and **Skip**, with "Continue …" for anything half-watched underneath.
    - **My Focus** shows this week's time per topic: planned, done, the weekly target, and how short a topic is.
    - **The Big Picture** is still written from records, with no AI.
    - The **Day calendar** has a strip of the week's days. What you did sits above the now line (the old activity log). The plan sits below it, with learning time tinted and busy times from your calendar hatched.
