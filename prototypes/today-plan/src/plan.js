@@ -23,7 +23,7 @@
   DATA.htmlClass.split(/\s+/).filter(Boolean).forEach((c) => document.documentElement.classList.add(c));
 
   /* ================================================================ time */
-  let H = 52; const H0 = 6 * 60, H1 = 23 * 60; // px per hour (52 on the day rail, 64 on the week); the calendar runs 6:00 to 23:00
+  let H = 64; const H0 = 6 * 60, H1 = 23 * 60; // px per hour (52 on the day rail, 64 on the week); the calendar runs 6:00 to 23:00
   const DN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const dateOf = (d) => new Date(2026, 9, 19 + d); // day 0 is Monday 19 October 2026
@@ -37,7 +37,7 @@
   const weekRange = (w) => { const a = dateOf(w * 7), b = dateOf(w * 7 + 6); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}` : `${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`; };
   const snap5 = (m) => Math.round(m / 5) * 5;
   /* Hour rows: on the week, working hours with nothing planned fold to a thin band, Motion-style. */
-  let ROW = Array(17).fill(52), FOLDED = Array(17).fill(false);
+  let ROW = Array(17).fill(64), FOLDED = Array(17).fill(false);
   const FOLD = 22; // a run of folded hours shares one band this tall
   const Y = (m) => { m = Math.min(Math.max(m, H0), H1); const i = Math.floor((m - H0) / 60); let y = 0; for (let k = 0; k < Math.min(i, ROW.length); k++) y += ROW[k]; return i >= ROW.length ? y : y + ((m - H0 - i * 60) / 60) * ROW[i]; };
   const M = (y) => { let acc = 0; for (let k = 0; k < ROW.length; k++) { if (y < acc + ROW[k]) return H0 + k * 60 + ((y - acc) / ROW[k]) * 60; acc += ROW[k]; } return H1; };
@@ -156,19 +156,69 @@
     $$('.navigation-rail .navigation-link[href="/today"], .tab-bar .tab-bar-link[href="/today"]', root).forEach((a) => a.setAttribute("aria-current", "page"));
   }
   const main = () => $("main", root);
-  const head = (sub) => `<header class="td-head"><h1>Today <span>${esc(sub)}</span></h1><div class="pl-tools">
-      <div class="pl-seg" role="group" aria-label="Show"><button type="button" data-view="day" aria-pressed="${S.view === "day"}">Day</button><button type="button" data-view="week" aria-pressed="${S.view === "week"}">Week</button></div>
+  const wide = () => matchMedia("(min-width: 1000px)").matches;
+  const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
       <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
-      <button class="button" type="button" data-copilot>${I.spark}Plan with the copilot</button>
+      <button class="button" type="button" data-copilot aria-pressed="${S.panel}">${I.spark}Plan with the copilot</button>
       <time>${h12(S.now.m)}</time></div></header>`;
+  const shownWeek = () => (S.view === "week" ? S.wk : Math.floor(S.sel / 7));
 
+  /** One fixed frame: the head, a side column (Next up, My Focus, the Big Picture, or the copilot in their place)
+      and the calendar. Re-rendering keeps every scroll position, so nothing jumps. */
   function render() {
     hidePop();
-    if (S.view === "read") return; // the reading view renders itself
-    const keep = main()?.scrollTop || 0;
-    H = S.view === "week" ? 68 : 52;
-    if (S.view === "week") renderWeek(); else renderDay();
-    if (main()) main().scrollTop = keep;
+    if (S.view === "read") return placePanel();
+    const keep = { cal: $(".pl-calscroll", root)?.scrollTop, side: $(".pl-side", root)?.scrollTop, main: main()?.scrollTop || 0, thread: $(".cp-body", cpw)?.scrollTop };
+    const focused = cpw.contains(document.activeElement) ? document.activeElement : null;
+    const docked = S.panel && wide();
+    const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
+    layout(days);
+    main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
+      <aside class="pl-side" aria-label="${docked ? "Copilot" : "Next up, My Focus and the Big Picture"}">${docked ? "" : `${nextCard()}${focusSec()}${bigPicture()}`}</aside>
+      <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div>
+        <p class="pl-calfoot">Drag a session to move it; it lands on the nearest free time. Click one for details.</p></section></div></div>`;
+    placePanel();
+    if (keep.cal != null) $(".pl-calscroll", root).scrollTop = keep.cal;
+    if (keep.side != null && !docked) $(".pl-side", root).scrollTop = keep.side;
+    main().scrollTop = keep.main;
+    if (keep.thread != null) $(".cp-body", cpw).scrollTop = keep.thread;
+    if (focused?.isConnected) focused.focus({ preventScroll: true });
+  }
+  function placePanel() {
+    cpw.hidden = !S.panel;
+    const side = S.panel && S.view !== "read" && wide() ? $(".pl-side", root) : null;
+    if (side) { side.appendChild(cpw); cpw.classList.add("is-docked"); }
+    else { if (cpw.parentElement !== document.body) document.body.appendChild(cpw); cpw.classList.remove("is-docked"); }
+    document.documentElement.classList.toggle("pl-sheet", S.panel && !side);
+    $$("[data-copilot]", root).forEach((b) => b.setAttribute("aria-pressed", String(S.panel)));
+  }
+  function calNav(w) {
+    const thisW = Math.floor(S.now.d / 7), wk = S.view === "week";
+    const title = wk ? `${w === thisW ? "This week" : "Next week"} <span>${weekRange(w)}</span>` : `${S.sel === S.now.d ? "Today" : DN[wd(S.sel)]} <span>${dateOf(S.sel).getDate()} ${MON[dateOf(S.sel).getMonth()]}</span>`;
+    const canPrev = wk ? w > 0 : S.sel > 0, canNext = wk ? w < 1 : S.sel < 13;
+    return `<div class="pl-calnav"><div class="pl-seg" role="group" aria-label="Calendar view"><button type="button" data-view="day" aria-pressed="${!wk}">Day</button><button type="button" data-view="week" aria-pressed="${wk}">Week</button></div>
+      <button class="icb" type="button" data-step="-1" aria-label="${wk ? "Previous week" : "Previous day"}"${canPrev ? "" : " disabled"}>${I.prev}</button><button class="icb" type="button" data-step="1" aria-label="${wk ? "Next week" : "Next day"}"${canNext ? "" : " disabled"}>${I.next}</button>
+      <h2>${title}</h2><span class="pl-key2"><i class="av"></i>Learning time${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
+  }
+  function hoursCol() {
+    let h = ""; for (let k = 6; k <= 22; k++) if (!FOLDED[k - 6]) h += `<span style="top:${Y(k * 60)}px">${k}:00</span>`;
+    for (const [a, e] of folds()) h += `<span class="fold" style="top:${Y(a) + 5}px" title="${hm(a)}–${hm(e)}, nothing planned">${a / 60}–${e / 60}</span>`;
+    return `<div class="pl-wkh" style="height:${TOT()}px">${h}</div>`;
+  }
+  const ghostDays = () => { const g = ghostOps(), s = new Set(g.add.map((b) => b.d)); g.to.forEach((o) => s.add(o.d)); g.from.forEach((id) => s.add(blockById(id)?.d)); g.gone.forEach((id) => s.add(blockById(id)?.d)); g.link.forEach((_, id) => s.add(blockById(id)?.d)); return s; };
+  function weekGrid(days) {
+    const gd = ghostDays();
+    const dh = days.map((d) => { const ld = dayLoad(d, S.blocks); return `<button type="button" class="pl-wd${d === S.now.d ? " is-today" : ""}${gd.has(d) ? " has-ghost" : ""}" data-sel="${d}" aria-label="Open ${dayLong(d)}${gd.has(d) ? ", has proposed changes" : ""}">${DN[wd(d)].slice(0, 3)}<b>${dateOf(d).getDate()}</b><span class="sm${ld > S.maxDay ? " over" : ""}">${ld ? len(ld) : "–"}</span></button>`; }).join("");
+    const cols = days.map((d) => `<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}</div>`).join("");
+    return `<div class="pl-grid" style="--cols:7"><div class="pl-gh"></div>${dh}${hoursCol()}${cols}</div>`;
+  }
+  function dayGrid(d, days) {
+    const gd = ghostDays();
+    const dayB = S.blocks.filter((b) => b.d === d && live(b));
+    const sum = dayB.length ? `${dayB.filter((b) => b.st === "done").length} done · ${dayB.filter((b) => b.st !== "done").length} to go · ${len(dayB.reduce((a, b) => a + b.m, 0))}` : "Nothing planned";
+    const strip = days.map((dd) => `<button type="button" data-sel="${dd}" class="${dd === d ? "is-on" : ""}${dd === S.now.d ? " is-today" : ""}" aria-pressed="${dd === d}" aria-label="${dayLong(dd)}${dd === S.now.d ? ", today" : ""}">${DN[wd(dd)][0]}<b>${dateOf(dd).getDate()}</b>${gd.has(dd) ? '<i class="gh"></i>' : S.blocks.some((b) => b.d === dd && live(b)) ? "<i></i>" : ""}</button>`).join("");
+    const logs = LOG.filter((l) => l.d === d && (d < S.now.d || l.at < S.now.m)).map((l) => `<div class="pl-log" style="top:${Y(l.at)}px"><b>${esc(l.title)}</b>${esc(l.sub)}</div>`).join("");
+    return `<div class="pl-grid is-day" style="--cols:1"><div class="pl-gh"></div><div class="pl-gh pl-strip" role="group" aria-label="Days">${strip}<span class="sum" aria-live="polite">${sum}</span></div>${hoursCol()}<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}${logs}</div></div>`;
   }
 
   /* ---------------------------------------------------------------- blocks */
@@ -185,13 +235,11 @@
     return g;
   }
   function layout(days) {
-    const g = ghostOps();
     ROW = []; FOLDED = [];
     for (let h = 6; h < 23; h++) {
       const a = h * 60, e = a + 60, hit = (d, s, m) => days.includes(d) && overlaps(s, s + m, a, e);
-      const used = S.view !== "week" || AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e)))
-        || S.blocks.some((b) => b.st !== "dropped" && hit(b.d, b.s, b.m)) || g.add.some((b) => hit(b.d, b.s, b.m))
-        || [...g.to.values()].some((o) => hit(o.d, o.s, blockById(o.id)?.m || 0)) || (days.includes(S.now.d) && S.now.m >= a && S.now.m < e);
+      const used = AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e)))
+        || S.blocks.some((b) => b.st !== "dropped" && hit(b.d, b.s, b.m)) || (days.includes(S.now.d) && S.now.m >= a && S.now.m < e);
       ROW.push(H); FOLDED.push(!used);
     }
     for (const [a, b] of runs()) for (let i = a; i < b; i++) ROW[i] = FOLD / (b - a);
@@ -206,11 +254,12 @@
     const tag = gone ? "Drop" : ghost ? (b.ghostOf ? "Move" : "New") : "";
     const label = `${hm(b.s)} · ${kind}${tag ? ` · ${tag}` : ""}`;
     const aria = `${KIND[b.kind].noun}: ${b.title}, ${dayLong(b.d)} ${hm(b.s)} to ${hm(b.s + b.m)}${b.st === "done" ? ", done" : b.st === "moved" ? ", moved" : ""}${ghost ? ", proposed" : ""}${gone ? ", proposed to drop" : ""}`;
-    return `<button type="button" class="${cls}" data-b="${esc(b.id)}"${ghost ? ` data-ghost="1"` : ""} data-tr="${b.tr ? trOf(b.tr) : "a"}"${also ? ` data-tr2="${trOf(also)}"` : ""} style="top:${top}px;height:${h}px${b.kind === "plan" ? ";--tr:var(--ghost);--tr-soft:var(--ghost-soft)" : ""}" aria-label="${esc(aria)}"><span class="k">${esc(label)}</span><span class="t">${esc(b.title)}</span></button>`;
+    return `<button type="button" class="${cls}" data-b="${esc(b.id)}"${ghost ? ` data-ghost="1"` : ""} data-tr="${b.tr ? trOf(b.tr) : "a"}"${also ? ` data-tr2="${trOf(also)}"` : ""} style="top:${top}px;height:${h}px${b.kind === "plan" ? ";--tr:var(--ghost);--tr-soft:var(--ghost-soft)" : ""}" aria-label="${esc(aria)}"><span class="k">${esc(label)}</span><span class="t">${esc(b.title)}</span>${S.view === "day" && h >= 50 && b.why ? `<span class="w">${esc(b.why)}</span>` : ""}</button>`;
   }
   function dayLayer(d) {
     let h = "";
-    if (S.view === "week") { for (let k = 7; k < 23; k++) if (!FOLDED[k - 6] || !FOLDED[k - 7]) h += `<span class="pl-hl" style="top:${Y(k * 60)}px"></span>`; for (const [a, e] of folds()) h += `<div class="pl-fold" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`; }
+    for (let k = 7; k < 23; k++) if (!FOLDED[k - 6] || !FOLDED[k - 7]) h += `<span class="pl-hl" style="top:${Y(k * 60)}px"></span>`;
+    for (const [a, e] of folds()) h += `<div class="pl-fold" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`;
     for (const [a, e] of AVAIL[wd(d)]) h += `<div class="pl-av" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`;
     if (S.calOn) for (const z of S.busy.filter((z) => z.d === d)) h += `<div class="pl-busy${z.isNew ? " is-new" : ""}" style="top:${Y(z.s)}px;height:${Y(z.e) - Y(z.s)}px">${Y(z.e) - Y(z.s) > 16 ? `Busy · ${hm(z.s)}–${hm(z.e)}` : ""}</div>`;
     const pastTo = d < S.now.d ? H1 : d === S.now.d ? S.now.m : H0;
@@ -245,7 +294,7 @@
       <p class="td-k"><span>Next · ${esc(when)}</span><span class="pl-kind"${b.kind === "plan" ? ' style="--tr:var(--ghost-ink);--tr-soft:var(--ghost-soft)"' : ""}>${esc(K.k)}</span>${t ? `<span>${esc(t.name)} › ${esc(b.topic)}</span>` : ""}</p>
       <h2 class="td-n" id="pl-next-t">${esc(b.title)}</h2>
       <p class="td-m">${len(b.m)} · ${esc(K.noun)}${MADE[b.made] ? ` · ${esc(MADE[b.made])}` : ""}${b.also ? ` · counts for ${esc(track(b.also)?.name || "")} too` : ""}</p>
-      <div class="td-row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-quiet" type="button" data-movenext="${b.id}">Move to the next free time</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
+      <div class="td-row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-quiet" type="button" data-movenext="${b.id}">Next free time</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
       ${after.length ? `<p class="td-after">${after.join("<br>")}</p>` : ""}
       ${note ? `<p class="pl-note"><span class="av" aria-hidden="true">S</span><span>${note.text}</span></p>` : ""}
     </section>`;
@@ -260,6 +309,7 @@
         <span class="pl-hrs" title="${len(done)} done, ${len(plan)} planned, of ${len(t.target)} a week"><span class="pl-bar" aria-hidden="true"><i class="plnd" style="width:${(plan / max) * 100}%"></i><i style="width:${(done / max) * 100}%"></i><span class="tgt" style="left:${(t.target / max) * 100}%"></span></span><span>${len(plan)} of ${len(t.target)}</span>${short}</span></li>`;
     }).join("")}</ul>`;
   }
+  const focusSec = () => `<section aria-labelledby="pl-focus-h" class="td-focus-wrap"><div class="td-h is-plain"><h2 id="pl-focus-h">My Focus</h2><span>This week's time</span></div>${focusList()}</section>`;
   function bigPicture() {
     const w = Math.floor(S.now.d / 7);
     const wk = S.blocks.filter((b) => Math.floor(b.d / 7) === w && b.kind !== "plan");
@@ -275,44 +325,6 @@
       ${goal ? `<span> </span><em>${esc(goal.name)}</em><span> is in ${goal.until - S.now.d} days.</span>` : ""}</p>
       <p class="td-sub">Next week: ${nxt ? `${nxt} session${nxt === 1 ? "" : "s"} planned so far` : "nothing planned yet"} · plan it on Sunday at 17:30, or ask the copilot any time.</p></div></section>`;
   }
-  function renderDay() {
-    const d = S.sel, w = Math.floor(S.now.d / 7);
-    const dayB = S.blocks.filter((b) => b.d === d && live(b));
-    const sum = d === S.now.d
-      ? `<b>Today</b> · ${dayB.filter((b) => b.st === "done").length} done · ${dayB.filter((b) => b.st !== "done").length} to go · ${len(dayB.reduce((a, b) => a + b.m, 0))} planned`
-      : `<b>${DN[wd(d)]}</b> · ${dayB.length ? `${dayB.length} session${dayB.length === 1 ? "" : "s"} · ${len(dayB.reduce((a, b) => a + b.m, 0))}` : "nothing planned"}${S.calOn && S.busy.some((z) => z.d === d) ? " · busy " + S.busy.filter((z) => z.d === d).map((z) => `${hm(z.s)}–${hm(z.e)}`).join(", ") : ""}`;
-    layout([d]);
-    const logs = LOG.filter((l) => l.d === d && (d < S.now.d || l.at < S.now.m)).map((l) => `<div class="pl-log" style="top:${Y(l.at)}px"><b>${esc(l.title)}</b>${esc(l.sub)}</div>`).join("");
-    let hours = ""; for (let h = 6; h <= 22; h++) hours += `<span class="pl-hr" style="top:${Y(h * 60)}px">${h}:00</span><span class="pl-hl" style="top:${Y(h * 60)}px"></span>`;
-    main().innerHTML = `<div class="td plan-pg"><div class="td-stream">${head(dayLong(S.now.d))}
-      <div class="td-top">${nextCard()}<section aria-labelledby="pl-focus-h" class="td-focus-wrap"><div class="td-h is-plain"><h2 id="pl-focus-h">My Focus</h2><span>This week's time</span></div>${focusList()}</section></div>
-      ${bigPicture()}</div>
-      <aside aria-labelledby="pl-week-h" class="td-rail pl-rail"><div class="td-h is-plain"><h2 id="pl-week-h">This week</h2><button class="pl-linkbtn" type="button" data-view="week" style="font-size:12px">Open the week</button></div>
-        <div aria-label="Days of this week" class="td-strip" role="group">${[0, 1, 2, 3, 4, 5, 6].map((i) => { const dd = w * 7 + i; const has = S.blocks.some((b) => b.d === dd && live(b)); return `<button type="button" data-sel="${dd}" aria-pressed="${dd === d}" class="${dd === d ? "is-on" : ""}" aria-label="${dayLong(dd)}${dd === S.now.d ? ", today" : ""}">${DN[i][0]}<b>${dateOf(dd).getDate()}</b>${has ? "<i></i>" : ""}</button>`; }).join("")}</div>
-        <p aria-live="polite" class="pl-daysum">${sum}</p>
-        <div class="pl-tlwrap"><div class="pl-tl" style="height:${TOT()}px">${hours}${dayLayer(d)}${logs}</div></div>
-      </aside></div>`;
-    const tw = $(".pl-tlwrap", root);
-    if (tw && tw.scrollHeight > tw.clientHeight) { const nb = S.blocks.filter((b) => b.d === d && live(b)).map((b) => b.s); const focus = d === S.now.d ? S.now.m - 90 : (nb.length ? Math.min(...nb) - 60 : 1080); tw.scrollTop = Math.max(0, Y(focus)); }
-  }
-
-  /* ---------------------------------------------------------------- Week */
-  function renderWeek() {
-    const w = S.wk;
-    const legend = S.tracks.map((t) => `<span data-tr="${t.tr}"><i></i>${esc(t.name)} · ${len(weekMins(w, t.id))} of ${len(t.target)}</span>`).join("") + `<span><i class="av"></i>Learning time</span>${S.calOn ? '<span><i class="bz"></i>Busy</span>' : ""}`;
-    const days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
-    layout(days);
-    let hours = ""; for (let h = 6; h <= 22; h++) if (!FOLDED[h - 6]) hours += `<span style="top:${Y(h * 60)}px">${h}:00</span>`;
-    for (const [a, e] of folds()) hours += `<span class="fold" style="top:${Y(a) + 5}px" title="${hm(a)}–${hm(e)}, nothing planned">${a / 60}–${e / 60}</span>`;
-    const dh = days.map((d) => { const ld = dayLoad(d, S.blocks); return `<button type="button" class="pl-wd${d === S.now.d ? " is-today" : ""}" data-sel="${d}" aria-label="Open ${dayLong(d)}">${DN[wd(d)].slice(0, 3)}<b>${dateOf(d).getDate()}</b><span class="sm${ld > S.maxDay ? " over" : ""}">${ld ? len(ld) : "–"}</span></button>`; }).join("");
-    const cols = days.map((d) => `<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}</div>`).join("");
-    main().innerHTML = `<div class="plan-pg pl-wk">${head(dayLong(S.now.d))}
-      <div class="pl-wknav"><button class="icb" type="button" data-wk="-1" aria-label="Previous week"${w <= 0 ? " disabled" : ""}>${I.prev}</button><button class="icb" type="button" data-wk="1" aria-label="Next week"${w >= 1 ? " disabled" : ""}>${I.next}</button>
-        <h2>${w === Math.floor(S.now.d / 7) ? "This week" : "Next week"} <span>${weekRange(w)}</span></h2><div class="pl-legend">${legend}</div></div>
-      <div class="pl-wkscroll"><div class="pl-wkgrid"><div></div>${dh}<div class="pl-wkh" style="height:${TOT()}px">${hours}</div>${cols}</div></div>
-      <p class="pl-wkfoot">Drag a session to move it; it lands on the nearest free time. Click one for details. Tinted hours are your learning time; hatched hours are busy in your calendar. Working hours with nothing planned are folded.</p></div>`;
-  }
-
   /* ================================================================ popover */
   let popEl = null;
   function hidePop() { popEl?.remove(); popEl = null; }
@@ -355,7 +367,7 @@
     if (!p) return toast("No free time left", "There's no free learning time in the next two weeks for this. Try Learning time to add some.");
     const from = `${dayShort(b.d)} ${hm(b.s)}`;
     Object.assign(b, { d: p.d, s: p.s, why: `Moved by you from ${from}` });
-    flash([id]); jumpTo(p.d); render();
+    flash([id]); render();
     toast(`Moved to ${dayRel(p.d)} ${hm(p.s)}`, `${b.title}: the next free learning time.`, () => { restore(snap); render(); });
   }
   function skip(id) {
@@ -378,7 +390,6 @@
     S.blocks = S.blocks.filter((x) => x.id !== id);
     render(); toast("Removed from the plan", `${b.title}. The Lumen stays in Learn.`, () => { restore(snap); render(); });
   }
-  function jumpTo(d) { if (S.view === "week") S.wk = Math.floor(d / 7); else if (Math.floor(d / 7) === Math.floor(S.now.d / 7)) S.sel = d; }
 
   /* drag in the week grid */
   let drag = null;
@@ -432,12 +443,12 @@
   const PROMPTS = ["Plan the rest of my week", "I'm presenting a courtyard house to a client on 6 November", "Make Saturday lighter", "Plan next week"];
   const used = new Set();
   function prompts() { $(".prompts", cpw).innerHTML = PROMPTS.filter((p) => !used.has(p)).map((p) => `<button type="button" data-say="${esc(p)}">${esc(p)}</button>`).join(""); }
+  // The copilot takes the side column's place; the calendar and the view stay exactly as they are.
   function openPanel(focus = true) {
-    S.panel = true; cpw.hidden = false; document.documentElement.classList.add("pl-on");
-    if (S.view === "day") { S.view = "week"; S.wk = Math.floor(S.now.d / 7); render(); }
+    S.panel = true; render();
     if (focus) setTimeout(() => input.focus({ preventScroll: true }), 60);
   }
-  function closePanel() { S.panel = false; cpw.hidden = true; document.documentElement.classList.remove("pl-on"); }
+  function closePanel() { S.panel = false; render(); }
   const scrollThread = () => { const b = $(".cp-body", cpw); b.scrollTop = b.scrollHeight; };
   function addMsg(role, html) {
     const el = document.createElement("div"); el.className = `msg ${role}`;
@@ -480,9 +491,8 @@
     S.cards.push(c); S.card = c;
     const holder = document.createElement("div"); holder.className = "msg ai"; holder.innerHTML = cardHTML(c);
     thread.appendChild(holder); scrollThread();
-    if (S.view !== "week") S.view = "week";
-    S.wk = c.wk; render();
-    $(".pl-b.is-ghost, .pl-b.is-gone, .pl-b.is-linked", root)?.scrollIntoView({ block: "nearest", behavior: "auto" });
+    if (S.view === "week") S.wk = c.wk; // the view never switches by itself; the card has "Show on the week"
+    render();
   }
   function applyCard(id) {
     const c = S.cards.find((x) => x.id === id); if (!c || c.state !== "pending") return;
@@ -808,7 +818,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   };
   function openRead(b) {
     hidePop(); closeDlg();
-    S.view = "read"; S.readId = b.id;
+    S.back = S.view === "read" ? S.back : S.view; S.view = "read"; S.readId = b.id;
     const t = track(b.tr), thermal = /^Thermal mass/.test(b.title);
     const secs = thermal ? ["A climate of big swings", "What mass does", "The court as a reservoir", "Night ventilation", "Rules of thumb", "When mass works against you", "For your client", "Check yourself"] : [];
     main().innerHTML = `<div class="pl-read"><div class="pl-read-bar"><button class="pl-linkbtn" type="button" data-back>‹ Today</button><span>Reading Lumen · ${t ? `${esc(t.name)} › ${esc(b.topic)}` : ""}</span><span class="grow"></span><button class="button button-quiet" type="button" data-askpage style="min-height:0;padding:5px 10px;font-size:12.5px">${I.spark}Ask about this page</button><div class="pl-prog" aria-hidden="true"><i></i></div></div>
@@ -819,7 +829,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
         <div class="done-row"><p>${b.st === "done" ? `Done · ${esc(b.res || "")}` : "When you finish, it's ticked on your calendar and your quiz answers shape next week's plan."}</p><button class="button" type="button" data-readdone>${b.st === "done" ? "Back to Today" : "Done reading"}</button></div>
       </article>
       ${thermal ? `<nav class="pl-toc" aria-label="On this page"><b>On this page</b>${secs.map((s, i) => `<a href="#s${i + 1}" data-toc="s${i + 1}">${esc(s)}</a>`).join("")}<p class="pl-note"><span class="av" aria-hidden="true">S</span><span>A reading Lumen is a long lesson page: text, figures, a table and a quiz, written the evening before.</span></p></nav>` : "<div></div>"}</div>`;
-    main().scrollTop = 0;
+    main().scrollTop = 0; placePanel();
     S.readQuiz = { right: 0, n: 0 };
     if (!thermal) writeLesson(b);
   }
@@ -856,7 +866,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       body.innerHTML = `${outline.map((h) => `<h2>${esc(h)}</h2><p class="fine">This section is written the evening before the session.</p>`).join("")}<p class="fine">The lesson couldn't be written just now${e?.code === "rate_limited" ? " (Claude is busy for you; try again in a minute)" : ""}.</p>`;
     }
   }
-  function leaveRead() { S.view = "day"; S.sel = S.now.d; S.readId = null; renderDay(); main().scrollTop = 0; }
+  function leaveRead() { S.view = S.back || "day"; S.readId = null; main().innerHTML = ""; render(); }
   function readQuizAnswer(btn) {
     if (btn.disabled) return;
     const b = blockById(S.readId); const q = btn.closest("[data-q]"); const qi = +q.dataset.q;
@@ -899,7 +909,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       if (p) { const from = hm(b.s); Object.assign(b, { d: p.d, s: p.s, why: `Moved from ${DN[wd(d)]} ${from}: something new landed in your calendar` }); moved.push(`${b.title} → ${dayRel(p.d)} ${hm(p.s)}`); }
     }
     if (moved.length) S.notes.push({ d: S.now.d, text: `Something new is busy on Thursday 18:45–20:00, so <b>${esc(hit[0].title)}</b> moved to ${esc(moved[0].split(" → ")[1])}.` });
-    S.view = "week"; S.wk = w; flash(hit.map((b) => b.id)); render();
+    if (S.view === "week") S.wk = w; else S.sel = d;
+    flash(hit.map((b) => b.id)); render();
     toast("Your calendar changed", hit.length ? (S.autoMove ? `Thursday 18:45–20:00 is now busy. ${moved.join("; ")}.` : "Thursday 18:45–20:00 is now busy. The session there is marked as clashing.") : "Thursday 18:45–20:00 is now busy. Nothing planned was in the way.");
   }
   function skipToSunday() {
@@ -925,8 +936,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   /* ================================================================ toast and badge */
   function toast(title, body, undo) {
     $$(".vtoasts.pl-t").forEach((t) => t.remove());
-    const h = document.createElement("div"); h.className = "vtoasts start pl-t"; h.setAttribute("role", "status");
-    h.style.cssText = "bottom:calc(76px + env(safe-area-inset-bottom, 0px));left:calc(var(--t-rail) + 16px)";
+    const h = document.createElement("div"); h.className = "vtoasts pl-t"; h.setAttribute("role", "status");
+    h.style.cssText = "bottom:calc(64px + env(safe-area-inset-bottom, 0px))";
     h.innerHTML = `<div class="vtoast"><b>${esc(title)}</b><button class="icb" aria-label="Dismiss" type="button" data-tx>×</button><p>${esc(body)}${undo ? ' <button class="pl-linkbtn vtoast-action" type="button" data-tundo>Undo</button>' : ""}</p></div>`;
     h.addEventListener("click", (e) => { if (e.target.closest("[data-tundo]")) { undo(); h.remove(); } else if (e.target.closest("[data-tx]")) h.remove(); });
     document.body.appendChild(h); setTimeout(() => h.remove(), 9000);
@@ -945,16 +956,20 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     if (a && !a.matches("[data-toc], [data-open], [data-start]")) {
       e.preventDefault();
       const href = a.getAttribute("href");
-      if (href === "/today") { if (S.view === "read") leaveRead(); else { S.view = "day"; S.sel = S.now.d; render(); } return; }
+      if (href === "/today") { if (S.view === "read") leaveRead(); else { S.sel = S.now.d; S.wk = Math.floor(S.now.d / 7); render(); } return; }
       if (/^\/(learn|library|graph)|capture/.test(href)) return toast("Not in this prototype", "This prototype covers Today. Learn, Live covers Lumens and live sessions.");
       return;
     }
     const tg = t.closest(".theme-toggle"); if (tg) { const el = document.documentElement; const dark = el.dataset.theme ? el.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; el.dataset.theme = dark ? "light" : "dark"; return; }
-    const v = t.closest("[data-view]"); if (v) { S.view = v.dataset.view; S.wk = Math.floor(S.now.d / 7); S.sel = S.now.d; return render(); }
-    if (t.closest("[data-copilot]")) return openPanel();
+    const v = t.closest("[data-view]"); if (v) {
+      if (v.dataset.view === "week") S.wk = Math.floor(S.sel / 7);
+      else if (Math.floor(S.sel / 7) !== S.wk) S.sel = S.wk === Math.floor(S.now.d / 7) ? S.now.d : S.wk * 7;
+      S.view = v.dataset.view; return render();
+    }
+    const stp = t.closest("[data-step]"); if (stp) { const k = +stp.dataset.step; if (S.view === "week") S.wk = Math.min(1, Math.max(0, S.wk + k)); else S.sel = Math.min(13, Math.max(0, S.sel + k)); return render(); }
+    if (t.closest("[data-copilot]")) return S.panel ? closePanel() : openPanel();
     if (t.closest("[data-lt]")) return openLT();
-    const sel = t.closest("[data-sel]"); if (sel) { S.sel = +sel.dataset.sel; S.view = "day"; if (Math.floor(S.sel / 7) !== Math.floor(S.now.d / 7)) { S.view = "week"; S.wk = Math.floor(S.sel / 7); } return render(); }
-    const wkb = t.closest("[data-wk]"); if (wkb) { S.wk = Math.min(1, Math.max(0, S.wk + +wkb.dataset.wk)); return render(); }
+    const sel = t.closest("[data-sel]"); if (sel) { S.sel = +sel.dataset.sel; S.view = "day"; return render(); }
     const st = t.closest("[data-start]"); if (st) { e.preventDefault(); return start(st.dataset.start); }
     const op = t.closest("[data-open]"); if (op) { e.preventDefault(); const el = $(`.pl-b[data-b="${op.dataset.open}"]`, root); return el ? showPop(op.dataset.open, el) : start(op.dataset.open); }
     const mv = t.closest("[data-movenext]"); if (mv) return moveNext(mv.dataset.movenext);
@@ -971,7 +986,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const toc = t.closest("[data-toc]"); if (toc) { e.preventDefault(); $(`#${toc.dataset.toc}`, root)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); return; }
     const blk = t.closest(".pl-b"); if (blk && !blk.classList.contains("is-drag")) { if (popEl && popEl.dataset.for === blk.dataset.b) return hidePop(); showPop(blk.dataset.b, blk, !!blk.dataset.ghost); if (popEl) popEl.dataset.for = blk.dataset.b; return; }
   });
-  function openPanelKeepView() { S.panel = true; cpw.hidden = false; document.documentElement.classList.add("pl-on"); }
+  function openPanelKeepView() { S.panel = true; placePanel(); }
   root.addEventListener("pointerdown", (e) => { const el = e.target.closest(".pl-col .pl-b"); if (el) dragStart(e, el); });
   window.addEventListener("pointermove", dragMove);
   window.addEventListener("pointerup", dragEnd);
@@ -1016,6 +1031,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   $("form", cpw).addEventListener("submit", (e) => { e.preventDefault(); send(input.value); });
   input.addEventListener("input", () => { sendBtn.disabled = !input.value.trim() || S.busyAI; });
   input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
+  let wasWide = wide();
+  window.addEventListener("resize", () => { if (wide() !== wasWide) { wasWide = wide(); render(); } });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (dlg) closeDlg(); else if (popEl) hidePop(); } });
 
   /* ================================================================ prototype bar */

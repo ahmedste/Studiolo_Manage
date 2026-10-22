@@ -6,21 +6,32 @@ This is the owner's T4 direction (Craft *Today*; `studiolo` `docs/superpowers/sp
 
 Open `dist/today-plan-prototype.html`. It's also published as a claude.ai artifact that may use Claude.
 
+## The layout
+
+The layout is one fixed frame, and nothing moves around on its own:
+
+- **The head** (Learning time, Plan with the copilot) never moves.
+- **The side column** on the left holds Next up, My Focus and the Big Picture.
+- **The calendar** on the right has a **Day | Week** switch. Both views share one hour axis, so switching only changes the number of columns: the 7:00 line stays at the same height.
+- **Plan with the copilot** puts the copilot *in the side column's place*. The calendar keeps its size, position and view, and the copilot never switches the view for you. A card's **Show on the week** does that when you want it.
+- Scroll positions are kept across every change. Hours fold only around learning time and sessions already on the calendar, never around proposals, so ghosts don't shift the axis.
+- Under 1000 px the side column stacks above the calendar and the copilot becomes a bottom sheet.
+
 ## Try it
 
 1. **Day** (Today as it is now, planned):
-   - **Next up** replaces Continue. It shows the next planned session with **Start**, **Move to the next free time** and **Skip**, and keeps "Earlier today … Continue" underneath.
+   - **Next up** replaces Continue. It shows the next planned session with **Start**, **Next free time** and **Skip**, and keeps "Earlier today … Continue" underneath.
    - **My Focus** shows this week's time per topic: planned, done, the weekly target, and how short a topic is.
    - **The Big Picture** is still written from records, with no AI.
-   - The **rail** is the day's timeline. What you did sits above the now line (the old activity log). The plan sits below it, with learning time tinted and busy times from your calendar hatched.
-2. **Plan with the copilot** opens the panel and the **Week** grid. Try the suggestions in order:
+   - The **Day calendar** has a strip of the week's days. What you did sits above the now line (the old activity log). The plan sits below it, with learning time tinted and busy times from your calendar hatched.
+2. **Plan with the copilot** opens the copilot in the side column. Switch the calendar to **Week** to see the whole plan, then try the suggestions in order:
    - *Plan the rest of my week*: fills the topic that's short.
    - *I'm presenting a courtyard house to a client on 6 November*: becomes a **goal** that draws on two topics. Its sessions count for both topics and for the goal, shown as a two-colour edge. That's the "overlapping" plan.
    - *Make Saturday lighter*: revises the plan. The earlier card reads "Replaced by a newer plan".
    - *Plan next week*: a **review of the week** (done, missed, quiz results) and next week's plan, with additions, moves and drops.
 
-   Every answer is a **plan card**. Its changes show as dashed ghosts on the calendar until you **Apply** them, and Apply has **Undo**. Untick a line to leave it out.
-3. **The week grid, Motion-style:**
+   Every answer is a **plan card**. Its changes show as dashed ghosts on the calendar until you **Apply** them, and Apply has **Undo**. Days with proposed changes get a dashed dot in the Day strip and the Week header. Untick a line to leave it out.
+3. **The calendar, Motion-style** (Day and Week):
    - Drag a session and it lands on the nearest free time.
    - Click a session for its details, **Start**, **Next free time**, **Skip** (it rolls forward on its own) or **Remove**.
    - Working hours with nothing planned fold to a thin band.
