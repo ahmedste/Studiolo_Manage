@@ -648,9 +648,9 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const D = DIALOGUES.find((x) => x.id === id); if (!D) return;
     A.leaveStudio(); A.S.run++;
     cur = D; A.S.view = "dialogue"; A.S.tab = "lumens";
-    A.learnShell(`<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(D.title)}</span></div></header>
-      <div class="dl-head"></div>
-      <div class="dl-main"><div class="dl-col">
+    A.learnShell(`${A.crumb(D.title)}
+      <div class="lf-lhead" data-dhead></div>
+      <div class="dl-main lf-body"><div class="dl-col">
         <div class="dl-player" data-d="${D.id}">
           <div class="dl-voices"><div class="dl-v a"><span class="dl-disc a">${initials(D.pair.A)}</span><p><b>${esc(D.pair.A.name)}</b>${esc(D.pair.A.role)}</p></div><span class="dl-wave" aria-hidden="true">${"<i></i>".repeat(22)}</span><div class="dl-v b"><span class="dl-disc b">${initials(D.pair.B)}</span><p><b>${esc(D.pair.B.name)}</b>${esc(D.pair.B.role)}</p></div></div>
           <p class="dl-cap" aria-live="off"><span class="dl-cap-who" data-dl-speaker="${D.id}"></span><span class="dl-cap-t"></span></p>
@@ -672,12 +672,12 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (autoplay) play(D);
   }
   function renderHead() {
-    const D = cur, h = $(".dl-head"); if (!h) return;
+    const D = cur, h = $("[data-dhead]"); if (!h) return;
     const L = lumenOf(D);
     const ed = D.context === "drive" ? (L?.listen && L.listen !== D.id ? `<button class="button button-quiet" type="button" data-dl-open="${L.listen}">${IC.phones}Standard edition</button>` : "")
       : L?.listenDrive ? `<button class="button button-quiet" type="button" data-dl-open="${L.listenDrive}">${IC.car}Drive edition</button>` : `<button class="button button-quiet" type="button" data-dl-act="drive-edition">${IC.car}Make a drive edition</button>`;
-    h.innerHTML = `<div class="dl-head-l"><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}${ctxPill(D)}<span>Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}</div></div>
-      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button></div></div>`;
+    // The same head as Watch and Read: only the format's own bits (edition, offline) differ, and they sit under the switcher.
+    h.innerHTML = A.lumenHeadInner(L, "listen", { title: D.title, q: D.q, anchorFrom: { anchor: [areaOf(D.topic), D.topic] }, bar: `${ctxPill(D)}<span class="lf-fmeta">Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}<span class="sp"></span>${A.S.shareView ? "" : ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button>` });
   }
   function renderChapters() {
     const D = cur, ol = $(".dl-chapters"), bar = $(".dl-bar"); if (!ol) return;

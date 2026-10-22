@@ -339,6 +339,8 @@
 .lf-switch button svg { width: 15px; height: 15px; }
 .lf-switch button b { font-weight: 500; }
 .lf-switch button small { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+/* Every format takes the same slot whatever its state ("+", "…", "12 min"), so nothing in the switcher ever shifts. */
+.lf-switch button[data-k]:not(.lf-sw-live) { width: 124px; justify-content: center; }
 .lf-switch button:hover:not(:disabled) { color: var(--ink); }
 .lf-switch button[aria-pressed="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); }
 .lf-switch button[aria-pressed="true"] svg { color: var(--accent); }
@@ -456,3 +458,72 @@ a.lf-ntitle:hover { color: var(--accent); }
   .lf-pacts { grid-column: 1 / -1; }
   .lf-under { padding-left: 0; }
 }
+
+/* ---------- One frame for every format: the title row and the switcher are pinned in the same place, so moving
+   from Watch to Listen to Read changes only what's under them. ---------- */
+/* The stage scrolls with its own top padding still applied to sticky things, so the row pins at minus that. */
+.ll-page { --lf-gx: 44px; --lf-pt: 36px; }
+.lf-lhead { display: contents; } /* the title row sticks for the whole page, not just its own head */
+.lf-trow { position: sticky; top: calc(-1 * var(--lf-pt)); z-index: 30; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 52px; margin: -10px calc(-1 * var(--lf-gx)) 0; padding: 8px var(--lf-gx); background: var(--paper); box-shadow: 0 1px 0 var(--line); }
+.lf-trow h1 { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--read); font-size: 26px; font-weight: 400; line-height: 1.2; }
+.lf-tr { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lf-share { all: unset; box-sizing: border-box; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; font-size: 13px; color: var(--ink-2); }
+.lf-share svg { width: 15px; height: 15px; }
+.lf-share:hover { color: var(--ink); background: var(--hover-fill); }
+.lf-share:focus-visible { outline: var(--focus-ring); }
+/* Reading progress, drawn along the bottom of the pinned row (Read only sets it). */
+.lf-rp { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--rp, 0)); pointer-events: none; }
+.lf-lhead + .lf-q, .lf-trow + .lf-q { margin-top: 10px; }
+.lf-trow ~ .lf-q { margin: 10px 0 0; font-size: 16px; }
+.lf-trow ~ .lf-meta { margin: 8px 0 18px; min-height: 30px; }
+.lf-fbar { display: contents; }
+.lf-fmeta { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lf-meta .sp { flex: 1; }
+.lf-meta .button { display: inline-flex; align-items: center; gap: 7px; min-height: 0; padding: 5px 11px; font-size: 12.5px; border-radius: 2px; }
+.lf-meta .button svg { width: 14px; height: 14px; }
+.lf-meta .button[aria-pressed="true"] { color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.lf-crumb { margin-bottom: 10px; }
+/* Only the content moves when you switch. */
+.lf-body { animation: lf-in var(--dur-move) var(--ease-entrance) both; }
+@keyframes lf-in { from { opacity: 0; transform: translateY(var(--enter-travel)); } }
+@media (prefers-reduced-motion: reduce) { .lf-body { animation: none; } }
+@media (max-width: 980px) { .ll-page { --lf-gx: 24px; --lf-pt: 28px; } }
+/* On Lumen pages nothing floats over the pinned row: the prototype banner tucks under it and the mini player moves to the bottom. */
+@media (min-width: 700px) { body:has(.lf-trow) .td-proto.ll-proto { z-index: 20; max-width: none; flex-wrap: nowrap; white-space: nowrap; } /* sits beside the breadcrumb; the pinned row slides over it */
+  body:has(.lf-trow) .dl-mini { top: auto; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 264px; } body:has(.lf-trow) .td-proto.ll-proto .ai { display: none; } }
+@media (max-width: 699.98px) {
+  .ll-page { --lf-gx: var(--m-gutter); }
+  .lf-trow { top: var(--m-bar); grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px var(--lf-gx) 8px; }
+  .lf-trow h1 { font-size: 20px; }
+  .lf-tr { justify-content: space-between; }
+  .lf-tr .lf-switch { flex: 1; }
+  .lf-switch button[data-k] { width: auto; flex: 1; justify-content: center; }
+  .lf-share { font-size: 0; gap: 0; padding: 0 11px; } /* icon only; the label stays for screen readers */
+}
+
+/* ---------- Sharing a Lumen ---------- */
+.lf-sharedlg { width: min(480px, calc(100vw - 32px)); }
+.lf-shp { margin: 4px 0 14px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.lf-shp b { font-weight: 500; color: var(--ink); }
+.lf-shfmts { display: grid; gap: 6px; margin: 0 0 12px; }
+.lf-shf { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13.5px; cursor: pointer; }
+.lf-shf:has(input:checked) { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.lf-shf input { margin: 0; accent-color: var(--accent); }
+.lf-shf svg { width: 16px; height: 16px; color: var(--ink-2); }
+.lf-shf b { font-weight: 500; }
+.lf-shf span { justify-self: end; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lf-shnot { margin: 0 0 14px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.lf-shlink { display: flex; gap: 8px; margin: 0 0 16px; }
+.lf-shlink input { flex: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 10px; border: 0; border-radius: 3px; background: var(--board); font: inherit; font-size: 13.5px; color: var(--ink); }
+.lf-shlink input:focus-visible { outline: var(--focus-ring); }
+.lf-shacts { display: flex; justify-content: flex-end; gap: 8px; }
+/* What someone with the link sees: the formats you shared, nothing of yours. */
+.lf-sharebar { position: sticky; top: calc(-1 * var(--lf-pt)); min-height: 36px; box-sizing: border-box; z-index: 31; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: -10px calc(-1 * var(--lf-gx)) 12px; padding: 8px var(--lf-gx); background: var(--accent-soft); font-size: 12.5px; color: var(--ink-2); }
+.lf-sharebar b { font-weight: 600; color: var(--accent); }
+.lf-sharebar span { flex: 1 1 260px; }
+.lf-sharebar button { all: unset; cursor: pointer; font-weight: 500; color: var(--accent); }
+.lf-sharebar button:hover { text-decoration: underline; }
+.lf-sharebar button:focus-visible { outline: var(--focus-ring); }
+.lf-shared .lf-trow { top: calc(36px - var(--lf-pt)); }
+.lf-shared [data-act="keep"], .lf-shared .ll-livepill, .lf-shared [data-dl-act="mark"], .lf-shared [data-dl-act="drive-edition"], .lf-shared .dl-marks-sec, .lf-shared .dl-ways, .lf-shared .dl-goal { display: none !important; }
+@media (max-width: 699.98px) { .lf-sharebar { top: var(--m-bar); } .lf-shared .lf-trow { top: calc(var(--m-bar) + 52px); } }

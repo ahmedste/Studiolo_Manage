@@ -1,6 +1,6 @@
 <title>Learn, One Lumen</title>
 <meta name="description" content="Studiolo's Learn with one kind of thing, the Lumen, in three formats: watch it, listen to it, or read it. Made from one brief, kept in one place.">
-<!-- Screens and styles: studiolo /dev/specimens, captured read-only. Learn: src/learn.js. Listen and the brief: src/listen.js. -->
+<!-- Screens and styles: studiolo /dev/specimens, captured read-only. Learn: src/learn.js. Listen and the brief: src/listen.js. Read: src/read.js. -->
 <style>
 :root {
   --lightningcss-light: initial;
@@ -25630,6 +25630,8 @@ html.theme-switching::view-transition-new(root) {
 .lf-switch button svg { width: 15px; height: 15px; }
 .lf-switch button b { font-weight: 500; }
 .lf-switch button small { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+/* Every format takes the same slot whatever its state ("+", "…", "12 min"), so nothing in the switcher ever shifts. */
+.lf-switch button[data-k]:not(.lf-sw-live) { width: 124px; justify-content: center; }
 .lf-switch button:hover:not(:disabled) { color: var(--ink); }
 .lf-switch button[aria-pressed="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); }
 .lf-switch button[aria-pressed="true"] svg { color: var(--accent); }
@@ -25747,6 +25749,75 @@ a.lf-ntitle:hover { color: var(--accent); }
   .lf-pacts { grid-column: 1 / -1; }
   .lf-under { padding-left: 0; }
 }
+
+/* ---------- One frame for every format: the title row and the switcher are pinned in the same place, so moving
+   from Watch to Listen to Read changes only what's under them. ---------- */
+/* The stage scrolls with its own top padding still applied to sticky things, so the row pins at minus that. */
+.ll-page { --lf-gx: 44px; --lf-pt: 36px; }
+.lf-lhead { display: contents; } /* the title row sticks for the whole page, not just its own head */
+.lf-trow { position: sticky; top: calc(-1 * var(--lf-pt)); z-index: 30; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 52px; margin: -10px calc(-1 * var(--lf-gx)) 0; padding: 8px var(--lf-gx); background: var(--paper); box-shadow: 0 1px 0 var(--line); }
+.lf-trow h1 { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--read); font-size: 26px; font-weight: 400; line-height: 1.2; }
+.lf-tr { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lf-share { all: unset; box-sizing: border-box; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 19px; font-size: 13px; color: var(--ink-2); }
+.lf-share svg { width: 15px; height: 15px; }
+.lf-share:hover { color: var(--ink); background: var(--hover-fill); }
+.lf-share:focus-visible { outline: var(--focus-ring); }
+/* Reading progress, drawn along the bottom of the pinned row (Read only sets it). */
+.lf-rp { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--rp, 0)); pointer-events: none; }
+.lf-lhead + .lf-q, .lf-trow + .lf-q { margin-top: 10px; }
+.lf-trow ~ .lf-q { margin: 10px 0 0; font-size: 16px; }
+.lf-trow ~ .lf-meta { margin: 8px 0 18px; min-height: 30px; }
+.lf-fbar { display: contents; }
+.lf-fmeta { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lf-meta .sp { flex: 1; }
+.lf-meta .button { display: inline-flex; align-items: center; gap: 7px; min-height: 0; padding: 5px 11px; font-size: 12.5px; border-radius: 2px; }
+.lf-meta .button svg { width: 14px; height: 14px; }
+.lf-meta .button[aria-pressed="true"] { color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.lf-crumb { margin-bottom: 10px; }
+/* Only the content moves when you switch. */
+.lf-body { animation: lf-in var(--dur-move) var(--ease-entrance) both; }
+@keyframes lf-in { from { opacity: 0; transform: translateY(var(--enter-travel)); } }
+@media (prefers-reduced-motion: reduce) { .lf-body { animation: none; } }
+@media (max-width: 980px) { .ll-page { --lf-gx: 24px; --lf-pt: 28px; } }
+/* On Lumen pages nothing floats over the pinned row: the prototype banner tucks under it and the mini player moves to the bottom. */
+@media (min-width: 700px) { body:has(.lf-trow) .td-proto.ll-proto { z-index: 20; max-width: none; flex-wrap: nowrap; white-space: nowrap; } /* sits beside the breadcrumb; the pinned row slides over it */
+  body:has(.lf-trow) .dl-mini { top: auto; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 264px; } body:has(.lf-trow) .td-proto.ll-proto .ai { display: none; } }
+@media (max-width: 699.98px) {
+  .ll-page { --lf-gx: var(--m-gutter); }
+  .lf-trow { top: var(--m-bar); grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px var(--lf-gx) 8px; }
+  .lf-trow h1 { font-size: 20px; }
+  .lf-tr { justify-content: space-between; }
+  .lf-tr .lf-switch { flex: 1; }
+  .lf-switch button[data-k] { width: auto; flex: 1; justify-content: center; }
+  .lf-share { font-size: 0; gap: 0; padding: 0 11px; } /* icon only; the label stays for screen readers */
+}
+
+/* ---------- Sharing a Lumen ---------- */
+.lf-sharedlg { width: min(480px, calc(100vw - 32px)); }
+.lf-shp { margin: 4px 0 14px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.lf-shp b { font-weight: 500; color: var(--ink); }
+.lf-shfmts { display: grid; gap: 6px; margin: 0 0 12px; }
+.lf-shf { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13.5px; cursor: pointer; }
+.lf-shf:has(input:checked) { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.lf-shf input { margin: 0; accent-color: var(--accent); }
+.lf-shf svg { width: 16px; height: 16px; color: var(--ink-2); }
+.lf-shf b { font-weight: 500; }
+.lf-shf span { justify-self: end; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lf-shnot { margin: 0 0 14px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.lf-shlink { display: flex; gap: 8px; margin: 0 0 16px; }
+.lf-shlink input { flex: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 10px; border: 0; border-radius: 3px; background: var(--board); font: inherit; font-size: 13.5px; color: var(--ink); }
+.lf-shlink input:focus-visible { outline: var(--focus-ring); }
+.lf-shacts { display: flex; justify-content: flex-end; gap: 8px; }
+/* What someone with the link sees: the formats you shared, nothing of yours. */
+.lf-sharebar { position: sticky; top: calc(-1 * var(--lf-pt)); min-height: 36px; box-sizing: border-box; z-index: 31; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: -10px calc(-1 * var(--lf-gx)) 12px; padding: 8px var(--lf-gx); background: var(--accent-soft); font-size: 12.5px; color: var(--ink-2); }
+.lf-sharebar b { font-weight: 600; color: var(--accent); }
+.lf-sharebar span { flex: 1 1 260px; }
+.lf-sharebar button { all: unset; cursor: pointer; font-weight: 500; color: var(--accent); }
+.lf-sharebar button:hover { text-decoration: underline; }
+.lf-sharebar button:focus-visible { outline: var(--focus-ring); }
+.lf-shared .lf-trow { top: calc(36px - var(--lf-pt)); }
+.lf-shared [data-act="keep"], .lf-shared .ll-livepill, .lf-shared [data-dl-act="mark"], .lf-shared [data-dl-act="drive-edition"], .lf-shared .dl-marks-sec, .lf-shared .dl-ways, .lf-shared .dl-goal { display: none !important; }
+@media (max-width: 699.98px) { .lf-sharebar { top: var(--m-bar); } .lf-shared .lf-trow { top: calc(var(--m-bar) + 52px); } }
 </style>
 <style>/* Learn, Dialogues (prototype). Long-form audio in Learn: the Home shelf, the Dialogues tab, the composer, the
    player page, walk mode and the mini player. NEW parts use the prefix `dl-` and only the app's tokens. The player's
@@ -26111,6 +26182,129 @@ a.lf-ntitle:hover { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) {
   .dl-wave i { animation: none !important; }
   .dl-v, .dl-v .dl-disc, .dl-s { transition: none !important; }
+}
+</style>
+<style>/* Learn, slice 2 (prototype): the Read format as a real article. Diagrams take the app's own ink, paper and accent;
+   warm air is the app's warn tone, cool air its accent, and nothing else is coloured. Motion stops for reduced motion. */
+.lf-read { grid-template-columns: 190px minmax(0, 68ch); gap: 44px; }
+.lf-toc { top: 76px; }
+.lf-toc ol { list-style: none; padding: 0; gap: 2px; counter-reset: toc; }
+.lf-toc li { counter-increment: toc; }
+.lf-toc a { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px; padding: 5px 8px; border-radius: 3px; color: var(--ink-2); text-decoration: none; line-height: 1.35; transition: color var(--dur-quick) var(--ease-standard), background var(--dur-quick) var(--ease-standard); }
+.lf-toc a::before { content: counter(toc); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.lf-toc a:hover { color: var(--ink); background: var(--hover-fill); }
+.lf-toc li[aria-current="true"] a { color: var(--ink); background: var(--panel); box-shadow: inset 2px 0 0 var(--accent); }
+.lf-toc a:focus-visible { outline: var(--focus-ring); }
+
+.rd-sec { scroll-margin-top: 84px; margin: 0 0 40px; }
+.lf-article .rd-sec h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 25px; line-height: 1.2; }
+.rd-sec h2 span { font-family: var(--ui); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.lf-article .rd-lede { font-size: 22px; line-height: 1.5; color: var(--ink); }
+.lf-article .rd-lede::before { content: ""; display: block; width: 36px; height: 2px; margin: 0 0 14px; background: var(--accent); }
+.lf-article .rd-pull { margin: 26px 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--quote-rule); font-size: 26px; font-style: italic; line-height: 1.3; color: var(--ink); text-wrap: balance; }
+
+/* Figures */
+.rd-fig { margin: 22px 0 26px; padding: 18px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.rd-fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rd-fig figcaption { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.rd-t { font-family: var(--ui); font-size: 11px; fill: var(--ink-2); }
+.rd-wall { fill: none; stroke: var(--ink-2); stroke-width: 3; stroke-linecap: round; }
+.rd-mass { fill: var(--board); stroke: var(--ink-3); stroke-width: 1; }
+.rd-room { fill: var(--panel); stroke: none; }
+.rd-ground { stroke: var(--ink-3); stroke-width: 1.5; }
+.rd-jar { fill: var(--surface-board); stroke: var(--ink-2); stroke-width: 1.5; }
+.rd-water { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.7; }
+.rd-ah.cool { fill: var(--accent); } .rd-ah.warm { fill: var(--warn); }
+.rd-flow { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 7 7; animation: rd-dash 1.4s linear infinite; }
+.rd-flow.cool { stroke: var(--accent); } .rd-flow.warm { stroke: var(--warn); }
+@keyframes rd-dash { to { stroke-dashoffset: -28; } }
+.rd-wisp { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-linecap: round; opacity: 0; animation: rd-rise 2.4s ease-out infinite; }
+.rd-wisp.w2 { animation-delay: 0.8s; } .rd-wisp.w3 { animation-delay: 1.6s; }
+.rd-wisps { opacity: var(--wo, 1); transition: opacity var(--dur-move) var(--ease-standard); }
+@keyframes rd-rise { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+.rd-trio-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.rd-mech { display: grid; align-content: start; gap: 4px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.rd-mech svg { margin-bottom: 6px; padding: 6px; border-radius: 3px; background: var(--paper); box-sizing: border-box; }
+.rd-mech b { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+
+/* Interactive figures: a slider, a readout and a bar. */
+.rd-hum-grid { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 22px; align-items: center; }
+.rd-hum-ctl, .rd-court-ctl { display: grid; gap: 8px; font-size: 13px; }
+.rd-court-ctl { margin-top: 12px; }
+.rd-hum-ctl label, .rd-court-ctl label { color: var(--ink-2); }
+.rd-hum-ctl label b, .rd-court-ctl label b { font-weight: 600; color: var(--ink); }
+.rd-fig input[type="range"] { width: 100%; margin: 4px 0 0; accent-color: var(--accent); }
+.rd-ticks { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); }
+.rd-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.rd-presets button, .rd-seg button, .rd-reveal, .rd-cite { all: unset; box-sizing: border-box; cursor: pointer; }
+.rd-presets button { padding: 4px 10px; border-radius: 12px; font-size: 12px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); }
+.rd-presets button:hover { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.lf-article .rd-out { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 0; font-family: var(--ui); font-size: 13px; color: var(--ink-2); }
+.rd-out b { font-family: var(--read); font-size: 22px; font-weight: 400; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rd-bar { height: 6px; border-radius: 3px; background: var(--board); overflow: hidden; }
+.rd-bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--accent); transition: width var(--dur-move) var(--ease-standard); }
+.rd-shade { fill: var(--ink); opacity: 0.12; transition: d var(--dur-move) var(--ease-standard); }
+.rd-ray { stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 0.8; }
+
+/* The house, afternoon and night. */
+.rd-seg { display: inline-flex; gap: 2px; margin: 0 0 12px; padding: 3px; border-radius: 18px; background: var(--surface-board); }
+.rd-seg button { padding: 5px 14px; border-radius: 15px; font-size: 12.5px; color: var(--ink-2); }
+.rd-seg button[aria-pressed="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); }
+.rd-seg button:focus-visible, .rd-presets button:focus-visible, .rd-reveal:focus-visible, .rd-cite:focus-visible { outline: var(--focus-ring); }
+.rd-house svg { transition: background var(--dur-calm) var(--ease-standard); border-radius: 3px; }
+.rd-house[data-time="night"] svg { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.rd-day, .rd-night { transition: opacity var(--dur-move) var(--ease-standard); }
+.rd-house[data-time="day"] .rd-night, .rd-house[data-time="night"] .rd-day { opacity: 0; }
+.rd-sun { fill: color-mix(in srgb, var(--board-marker) 70%, transparent); }
+.rd-rays path { stroke: var(--board-marker); stroke-width: 2; stroke-linecap: round; }
+.rd-rays { transform-origin: 560px 56px; animation: rd-spin 30s linear infinite; }
+@keyframes rd-spin { to { transform: rotate(360deg); } }
+.rd-moon { fill: var(--ink-3); }
+.rd-sleep { stroke: var(--ink-2); stroke-width: 4; stroke-linecap: round; }
+
+/* Table, steps, check yourself, sources */
+.rd-tablewrap { overflow-x: auto; margin: 20px 0 24px; }
+.rd-table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
+.rd-table th, .rd-table td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.rd-table thead th { font-family: var(--read); font-size: 17px; font-weight: 400; color: var(--ink); }
+.rd-table tbody th { font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+.rd-steps { margin: 0 0 22px; padding: 0; list-style: none; counter-reset: st; display: grid; gap: 12px; }
+.rd-steps li { counter-increment: st; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; font-family: var(--read); font-size: 18px; line-height: 1.55; }
+.rd-steps li::before { content: counter(st); display: grid; place-items: center; width: 26px; height: 26px; margin-top: 2px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--ui); font-size: 12.5px; font-weight: 600; }
+.rd-steps b { font-weight: 600; }
+.rd-check { margin: 0 0 22px; padding: 16px 18px; border-radius: 4px; background: var(--quote-paper); box-shadow: inset 3px 0 0 var(--quote-rule); }
+.lf-article .rd-check p { margin: 0 0 10px; font-size: 17px; }
+.rd-check b { font-weight: 600; }
+.rd-reveal { font-size: 13px; font-weight: 500; color: var(--accent); }
+.rd-reveal:hover { text-decoration: underline; }
+.lf-article .rd-answer { margin: 10px 0 0; animation: lf-in var(--dur-standard) var(--ease-entrance) both; }
+.rd-cite { display: inline-flex; align-items: baseline; gap: 6px; max-width: 100%; margin: 0 2px; padding: 1px 9px; border-radius: 11px; background: var(--accent-soft); font-family: var(--ui); font-size: 12px; color: var(--accent); vertical-align: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-cite span { color: var(--ink-2); }
+.rd-cite:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.lf-article .rd-srcs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--ui); font-size: 12px; color: var(--ink-3); }
+.rd-srcs > span { margin-right: 4px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 10.5px; }
+
+@media (max-width: 760px) {
+  .lf-read { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lf-toc { position: static; margin: 0 calc(-1 * var(--lf-gx)); padding: 0 var(--lf-gx); overflow-x: auto; scrollbar-width: none; }
+  .lf-toc p { display: none; }
+  .lf-toc ol { display: flex; gap: 6px; width: max-content; }
+  .lf-toc a { display: flex; gap: 6px; padding: 5px 11px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
+  .lf-toc li[aria-current="true"] a { box-shadow: inset 0 0 0 1px var(--accent); }
+  .rd-hum-ctl label, .rd-out { min-width: 0; }
+  .rd-trio-grid { grid-template-columns: minmax(0, 1fr); }
+  .rd-mech { grid-template-columns: 120px minmax(0, 1fr); column-gap: 12px; }
+  .rd-mech svg { grid-row: span 2; margin: 0; }
+  .rd-hum-grid { grid-template-columns: minmax(0, 1fr); }
+  .rd-hum-grid > svg { max-width: 200px; justify-self: center; }
+  .lf-article .rd-lede { font-size: 19px; }
+  .lf-article .rd-pull { font-size: 22px; }
+  .rd-fig { padding: 14px; margin-left: -4px; margin-right: -4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rd-flow, .rd-wisp, .rd-rays { animation: none; }
+  .rd-wisp { opacity: 0.8; }
 }
 </style>
 <div id="vx-app"></div>
@@ -26765,9 +26959,9 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const D = DIALOGUES.find((x) => x.id === id); if (!D) return;
     A.leaveStudio(); A.S.run++;
     cur = D; A.S.view = "dialogue"; A.S.tab = "lumens";
-    A.learnShell(`<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(D.title)}</span></div></header>
-      <div class="dl-head"></div>
-      <div class="dl-main"><div class="dl-col">
+    A.learnShell(`${A.crumb(D.title)}
+      <div class="lf-lhead" data-dhead></div>
+      <div class="dl-main lf-body"><div class="dl-col">
         <div class="dl-player" data-d="${D.id}">
           <div class="dl-voices"><div class="dl-v a"><span class="dl-disc a">${initials(D.pair.A)}</span><p><b>${esc(D.pair.A.name)}</b>${esc(D.pair.A.role)}</p></div><span class="dl-wave" aria-hidden="true">${"<i></i>".repeat(22)}</span><div class="dl-v b"><span class="dl-disc b">${initials(D.pair.B)}</span><p><b>${esc(D.pair.B.name)}</b>${esc(D.pair.B.role)}</p></div></div>
           <p class="dl-cap" aria-live="off"><span class="dl-cap-who" data-dl-speaker="${D.id}"></span><span class="dl-cap-t"></span></p>
@@ -26789,12 +26983,12 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     if (autoplay) play(D);
   }
   function renderHead() {
-    const D = cur, h = $(".dl-head"); if (!h) return;
+    const D = cur, h = $("[data-dhead]"); if (!h) return;
     const L = lumenOf(D);
     const ed = D.context === "drive" ? (L?.listen && L.listen !== D.id ? `<button class="button button-quiet" type="button" data-dl-open="${L.listen}">${IC.phones}Standard edition</button>` : "")
       : L?.listenDrive ? `<button class="button button-quiet" type="button" data-dl-open="${L.listenDrive}">${IC.car}Drive edition</button>` : `<button class="button button-quiet" type="button" data-dl-act="drive-edition">${IC.car}Make a drive edition</button>`;
-    h.innerHTML = `<div class="dl-head-l"><h1>${esc(D.title)}</h1><p class="dl-qline">${esc(D.q)}</p><div class="dl-meta">${topicTag(D)}${goalPill(D)}${ctxPill(D)}<span>Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}</div></div>
-      <div class="dl-head-r">${A.fmtSwitch(L, "listen")}<div class="dl-head-acts">${ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button></div></div>`;
+    // The same head as Watch and Read: only the format's own bits (edition, offline) differ, and they sit under the switcher.
+    h.innerHTML = A.lumenHeadInner(L, "listen", { title: D.title, q: D.q, anchorFrom: { anchor: [areaOf(D.topic), D.topic] }, bar: `${ctxPill(D)}<span class="lf-fmeta">Two voices · ${lenLabel(D)} · ${D.chapters.length || "…"} chapters${D.sample ? " · sample, abridged" : ""}</span>${stateLine(D)}<span class="sp"></span>${A.S.shareView ? "" : ed}<button class="button button-quiet" type="button" data-dl-act="offline" aria-pressed="${!!D.offline}">${IC.down}${D.offline ? "Saved offline" : "Save for offline"}</button>` });
   }
   function renderChapters() {
     const D = cur, ol = $(".dl-chapters"), bar = $(".dl-bar"); if (!ol) return;
@@ -27019,6 +27213,183 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   };
 })();
 </script>
+<script>/* Learn, slice 2 (prototype): the Read format's long reads. A long read is a real article, not a page of text: animated
+   HTML/SVG diagrams of the mechanism, small interactive figures you can play with, a comparison table, steps, a
+   check-yourself question, and source chips that point into Commonplace. learn.js asks for an article by key and mounts
+   its behaviour; generated long reads without a key fall back to plain sections.
+   Nothing here invents numbers: the humidity figure is qualitative, and the courtyard figure is plain geometry with its
+   assumption stated (the sun 45° up). */
+(() => {
+  "use strict";
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const cite = (title, where) => `<button type="button" class="rd-cite" data-rd-src="${esc(title)}">${esc(title)}${where ? `<span>${esc(where)}</span>` : ""}</button>`;
+  const sec = (i, title, body) => `<section id="rs-${i}" class="rd-sec" data-rs-sec="${i}"><h2><span>${i + 1}</span>${esc(title)}</h2>${body}</section>`;
+  const fig = (cls, inner, caption) => `<figure class="rd-fig ${cls}">${inner}${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`;
+  // Arrowheads take their colour from the line's class.
+  const DEFS = `<defs><marker id="rd-ah-cool" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="rd-ah cool"/></marker><marker id="rd-ah-warm" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="rd-ah warm"/></marker></defs>`;
+  const flow = (d, kind = "cool") => `<path class="rd-flow ${kind}" d="${d}" marker-end="url(#rd-ah-${kind})"/>`;
+
+  /* ---------- figures */
+  const mechanisms = () => fig("rd-trio", `<div class="rd-trio-grid">
+      <div class="rd-mech"><svg viewBox="0 0 200 120" role="img" aria-label="Wind pressure: air pushed in one side of a room and out the other">${DEFS}
+        <path class="rd-wall" d="M40 30H160M40 30V52M40 78V100M160 30V52M160 78V100M40 100H160"/>${flow("M6 65H194")}<text class="rd-t" x="8" y="20">wind</text></svg><b>Wind pressure</b><span>Pushed in on the windward side, pulled out on the lee.</span></div>
+      <div class="rd-mech"><svg viewBox="0 0 200 120" role="img" aria-label="Stack effect: cool air drawn in low, warm air rising and leaving high">${DEFS}
+        <path class="rd-wall" d="M40 30H128M152 30H160M40 30V80M40 98V100M160 30V100M40 100H160"/>${flow("M4 90H70", "cool")}${flow("M84 88C112 76 136 60 140 34V6", "warm")}<text class="rd-t" x="150" y="14">warm out</text><text class="rd-t" x="4" y="112">cool in</text></svg><b>Stack effect</b><span>Warm air rises and leaves high up; cooler air is drawn in low.</span></div>
+      <div class="rd-mech"><svg viewBox="0 0 200 120" role="img" aria-label="Evaporation: air passing over a wet jar loses heat">${DEFS}
+        <path class="rd-jar" d="M84 112C76 96 76 80 86 72H114C124 80 124 96 116 112Z"/><path class="rd-water" d="M80 92C92 88 108 96 120 92"/>
+        <g class="rd-wisps"><path class="rd-wisp" d="M92 68C88 60 96 54 92 46"/><path class="rd-wisp w2" d="M100 68C96 60 104 54 100 46"/><path class="rd-wisp w3" d="M108 68C104 60 112 54 108 46"/></g>
+        ${flow("M196 40H128", "warm")}${flow("M72 40H6", "cool")}<text class="rd-t" x="150" y="28">warm</text><text class="rd-t" x="16" y="28">cooler</text></svg><b>Evaporation</b><span>Water turning to vapour takes heat from the air passing over it.</span></div>
+    </div>`, "Three ways air takes heat away. The old builders used all three without naming them.");
+
+  const humidity = () => fig("rd-hum", `<div class="rd-hum-grid"><svg viewBox="0 0 220 170" role="img" aria-label="A wet jar at the foot of a tower, with vapour rising">${DEFS}
+        <path class="rd-wall" d="M60 6V120M160 6V120"/><path class="rd-jar" d="M94 160C84 140 84 120 96 110H124C136 120 136 140 126 160Z"/><path class="rd-water" d="M90 136C102 132 118 140 130 136"/>
+        <g class="rd-wisps"><path class="rd-wisp" d="M102 104C98 94 106 88 102 76"/><path class="rd-wisp w2" d="M110 104C106 94 114 88 110 76"/><path class="rd-wisp w3" d="M118 104C114 94 122 88 118 76"/></g>
+        ${flow("M110 8V64")}<text class="rd-t" x="168" y="20">down the tower</text></svg>
+      <div class="rd-hum-ctl"><label for="rd-rh"><b>How humid is the air?</b></label><input id="rd-rh" type="range" min="10" max="95" value="25" data-rd-rh>
+        <div class="rd-ticks"><span>Dry</span><span>Humid</span></div>
+        <div class="rd-presets"><button type="button" data-rh="20">Dry desert afternoon</button><button type="button" data-rh="82">Humid coast in August</button></div>
+        <p class="rd-out"><span>Cooling from the wet jar</span><b data-rd-out>Strong</b></p><div class="rd-bar"><i data-rd-bar></i></div></div></div>`,
+    "Drag it. In dry air the water evaporates quickly and takes heat with it. As the air fills with water there's less room for more, and the jar stops helping. Qualitative, no numbers.");
+
+  const house = () => fig("rd-house", `<div class="rd-seg" role="group" aria-label="Time of day"><button type="button" data-rd-time="day" aria-pressed="true">Afternoon</button><button type="button" data-rd-time="night" aria-pressed="false">Night</button></div>
+      <svg viewBox="0 0 640 300" role="img" aria-label="Section through a courtyard house with a wind tower over the family room">${DEFS}
+        <path class="rd-ground" d="M20 262H620"/>
+        <path class="rd-mass" d="M60 170H300V262H60Z"/><path class="rd-mass" d="M480 150H600V262H480Z"/>
+        <path class="rd-mass" d="M86 60H96V170H86ZM134 60H144V170H134Z"/><path class="rd-wall" d="M80 60H150M80 52H150"/>
+        <path class="rd-room" d="M70 180H290V256H70Z"/>
+        <text class="rd-t" x="150" y="226">Family room</text><text class="rd-t" x="362" y="282">Courtyard</text><text class="rd-t" x="40" y="44">Tower (barjeel)</text>
+        <g class="rd-day"><circle class="rd-sun" cx="560" cy="56" r="16"/><g class="rd-rays"><path d="M560 26V16M560 96V86M530 56H520M600 56H590M539 35L532 28M588 84L581 77M539 77L532 84M588 28L581 35"/></g>
+          ${flow("M250 50H115V214H300C350 214 386 176 394 110")}<text class="rd-t" x="256" y="46">breeze</text><text class="rd-t" x="196" y="160">roof terrace</text></g>
+        <g class="rd-night"><path class="rd-moon" d="M572 40A20 20 0 1 0 572 76A15 15 0 1 1 572 40Z"/>
+          ${flow("M340 252C334 224 346 204 338 170", "warm")}${flow("M390 252C384 222 396 200 388 160", "warm")}${flow("M440 252C434 226 446 204 438 176", "warm")}
+          <path class="rd-sleep" d="M200 166H250"/><text class="rd-t" x="196" y="148">sleeping on the roof</text></g>
+      </svg>`, `<span data-rd-cap="day">Afternoon: the breeze comes down the tower, crosses the family room and leaves through the courtyard.</span><span data-rd-cap="night" hidden>Night: the courtyard and the walls give the day's heat back to the sky, and the family sleeps on the roof.</span>`);
+
+  const court = () => fig("rd-court", `<svg viewBox="0 0 520 250" role="img" aria-label="Section through a courtyard: the deeper it is, the more of its floor is in shade">${DEFS}
+        <path class="rd-ground" d="M20 222H500"/><path class="rd-shade" data-rd-shade d=""/><path class="rd-ray" data-rd-ray d=""/>
+        <rect class="rd-mass" data-rd-wl x="0" y="82" width="24" height="140"/><rect class="rd-mass" data-rd-wr x="0" y="82" width="24" height="140"/>
+        <text class="rd-t" x="24" y="40">sun 45° up</text></svg>
+      <div class="rd-court-ctl"><label for="rd-ratio"><b>How deep is the court?</b> <span data-rd-ratio-out></span></label><input id="rd-ratio" type="range" min="0.5" max="2.5" step="0.1" value="0.8" data-rd-ratio>
+        <div class="rd-ticks"><span>Wide and shallow</span><span>Deep and narrow</span></div>
+        <p class="rd-out"><span>Floor in shade</span><b data-rd-shade-out></b></p><div class="rd-bar"><i data-rd-shade-bar></i></div></div>`,
+    "Geometry only: walls the same height, the sun 45° up from one side. Once the court is as deep as it is wide, its whole floor is in shade.");
+
+  const breeze = () => fig("rd-breeze", `<svg viewBox="0 0 520 170" role="img" aria-label="Plan: a breeze crossing the rooms and leaving through the courtyard">${DEFS}
+        <path class="rd-mass" d="M40 30H190V140H40Z"/><path class="rd-mass" d="M330 30H480V140H330Z"/><path class="rd-room" d="M52 42H178V128H52ZM342 42H468V128H342Z"/>
+        <text class="rd-t" x="86" y="90">room</text><text class="rd-t" x="378" y="90">room</text><text class="rd-t" x="232" y="160">courtyard</text>
+        ${flow("M6 85H230C250 85 260 70 260 40V8")}${flow("M514 85H290C270 85 260 70 260 40", "cool")}<text class="rd-t" x="8" y="74">prevailing wind</text></svg>`,
+    "Plan view. With openings on the far side of each room, the courtyard becomes the outlet that pulls air across the house.");
+
+  /* ---------- articles */
+  const ARTICLES = {
+    cooling: () => {
+      const sections = ["The one idea", "Three ways air takes heat away", "Why humidity changes the rules", "What the barjeel houses did", "What it means for your site"];
+      const html = [
+        sec(0, sections[0], `<p class="rd-lede">In Dubai, a wind tower can't make the air colder, but it can make the air move, and moving air is what makes people comfortable for much of the year.</p>
+          <p>This long read follows that idea from the physics to your thesis site. It draws on your lecture notes and on Hassan Fathy where they help, and says so when it's general knowledge.</p>
+          <p class="rd-pull">Moving air, not colder air.</p>`),
+        sec(1, sections[1], `<p>Three mechanisms do the work. Wind pressure, the stack effect and evaporation each take heat away in a different way, and the old builders used all three without naming them.</p>
+          ${mechanisms()}
+          <p>Your lecture notes put the order in one line: shade first, then move air, then store or lose heat. ${cite("Climate and Architecture: lecture notes", "p. 2")}</p>`),
+        sec(2, sections[2], `<p>Evaporation needs dry air. On a humid August day the air is already close to full of water, so there's little room for more, and the wet jar at the foot of an Egyptian malqaf does very little.</p>
+          ${humidity()}
+          <p>That's why the Gulf's barjeel rarely relied on water the way the Egyptian malqaf did. It opened on four sides and caught whatever breeze came off the sea. A breeze across damp skin still carries sweat away, so it cools people even when it can't cool the air.</p>`),
+        sec(3, sections[3], `<p>In the old courtyard houses of Al Fahidi, the tower stands over one room, where the family sat through the hottest hours. Not the whole house: one room. The courtyard and the thick, shaded walls carried the rest, along with the family moving to wherever was coolest at that hour.</p>
+          ${house()}
+          <p>Fathy's point, in your copy of his book, is that houses like these work as systems: the tower, the courtyard, the shaded walls and the family's habits together. Lift the tower out on its own and you don't get the same result. ${cite("Natural Energy and Vernacular Architecture", "Hassan Fathy")}</p>
+          <div class="rd-tablewrap"><table class="rd-table"><thead><tr><th></th><th>Malqaf</th><th>Barjeel</th></tr></thead><tbody>
+            <tr><th>Faces</th><td>One way, to the prevailing breeze</td><td>Four ways, for wind from anywhere</td></tr>
+            <tr><th>Cools with</td><td>Often water at its foot</td><td>Mostly moving air</td></tr>
+            <tr><th>Works best</td><td>In dry heat</td><td>Where the air is too humid for water to help</td></tr>
+            <tr><th>See one</td><td>Old Cairo houses</td><td>Al Fahidi, Dubai</td></tr></tbody></table></div>`),
+        sec(4, sections[4], `<ol class="rd-steps">
+            <li><b>Shade first.</b> A deep, narrow courtyard, and openings shaded from the low east and west sun.</li>
+            <li><b>Give the tower one job.</b> Move air through the main living room: in high, across, and out to the courtyard.</li>
+            <li><b>Give it a door.</b> Closed through the humid months, open through the cooler ones. Ceiling fans keep the air moving when it's shut.</li>
+            <li><b>Put mass only where it can cool down.</b> Humid nights barely cool, so heavy walls help only where they're shaded and can lose heat on cooler nights.</li></ol>
+          <div class="rd-check"><p class="rd-check-q"><b>Check yourself.</b> Why does a wet jar at the foot of a tower cool the air in a dry desert, but hardly at all on a humid coast?</p>
+            <button type="button" class="rd-reveal" data-rd-reveal>Show the answer</button><p class="rd-answer" hidden>Dry air can take up water, so evaporation takes heat with it. Humid air is already close to full of water, so it can't.</p></div>
+          <p class="rd-srcs"><span>Sources in this read</span>${cite("Climate and Architecture: lecture notes", "PDF")}${cite("Natural Energy and Vernacular Architecture", "Book")}</p>`),
+      ].join("");
+      return { sections, html };
+    },
+    courtyards: () => {
+      const sections = ["What a courtyard does", "Dry heat: a well of cool air", "Humid heat: a path for breezes", "Proportions that work", "Shade before anything"];
+      const html = [
+        sec(0, sections[0], `<p class="rd-lede">A courtyard does different work in different climates. In dry heat it holds cool night air; in humid heat it shades, and it gives the breeze somewhere to go.</p>
+          <p>This long read follows that difference, and ends with what to check on your own site.</p>`),
+        sec(1, sections[1], `<p>In a dry climate the nights cool down. A courtyard collects that cool night air, which is heavier than warm air, and holds it into the morning, while the walls around it stay shaded.</p>`),
+        sec(2, sections[2], `<p>In a humid climate the nights barely cool, so that trick fades. The courtyard earns its keep another way: open it to the prevailing wind, keep each room's other opening on the far side, and it becomes the outlet that pulls air across the house.</p>${breeze()}`),
+        sec(3, sections[3], `<p>The deeper and narrower the court, the more of its floor and walls stay in shade. Try it.</p>${court()}
+          <p class="rd-pull">How much of it is in shade at three in the afternoon?</p>`),
+        sec(4, sections[4], `<p>So in humid places, judge a courtyard by two questions: how much of it is in shade at three in the afternoon, and where the air leaves the rooms around it. Thermal mass comes a distant third.</p>
+          <div class="rd-check"><p class="rd-check-q"><b>Check yourself.</b> Why does a courtyard's cool-air trick work in dry heat but fade in humid heat?</p>
+            <button type="button" class="rd-reveal" data-rd-reveal>Show the answer</button><p class="rd-answer" hidden>Because dry nights cool down and humid ones barely do, so in humid heat there's little cool night air to collect.</p></div>
+          <p class="rd-srcs"><span>Sources in this read</span>${cite("Climate and Architecture: lecture notes", "PDF")}</p>`),
+      ].join("");
+      return { sections, html };
+    },
+  };
+  const article = (key) => (ARTICLES[key] ? ARTICLES[key]() : null);
+
+  /* ---------- behaviour: the figures, the section list and the reading progress */
+  function mount(el, { toast } = {}) {
+    if (!el) return;
+    const $ = (s) => el.querySelector(s), $$ = (s) => [...el.querySelectorAll(s)];
+    const hum = (v) => {
+      const f = $(".rd-hum"); if (!f) return;
+      const rh = +v, dry = Math.max(0, Math.min(1, (90 - rh) / 75));
+      f.style.setProperty("--wo", (0.15 + dry * 0.85).toFixed(2));
+      $("[data-rd-bar]").style.width = `${Math.round(dry * 100)}%`;
+      $("[data-rd-out]").textContent = rh < 35 ? "Strong" : rh < 55 ? "Useful" : rh < 75 ? "Weak" : "Almost none";
+      $("[data-rd-rh]").value = rh;
+    };
+    const courtFig = (v) => {
+      const f = $(".rd-court"); if (!f) return;
+      const r = +v, H = 140, W = Math.round(H / r), cx = 260, x0 = cx - W / 2, x1 = cx + W / 2, top = 222 - H;
+      const sh = Math.min(W, H); // the sun 45° up: the left wall's shadow reaches as far across as the wall is tall
+      $("[data-rd-wl]").setAttribute("x", x0 - 24); $("[data-rd-wr]").setAttribute("x", x1);
+      $("[data-rd-shade]").setAttribute("d", `M${x0} ${top}L${x0 + sh} 222H${x0}Z`);
+      $("[data-rd-ray]").setAttribute("d", `M${x0 - 60} ${top - 60}L${x0 + sh} 222`);
+      const pct = Math.round((sh / W) * 100);
+      $("[data-rd-shade-out]").textContent = `${pct}%`; $("[data-rd-shade-bar]").style.width = `${pct}%`;
+      $("[data-rd-ratio-out]").textContent = `${r.toFixed(1)} times as deep as wide`;
+    };
+    if ($("[data-rd-rh]")) hum($("[data-rd-rh]").value);
+    if ($("[data-rd-ratio]")) courtFig($("[data-rd-ratio]").value);
+    el.addEventListener("input", (e) => { if (e.target.dataset.rdRh !== undefined) hum(e.target.value); if (e.target.dataset.rdRatio !== undefined) courtFig(e.target.value); });
+    el.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      if (b.dataset.rh) return hum(b.dataset.rh);
+      if (b.dataset.rdTime) {
+        const f = b.closest(".rd-house"); f.dataset.time = b.dataset.rdTime;
+        $$("[data-rd-time]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        $$("[data-rd-cap]").forEach((c) => (c.hidden = c.dataset.rdCap !== b.dataset.rdTime));
+        return;
+      }
+      if (b.dataset.rdReveal !== undefined) { const a = b.nextElementSibling; a.hidden = !a.hidden; b.textContent = a.hidden ? "Show the answer" : "Hide the answer"; return; }
+      if (b.dataset.rdSrc) return toast?.("Opens in your Commonplace.", `“${esc(b.dataset.rdSrc)}”, at the passage this read draws on.`);
+    });
+    const house = $(".rd-house"); if (house) house.dataset.time = "day";
+    // The section list follows the reading, and the pinned head shows how far through you are.
+    // The app's main stage scrolls on desktop; on a phone it doesn't, and the window does.
+    const main = el.closest("main"), sc = main && getComputedStyle(main).overflowY === "auto" ? main : null;
+    const toc = [...document.querySelectorAll(".lf-toc li")], secs = $$("[data-rs-sec]");
+    const bar = document.querySelector(".lf-trow");
+    const onScroll = () => {
+      if (!el.isConnected) return (sc || window).removeEventListener("scroll", onScroll);
+      const top = sc ? sc.getBoundingClientRect().top : 0, vh = sc ? sc.clientHeight : innerHeight;
+      let cur = 0; secs.forEach((s, i) => { if (s.getBoundingClientRect().top - top < 160) cur = i; });
+      toc.forEach((li, i) => (i === cur ? li.setAttribute("aria-current", "true") : li.removeAttribute("aria-current")));
+      const art = $(".lf-article") || el, r = art.getBoundingClientRect(), h = r.height - vh * 0.6;
+      bar?.style.setProperty("--rp", Math.max(0, Math.min(1, (top - r.top + 120) / Math.max(1, h))).toFixed(3));
+    };
+    (sc || window).addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  }
+
+  window.LearnRead = { article, mount };
+})();
+</script>
 <script>/* Learn, slice 2 (prototype): one Lumen, three formats.
    - A Lumen is one idea, explained for you. It comes as Watch (slides and a narrator), Listen (two voices, 10–30 min;
      src/listen.js) or Read (a long read). Live isn't a format: it's talking any Lumen through.
@@ -27057,6 +27428,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     watch: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.3v5.4l4.6-2.7z" fill="currentColor" stroke="none"/></svg>',
     listen: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="1.5"/><rect x="16.5" y="14" width="4.5" height="7" rx="1.5"/></svg>',
     read: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 5.5c3-1 5.8-.6 8.5 1v13c-2.7-1.6-5.5-2-8.5-1zM20.5 5.5c-3-1-5.8-.6-8.5 1v13c2.7-1.6 5.5-2 8.5-1z"/></svg>',
+    share: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7h14v-7"/></svg>',
     plus: '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   };
   const now = () => new Date().toTimeString().slice(0, 5);
@@ -27186,7 +27558,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     shell("library");
     railCurrent("/learn");
     const main = $("main", root);
-    main.innerHTML = `<div class="ll-page" data-view="${S.view}">${inner}</div>`;
+    const share = S.shareView ? `<div class="lf-sharebar" role="status"><b>Viewer preview</b><span>This is what someone with the link sees: ${[...S.shareView.fmts].map((k) => FMT[k]).join(", ")}. No Live, no notes, no goal.</span><button type="button" data-share-exit>Back to your Lumen</button></div>` : "";
+    main.innerHTML = `<div class="ll-page${S.shareView ? " lf-shared" : ""}" data-view="${S.view}">${share}${inner}</div>`;
     fitStages();
   }
   const TABS = [["home", "Home"], ["lumens", "Lumens"], ["courses", "Courses"]];
@@ -27218,13 +27591,25 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   /** The same switcher at the top of every Lumen page: its three formats, then Live (talk it through now).
    *  On the Watch page, Watch and Live are the player's own modes (recording and live), so one control does both. */
   function fmtSwitch(L, cur, { studio } = {}) {
-    const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
+    const fs = (L ? formats(L) : [["watch", "Watch", true, ""]]).filter((f) => !S.shareView || (f[2] && S.shareView.fmts.has(f[0])));
     const btn = ([k, label, has, meta]) => studio && k === "watch"
       ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta)}</small></button>`
-      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+"}</small></button>`;
+      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}"${!has && L.making === k ? ' title="Being written"' : ""}>${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? "…" : "+"}</small></button>`;
     const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
+    if (S.shareView) return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}</span>`;
     return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b></button></span>`;
   }
+  /** The head every Lumen page shares, so moving between formats changes only what's under it. The top row (title,
+   *  the format switcher, Share) is identical in all three formats and stays pinned while you scroll. `bar` holds the
+   *  format's own actions, under the switcher, where they can't push it around. */
+  function lumenHeadInner(L, cur, { studio, title, q, bar = "", anchorFrom } = {}) {
+    const T = title || L?.title || "", Q = q ?? L?.q ?? "", A0 = anchorFrom || L;
+    return `<div class="lf-trow"><h1 title="${esc(T)}">${esc(T)}</h1><div class="lf-tr">${fmtSwitch(L, cur, { studio })}${L && !S.shareView ? `<button class="lf-share" type="button" data-share="${L.id}">${I.share}Share</button>` : ""}</div><i class="lf-rp" aria-hidden="true"></i></div>
+      <p class="lf-q">${esc(Q)}</p>
+      <div class="lf-meta">${A0?.anchor ? tag(A0) : ""}${L ? goalTag(L) : ""}<span class="lf-fbar">${bar}</span></div>`;
+  }
+  const lumenHead = (L, cur, o) => `<div class="lf-lhead">${lumenHeadInner(L, cur, o)}</div>`;
+  const crumb = (t) => `<header class="destination-header lf-crumb"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(t)}</span></div></header>`;
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
   const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><b>${esc(L.title)}</b><span class="lf-read-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
   /** The poster follows the Lumen's main format, and carries that format's flag so the kinds read apart at a glance. */
@@ -27398,7 +27783,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
   function dock({ ctx, chips, right = 0 }) {
-    ld.hidden = false; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
+    ld.hidden = !!S.shareView; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
     requestAnimationFrame(placeDock);
   }
   function placeDock() {
@@ -27617,10 +28002,9 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     },
     markup() {
       const L = this.L;
-      return `<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-        <div class="ll-studio-head"><h1>${esc(L.title)}</h1>${fmtSwitch(LUMENS.find((x) => x.id === L.id), "watch", { studio: true })}<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
-          <button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button></div>
-        <div class="ll-studio"><div class="ll-stagecol">
+      return `${crumb(L.title)}
+        ${lumenHead(LUMENS.find((x) => x.id === L.id), "watch", { studio: true, title: L.title, q: L.q, anchorFrom: L, bar: `<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span><button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button>` })}
+        <div class="ll-studio lf-body"><div class="ll-stagecol">
           <div class="xp-screen-stage" data-captions="on" style="position:relative"><div class="xp-box"><div class="xp-stage" role="region" aria-label="Lumen stage" style="${STAGE}"><div class="xp-slide-host"></div><span class="xp-watermark" aria-hidden="true"><span class="xp-mark xp-watermark-mark" aria-hidden="true">S</span></span><span class="xp-pointer" aria-hidden="true" data-visible="false"><svg viewBox="0 0 20 28" width="22" height="30.8"><path d="M2 2 L2 22.5 L7.2 17.8 L11 26 L14.6 24.4 L10.9 16.3 L17.8 16.3 Z"></path></svg></span></div><div class="xp-overlay"><div class="xp-caption" aria-hidden="true" data-visible="false"></div></div></div></div>
           <div class="ll-ctrl"><button class="xp-ib xp-ib-play" type="button" aria-label="Play">${I.play}</button><span class="ll-progress" aria-hidden="true"></span><span class="ll-pos" style="font-variant-numeric:tabular-nums;white-space:nowrap"></span></div>
           <div class="ll-beats" role="group" aria-label="Slides"></div>
@@ -27893,7 +28277,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
         try {
           await streamLines(`${LEARNER}\nMake a Lumen: a narrated slide explainer you will speak aloud, live, to this learner.\n${anchor ? `It's about their topic "${anchor}".\n` : ""}They asked: "${q}"\nReply with JSON Lines only. First line: {"title":"at most 7 words","question":"the question in one line","intro":"one spoken opening sentence, under 25 words"}. Then 5 slide lines, using at least two slide types, building from the basics to one practical takeaway.\n${FORMAT}`, (o) => {
             if (!mine()) return;
-            if (!gotTitle && o.question !== undefined) { gotTitle = true; L.title = o.title || L.title; L.q = o.question || q; L.intro = o.intro || ""; SES.beats[0] = titleBeat(L); $(".ll-studio-head h1", root).textContent = L.title; if (SES.i === 0) STG.show(SES.beats[0]); SES.rail(); return; }
+            if (!gotTitle && o.question !== undefined) { gotTitle = true; L.title = o.title || L.title; L.q = o.question || q; L.intro = o.intro || ""; SES.beats[0] = titleBeat(L); $(".lf-trow h1", root).textContent = L.title; if (SES.i === 0) STG.show(SES.beats[0]); SES.rail(); return; }
             if (o.title && o.say) { SES.beats.push(beat(o)); SES.rail(); }
           });
         } catch (e) { if (e === STOP) return; try { aiFail(e); } catch { return; } }
@@ -27901,7 +28285,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       if (SES.beats.length < 2 && mine()) {
         if (S.ai === null) TX.event("Sample Lumen: with Claude allowed, this is written for your exact question.");
         Object.assign(L, { title: MALQAF.title, q: MALQAF.q, intro: MALQAF.intro, subject: MALQAF.subject, anchor: MALQAF.anchor, quiz: MALQAF.quiz, answers: MALQAF.answers, whats: MALQAF.whats, beats: MALQAF.beats });
-        SES.beats[0] = titleBeat(L); $(".ll-studio-head h1", root).textContent = L.title;
+        SES.beats[0] = titleBeat(L); $(".lf-trow h1", root).textContent = L.title;
         for (const b of MALQAF.beats) { await sleep(900); if (!mine()) return; SES.beats.push(beat(b)); SES.rail(); }
       }
       if (mine()) { SES.streaming = false; SES.rail(); }
@@ -27982,12 +28366,37 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     const L = LUMENS.find((x) => x.id === id); if (!L?.read) return;
     L.fresh = false; leaveStudio(); EXT?.pause?.(); S.run++; S.view = "read"; S.tab = "lumens"; S.readId = id;
     const R = L.read;
-    learnShell(`<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-      <div class="lf-head"><div class="lf-head-l"><h1>${esc(L.title)}</h1><p class="lf-q">${esc(L.q)}</p><div class="lf-meta">${tag(L)}${goalTag(L)}<span>${R.mins} min read · ${R.sections.length} sections</span></div></div>${fmtSwitch(L, "read")}</div>
-      <div class="lf-read"><nav class="lf-toc" aria-label="Sections"><p>Sections</p><ol>${R.sections.map((t, i) => `<li${i ? "" : ' aria-current="true"'}>${esc(t)}</li>`).join("")}</ol></nav>
-        <article class="lf-article"><h2>${esc(R.sections[0])}</h2>${R.paras.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="lf-stub">${R.sample ? "Sample text: with Claude allowed, this is written for your question. " : ""}The long read carries on from here. This prototype shows where long reads sit among the formats; the reader itself is its own piece of work.</p></article></div>`);
+    const rich = window.LearnRead?.article(R.rich || (R === READS.cooling ? "cooling" : R === READS.courtyards ? "courtyards" : ""));
+    const toc = rich ? rich.sections : R.sections;
+    learnShell(`${crumb(L.title)}
+      ${lumenHead(L, "read", { bar: `<span class="lf-fmeta">${R.mins} min read · ${toc.length} sections</span>` })}
+      <div class="lf-read lf-body"><nav class="lf-toc" aria-label="Sections"><p>Sections</p><ol>${toc.map((t, i) => `<li${i ? "" : ' aria-current="true"'}><a href="#rs-${i}" data-rs="${i}">${esc(t)}</a></li>`).join("")}</ol></nav>
+        <article class="lf-article">${rich ? rich.html : `<section id="rs-0" data-rs-sec="0"><h2>${esc(R.sections[0])}</h2>${R.paras.map((x) => `<p>${esc(x)}</p>`).join("")}</section><p class="lf-stub">${R.sample ? "Sample text: with Claude allowed, this is written for your question. " : ""}The long read carries on from here.</p>`}</article></div>`);
+    window.LearnRead?.mount($(".lf-read", root), { toast });
     dock({ ctx: `Read · ${L.title}`, chips: [L.listen ? "Listen to this instead" : "Make a listen version", "Talk it through live"] });
     window.scrollTo(0, 0);
+  }
+  /* ---------- sharing a whole Lumen: the formats you pick, never Live, notes or goals */
+  function shareDialog(L) {
+    const made = formats(L).filter((f) => f[2]);
+    const w = document.createElement("div"); w.className = "lf-sharewrap";
+    const code = "K7q2mX";
+    w.innerHTML = `<div class="graph-dialog-overlay" style="pointer-events:auto;z-index:150" data-share-close></div><div role="dialog" aria-modal="true" aria-labelledby="lf-sh-t" class="graph-dialog lf-sharedlg" style="pointer-events:auto;z-index:151">
+      <h2 id="lf-sh-t" class="graph-dialog-title">Share this Lumen</h2>
+      <p class="lf-shp">Anyone with the link can open <b>${esc(L.title)}</b> in the formats you include, and move between them as you do.</p>
+      <div class="lf-shfmts">${made.map(([k, label, , meta]) => `<label class="lf-shf"><input type="checkbox" data-share-fmt="${k}" checked>${I[k]}<b>${label}</b><span>${esc(meta)}</span></label>`).join("")}</div>
+      <p class="lf-shnot">Not shared: your live sessions, your questions and marks, your goal and your Commonplace notes.</p>
+      <div class="lf-shlink"><label class="visually-hidden" for="lf-shurl">Link</label><input id="lf-shurl" readonly value="studiolo.app/e/${code}"><button class="button button-quiet" type="button" data-share-copy>Copy link</button></div>
+      <div class="lf-shacts"><button class="button button-quiet" type="button" data-share-preview="${L.id}">Preview as a viewer</button><button class="button" type="button" data-share-close>Done</button></div></div>`;
+    document.body.appendChild(w);
+    w.addEventListener("click", async (e) => {
+      const t = e.target.closest("[data-share-close], [data-share-copy], [data-share-preview]"); if (!t) return;
+      if (t.dataset.shareCopy !== undefined) { const i = $("#lf-shurl", w); try { await navigator.clipboard.writeText("https://" + i.value); t.textContent = "Copied"; } catch { i.select(); t.textContent = "Selected: copy it"; } return; }
+      const fmts = new Set($$("[data-share-fmt]", w).filter((c) => c.checked).map((c) => c.dataset.shareFmt));
+      w.remove();
+      if (t.dataset.sharePreview && fmts.size) { S.shareView = { id: L.id, fmts }; openFormat(L, [...fmts][0]); }
+    });
+    $("#lf-shurl", w).addEventListener("focus", (e) => e.target.select());
   }
   /** Opens a Lumen in a format it has. */
   function openFormat(L, k) {
@@ -28079,6 +28488,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       if (h === "/graph") return goGraph();
       if (h.startsWith("#play-")) return playLumen(h.slice(6));
       if (h.startsWith("#open-")) return openLumen(h.slice(6));
+      if (a.dataset.rs !== undefined) return $(`#rs-${a.dataset.rs}`, root)?.scrollIntoView({ behavior: "smooth", block: "start" });
       if (h.startsWith("#course-")) return goCourse();
       if (/^Learn$|Lumens/.test(a.textContent.trim()) && S.view === "course") return openTab("lumens");
       return;
@@ -28092,6 +28502,8 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     }
     if (b.dataset.tab) return openTab(b.dataset.tab);
     if (b.dataset.fmt && b.dataset.lumenId) { const L = LUMENS.find((x) => x.id === b.dataset.lumenId); if (L) L.fresh = false; return openFormat(L, b.dataset.fmt); }
+    if (b.dataset.share) return shareDialog(LUMENS.find((x) => x.id === b.dataset.share));
+    if (b.dataset.shareExit !== undefined) { const L = LUMENS.find((x) => x.id === S.shareView?.id); S.shareView = null; return openLumen(L.id); }
     if (b.dataset.addfmt) return addFormat(LUMENS.find((x) => x.id === b.dataset.lumenId), b.dataset.addfmt);
     if (b.dataset.nextMake) { const [q, fmt, topic] = [b.dataset.q, b.dataset.nextMake, b.dataset.topic]; const anchor = TOPIC_AREA[topic] ? [TOPIC_AREA[topic], topic] : null; return fmt === "listen" ? EXT?.quickListen?.(q) : fmt === "read" ? makeRead(q, { anchor, goal: b.dataset.goal }) : makeLumen(q, { anchor, goal: b.dataset.goal }); }
     if (b.dataset.livego !== undefined) { const v = $("#ll-hero-in", root)?.value.trim(); return startNew(v || "How do wind catchers actually cool a house?"); }
@@ -28124,7 +28536,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     SES.open(deck, { mode: "recorded", from: L.id === "malqaf" ? 3 : 0 });
     begin(() => SES.playRecorded());
   }
-  function openTab(k) { leaveStudio(); S.run++; hush(); clearInterval(SES.tick); if (k === "lumens" && S.filter.fmt === "sessions") S.filter.fmt = "all";
+  function openTab(k) { S.shareView = null; leaveStudio(); S.run++; hush(); clearInterval(SES.tick); if (k === "lumens" && S.filter.fmt === "sessions") S.filter.fmt = "all";
     ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions, ...(EXT?.renderers || {}) })[k](); window.scrollTo(0, 0); }
 
   /* ================================================================ prototype bar */
@@ -28136,7 +28548,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
   EXT?.init?.({ root, S, I, STAGE, LEARNER, LUMENS, DECKS, ld, LD, learnShell, header, poster, tag, dock, setChips, setState, toast, openTab, startNew, leaveStudio, streamLines, aiBadge, hush, nextId: () => ++uid,
-    makeLumen, makeRead, lumenFor, formats, fmtSwitch, fmtPills, openFormat, openLumen, goalTag, renderHome, renderLumens });
+    makeLumen, makeRead, lumenFor, formats, fmtSwitch, fmtPills, openFormat, openLumen, goalTag, renderHome, renderLumens, lumenHeadInner, crumb });
   function aiBadge() { const el = $("#ll-ai"); if (!el) return; el.dataset.on = String(!!S.ai); el.textContent = S.ai ? "Live answers: written by Claude" : "Live answers: scripted sample"; }
 
   renderHome();

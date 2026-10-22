@@ -36,6 +36,7 @@
     watch: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.3v5.4l4.6-2.7z" fill="currentColor" stroke="none"/></svg>',
     listen: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="7" rx="1.5"/><rect x="16.5" y="14" width="4.5" height="7" rx="1.5"/></svg>',
     read: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 5.5c3-1 5.8-.6 8.5 1v13c-2.7-1.6-5.5-2-8.5-1zM20.5 5.5c-3-1-5.8-.6-8.5 1v13c2.7-1.6 5.5-2 8.5-1z"/></svg>',
+    share: '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7h14v-7"/></svg>',
     plus: '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   };
   const now = () => new Date().toTimeString().slice(0, 5);
@@ -165,7 +166,8 @@
     shell("library");
     railCurrent("/learn");
     const main = $("main", root);
-    main.innerHTML = `<div class="ll-page" data-view="${S.view}">${inner}</div>`;
+    const share = S.shareView ? `<div class="lf-sharebar" role="status"><b>Viewer preview</b><span>This is what someone with the link sees: ${[...S.shareView.fmts].map((k) => FMT[k]).join(", ")}. No Live, no notes, no goal.</span><button type="button" data-share-exit>Back to your Lumen</button></div>` : "";
+    main.innerHTML = `<div class="ll-page${S.shareView ? " lf-shared" : ""}" data-view="${S.view}">${share}${inner}</div>`;
     fitStages();
   }
   const TABS = [["home", "Home"], ["lumens", "Lumens"], ["courses", "Courses"]];
@@ -197,13 +199,25 @@
   /** The same switcher at the top of every Lumen page: its three formats, then Live (talk it through now).
    *  On the Watch page, Watch and Live are the player's own modes (recording and live), so one control does both. */
   function fmtSwitch(L, cur, { studio } = {}) {
-    const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
+    const fs = (L ? formats(L) : [["watch", "Watch", true, ""]]).filter((f) => !S.shareView || (f[2] && S.shareView.fmts.has(f[0])));
     const btn = ([k, label, has, meta]) => studio && k === "watch"
       ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta)}</small></button>`
-      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+"}</small></button>`;
+      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}"${!has && L.making === k ? ' title="Being written"' : ""}>${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? "…" : "+"}</small></button>`;
     const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
+    if (S.shareView) return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}</span>`;
     return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b></button></span>`;
   }
+  /** The head every Lumen page shares, so moving between formats changes only what's under it. The top row (title,
+   *  the format switcher, Share) is identical in all three formats and stays pinned while you scroll. `bar` holds the
+   *  format's own actions, under the switcher, where they can't push it around. */
+  function lumenHeadInner(L, cur, { studio, title, q, bar = "", anchorFrom } = {}) {
+    const T = title || L?.title || "", Q = q ?? L?.q ?? "", A0 = anchorFrom || L;
+    return `<div class="lf-trow"><h1 title="${esc(T)}">${esc(T)}</h1><div class="lf-tr">${fmtSwitch(L, cur, { studio })}${L && !S.shareView ? `<button class="lf-share" type="button" data-share="${L.id}">${I.share}Share</button>` : ""}</div><i class="lf-rp" aria-hidden="true"></i></div>
+      <p class="lf-q">${esc(Q)}</p>
+      <div class="lf-meta">${A0?.anchor ? tag(A0) : ""}${L ? goalTag(L) : ""}<span class="lf-fbar">${bar}</span></div>`;
+  }
+  const lumenHead = (L, cur, o) => `<div class="lf-lhead">${lumenHeadInner(L, cur, o)}</div>`;
+  const crumb = (t) => `<header class="destination-header lf-crumb"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(t)}</span></div></header>`;
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
   const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><b>${esc(L.title)}</b><span class="lf-read-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
   /** The poster follows the Lumen's main format, and carries that format's flag so the kinds read apart at a glance. */
@@ -377,7 +391,7 @@
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
   function dock({ ctx, chips, right = 0 }) {
-    ld.hidden = false; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
+    ld.hidden = !!S.shareView; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
     requestAnimationFrame(placeDock);
   }
   function placeDock() {
@@ -596,10 +610,9 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     },
     markup() {
       const L = this.L;
-      return `<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-        <div class="ll-studio-head"><h1>${esc(L.title)}</h1>${fmtSwitch(LUMENS.find((x) => x.id === L.id), "watch", { studio: true })}<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
-          <button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button></div>
-        <div class="ll-studio"><div class="ll-stagecol">
+      return `${crumb(L.title)}
+        ${lumenHead(LUMENS.find((x) => x.id === L.id), "watch", { studio: true, title: L.title, q: L.q, anchorFrom: L, bar: `<span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span><button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button>` })}
+        <div class="ll-studio lf-body"><div class="ll-stagecol">
           <div class="xp-screen-stage" data-captions="on" style="position:relative"><div class="xp-box"><div class="xp-stage" role="region" aria-label="Lumen stage" style="${STAGE}"><div class="xp-slide-host"></div><span class="xp-watermark" aria-hidden="true"><span class="xp-mark xp-watermark-mark" aria-hidden="true">S</span></span><span class="xp-pointer" aria-hidden="true" data-visible="false"><svg viewBox="0 0 20 28" width="22" height="30.8"><path d="M2 2 L2 22.5 L7.2 17.8 L11 26 L14.6 24.4 L10.9 16.3 L17.8 16.3 Z"></path></svg></span></div><div class="xp-overlay"><div class="xp-caption" aria-hidden="true" data-visible="false"></div></div></div></div>
           <div class="ll-ctrl"><button class="xp-ib xp-ib-play" type="button" aria-label="Play">${I.play}</button><span class="ll-progress" aria-hidden="true"></span><span class="ll-pos" style="font-variant-numeric:tabular-nums;white-space:nowrap"></span></div>
           <div class="ll-beats" role="group" aria-label="Slides"></div>
@@ -872,7 +885,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
         try {
           await streamLines(`${LEARNER}\nMake a Lumen: a narrated slide explainer you will speak aloud, live, to this learner.\n${anchor ? `It's about their topic "${anchor}".\n` : ""}They asked: "${q}"\nReply with JSON Lines only. First line: {"title":"at most 7 words","question":"the question in one line","intro":"one spoken opening sentence, under 25 words"}. Then 5 slide lines, using at least two slide types, building from the basics to one practical takeaway.\n${FORMAT}`, (o) => {
             if (!mine()) return;
-            if (!gotTitle && o.question !== undefined) { gotTitle = true; L.title = o.title || L.title; L.q = o.question || q; L.intro = o.intro || ""; SES.beats[0] = titleBeat(L); $(".ll-studio-head h1", root).textContent = L.title; if (SES.i === 0) STG.show(SES.beats[0]); SES.rail(); return; }
+            if (!gotTitle && o.question !== undefined) { gotTitle = true; L.title = o.title || L.title; L.q = o.question || q; L.intro = o.intro || ""; SES.beats[0] = titleBeat(L); $(".lf-trow h1", root).textContent = L.title; if (SES.i === 0) STG.show(SES.beats[0]); SES.rail(); return; }
             if (o.title && o.say) { SES.beats.push(beat(o)); SES.rail(); }
           });
         } catch (e) { if (e === STOP) return; try { aiFail(e); } catch { return; } }
@@ -880,7 +893,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       if (SES.beats.length < 2 && mine()) {
         if (S.ai === null) TX.event("Sample Lumen: with Claude allowed, this is written for your exact question.");
         Object.assign(L, { title: MALQAF.title, q: MALQAF.q, intro: MALQAF.intro, subject: MALQAF.subject, anchor: MALQAF.anchor, quiz: MALQAF.quiz, answers: MALQAF.answers, whats: MALQAF.whats, beats: MALQAF.beats });
-        SES.beats[0] = titleBeat(L); $(".ll-studio-head h1", root).textContent = L.title;
+        SES.beats[0] = titleBeat(L); $(".lf-trow h1", root).textContent = L.title;
         for (const b of MALQAF.beats) { await sleep(900); if (!mine()) return; SES.beats.push(beat(b)); SES.rail(); }
       }
       if (mine()) { SES.streaming = false; SES.rail(); }
@@ -961,12 +974,37 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     const L = LUMENS.find((x) => x.id === id); if (!L?.read) return;
     L.fresh = false; leaveStudio(); EXT?.pause?.(); S.run++; S.view = "read"; S.tab = "lumens"; S.readId = id;
     const R = L.read;
-    learnShell(`<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><a href="#lumens" data-tab="lumens">Lumens</a><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-      <div class="lf-head"><div class="lf-head-l"><h1>${esc(L.title)}</h1><p class="lf-q">${esc(L.q)}</p><div class="lf-meta">${tag(L)}${goalTag(L)}<span>${R.mins} min read · ${R.sections.length} sections</span></div></div>${fmtSwitch(L, "read")}</div>
-      <div class="lf-read"><nav class="lf-toc" aria-label="Sections"><p>Sections</p><ol>${R.sections.map((t, i) => `<li${i ? "" : ' aria-current="true"'}>${esc(t)}</li>`).join("")}</ol></nav>
-        <article class="lf-article"><h2>${esc(R.sections[0])}</h2>${R.paras.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="lf-stub">${R.sample ? "Sample text: with Claude allowed, this is written for your question. " : ""}The long read carries on from here. This prototype shows where long reads sit among the formats; the reader itself is its own piece of work.</p></article></div>`);
+    const rich = window.LearnRead?.article(R.rich || (R === READS.cooling ? "cooling" : R === READS.courtyards ? "courtyards" : ""));
+    const toc = rich ? rich.sections : R.sections;
+    learnShell(`${crumb(L.title)}
+      ${lumenHead(L, "read", { bar: `<span class="lf-fmeta">${R.mins} min read · ${toc.length} sections</span>` })}
+      <div class="lf-read lf-body"><nav class="lf-toc" aria-label="Sections"><p>Sections</p><ol>${toc.map((t, i) => `<li${i ? "" : ' aria-current="true"'}><a href="#rs-${i}" data-rs="${i}">${esc(t)}</a></li>`).join("")}</ol></nav>
+        <article class="lf-article">${rich ? rich.html : `<section id="rs-0" data-rs-sec="0"><h2>${esc(R.sections[0])}</h2>${R.paras.map((x) => `<p>${esc(x)}</p>`).join("")}</section><p class="lf-stub">${R.sample ? "Sample text: with Claude allowed, this is written for your question. " : ""}The long read carries on from here.</p>`}</article></div>`);
+    window.LearnRead?.mount($(".lf-read", root), { toast });
     dock({ ctx: `Read · ${L.title}`, chips: [L.listen ? "Listen to this instead" : "Make a listen version", "Talk it through live"] });
     window.scrollTo(0, 0);
+  }
+  /* ---------- sharing a whole Lumen: the formats you pick, never Live, notes or goals */
+  function shareDialog(L) {
+    const made = formats(L).filter((f) => f[2]);
+    const w = document.createElement("div"); w.className = "lf-sharewrap";
+    const code = "K7q2mX";
+    w.innerHTML = `<div class="graph-dialog-overlay" style="pointer-events:auto;z-index:150" data-share-close></div><div role="dialog" aria-modal="true" aria-labelledby="lf-sh-t" class="graph-dialog lf-sharedlg" style="pointer-events:auto;z-index:151">
+      <h2 id="lf-sh-t" class="graph-dialog-title">Share this Lumen</h2>
+      <p class="lf-shp">Anyone with the link can open <b>${esc(L.title)}</b> in the formats you include, and move between them as you do.</p>
+      <div class="lf-shfmts">${made.map(([k, label, , meta]) => `<label class="lf-shf"><input type="checkbox" data-share-fmt="${k}" checked>${I[k]}<b>${label}</b><span>${esc(meta)}</span></label>`).join("")}</div>
+      <p class="lf-shnot">Not shared: your live sessions, your questions and marks, your goal and your Commonplace notes.</p>
+      <div class="lf-shlink"><label class="visually-hidden" for="lf-shurl">Link</label><input id="lf-shurl" readonly value="studiolo.app/e/${code}"><button class="button button-quiet" type="button" data-share-copy>Copy link</button></div>
+      <div class="lf-shacts"><button class="button button-quiet" type="button" data-share-preview="${L.id}">Preview as a viewer</button><button class="button" type="button" data-share-close>Done</button></div></div>`;
+    document.body.appendChild(w);
+    w.addEventListener("click", async (e) => {
+      const t = e.target.closest("[data-share-close], [data-share-copy], [data-share-preview]"); if (!t) return;
+      if (t.dataset.shareCopy !== undefined) { const i = $("#lf-shurl", w); try { await navigator.clipboard.writeText("https://" + i.value); t.textContent = "Copied"; } catch { i.select(); t.textContent = "Selected: copy it"; } return; }
+      const fmts = new Set($$("[data-share-fmt]", w).filter((c) => c.checked).map((c) => c.dataset.shareFmt));
+      w.remove();
+      if (t.dataset.sharePreview && fmts.size) { S.shareView = { id: L.id, fmts }; openFormat(L, [...fmts][0]); }
+    });
+    $("#lf-shurl", w).addEventListener("focus", (e) => e.target.select());
   }
   /** Opens a Lumen in a format it has. */
   function openFormat(L, k) {
@@ -1058,6 +1096,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       if (h === "/graph") return goGraph();
       if (h.startsWith("#play-")) return playLumen(h.slice(6));
       if (h.startsWith("#open-")) return openLumen(h.slice(6));
+      if (a.dataset.rs !== undefined) return $(`#rs-${a.dataset.rs}`, root)?.scrollIntoView({ behavior: "smooth", block: "start" });
       if (h.startsWith("#course-")) return goCourse();
       if (/^Learn$|Lumens/.test(a.textContent.trim()) && S.view === "course") return openTab("lumens");
       return;
@@ -1071,6 +1110,8 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     }
     if (b.dataset.tab) return openTab(b.dataset.tab);
     if (b.dataset.fmt && b.dataset.lumenId) { const L = LUMENS.find((x) => x.id === b.dataset.lumenId); if (L) L.fresh = false; return openFormat(L, b.dataset.fmt); }
+    if (b.dataset.share) return shareDialog(LUMENS.find((x) => x.id === b.dataset.share));
+    if (b.dataset.shareExit !== undefined) { const L = LUMENS.find((x) => x.id === S.shareView?.id); S.shareView = null; return openLumen(L.id); }
     if (b.dataset.addfmt) return addFormat(LUMENS.find((x) => x.id === b.dataset.lumenId), b.dataset.addfmt);
     if (b.dataset.nextMake) { const [q, fmt, topic] = [b.dataset.q, b.dataset.nextMake, b.dataset.topic]; const anchor = TOPIC_AREA[topic] ? [TOPIC_AREA[topic], topic] : null; return fmt === "listen" ? EXT?.quickListen?.(q) : fmt === "read" ? makeRead(q, { anchor, goal: b.dataset.goal }) : makeLumen(q, { anchor, goal: b.dataset.goal }); }
     if (b.dataset.livego !== undefined) { const v = $("#ll-hero-in", root)?.value.trim(); return startNew(v || "How do wind catchers actually cool a house?"); }
@@ -1103,7 +1144,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     SES.open(deck, { mode: "recorded", from: L.id === "malqaf" ? 3 : 0 });
     begin(() => SES.playRecorded());
   }
-  function openTab(k) { leaveStudio(); S.run++; hush(); clearInterval(SES.tick); if (k === "lumens" && S.filter.fmt === "sessions") S.filter.fmt = "all";
+  function openTab(k) { S.shareView = null; leaveStudio(); S.run++; hush(); clearInterval(SES.tick); if (k === "lumens" && S.filter.fmt === "sessions") S.filter.fmt = "all";
     ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions, ...(EXT?.renderers || {}) })[k](); window.scrollTo(0, 0); }
 
   /* ================================================================ prototype bar */
@@ -1115,7 +1156,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
   EXT?.init?.({ root, S, I, STAGE, LEARNER, LUMENS, DECKS, ld, LD, learnShell, header, poster, tag, dock, setChips, setState, toast, openTab, startNew, leaveStudio, streamLines, aiBadge, hush, nextId: () => ++uid,
-    makeLumen, makeRead, lumenFor, formats, fmtSwitch, fmtPills, openFormat, openLumen, goalTag, renderHome, renderLumens });
+    makeLumen, makeRead, lumenFor, formats, fmtSwitch, fmtPills, openFormat, openLumen, goalTag, renderHome, renderLumens, lumenHeadInner, crumb });
   function aiBadge() { const el = $("#ll-ai"); if (!el) return; el.dataset.on = String(!!S.ai); el.textContent = S.ai ? "Live answers: written by Claude" : "Live answers: scripted sample"; }
 
   renderHome();

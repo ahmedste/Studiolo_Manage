@@ -1,0 +1,122 @@
+/* Learn, slice 2 (prototype): the Read format as a real article. Diagrams take the app's own ink, paper and accent;
+   warm air is the app's warn tone, cool air its accent, and nothing else is coloured. Motion stops for reduced motion. */
+.lf-read { grid-template-columns: 190px minmax(0, 68ch); gap: 44px; }
+.lf-toc { top: 76px; }
+.lf-toc ol { list-style: none; padding: 0; gap: 2px; counter-reset: toc; }
+.lf-toc li { counter-increment: toc; }
+.lf-toc a { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 4px; padding: 5px 8px; border-radius: 3px; color: var(--ink-2); text-decoration: none; line-height: 1.35; transition: color var(--dur-quick) var(--ease-standard), background var(--dur-quick) var(--ease-standard); }
+.lf-toc a::before { content: counter(toc); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.lf-toc a:hover { color: var(--ink); background: var(--hover-fill); }
+.lf-toc li[aria-current="true"] a { color: var(--ink); background: var(--panel); box-shadow: inset 2px 0 0 var(--accent); }
+.lf-toc a:focus-visible { outline: var(--focus-ring); }
+
+.rd-sec { scroll-margin-top: 84px; margin: 0 0 40px; }
+.lf-article .rd-sec h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; font-size: 25px; line-height: 1.2; }
+.rd-sec h2 span { font-family: var(--ui); font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.lf-article .rd-lede { font-size: 22px; line-height: 1.5; color: var(--ink); }
+.lf-article .rd-lede::before { content: ""; display: block; width: 36px; height: 2px; margin: 0 0 14px; background: var(--accent); }
+.lf-article .rd-pull { margin: 26px 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--quote-rule); font-size: 26px; font-style: italic; line-height: 1.3; color: var(--ink); text-wrap: balance; }
+
+/* Figures */
+.rd-fig { margin: 22px 0 26px; padding: 18px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.rd-fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rd-fig figcaption { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.rd-t { font-family: var(--ui); font-size: 11px; fill: var(--ink-2); }
+.rd-wall { fill: none; stroke: var(--ink-2); stroke-width: 3; stroke-linecap: round; }
+.rd-mass { fill: var(--board); stroke: var(--ink-3); stroke-width: 1; }
+.rd-room { fill: var(--panel); stroke: none; }
+.rd-ground { stroke: var(--ink-3); stroke-width: 1.5; }
+.rd-jar { fill: var(--surface-board); stroke: var(--ink-2); stroke-width: 1.5; }
+.rd-water { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.7; }
+.rd-ah.cool { fill: var(--accent); } .rd-ah.warm { fill: var(--warn); }
+.rd-flow { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 7 7; animation: rd-dash 1.4s linear infinite; }
+.rd-flow.cool { stroke: var(--accent); } .rd-flow.warm { stroke: var(--warn); }
+@keyframes rd-dash { to { stroke-dashoffset: -28; } }
+.rd-wisp { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-linecap: round; opacity: 0; animation: rd-rise 2.4s ease-out infinite; }
+.rd-wisp.w2 { animation-delay: 0.8s; } .rd-wisp.w3 { animation-delay: 1.6s; }
+.rd-wisps { opacity: var(--wo, 1); transition: opacity var(--dur-move) var(--ease-standard); }
+@keyframes rd-rise { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+.rd-trio-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.rd-mech { display: grid; align-content: start; gap: 4px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.rd-mech svg { margin-bottom: 6px; padding: 6px; border-radius: 3px; background: var(--paper); box-sizing: border-box; }
+.rd-mech b { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+
+/* Interactive figures: a slider, a readout and a bar. */
+.rd-hum-grid { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 22px; align-items: center; }
+.rd-hum-ctl, .rd-court-ctl { display: grid; gap: 8px; font-size: 13px; }
+.rd-court-ctl { margin-top: 12px; }
+.rd-hum-ctl label, .rd-court-ctl label { color: var(--ink-2); }
+.rd-hum-ctl label b, .rd-court-ctl label b { font-weight: 600; color: var(--ink); }
+.rd-fig input[type="range"] { width: 100%; margin: 4px 0 0; accent-color: var(--accent); }
+.rd-ticks { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); }
+.rd-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.rd-presets button, .rd-seg button, .rd-reveal, .rd-cite { all: unset; box-sizing: border-box; cursor: pointer; }
+.rd-presets button { padding: 4px 10px; border-radius: 12px; font-size: 12px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); }
+.rd-presets button:hover { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.lf-article .rd-out { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 0; font-family: var(--ui); font-size: 13px; color: var(--ink-2); }
+.rd-out b { font-family: var(--read); font-size: 22px; font-weight: 400; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rd-bar { height: 6px; border-radius: 3px; background: var(--board); overflow: hidden; }
+.rd-bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--accent); transition: width var(--dur-move) var(--ease-standard); }
+.rd-shade { fill: var(--ink); opacity: 0.12; transition: d var(--dur-move) var(--ease-standard); }
+.rd-ray { stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 0.8; }
+
+/* The house, afternoon and night. */
+.rd-seg { display: inline-flex; gap: 2px; margin: 0 0 12px; padding: 3px; border-radius: 18px; background: var(--surface-board); }
+.rd-seg button { padding: 5px 14px; border-radius: 15px; font-size: 12.5px; color: var(--ink-2); }
+.rd-seg button[aria-pressed="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); }
+.rd-seg button:focus-visible, .rd-presets button:focus-visible, .rd-reveal:focus-visible, .rd-cite:focus-visible { outline: var(--focus-ring); }
+.rd-house svg { transition: background var(--dur-calm) var(--ease-standard); border-radius: 3px; }
+.rd-house[data-time="night"] svg { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.rd-day, .rd-night { transition: opacity var(--dur-move) var(--ease-standard); }
+.rd-house[data-time="day"] .rd-night, .rd-house[data-time="night"] .rd-day { opacity: 0; }
+.rd-sun { fill: color-mix(in srgb, var(--board-marker) 70%, transparent); }
+.rd-rays path { stroke: var(--board-marker); stroke-width: 2; stroke-linecap: round; }
+.rd-rays { transform-origin: 560px 56px; animation: rd-spin 30s linear infinite; }
+@keyframes rd-spin { to { transform: rotate(360deg); } }
+.rd-moon { fill: var(--ink-3); }
+.rd-sleep { stroke: var(--ink-2); stroke-width: 4; stroke-linecap: round; }
+
+/* Table, steps, check yourself, sources */
+.rd-tablewrap { overflow-x: auto; margin: 20px 0 24px; }
+.rd-table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
+.rd-table th, .rd-table td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.rd-table thead th { font-family: var(--read); font-size: 17px; font-weight: 400; color: var(--ink); }
+.rd-table tbody th { font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+.rd-steps { margin: 0 0 22px; padding: 0; list-style: none; counter-reset: st; display: grid; gap: 12px; }
+.rd-steps li { counter-increment: st; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; font-family: var(--read); font-size: 18px; line-height: 1.55; }
+.rd-steps li::before { content: counter(st); display: grid; place-items: center; width: 26px; height: 26px; margin-top: 2px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--ui); font-size: 12.5px; font-weight: 600; }
+.rd-steps b { font-weight: 600; }
+.rd-check { margin: 0 0 22px; padding: 16px 18px; border-radius: 4px; background: var(--quote-paper); box-shadow: inset 3px 0 0 var(--quote-rule); }
+.lf-article .rd-check p { margin: 0 0 10px; font-size: 17px; }
+.rd-check b { font-weight: 600; }
+.rd-reveal { font-size: 13px; font-weight: 500; color: var(--accent); }
+.rd-reveal:hover { text-decoration: underline; }
+.lf-article .rd-answer { margin: 10px 0 0; animation: lf-in var(--dur-standard) var(--ease-entrance) both; }
+.rd-cite { display: inline-flex; align-items: baseline; gap: 6px; max-width: 100%; margin: 0 2px; padding: 1px 9px; border-radius: 11px; background: var(--accent-soft); font-family: var(--ui); font-size: 12px; color: var(--accent); vertical-align: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-cite span { color: var(--ink-2); }
+.rd-cite:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.lf-article .rd-srcs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--ui); font-size: 12px; color: var(--ink-3); }
+.rd-srcs > span { margin-right: 4px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 10.5px; }
+
+@media (max-width: 760px) {
+  .lf-read { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lf-toc { position: static; margin: 0 calc(-1 * var(--lf-gx)); padding: 0 var(--lf-gx); overflow-x: auto; scrollbar-width: none; }
+  .lf-toc p { display: none; }
+  .lf-toc ol { display: flex; gap: 6px; width: max-content; }
+  .lf-toc a { display: flex; gap: 6px; padding: 5px 11px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
+  .lf-toc li[aria-current="true"] a { box-shadow: inset 0 0 0 1px var(--accent); }
+  .rd-hum-ctl label, .rd-out { min-width: 0; }
+  .rd-trio-grid { grid-template-columns: minmax(0, 1fr); }
+  .rd-mech { grid-template-columns: 120px minmax(0, 1fr); column-gap: 12px; }
+  .rd-mech svg { grid-row: span 2; margin: 0; }
+  .rd-hum-grid { grid-template-columns: minmax(0, 1fr); }
+  .rd-hum-grid > svg { max-width: 200px; justify-self: center; }
+  .lf-article .rd-lede { font-size: 19px; }
+  .lf-article .rd-pull { font-size: 22px; }
+  .rd-fig { padding: 14px; margin-left: -4px; margin-right: -4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rd-flow, .rd-wisp, .rd-rays { animation: none; }
+  .rd-wisp { opacity: 0.8; }
+}
