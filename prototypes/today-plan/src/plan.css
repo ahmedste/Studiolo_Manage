@@ -87,8 +87,12 @@ body { background: var(--surface-page); }
    column's place, and Day and Week share one hour axis inside the same calendar box. */
 .pl-frame { height: calc(100dvh - 88px); min-height: 560px; display: flex; flex-direction: column; max-width: 1480px; }
 .pl-frame > .td-head { flex: none; margin: 0 0 18px; }
-.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 28px; }
-.pl-side { min-height: 0; min-width: 0; overflow-y: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: 26px; padding: 0 4px 12px 0; }
+/* The calendar on the left; Next up, My Focus and the Big Picture on the right, where the copilot also opens,
+   as it does on the Graph. Side first in the source, so it reads first and stacks on top on narrow screens. */
+.pl-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "cal side"; gap: 28px; }
+.pl-body > .pl-side { grid-area: side; }
+.pl-body > .pl-cal { grid-area: cal; }
+.pl-side { min-height: 0; min-width: 0; overflow-y: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: 26px; padding: 0 0 12px 4px; }
 .pl-side .td-next { flex: none; }
 .pl-side .td-focus-wrap { border-left: 0; padding-left: 0; }
 .pl-side .td-compass { margin: 0; }
@@ -320,11 +324,12 @@ body { background: var(--surface-page); }
 .pl-toc .pl-note { margin-top: 14px; }
 
 /* ------------------------------------------------------------------ prototype bar */
-.pl-proto { display: block; left: auto; right: calc(16px + env(safe-area-inset-right, 0px)); max-width: calc(100vw - 90px); }
+.pl-proto { display: block; max-width: calc(100vw - var(--t-rail) - 470px); }
+@media (max-width: 999.98px) { .pl-proto { max-width: calc(100vw - var(--t-rail) - 32px); } }
 .pl-proto .row { display: flex; align-items: center; gap: 10px; white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
 .pl-proto .ai { color: var(--ink-2); }
 .pl-proto .ai[data-on="true"] { color: var(--ok); }
-.pl-proto .hint { position: absolute; right: 0; bottom: calc(100% + 6px); width: min(560px, calc(100vw - 16px)); box-sizing: border-box; margin: 0; padding: 12px 14px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 4px; color: var(--ink); line-height: 1.5; white-space: normal; }
+.pl-proto .hint { position: absolute; left: 0; bottom: calc(100% + 6px); width: min(560px, calc(100vw - 16px)); box-sizing: border-box; margin: 0; padding: 12px 14px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 4px; color: var(--ink); line-height: 1.5; white-space: normal; }
 .pl-proto .hint b { text-transform: none; letter-spacing: 0; font-size: inherit; color: var(--ink); font-weight: 600; }
 
 /* ------------------------------------------------------------------ narrower screens */
@@ -333,7 +338,7 @@ body { background: var(--surface-page); }
   .pl-toc { display: none; }
 }
 @media (max-width: 1280px) {
-  .pl-body { grid-template-columns: 340px minmax(0, 1fr); gap: 24px; }
+  .pl-body { grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; }
 }
 /* Below 1000px the frame flows: side column above the calendar, and the copilot is a bottom sheet. */
 @media (max-width: 999.98px) {

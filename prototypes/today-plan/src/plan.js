@@ -936,8 +936,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   /* ================================================================ toast and badge */
   function toast(title, body, undo) {
     $$(".vtoasts.pl-t").forEach((t) => t.remove());
-    const h = document.createElement("div"); h.className = "vtoasts pl-t"; h.setAttribute("role", "status");
-    h.style.cssText = "bottom:calc(64px + env(safe-area-inset-bottom, 0px))";
+    const h = document.createElement("div"); h.className = "vtoasts start pl-t"; h.setAttribute("role", "status");
+    h.style.cssText = "bottom:calc(64px + env(safe-area-inset-bottom, 0px));left:calc(var(--t-rail) + 16px)";
     h.innerHTML = `<div class="vtoast"><b>${esc(title)}</b><button class="icb" aria-label="Dismiss" type="button" data-tx>×</button><p>${esc(body)}${undo ? ' <button class="pl-linkbtn vtoast-action" type="button" data-tundo>Undo</button>' : ""}</p></div>`;
     h.addEventListener("click", (e) => { if (e.target.closest("[data-tundo]")) { undo(); h.remove(); } else if (e.target.closest("[data-tx]")) h.remove(); });
     document.body.appendChild(h); setTimeout(() => h.remove(), 9000);

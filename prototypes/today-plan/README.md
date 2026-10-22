@@ -11,8 +11,8 @@ Open `dist/today-plan-prototype.html`. It's also published as a claude.ai artifa
 The layout is one fixed frame, and nothing moves around on its own:
 
 - **The head** (Learning time, Plan with the copilot) never moves.
-- **The side column** on the left holds Next up, My Focus and the Big Picture.
-- **The calendar** on the right has a **Day | Week** switch. Both views share one hour axis, so switching only changes the number of columns: the 7:00 line stays at the same height.
+- **The calendar** is on the left. **The side column** on the right holds Next up, My Focus and the Big Picture, and the copilot opens there too, on the right as it does on the Graph.
+- **The calendar** has a **Day | Week** switch. Both views share one hour axis, so switching only changes the number of columns: the 7:00 line stays at the same height.
 - **Plan with the copilot** puts the copilot *in the side column's place*. The calendar keeps its size, position and view, and the copilot never switches the view for you. A card's **Show on the week** does that when you want it.
 - Scroll positions are kept across every change. Hours fold only around learning time and sessions already on the calendar, never around proposals, so ghosts don't shift the axis.
 - Under 1000 px the side column stacks above the calendar and the copilot becomes a bottom sheet.
