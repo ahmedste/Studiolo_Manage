@@ -34,6 +34,8 @@
   const hm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
   const h12 = (m) => { const h = Math.floor(m / 60); return `${String(((h + 11) % 12) + 1).padStart(2, "0")}:${String(m % 60).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
   const len = (m) => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ` ${String(m % 60).padStart(2, "0")}` : ""}`);
+  const lcNoun = (n) => (n === "Lumen" ? n : n[0].toLowerCase() + n.slice(1)); // "Reading Lumen" → "reading Lumen"
+  const daysLabel = (ds) => { const k = ds.slice().sort().join(""); return k === "01234" ? "Weekdays" : k === "0123456" ? "Every day" : k === "56" ? "Weekends" : ds.slice().sort().map((i) => DN[i].slice(0, 3)).join(", "); };
   const weekRange = (w) => { const a = dateOf(w * 7), b = dateOf(w * 7 + 6); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MON[b.getMonth()]}` : `${a.getDate()} ${MON[a.getMonth()]} – ${b.getDate()} ${MON[b.getMonth()]}`; };
   const snap5 = (m) => Math.round(m / 5) * 5;
   /* Hour rows: on the week, working hours with nothing planned fold to a thin band, Motion-style. */
@@ -60,6 +62,30 @@
     course: { k: "Course", noun: "Course part", go: "Watch the part" },
     library: { k: "Library", noun: "From your Library", go: "Open in Library" },
     plan: { k: "Plan", noun: "Weekly plan", go: "Plan with the copilot" },
+    listen: { k: "Listen", noun: "Dialogue", go: "Listen" },
+    aloud: { k: "Aloud", noun: "Spoken review", go: "Start, hands-free" },
+  };
+  /* Routines: things the learner does anyway (a drive, a ride, a walk) that can hold learning, but only in formats
+     that suit them. Driving and walking take dialogues and spoken reviews (answered aloud); cycling takes dialogues
+     only. Screen formats never go into a routine, and routine time doesn't count towards the daily maximum. */
+  const MODES = {
+    driving: { label: "Driving", verb: "watched while driving", kinds: ["listen", "aloud"], note: "Audio only · no screen · questions answered aloud · stops cleanly between chapters", prose: "audio only with nothing to look at, questions you answer aloud, and chapters that end at natural pauses so you can stop at any light" },
+    cycling: { label: "Cycling", verb: "watched on a bike", kinds: ["listen"], note: "Audio only · no talking back · short chapters", prose: "audio only, with nothing to answer and short chapters" },
+    walking: { label: "Walking", verb: "watched on a walk", kinds: ["listen", "aloud"], note: "Audio only · questions answered aloud", prose: "audio only, with questions you answer aloud" },
+  };
+  const AUDIO = new Set(["listen", "aloud"]);
+  // How well a sub-topic works by ear alone, and why. The planner fills routines from the "good" ones.
+  const FIT = {
+    "Glare": ["poor", "it's about what you see, so it needs pictures"], "Sun angles": ["poor", "it's geometry and needs diagrams"],
+    "Light shelves": ["fair", "it works if the speakers paint the room"], "Mashrabiya screens": ["good", "shade, air and privacy all talk well"],
+    "Four-iwan plan": ["fair", "it's spatial, so it's told as a walk through the building"], "Hypostyle hall": ["good", "its story carries without pictures"],
+    "Qibla orientation": ["good", "it's a story about direction and belief"], "Courtyard houses": ["good", "a day in a house is easy to picture"],
+    "Wind catchers": ["good", "moving air is easy to follow by ear"], "Thermal mass": ["good", "it's a slow, causal story: heat in by day, out by night"],
+  };
+  const DIALOGUES = {
+    plan: [["Qibla orientation: why the mosque turns", "Qibla orientation"], ["Hypostyle halls: a forest of columns", "Hypostyle hall"], ["The mihrab: pointing the way", "Qibla orientation"], ["Caravanserais: four iwans on the Silk Road", "Four-iwan plan"], ["Madrasas: four iwans, four schools", "Four-iwan plan"]],
+    ver: [["Wind catchers: arguing with the wind", "Wind catchers"], ["A day in the life of a courtyard", "Courtyard houses"], ["Thermal mass, the night shift", "Thermal mass"], ["Why the court has a pool", "Courtyard houses"], ["A city of towers: the badgirs of Yazd", "Wind catchers"]],
+    day: [["Mashrabiya: shade you can hear through", "Mashrabiya screens"], ["Screens around the world: jali, mashrabiya, brise-soleil", "Mashrabiya screens"], ["Light shelves: bouncing daylight deep into a room", "Light shelves"]],
   };
   const MADE = { ready: "Ready · made last night", evening: "Made the evening before · nothing is spent until then", exists: "Already in your Library", course: "Made when you reach it, like every course part", none: "" };
   const B = (id, d, s, m, kind, title, tr, topic, st, x = {}) => ({ id, d, s, m, kind, title, tr, topic, st, made: "evening", why: "", also: null, ...x });
@@ -99,7 +125,7 @@
 
   const S = {
     now: { d: 2, m: 935 }, view: "day", sel: 2, wk: 0, panel: false, readId: null,
-    blocks: clone(START_BLOCKS), busy: clone(START_BUSY), tracks: clone(TRACKS), maxDay: 90, calOn: true, autoMove: true,
+    blocks: clone(START_BLOCKS), busy: clone(START_BUSY), tracks: clone(TRACKS), routines: [], extraRt: [], maxDay: 90, calOn: true, autoMove: true,
     notes: [{ d: 2, text: "<b>Glare</b> moved from Tuesday to Thursday 07:00, because you missed it on Tuesday." }],
     msgs: [], cards: [], card: null, seq: 0, ai: null, busyAI: false, meeting: false, skipped: false,
   };
@@ -111,30 +137,41 @@
   const isPast = (d, m) => d < S.now.d || (d === S.now.d && m < S.now.m);
   const blockById = (id, bl = S.blocks) => bl.find((b) => b.id === id);
   const overlaps = (s1, e1, s2, e2) => s1 < e2 && s2 < e1;
-  const dayLoad = (d, bl, ignore = []) => bl.filter((b) => b.d === d && live(b) && !ignore.includes(b.id)).reduce((a, b) => a + b.m, 0);
-  function free(d, s, m, bl, ignore = []) {
+  const routines = () => { const all = S.routines.concat(S.extraRt, S.card?.state === "pending" && S.card.routine ? [S.card.routine] : []); return all.filter((r, i) => all.findIndex((x) => x.id === r.id) === i); };
+  const routineOver = (d, s, m) => routines().find((r) => r.days.includes(wd(d)) && overlaps(s, s + m, r.s, r.e)) || null;
+  const inRoutine = (b) => AUDIO.has(b.kind) && !!routineOver(b.d, b.s, b.m);
+  const dayLoad = (d, bl, ignore = []) => bl.filter((b) => b.d === d && live(b) && !ignore.includes(b.id) && !inRoutine(b)).reduce((a, b) => a + b.m, 0);
+  function free(d, s, m, bl, ignore = [], kind = "watch") {
     if (s < H0 || s + m > H1) return false;
+    const r = routineOver(d, s, m);
+    if (r && (!MODES[r.mode].kinds.includes(kind) || s < r.s || s + m > r.e)) return false;
     if (bl.some((b) => b.d === d && live(b) && !ignore.includes(b.id) && overlaps(s, s + m, b.s, b.s + b.m))) return false;
     if (S.calOn && S.busy.some((z) => z.d === d && overlaps(s, s + m, z.s, z.e))) return false;
     return true;
   }
   const inAvail = (d, s, m) => AVAIL[wd(d)].some(([a, e]) => s >= a && s + m <= e);
-  const fits = (d, s, m, bl, ignore = []) => !isPast(d, s) && inAvail(d, s, m) && free(d, s, m, bl, ignore) && dayLoad(d, bl, ignore) + m <= S.maxDay;
+  function fits(d, s, m, bl, ignore = [], kind = "watch") {
+    if (isPast(d, s) || !free(d, s, m, bl, ignore, kind)) return false;
+    if (routineOver(d, s, m)) return true; // a routine is its own time: no learning-time window, no daily maximum
+    return inAvail(d, s, m) && dayLoad(d, bl, ignore) + m <= S.maxDay;
+  }
+  /** Where a kind may go on a day: audio kinds try that day's routines first, then learning time. */
+  const winsFor = (d, kind) => (AUDIO.has(kind) ? routines().filter((r) => r.days.includes(wd(d)) && MODES[r.mode].kinds.includes(kind)).map((r) => [r.s, r.e]) : []).concat(AVAIL[wd(d)]);
   /** Motion-style placement: the preferred slot if it's free, else the first free learning time from that day on,
       else the earliest one in range. Never in the past, never in busy time, never over the daily maximum. */
-  function place(m, { d0, d1, prefD = null, prefS = null }, bl, ignore = []) {
-    if (prefD != null && prefS != null && prefD >= d0 && prefD <= d1 && fits(prefD, prefS, m, bl, ignore)) return { d: prefD, s: prefS };
+  function place(m, { d0, d1, prefD = null, prefS = null }, bl, ignore = [], kind = "watch") {
+    if (prefD != null && prefS != null && prefD >= d0 && prefD <= d1 && fits(prefD, prefS, m, bl, ignore, kind)) return { d: prefD, s: prefS };
     const start = Math.max(d0, prefD ?? d0);
     const order = []; for (let d = start; d <= d1; d++) order.push(d); for (let d = d0; d < start; d++) order.push(d);
     for (const d of order) {
-      const wins = AVAIL[wd(d)].slice().sort((a, b) => (prefS != null && d === prefD ? Math.abs(a[0] - prefS) - Math.abs(b[0] - prefS) : 0));
-      for (const [a, e] of wins) for (let s = a; s + m <= e; s += 5) if (fits(d, s, m, bl, ignore)) return { d, s };
+      const wins = winsFor(d, kind).sort((a, b) => (prefS != null && d === prefD ? Math.abs(a[0] - prefS) - Math.abs(b[0] - prefS) : 0));
+      for (const [a, e] of wins) for (let s = a; s + m <= e; s += 5) if (fits(d, s, m, bl, ignore, kind)) return { d, s };
     }
     return null;
   }
   /** Where a dragged session lands: the exact time if free, else the nearest free time that day (any hour). */
-  function nearest(d, s, m, ignore) {
-    for (let off = 0; off <= 17 * 60; off += 5) for (const t of off ? [s + off, s - off] : [s]) if (!isPast(d, t) && free(d, t, m, S.blocks, ignore)) return t;
+  function nearest(d, s, m, ignore, kind) {
+    for (let off = 0; off <= 17 * 60; off += 5) for (const t of off ? [s + off, s - off] : [s]) if (!isPast(d, t) && free(d, t, m, S.blocks, ignore, kind)) return t;
     return null;
   }
   const weekMins = (w, trId, bl = S.blocks) => bl.filter((b) => Math.floor(b.d / 7) === w && live(b) && (b.tr === trId || b.also === trId)).reduce((a, b) => a + b.m, 0);
@@ -142,6 +179,10 @@
 
   /* ================================================================ icons */
   const I = {
+    driving: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
+    cycling: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+    walking: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13" cy="4" r="1.6"/><path d="M10 21l2-6 3 3v3M8 12l3-4 3 2 3 2M11 8l-1 5"/></svg>',
+    ears: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>',
     spark: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
     clock: '<svg class="pl-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     send: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
@@ -198,14 +239,14 @@
     const canPrev = wk ? w > 0 : S.sel > 0, canNext = wk ? w < 1 : S.sel < 13;
     return `<div class="pl-calnav"><div class="pl-seg" role="group" aria-label="Calendar view"><button type="button" data-view="day" aria-pressed="${!wk}">Day</button><button type="button" data-view="week" aria-pressed="${wk}">Week</button></div>
       <button class="icb" type="button" data-step="-1" aria-label="${wk ? "Previous week" : "Previous day"}"${canPrev ? "" : " disabled"}>${I.prev}</button><button class="icb" type="button" data-step="1" aria-label="${wk ? "Next week" : "Next day"}"${canNext ? "" : " disabled"}>${I.next}</button>
-      <h2>${title}</h2><span class="pl-key2"><i class="av"></i>Learning time${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
+      <h2>${title}</h2><span class="pl-key2"><i class="av"></i>Learning time${S.routines.length ? '<i class="rt"></i>Routine' : ""}${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
   }
   function hoursCol() {
     let h = ""; for (let k = 6; k <= 22; k++) if (!FOLDED[k - 6]) h += `<span style="top:${Y(k * 60)}px">${k}:00</span>`;
     for (const [a, e] of folds()) h += `<span class="fold" style="top:${Y(a) + 5}px" title="${hm(a)}–${hm(e)}, nothing planned">${a / 60}–${e / 60}</span>`;
     return `<div class="pl-wkh" style="height:${TOT()}px">${h}</div>`;
   }
-  const ghostDays = () => { const g = ghostOps(), s = new Set(g.add.map((b) => b.d)); g.to.forEach((o) => s.add(o.d)); g.from.forEach((id) => s.add(blockById(id)?.d)); g.gone.forEach((id) => s.add(blockById(id)?.d)); g.link.forEach((_, id) => s.add(blockById(id)?.d)); return s; };
+  const ghostDays = () => { const g = ghostOps(), s = new Set(g.add.map((b) => b.d)); g.to.forEach((o) => s.add(o.d)); g.from.forEach((id) => s.add(blockById(id)?.d)); g.gone.forEach((id) => s.add(blockById(id)?.d)); g.link.forEach((_, id) => s.add(blockById(id)?.d)); g.conv.forEach((_, id) => s.add(blockById(id)?.d)); return s; };
   function weekGrid(days) {
     const gd = ghostDays();
     const dh = days.map((d) => { const ld = dayLoad(d, S.blocks); return `<button type="button" class="pl-wd${d === S.now.d ? " is-today" : ""}${gd.has(d) ? " has-ghost" : ""}" data-sel="${d}" aria-label="Open ${dayLong(d)}${gd.has(d) ? ", has proposed changes" : ""}">${DN[wd(d)].slice(0, 3)}<b>${dateOf(d).getDate()}</b><span class="sm${ld > S.maxDay ? " over" : ""}">${ld ? len(ld) : "–"}</span></button>`; }).join("");
@@ -223,7 +264,7 @@
 
   /* ---------------------------------------------------------------- blocks */
   function ghostOps() {
-    const g = { add: [], from: new Set(), gone: new Set(), link: new Map(), to: new Map() };
+    const g = { add: [], from: new Set(), gone: new Set(), link: new Map(), to: new Map(), conv: new Map() };
     const c = S.card; if (!c || c.state !== "pending") return g;
     for (const o of c.ops) {
       if (!o.on) continue;
@@ -231,6 +272,7 @@
       if (o.type === "move") { g.from.add(o.id); g.to.set(o.id, o); }
       if (o.type === "drop") g.gone.add(o.id);
       if (o.type === "link") g.link.set(o.id, o.also);
+      if (o.type === "convert") g.conv.set(o.id, o);
     }
     return g;
   }
@@ -238,7 +280,7 @@
     ROW = []; FOLDED = [];
     for (let h = 6; h < 23; h++) {
       const a = h * 60, e = a + 60, hit = (d, s, m) => days.includes(d) && overlaps(s, s + m, a, e);
-      const used = AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e)))
+      const used = AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e))) || routines().some((r) => overlaps(r.s, r.e, a, e))
         || S.blocks.some((b) => b.st !== "dropped" && hit(b.d, b.s, b.m)) || (days.includes(S.now.d) && S.now.m >= a && S.now.m < e);
       ROW.push(H); FOLDED.push(!used);
     }
@@ -249,9 +291,9 @@
   function blockEl(b, { ghost = false, from = false, gone = false, linked = null } = {}) {
     const also = linked || b.also;
     const top = Y(b.s), h = Math.max(16, Y(b.s + b.m) - top - 2);
-    const cls = ["pl-b", `is-${b.st}`, ghost && "is-ghost", from && "is-from", gone && "is-gone", linked && "is-linked", also && "has-also", h < 28 ? "is-short" : h < 46 && "is-two", b.flash && "is-flash"].filter(Boolean).join(" ");
+    const cls = ["pl-b", `is-${b.st}`, ghost && "is-ghost", from && "is-from", gone && "is-gone", linked && "is-linked", also && "has-also", h < 28 ? "is-short" : h < 46 && "is-two", b.flash && "is-flash", inRoutine(b) && "in-rt"].filter(Boolean).join(" ");
     const kind = KIND[b.kind].k;
-    const tag = gone ? "Drop" : ghost ? (b.ghostOf ? "Move" : "New") : "";
+    const tag = gone ? "Drop" : ghost ? (b.ghostOf ? "Move" : b.convOf ? "Change" : "New") : "";
     const label = `${hm(b.s)} · ${kind}${tag ? ` · ${tag}` : ""}`;
     const aria = `${KIND[b.kind].noun}: ${b.title}, ${dayLong(b.d)} ${hm(b.s)} to ${hm(b.s + b.m)}${b.st === "done" ? ", done" : b.st === "moved" ? ", moved" : ""}${ghost ? ", proposed" : ""}${gone ? ", proposed to drop" : ""}`;
     return `<button type="button" class="${cls}" data-b="${esc(b.id)}"${ghost ? ` data-ghost="1"` : ""} data-tr="${b.tr ? trOf(b.tr) : "a"}"${also ? ` data-tr2="${trOf(also)}"` : ""} style="top:${top}px;height:${h}px${b.kind === "plan" ? ";--tr:var(--ghost);--tr-soft:var(--ghost-soft)" : ""}" aria-label="${esc(aria)}"><span class="k">${esc(label)}</span><span class="t">${esc(b.title)}</span>${S.view === "day" && h >= 50 && b.why ? `<span class="w">${esc(b.why)}</span>` : ""}</button>`;
@@ -265,7 +307,8 @@
     const pastTo = d < S.now.d ? H1 : d === S.now.d ? S.now.m : H0;
     if (pastTo > H0) h += `<div class="pl-past" style="height:${Y(pastTo)}px"></div>`;
     const g = ghostOps();
-    for (const b of S.blocks.filter((x) => x.d === d && x.st !== "dropped")) h += blockEl(b, { from: g.from.has(b.id), gone: g.gone.has(b.id), linked: g.link.get(b.id) || null });
+    for (const r of routines().filter((x) => x.days.includes(wd(d)) && d >= S.now.d)) h += `<div class="pl-rt${S.routines.some((x) => x.id === r.id) ? "" : " is-ghost"}" style="top:${Y(r.s)}px;height:${Y(r.e) - Y(r.s)}px" title="${esc(r.name)} · ${hm(r.s)}–${hm(r.e)} · ${esc(MODES[r.mode].note)}"><span class="ic" aria-hidden="true">${I[r.mode]}</span></div>`;
+    for (const b of S.blocks.filter((x) => x.d === d && x.st !== "dropped")) { const cv = g.conv.get(b.id); h += cv ? blockEl({ ...b, kind: cv.kind, title: cv.title, m: cv.m, why: cv.why, convOf: b.id }, { ghost: true }) : blockEl(b, { from: g.from.has(b.id), gone: g.gone.has(b.id), linked: g.link.get(b.id) || null }); }
     for (const [id, o] of g.to) { const b = blockById(id); if (b && o.d === d) h += blockEl({ ...b, d: o.d, s: o.s, id: b.id, ghostOf: b.id }, { ghost: true }); }
     for (const nb of g.add.filter((x) => x.d === d)) h += blockEl(nb, { ghost: true });
     if (d === S.now.d) h += `<div class="pl-now" style="top:${Y(S.now.m)}px" aria-hidden="true"></div>`;
@@ -293,7 +336,7 @@
     return `<section class="td-next pl-next${b.kind === "plan" ? " is-plan" : ""}" aria-labelledby="pl-next-t" data-tr="${t ? t.tr : "a"}">
       <p class="td-k"><span>Next · ${esc(when)}</span><span class="pl-kind"${b.kind === "plan" ? ' style="--tr:var(--ghost-ink);--tr-soft:var(--ghost-soft)"' : ""}>${esc(K.k)}</span>${t ? `<span>${esc(t.name)} › ${esc(b.topic)}</span>` : ""}</p>
       <h2 class="td-n" id="pl-next-t">${esc(b.title)}</h2>
-      <p class="td-m">${len(b.m)} · ${esc(K.noun)}${MADE[b.made] ? ` · ${esc(MADE[b.made])}` : ""}${b.also ? ` · counts for ${esc(track(b.also)?.name || "")} too` : ""}</p>
+      <p class="td-m">${len(b.m)} · ${esc(K.noun)}${(() => { const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m); return r ? ` · ${esc(r.name)}, audio only` : ""; })()}${MADE[b.made] ? ` · ${esc(MADE[b.made])}` : ""}${b.also ? ` · counts for ${esc(track(b.also)?.name || "")} too` : ""}</p>
       <div class="td-row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-quiet" type="button" data-movenext="${b.id}">Next free time</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
       ${after.length ? `<p class="td-after">${after.join("<br>")}</p>` : ""}
       ${note ? `<p class="pl-note"><span class="av" aria-hidden="true">S</span><span>${note.text}</span></p>` : ""}
@@ -331,7 +374,8 @@
   function showPop(id, anchor, ghost) {
     hidePop();
     const g = ghostOps();
-    const b = ghost ? (g.add.find((x) => x.id === id) || (g.to.get(id) && { ...blockById(id), d: g.to.get(id).d, s: g.to.get(id).s, why: g.to.get(id).why, ghostOf: id })) : blockById(id);
+    const cv = g.conv.get(id);
+    const b = ghost ? (g.add.find((x) => x.id === id) || (g.to.get(id) && { ...blockById(id), d: g.to.get(id).d, s: g.to.get(id).s, why: g.to.get(id).why, ghostOf: id }) || (cv && { ...blockById(id), kind: cv.kind, title: cv.title, m: cv.m, why: cv.why, convOf: id })) : blockById(id);
     if (!b) return;
     const K = KIND[b.kind], t = track(b.tr), a2 = b.also ? track(b.also) : null;
     const can = !ghost && (b.st === "planned" || b.st === "started");
@@ -343,6 +387,7 @@
       <p class="meta"><span>${dayLong(b.d)} · ${hm(b.s)}–${hm(b.s + b.m)} · ${len(b.m)}</span>
         ${t ? `<span class="trs"><span data-tr="${t.tr}"><i></i>${esc(t.name)} › ${esc(b.topic)}</span>${a2 ? `<span data-tr="${a2.tr}"><i></i>${esc(a2.name)}</span>` : ""}</span>` : ""}
         <span>${esc(status)}</span>${MADE[b.made] && b.st !== "done" ? `<span>${esc(MADE[b.made])}</span>` : ""}
+        ${(() => { const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m); return r ? `<span>In ${esc(r.name)} · ${esc(MODES[r.mode].note)}</span>` : ""; })()}
         ${b.why ? `<span class="why">“${esc(b.why)}”</span>` : ""}</p>
       <div class="acts">${ghost ? `<button class="button button-quiet" type="button" data-leave="${esc(id)}">Leave this out of the plan</button>` : `${can || b.st === "done" ? `<button class="button" type="button" data-start="${b.id}">${b.st === "done" ? "Open again" : esc(K.go)}</button>` : ""}${can ? `<button class="button button-quiet" type="button" data-movenext="${b.id}">Next free time</button><button class="button button-quiet" type="button" data-skip="${b.id}">Skip</button><button class="button button-link" type="button" data-remove="${b.id}">Remove</button>` : ""}`}</div>`;
     document.body.appendChild(popEl);
@@ -355,15 +400,15 @@
   }
 
   /* ================================================================ changing the plan by hand */
-  function snapshot() { return { blocks: clone(S.blocks), tracks: clone(S.tracks), notes: clone(S.notes) }; }
-  function restore(snap) { S.blocks = snap.blocks; S.tracks = snap.tracks; S.notes = snap.notes; }
+  function snapshot() { return { blocks: clone(S.blocks), tracks: clone(S.tracks), notes: clone(S.notes), routines: clone(S.routines) }; }
+  function restore(snap) { S.blocks = snap.blocks; S.tracks = snap.tracks; S.notes = snap.notes; S.routines = snap.routines; }
   function flash(ids) { S.blocks.forEach((b) => { b.flash = ids.includes(b.id); }); setTimeout(() => S.blocks.forEach((b) => delete b.flash), 1700); }
   const newId = () => `n${++S.seq}`;
   function moveNext(id) {
     const b = blockById(id); if (!b) return;
     const snap = snapshot();
     let p = null;
-    for (let d = Math.max(b.d, S.now.d); d <= Math.floor(S.now.d / 7) * 7 + 13 && !p; d++) for (const [a, e] of AVAIL[wd(d)]) { for (let s = d === b.d ? Math.max(a, b.s + 5) : a; s + b.m <= e; s += 5) if (fits(d, s, b.m, S.blocks, [id])) { p = { d, s }; break; } if (p) break; }
+    for (let d = Math.max(b.d, S.now.d); d <= Math.floor(S.now.d / 7) * 7 + 13 && !p; d++) for (const [a, e] of winsFor(d, b.kind)) { for (let s = d === b.d ? Math.max(a, b.s + 5) : a; s + b.m <= e; s += 5) if (fits(d, s, b.m, S.blocks, [id], b.kind)) { p = { d, s }; break; } if (p) break; }
     if (!p) return toast("No free time left", "There's no free learning time in the next two weeks for this. Try Learning time to add some.");
     const from = `${dayShort(b.d)} ${hm(b.s)}`;
     Object.assign(b, { d: p.d, s: p.s, why: `Moved by you from ${from}` });
@@ -373,7 +418,7 @@
   function skip(id) {
     const b = blockById(id); if (!b) return;
     const snap = snapshot();
-    const p = place(b.m, { d0: b.d + 1, d1: Math.floor(b.d / 7) * 7 + 13, prefD: b.d + 1 }, S.blocks, [id]);
+    const p = place(b.m, { d0: b.d + 1, d1: Math.floor(b.d / 7) * 7 + 13, prefD: b.d + 1 }, S.blocks, [id], b.kind);
     b.st = "moved"; b.why = p ? `Skipped. Moved to ${dayShort(p.d)} ${hm(p.s)}` : "Skipped";
     let msg = "Nothing else changed.";
     if (p && b.kind !== "plan") {
@@ -422,13 +467,14 @@
     const d = +col.dataset.d, top = e.clientY - dy - col.getBoundingClientRect().top;
     const s = snap5(M(Math.max(0, top)));
     if (isPast(d, Math.max(s, H0))) { render(); return toast("That time has passed", "Sessions can only move to later times."); }
-    const ns = nearest(d, Math.min(Math.max(s, H0), H1 - b.m), b.m, [b.id]);
+    const ns = nearest(d, Math.min(Math.max(s, H0), H1 - b.m), b.m, [b.id], b.kind);
     if (ns == null) { render(); return toast("No room that day", `${dayLong(d)} has no free time for ${len(b.m)}.`); }
+    const rr = routineOver(d, s, b.m); const skipped = rr && !MODES[rr.mode].kinds.includes(b.kind);
     const snap = snapshot(), from = `${dayShort(b.d)} ${hm(b.s)}`;
     Object.assign(b, { d, s: ns, why: `Moved by you from ${from}` });
     flash([b.id]); render();
     const outside = !inAvail(d, ns, b.m), over = dayLoad(d, S.blocks) > S.maxDay;
-    toast(`Moved to ${dayShort(d)} ${hm(ns)}`, `${ns !== s ? "The nearest free time. " : ""}${outside ? "It's outside your learning time, which is fine: your choice wins. " : ""}${over ? `${DN[wd(d)]} is now over your ${len(S.maxDay)} a day.` : ""}`.trim() || b.title, () => { restore(snap); render(); });
+    toast(`Moved to ${dayShort(d)} ${hm(ns)}`, `${skipped ? `A ${KIND[b.kind].noun.toLowerCase()} can't be ${MODES[rr.mode].verb}, so it went to the nearest time outside ${rr.name}. ` : ns !== s ? "The nearest free time. " : ""}${outside ? "It's outside your learning time, which is fine: your choice wins. " : ""}${over ? `${DN[wd(d)]} is now over your ${len(S.maxDay)} a day.` : ""}`.trim() || b.title, () => { restore(snap); render(); });
   }
 
   /* ================================================================ the copilot panel */
@@ -440,7 +486,7 @@
     <div class="cp-comp"><div class="prompts"></div><form class="box"><label class="visually-hidden" for="pl-in">Ask the copilot about your plan</label><textarea id="pl-in" rows="2" maxlength="1200" placeholder="Plan my week, or tell me about a deadline…"></textarea><div class="tools"><small id="pl-ai2"></small><span class="grow"></span><button aria-label="Send" class="send" type="submit" disabled>${I.send}</button></div></form></div></section>`;
   document.body.appendChild(cpw);
   const thread = $(".cp-thread", cpw), input = $("#pl-in", cpw), sendBtn = $(".send", cpw);
-  const PROMPTS = ["Plan the rest of my week", "I'm presenting a courtyard house to a client on 6 November", "Make Saturday lighter", "Plan next week"];
+  const PROMPTS = ["Plan the rest of my week", "I drive to work every weekday, 7:00 to 7:30", "I'm presenting a courtyard house to a client on 6 November", "I cycle on Saturday mornings, 8 to 9", "Make Saturday lighter", "Plan next week"];
   const used = new Set();
   function prompts() { $(".prompts", cpw).innerHTML = PROMPTS.filter((p) => !used.has(p)).map((p) => `<button type="button" data-say="${esc(p)}">${esc(p)}</button>`).join(""); }
   // The copilot takes the side column's place; the calendar and the view stay exactly as they are.
@@ -459,7 +505,7 @@
   function greet() {
     const w = Math.floor(S.now.d / 7), n = S.blocks.filter((b) => Math.floor(b.d / 7) === w && live(b) && b.kind !== "plan");
     const short = S.tracks.find((t) => !t.goal && weekMins(w, t.id) < t.target);
-    addMsg("ai", `<p>Your week has ${n.length} sessions, about ${len(n.reduce((a, b) => a + b.m, 0))}. I moved <b>Glare</b> from Tuesday to Thursday morning because you missed it.</p>${short ? `<p>${esc(short.name)} is ${len(short.target - weekMins(w, short.id))} short this week. Want me to find time, or is there a deadline I should plan around?</p>` : ""}`);
+    addMsg("ai", `<p>Your week has ${n.length} sessions, about ${len(n.reduce((a, b) => a + b.m, 0))}. I moved <b>Glare</b> from Tuesday to Thursday morning because you missed it.</p>${short ? `<p>${esc(short.name)} is ${len(short.target - weekMins(w, short.id))} short this week. Want me to find time, or is there a deadline I should plan around?</p>` : ""}<p>Tell me about your routines too, like a daily drive or a ride, and I'll plan things to listen to there.</p>`);
     S.msgs.push({ role: "assistant", content: "Greeting: summarised the week." });
   }
 
@@ -468,20 +514,22 @@
     const byDay = new Map();
     c.ops.forEach((o, i) => { const d = o.type === "add" ? o.nb.d : o.type === "move" ? o.d : (blockById(o.id) || o.gone)?.d ?? 0; if (!byDay.has(d)) byDay.set(d, []); byDay.get(d).push([o, i]); });
     const days = [...byDay.keys()].sort((a, b) => a - b);
-    const G = { add: "+", move: "→", drop: "−", link: "◆" };
+    const G = { add: "+", move: "→", drop: "−", link: "◆", convert: "⇄" };
     const rows = days.map((d) => `<p class="pl-dayh">${dayLong(d)}</p>${byDay.get(d).map(([o, i]) => {
-      const b = o.type === "add" ? o.nb : blockById(o.id) || o.gone; if (!b) return "";
-      const what = o.type === "add" ? `${hm(b.s)} · ${len(b.m)} · ${KIND[b.kind].noun}` : o.type === "move" ? `${dayShort(o.fd ?? b.d)} ${hm(o.fs ?? b.s)} → ${dayShort(o.d)} ${hm(o.s)}` : o.type === "drop" ? `Drop · was ${hm(b.s)}` : `Also counts for ${esc(track(o.also)?.name || c.goal?.name || "")}`;
+      const b0 = o.type === "add" ? o.nb : blockById(o.id) || o.gone; if (!b0) return "";
+      const b = o.type === "convert" ? { ...b0, title: o.title } : b0;
+      const what = o.type === "add" ? `${hm(b.s)} · ${len(b.m)} · ${KIND[b.kind].noun}` : o.type === "move" ? `${dayShort(o.fd ?? b.d)} ${hm(o.fs ?? b.s)} → ${dayShort(o.d)} ${hm(o.s)}` : o.type === "drop" ? `Drop · was ${hm(b.s)}` : o.type === "convert" ? `${hm(b.s)} · ${KIND[o.fk].noun} → ${KIND[o.kind].noun} · ${len(o.m)}` : `Also counts for ${esc(track(o.also)?.name || c.goal?.name || "")}`;
       const t = track(b.tr);
       return `<label class="pl-op${o.on ? "" : " is-off"}"><input type="checkbox" data-op="${i}"${o.on ? " checked" : ""}${c.state !== "pending" ? " disabled" : ""}><span class="g${o.type === "drop" ? " drop" : ""}" aria-hidden="true">${G[o.type]}</span><span class="tt"><b>${esc(b.title)}</b><small>${what}${t ? ` · ${esc(t.name)}` : ""}</small>${o.why || b.why ? `<span class="why">${esc(o.why || b.why)}</span>` : ""}</span></label>`;
     }).join("")}`).join("");
     const n = c.ops.filter((o) => o.on);
     const added = n.filter((o) => o.type === "add").reduce((a, o) => a + o.nb.m, 0);
-    const sum = [n.filter((o) => o.type === "add").length && `${n.filter((o) => o.type === "add").length} new`, n.filter((o) => o.type === "move").length && `${n.filter((o) => o.type === "move").length} moved`, n.filter((o) => o.type === "drop").length && `${n.filter((o) => o.type === "drop").length} dropped`, n.filter((o) => o.type === "link").length && `${n.filter((o) => o.type === "link").length} linked to the goal`, added && `${len(added)} added`].filter(Boolean).join(" · ") || "Nothing selected";
+    const sum = [n.filter((o) => o.type === "add").length && `${n.filter((o) => o.type === "add").length} new`, n.filter((o) => o.type === "move").length && `${n.filter((o) => o.type === "move").length} moved`, n.filter((o) => o.type === "drop").length && `${n.filter((o) => o.type === "drop").length} dropped`, n.filter((o) => o.type === "link").length && `${n.filter((o) => o.type === "link").length} linked to the goal`, n.filter((o) => o.type === "convert").length && `${n.filter((o) => o.type === "convert").length} changed to fit`, added && `${len(added)} added`].filter(Boolean).join(" · ") || "Nothing selected";
     const acts = { pending: `<button class="button" type="button" data-apply="${c.id}"${n.length ? "" : " disabled"}>Apply to my calendar</button><button class="button button-quiet" type="button" data-dismiss="${c.id}">Not now</button><button class="button button-link" type="button" data-showwk="${c.wk}">Show on the week</button>`, applied: `<span class="done"><b>✓ Applied</b> to your calendar · <button class="pl-linkbtn" type="button" data-undo="${c.id}">Undo</button></span>`, undone: '<span class="done">Undone. Your calendar is as it was.</span>', dismissed: '<span class="done">Not applied.</span>', replaced: '<span class="done">Replaced by a newer plan below.</span>' }[c.state];
     return `<div class="pl-card${c.state === "pending" ? " is-pending" : ""}${["replaced", "dismissed", "undone"].includes(c.state) ? " is-old" : ""}" data-card="${c.id}">
       <div class="pl-card-h"><span class="tag">Plan</span><h4>${esc(c.title)}</h4></div><p class="pl-card-sum">${sum}</p>
       ${c.review ? `<div class="pl-review"><h5>How the week went</h5><p class="stat"><span><b>${c.review.done}</b>of ${c.review.total} sessions</span><span><b>${len(c.review.mins)}</b>of learning</span>${c.review.missed ? `<span><b>${c.review.missed}</b>missed or skipped</span>` : ""}</p><ul>${c.review.lines.map((l) => `<li>${l}</li>`).join("")}</ul></div>` : ""}
+      ${c.routine ? `<div class="pl-rtc"><span class="ic" aria-hidden="true">${I[c.routine.mode]}</span><span><b>New routine · ${esc(c.routine.name)}</b> · ${esc(daysLabel(c.routine.days))} · ${hm(c.routine.s)}–${hm(c.routine.e)}</span><span>${esc(MODES[c.routine.mode].note)}. Doesn't count towards your daily maximum.</span></div>` : ""}
       ${c.goal ? `<div class="pl-goal"><span><b>New goal · ${esc(c.goal.name)}</b> · ${esc(dayLong(c.goal.until))}</span><span>Draws on ${c.goal.draws.map((id) => esc(track(id)?.name || id)).join(" and ")}. Its sessions count for both, and for the goal.</span></div>` : ""}
       ${rows || '<p class="pl-card-sum">No calendar changes.</p>'}<div class="acts">${acts}</div></div>`;
   }
@@ -498,6 +546,7 @@
     const c = S.cards.find((x) => x.id === id); if (!c || c.state !== "pending") return;
     c.snap = snapshot();
     if (c.goal && !S.tracks.some((t) => t.id === c.goal.id)) S.tracks.push(clone(c.goal));
+    if (c.routine && !S.routines.some((r) => r.id === c.routine.id)) S.routines.push(clone(c.routine));
     const ids = [];
     for (const o of c.ops.filter((x) => x.on)) {
       if (o.type === "add") { S.blocks.push({ ...clone(o.nb), st: "planned" }); ids.push(o.nb.id); }
@@ -505,6 +554,7 @@
       if (o.type === "move" && b) { Object.assign(b, { d: o.d, s: o.s, why: o.why || b.why }); ids.push(b.id); }
       if (o.type === "drop" && b) { o.gone = clone(b); S.blocks = S.blocks.filter((x) => x.id !== o.id); }
       if (o.type === "link" && b) { b.also = o.also; ids.push(b.id); }
+      if (o.type === "convert" && b) { Object.assign(b, { kind: o.kind, title: o.title, m: o.m, why: o.why || b.why, made: "evening" }); ids.push(b.id); }
     }
     c.state = "applied"; S.card = null; refreshCard(c); flash(ids); render();
     toast("Plan applied", `${c.ops.filter((x) => x.on).length} changes on your calendar.`, () => undoCard(id));
@@ -512,15 +562,17 @@
   function undoCard(id) { const c = S.cards.find((x) => x.id === id); if (!c || c.state !== "applied") return; restore(c.snap); c.state = "undone"; refreshCard(c); render(); }
 
   /** Turns wishes (add / move / drop / link, with preferred times) into a card, placing each one Motion-style. */
-  function buildCard({ title, wishes, goal = null, review = null, wk = null }) {
+  function buildCard({ title, wishes, goal = null, review = null, wk = null, routine = null }) {
     const sim = clone(S.blocks), ops = [];
+    S.extraRt = routine ? [routine] : [];
     const w0 = Math.floor(S.now.d / 7);
     for (const x of wishes) {
       if (x.type === "add") {
         const m = Math.min(60, Math.max(5, x.m | 0 || 20));
         const wkx = x.d != null ? Math.floor(x.d / 7) : w0;
-        const p = place(m, { d0: Math.max(S.now.d, wkx * 7), d1: wkx * 7 + 6, prefD: x.d ?? null, prefS: x.s ?? null }, sim)
-          || place(m, { d0: S.now.d, d1: w0 * 7 + 13, prefD: x.d ?? null }, sim);
+        const kind = KIND[x.kind] ? x.kind : "watch";
+        const p = place(m, { d0: Math.max(S.now.d, wkx * 7), d1: wkx * 7 + 6, prefD: x.d ?? null, prefS: x.s ?? null }, sim, [], kind)
+          || place(m, { d0: S.now.d, d1: w0 * 7 + 13, prefD: x.d ?? null }, sim, [], kind);
         if (!p) continue;
         const nb = { id: newId(), d: p.d, s: p.s, m, kind: KIND[x.kind] ? x.kind : "watch", title: String(x.title || "A new Lumen").slice(0, 90), tr: track(x.tr) ? x.tr : S.tracks[0].id, also: x.also && (track(x.also) || x.also === goal?.id) ? x.also : null, topic: x.topic || "", st: "planned", made: x.made || (x.kind === "live" ? "none" : x.kind === "library" ? "exists" : "evening"), why: x.why || "" };
         sim.push(nb); ops.push({ type: "add", nb, on: true, why: x.why });
@@ -529,7 +581,7 @@
         if (!b || !(b.st === "planned" || b.st === "started") || isPast(b.d, b.s)) continue;
         if (x.type === "move") {
           const wkx = x.d != null ? Math.floor(x.d / 7) : Math.floor(b.d / 7);
-          const p = place(b.m, { d0: Math.max(S.now.d, wkx * 7), d1: wkx * 7 + 6, prefD: x.d ?? b.d, prefS: x.s ?? null }, sim, [b.id]);
+          const p = place(b.m, { d0: Math.max(S.now.d, wkx * 7), d1: wkx * 7 + 6, prefD: x.d ?? b.d, prefS: x.s ?? null }, sim, [b.id], b.kind);
           if (!p || (p.d === b.d && p.s === b.s)) continue;
           const added = ops.find((o) => o.type === "add" && o.nb.id === b.id);
           if (added) { Object.assign(added.nb, { d: p.d, s: p.s }); Object.assign(b, { d: p.d, s: p.s }); continue; }
@@ -537,11 +589,13 @@
         }
         if (x.type === "drop") { const ai = ops.findIndex((o) => o.type === "add" && o.nb.id === b.id); if (ai >= 0) ops.splice(ai, 1); else ops.push({ type: "drop", id: b.id, on: true, why: x.why }); b.st = "dropped"; }
         if (x.type === "link" && x.also) { if (b.also === x.also) continue; ops.push({ type: "link", id: b.id, also: x.also, on: true, why: x.why }); b.also = x.also; }
+        if (x.type === "convert" && KIND[x.kind]) { const m = Math.min(60, Math.max(5, x.m | 0 || b.m)); ops.push({ type: "convert", id: b.id, kind: x.kind, title: String(x.title || b.title).slice(0, 90), m, fk: b.kind, on: true, why: x.why }); Object.assign(b, { kind: x.kind, title: x.title || b.title, m }); }
       }
     }
+    S.extraRt = [];
     const weeks = new Set(ops.map((o) => Math.floor((o.type === "add" ? o.nb.d : o.type === "move" ? o.d : blockById(o.id)?.d ?? S.now.d) / 7)));
     const cw = wk ?? (weeks.size === 1 ? [...weeks][0] : w0);
-    return { id: `c${S.cards.length + 1}`, title: title || (cw > w0 ? `Next week · ${weekRange(cw)}` : weeks.size > 1 ? "Changes to this week and next" : "Changes to this week"), ops, goal, review, wk: cw, state: "pending" };
+    return { id: `c${S.cards.length + 1}`, title: title || (cw > w0 ? `Next week · ${weekRange(cw)}` : weeks.size > 1 ? "Changes to this week and next" : "Changes to this week"), ops, goal, review, routine, wk: cw, state: "pending" };
   }
 
   /* ---------------------------------------------------------------- scripted answers */
@@ -615,8 +669,63 @@
     const c = buildCard({ title: `Next week · ${weekRange(n)}`, wishes, wk: n, review: { done: done.length, total: wk.filter((b) => live(b) || b.st === "skipped").length, mins: done.reduce((a, b) => a + b.m, 0), missed: missed.length, lines } });
     return { say: "Here's how this week went, and what I'd put in next week. Busy evenings are left free, and no day goes over 1 h 30. Nothing changes until you apply it.", card: c };
   }
+  /** Reads a routine out of what the learner said: what they're doing, when, and on which days. */
+  function parseRoutine(text) {
+    const t = text.toLowerCase();
+    const mode = /cycl|bike|\bride|riding/.test(t) ? "cycling" : /walk/.test(t) ? "walking" : "driving";
+    const times = [...t.matchAll(/\b(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b/g)].map((m) => { let h = +m[1]; if (m[3] === "pm" && h < 12) h += 12; return h <= 23 ? h * 60 + (+m[2] || 0) : null; }).filter((x) => x != null && x >= 300);
+    const def = { driving: [420, 450], cycling: [480, 540], walking: [750, 780] }[mode];
+    let [s, e] = times.length >= 2 ? times : times.length === 1 ? [times[0], times[0] + 30] : def;
+    if (e <= s) e = s + 30;
+    const names = DN.map((n, i) => (new RegExp(`\\b${n.toLowerCase().slice(0, 3)}`).test(t) ? i : -1)).filter((i) => i >= 0);
+    const days = /weekend/.test(t) ? [5, 6] : /weekday|work|office/.test(t) && !names.length ? [0, 1, 2, 3, 4] : names.length ? names : /every ?day|daily/.test(t) ? [0, 1, 2, 3, 4, 5, 6] : mode === "cycling" ? [5] : [0, 1, 2, 3, 4];
+    const name = mode === "driving" ? (/work|office/.test(t) ? "Drive to work" : "Drive") : mode === "cycling" ? (days.length === 1 ? `${DN[days[0]]} ride` : "Ride") : "Walk";
+    return { id: `r${mode}${s}`, name, mode, days, s, e };
+  }
+  /** Fills a routine with what suits it: screen sessions in its way move or turn into dialogues, a spoken review
+      recalls yesterday's desk session (the loop: desk, then ears), and dialogues come from the topics most short. */
+  function scriptRoutine(text) {
+    const r = parseRoutine(text), M = MODES[r.mode], w0 = Math.floor(S.now.d / 7);
+    if (S.routines.some((x) => x.id === r.id)) return { say: `${r.name} is already on your calendar.` };
+    const span = r.e - r.s, wishes = [], used = new Set(), extra = {};
+    const daysAhead = []; for (let d = S.now.d; d <= w0 * 7 + 13; d++) if (r.days.includes(wd(d)) && !isPast(d, r.s)) daysAhead.push(d);
+    const goal = S.tracks.find((t) => t.goal);
+    let moved = [], turned = [];
+    for (const b of S.blocks.filter((x) => daysAhead.includes(x.d) && x.st === "planned" && overlaps(x.s, x.s + x.m, r.s, r.e) && !M.kinds.includes(x.kind))) {
+      const f = FIT[b.topic];
+      if (b.kind === "watch" && f?.[0] === "good") { wishes.push({ type: "convert", id: b.id, kind: "listen", title: b.title, m: Math.min(span - 5, Math.max(b.m, 20)), why: `${b.topic}: ${f[1]}, so it becomes a dialogue for the ${r.mode === "driving" ? "drive" : r.mode === "cycling" ? "ride" : "walk"}` }); turned.push(b); used.add(b.title); }
+      else { wishes.push({ type: "move", id: b.id, d: b.d, s: 1140, why: `${b.topic}: ${f ? f[1] : "it needs a screen"}; it can't be ${M.verb}` }); moved.push(b); }
+    }
+    const shortOf = (t, w) => t.target - weekMins(w, t.id) - (extra[`${w}${t.id}`] || 0);
+    let loops = 0;
+    for (const d of daysAhead) {
+      if (S.blocks.some((x) => x.d === d && live(x) && overlaps(x.s, x.s + x.m, r.s, r.e) && (M.kinds.includes(x.kind) || turned.includes(x)))) continue;
+      let at = r.s;
+      if (M.kinds.includes("aloud")) {
+        const prev = S.blocks.filter((x) => x.d === d - 1 && x.s >= 1020 && live(x) && ["read", "watch", "course"].includes(x.kind) && ["good", "fair"].includes(FIT[x.topic]?.[0])).sort((a, b) => b.s - a.s)[0];
+        if (prev && !used.has(`aloud${prev.topic}`)) { used.add(`aloud${prev.topic}`); loops++; wishes.push({ type: "add", kind: "aloud", title: `${prev.topic} · answer aloud`, tr: prev.tr, also: prev.also, topic: prev.topic, m: 10, d, s: at, made: "none", why: `Recalls ${DN[wd(d - 1)]} evening's ${lcNoun(KIND[prev.kind].noun)} on the way in` }); at += 10; }
+      }
+      while (r.e - at - 5 >= 15) {
+        const m = Math.min(25, r.e - at - 5), w = Math.floor(d / 7);
+        const pick = S.tracks.filter((t) => !t.goal && DIALOGUES[t.id]).sort((a, b) => shortOf(b, w) - shortOf(a, w)).map((t) => [t, DIALOGUES[t.id].filter(([title]) => !used.has(title) && !has(title)).sort((a, b) => (FIT[a[1]]?.[0] === "good" ? 0 : 1) - (FIT[b[1]]?.[0] === "good" ? 0 : 1))[0]]).find(([, x]) => x);
+        if (!pick) break;
+        const [t, [title, sub]] = pick; used.add(title); extra[`${w}${t.id}`] = (extra[`${w}${t.id}`] || 0) + m;
+        const short = shortOf(t, w) + m;
+        wishes.push({ type: "add", kind: "listen", title, tr: t.id, also: goal && goal.draws.includes(t.id) && FIT[sub]?.[0] === "good" ? goal.id : null, topic: sub, m, d, s: at, why: `${short > 0 ? `${t.name} is ${len(short)} short that week; ` : ""}${sub}: ${FIT[sub][1]}` });
+        at += m + 5;
+      }
+    }
+    const c = buildCard({ title: `New routine · ${r.name}`, wishes, routine: r });
+    const noun = r.mode === "driving" ? "drive" : r.mode === "cycling" ? "ride" : "walk";
+    const say = [`Your ${noun} is ${len(span)}${r.days.length === 5 ? " each weekday" : r.days.length === 1 ? ` every ${DN[r.days[0]]}` : ""}, so I'll plan ${r.mode === "cycling" ? "dialogues" : "dialogues and spoken reviews"} there: ${M.prose}.`,
+      turned.length ? `${turned.map((b) => b.title.split(":")[0]).join(" and ")} work${turned.length === 1 ? "s" : ""} well as a conversation, so ${turned.length === 1 ? "it becomes a dialogue" : "they become dialogues"}.` : "",
+      moved.length ? `${moved.map((b) => b.title.split(":")[0]).join(" and ")} need${moved.length === 1 ? "s" : ""} a screen, so ${moved.length === 1 ? "it moves" : "they move"} to the evening.` : "",
+      loops ? "After an evening at your desk, the next drive opens with a 10-minute spoken review of it, answered aloud." : ""].filter(Boolean).join(" ");
+    return { say, card: c };
+  }
   function scripted(text) {
     const t = text.toLowerCase();
+    if (/\b(driv\w*|commut\w*|car|cycl\w*|bike|ride|riding|walk\w*)\b/.test(t)) return scriptRoutine(text);
     if (/next week/.test(t)) return scriptNext();
     if (/client|present|deadline|exam|november|\bnov\b|due/.test(t)) return scriptGoal();
     if (/light|less|saturday|weekend|tired|busy/.test(t)) return scriptLighter();
@@ -636,9 +745,11 @@
       `Busy in their calendar: ${S.busy.filter((z) => z.d >= S.now.d && z.d < (w + 2) * 7).map((z) => `${wkLabel(z.d)} ${DN[wd(z.d)].slice(0, 3)} ${hm(z.s)}–${hm(z.e)}`).join("; ")}.`,
       `Sessions (id | week day time | minutes | kind | title | topic id | also | status | result):\n${bl.map((b) => `${b.id} | ${wkLabel(b.d)} ${DN[wd(b.d)].slice(0, 3)} ${hm(b.s)} | ${b.m} | ${b.kind} | ${b.title} | ${b.tr || "-"} | ${b.also || "-"} | ${b.st}${isPast(b.d, b.s) && b.st === "planned" ? " (time has passed)" : ""} | ${b.res || (b.score != null ? `${b.score} of 3 first try` : "-")}`).join("\n")}`,
       `Library: ${LIBRARY.join("; ")}.`,
+      `Routines (only audio kinds go there; routine time doesn't count towards the daily maximum): ${routines().map((r) => `${r.name}, ${r.mode}, ${daysLabel(r.days)} ${hm(r.s)}–${hm(r.e)}, allows ${MODES[r.mode].kinds.join(" and ")}`).join("; ") || "none yet"}.`,
+      `How well sub-topics work by ear: ${Object.entries(FIT).map(([k, [f]]) => `${k} ${f}`).join("; ")}.`,
     ].join("\n");
   }
-  const FORMAT = `Session kinds: watch (a narrated video Lumen, 4–25 min), read (a reading Lumen: a long illustrated lesson page with a short quiz, 15–40 min), live (a live session: the narrator talks it through and the learner interrupts, 15–30 min), review (a short spaced quiz, 5–15 min), course (the next part of a course), library (an item from their Library).
+  const FORMAT = `Session kinds: watch (a narrated video Lumen, 4–25 min), read (a reading Lumen: a long illustrated lesson page with a short quiz, 15–40 min), live (a live session: the narrator talks it through and the learner interrupts, 15–30 min), review (a short spaced quiz, 5–15 min), course (the next part of a course), library (an item from their Library), listen (an audio-only dialogue between two voices, 10–30 min, for routines like driving or cycling), aloud (a spoken review: questions read out and answered aloud, 5–10 min, for driving and walking).
 New Lumens can be planned on any sub-topic; they're made the evening before, so planning costs nothing.
 Reply with JSON Lines only: one object per line, no prose, no code fences.
 Line 1: {"say":"1 to 3 short, plain sentences to the learner. Say what you'd change and why. No lists."}
@@ -649,11 +760,13 @@ Then any of:
 {"drop":{"id":"b9","why":"…"}}
 {"link":{"id":"b3","also":"goal","why":"…"}}   counts an existing session for the goal too
 {"review":"one line on how the week went, from the records"}   up to 3, only when planning next week
-Rules: change only sessions that are planned and still ahead; keep to learning time, outside busy times, at most ${S.maxDay} minutes a day; prefer small changes (at most 8) unless asked to plan a whole week; never invent results the records don't show.`;
+{"routine":{"name":"Drive to work","mode":"driving|cycling|walking","days":["Mon","Tue"],"start":"HH:MM","end":"HH:MM"}}   when the learner describes a habit; fill it with listen (and aloud for driving and walking) sessions from sub-topics that work by ear
+{"convert":{"id":"b10","kind":"listen","title":"…","mins":25,"why":"…"}}   changes a planned session's format to fit a routine
+Rules: change only sessions that are planned and still ahead; keep to learning time, outside busy times, at most ${S.maxDay} minutes a day; prefer small changes (at most 8) unless asked to plan a whole week or a routine; never put watch, read, live, review, course or library sessions inside a routine (move them, or convert them to listen if the sub-topic works by ear); never invent results the records don't show.`;
   async function askClaude(text) {
     const hist = S.msgs.slice(-6).map((m) => `${m.role === "user" ? "Learner" : "Copilot"}: ${m.content}`).join("\n");
     const prompt = `You are Studiolo's copilot, planning a learner's study week on their calendar.\n\n${stateForAI()}\n\nConversation so far:\n${hist || "(none)"}\n\nLearner: ${text}\n\n${FORMAT}`;
-    const out = { say: "", wishes: [], goal: null, review: [] };
+    const out = { say: "", wishes: [], goal: null, review: [], routine: null };
     let pend = "";
     const dayIdx = (wk, day) => { const i = DN.findIndex((n) => n.slice(0, 3).toLowerCase() === String(day || "").slice(0, 3).toLowerCase()); if (i < 0) return null; return (Math.floor(S.now.d / 7) + (wk === "next" ? 1 : 0)) * 7 + i; };
     const eat = (l) => {
@@ -667,6 +780,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       if (o.move) out.wishes.push({ type: "move", id: o.move.id, d: dayIdx(o.move.week, o.move.day), s: parseHM(o.move.start), why: o.move.why });
       if (o.drop) out.wishes.push({ type: "drop", id: o.drop.id, why: o.drop.why });
       if (o.link) out.wishes.push({ type: "link", id: o.link.id, also: alsoOf(o.link.also), why: o.link.why });
+      if (o.routine && MODES[o.routine.mode]) { const s0 = parseHM(o.routine.start), e0 = parseHM(o.routine.end); const ds = (o.routine.days || []).map((x) => DN.findIndex((n) => n.slice(0, 3).toLowerCase() === String(x).slice(0, 3).toLowerCase())).filter((i) => i >= 0); if (s0 != null && e0 > s0 && ds.length) out.routine = { id: `r${o.routine.mode}${s0}`, name: String(o.routine.name || MODES[o.routine.mode].label).slice(0, 40), mode: o.routine.mode, days: ds, s: s0, e: e0 }; }
+      if (o.convert) out.wishes.push({ type: "convert", id: o.convert.id, kind: o.convert.kind, title: o.convert.title, m: +o.convert.mins || 20, why: o.convert.why });
     };
     let seen = 0;
     await S.ai(prompt, { modelTier: "default", cache: false, onText: ({ text: whole }) => { const lines = whole.split("\n"); pend = lines.pop(); for (; seen < lines.length; seen++) eat(lines[seen]); } });
@@ -676,7 +791,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const w = Math.floor(S.now.d / 7);
     const wk = S.blocks.filter((b) => Math.floor(b.d / 7) === w && b.kind !== "plan");
     const review = next || out.review.length ? { done: wk.filter((b) => b.st === "done").length, total: wk.filter((b) => live(b) || b.st === "skipped").length, mins: wk.filter((b) => b.st === "done").reduce((a, b) => a + b.m, 0), missed: wk.filter((b) => b.st === "skipped" || (b.st === "planned" && isPast(b.d, b.s + b.m))).length, lines: out.review.length ? out.review : ["Planned from what's done so far."] } : null;
-    const card = out.wishes.length || out.goal ? buildCard({ wishes: out.wishes, goal: out.goal, review, wk: next ? w + 1 : null, title: next ? `Next week · ${weekRange(w + 1)}` : out.goal ? "A goal, and changes to your plan" : null }) : null;
+    const card = out.wishes.length || out.goal || out.routine ? buildCard({ wishes: out.wishes, goal: out.goal, review, routine: out.routine, wk: next ? w + 1 : null, title: next ? `Next week · ${weekRange(w + 1)}` : out.routine ? `New routine · ${out.routine.name}` : out.goal ? "A goal, and changes to your plan" : null }) : null;
     return { say: esc(out.say), card };
   }
 
@@ -691,7 +806,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     if (!ans) { await sleep(900); ans = scripted(text); }
     th.remove(); S.busyAI = false;
     addMsg("ai", `<p>${ans.say}</p>`); S.msgs.push({ role: "assistant", content: ans.say.replace(/<[^>]+>/g, "") });
-    if (ans.card) { if (ans.card.ops.length || ans.card.goal) postCard(ans.card); else addMsg("ai", "<p>I couldn't fit those into free learning time without going over your daily maximum.</p>"); }
+    if (ans.card) { if (ans.card.ops.length || ans.card.goal || ans.card.routine) postCard(ans.card); else addMsg("ai", "<p>I couldn't fit those into free learning time without going over your daily maximum.</p>"); }
   }
 
   /* ================================================================ sessions: watch, read, live, review */
@@ -714,6 +829,8 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const b = blockById(id); if (!b) return; hidePop();
     if (b.kind === "plan") { openPanel(); send("Plan next week"); return; }
     if (b.kind === "read") return openRead(b);
+    if (b.kind === "listen") return openListen(b);
+    if (b.kind === "aloud") return openAloud(b);
     if (b.kind === "review") return openReview(b);
     const t = track(b.tr);
     const titles = { watch: "Playing the Lumen", course: "Playing the course part", live: "Live session", library: "Opening in your Library" };
@@ -743,6 +860,30 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       ["Where do thick walls help least?", ["Desert, 40 °C days and 20 °C nights", "A humid city where nights stay near 30 °C", "A highland town with cold nights"], 1, "Small daily swings leave no cool night to discharge into."],
     ],
   };
+  function openListen(b) {
+    const t = track(b.tr), r = routineOver(b.d, b.s, b.m);
+    const ch = ["The question", "Two voices disagree", "A building that answers it", "The catch", "What to keep"];
+    openDlg(`<h3>${esc(b.title)}</h3><p class="sub">Dialogue · audio only${r ? ` · ${esc(r.name)}` : ""}. In the app this plays from the lock screen and through the car or headphones. Chapters end at natural pauses, so you can stop at any light and pick up on the next ${r?.mode === "cycling" ? "ride" : "drive"}. Simulated here.</p>
+      <div class="pl-audio"><span class="ic" aria-hidden="true">${I.ears}</span><div><b>${t ? esc(t.name) : ""} › ${esc(b.topic)}</b><ol>${ch.map((c, i) => `<li data-ch="${i}">${esc(c)}</li>`).join("")}</ol></div></div>
+      <div class="pl-prog" aria-hidden="true"><i></i></div>
+      <div class="acts"><button class="button button-quiet" type="button" data-dx>Stop at this chapter</button><button class="button" type="button" data-fin disabled>Mark as listened</button></div>`, (e) => { if (e.target.closest("[data-fin]")) finish(b, `Listened · ${len(b.m)}`); });
+    const bar = $(".pl-prog i", dlg), fin = $("[data-fin]", dlg); let p = 0; const my = dlg;
+    (async () => { while (p < 1 && dlg === my) { await sleep(120); p = Math.min(1, p + 0.03); bar.style.width = `${p * 100}%`; $$("[data-ch]", my).forEach((li) => li.classList.toggle("is-on", +li.dataset.ch === Math.min(4, Math.floor(p * 5)))); } if (dlg === my) { fin.disabled = false; fin.focus(); } })();
+  }
+  function openAloud(b) {
+    const qs = QUIZ[b.topic] || QUIZ["Courtyard houses"]; let i = 0, right = 0;
+    const step = () => {
+      const [q, o, ok] = qs[i];
+      $(".pl-aloud", dlg).innerHTML = `<p class="n">Question ${i + 1} of ${qs.length}, read out</p><p class="q">“${esc(q)}”</p><p class="hint">Answer aloud, then hear the answer.</p><div class="acts" style="justify-content:flex-start"><button class="button button-quiet" type="button" data-reveal>Hear the answer</button></div>`;
+      $("[data-reveal]", dlg).addEventListener("click", () => { $(".pl-aloud .hint", dlg).textContent = `“${o[ok]}.”`; $(".pl-aloud .acts", dlg).innerHTML = '<button class="button" type="button" data-had="1">I had it</button><button class="button button-quiet" type="button" data-had="0">Not quite</button>'; $("[data-had]", dlg).focus(); });
+    };
+    openDlg(`<h3>${esc(b.title)}</h3><p class="sub">Spoken review · hands-free. Each question is read out; you answer aloud, then hear the answer and say "had it" or "not quite". Simulated here with buttons.</p><div class="pl-aloud"></div><div class="acts"><button class="button button-quiet" type="button" data-dx>Later</button></div>`, (e) => {
+      const h = e.target.closest("[data-had]"); if (!h) return;
+      right += +h.dataset.had; i++;
+      if (i < qs.length) step(); else finish(b, `${right} of ${qs.length} aloud`, { score: right });
+    });
+    step();
+  }
   function openReview(b) {
     const qs = QUIZ[b.topic] || QUIZ[Object.keys(QUIZ).find((k) => b.title.includes(k.split(" ")[0])) || "Courtyard houses"];
     let right = 0, answered = 0;
@@ -884,6 +1025,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const rows = [["Weekdays", AVAIL[0]], ["Saturday", AVAIL[5]], ["Sunday", AVAIL[6]]];
     openDlg(`<h3>Learning time</h3><p class="sub">When the copilot may plan sessions. You can still move any session anywhere by hand.</p>
       <div class="pl-lt">${rows.map(([n, ws]) => `<div class="pl-lt-row"><span>${n}</span><span class="slots">${ws.map(([a, e]) => `<i>${hm(a)}–${hm(e)}</i>`).join("")}</span></div>`).join("")}
+        <div class="pl-lt-row"><span>Routines</span><span class="slots">${S.routines.length ? S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)}</i>`).join("") : '<small>None yet. Tell the copilot, for example “I drive to work 7:00 to 7:30”. Routines hold audio only and don’t count towards the daily maximum.</small>'}</span></div>
         <div class="pl-lt-row"><span>Each day</span><span><label for="pl-max">At most <select id="pl-max">${[60, 90, 120].map((m) => `<option value="${m}"${m === S.maxDay ? " selected" : ""}>${len(m)}</option>`).join("")}</select></label></span></div>
         <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times in my calendar<small>Google Calendar, connected (simulated). Studiolo reads only busy and free, never event titles.</small></span></label>
         <label><input type="checkbox" id="pl-auto"${S.autoMove ? " checked" : ""}><span>When something new lands on a session, move the session to the next free time<small>Otherwise the session stays and is marked as clashing.</small></span></label></div>
@@ -905,7 +1047,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const moved = [];
     for (const b of hit) {
       if (!S.autoMove) { b.why = "Clashes with something new in your calendar"; continue; }
-      const p = place(b.m, { d0: d, d1: w * 7 + 13, prefD: d, prefS: z.e }, S.blocks, [b.id]);
+      const p = place(b.m, { d0: d, d1: w * 7 + 13, prefD: d, prefS: z.e }, S.blocks, [b.id], b.kind);
       if (p) { const from = hm(b.s); Object.assign(b, { d: p.d, s: p.s, why: `Moved from ${DN[wd(d)]} ${from}: something new landed in your calendar` }); moved.push(`${b.title} → ${dayRel(p.d)} ${hm(p.s)}`); }
     }
     if (moved.length) S.notes.push({ d: S.now.d, text: `Something new is busy on Thursday 18:45–20:00, so <b>${esc(hit[0].title)}</b> moved to ${esc(moved[0].split(" → ")[1])}.` });
@@ -1008,7 +1150,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       const m = t.closest("[data-movenext]"); if (m) return moveNext(m.dataset.movenext);
       const k = t.closest("[data-skip]"); if (k) return skip(k.dataset.skip);
       const r = t.closest("[data-remove]"); if (r) return removeB(r.dataset.remove);
-      const l = t.closest("[data-leave]"); if (l && S.card) { const id = l.dataset.leave; S.card.ops.forEach((o) => { if ((o.type === "add" && o.nb.id === id) || (o.type === "move" && o.id === id)) o.on = false; }); refreshCard(S.card); return render(); }
+      const l = t.closest("[data-leave]"); if (l && S.card) { const id = l.dataset.leave; S.card.ops.forEach((o) => { if ((o.type === "add" && o.nb.id === id) || ((o.type === "move" || o.type === "convert") && o.id === id)) o.on = false; }); refreshCard(S.card); return render(); }
       return;
     }
     if (!t.closest(".pl-b, [data-open]")) hidePop();
@@ -1038,7 +1180,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
   bar.className = "td-proto pl-proto"; bar.setAttribute("aria-label", "Prototype");
-  bar.innerHTML = '<div class="row"><b>Prototype · planning</b><button type="button" id="pl-how" aria-expanded="false">How to try it</button><button type="button" id="pl-meet">A meeting lands on Thursday</button><button type="button" id="pl-sun">Skip to Sunday</button><button type="button" id="pl-restart">Start again</button><span class="ai" id="pl-ai">Checking for Claude…</span></div><p class="hint" hidden>Open <b>Plan with the copilot</b> and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a lighter Saturday, then next week. Changes show as dashed ghosts until you apply them. Drag sessions on the week; click one to start it. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time. <b>Skip to Sunday</b> plays the week out so you can plan next week from what happened. The 19:00 reading Lumen today is a full lesson.</p>';
+  bar.innerHTML = '<div class="row"><b>Prototype · planning</b><button type="button" id="pl-how" aria-expanded="false">How to try it</button><button type="button" id="pl-meet">A meeting lands on Thursday</button><button type="button" id="pl-sun">Skip to Sunday</button><button type="button" id="pl-restart">Start again</button><span class="ai" id="pl-ai">Checking for Claude…</span></div><p class="hint" hidden>Open <b>Plan with the copilot</b> and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a lighter Saturday, then next week. Tell it about a <b>routine</b> (“I drive to work every weekday, 7:00 to 7:30”) and it fills the drive with dialogues and spoken reviews, moving anything that needs a screen. Changes show as dashed ghosts until you apply them. Drag sessions on the week; click one to start it. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time. <b>Skip to Sunday</b> plays the week out so you can plan next week from what happened. The 19:00 reading Lumen today is a full lesson.</p>';
   document.body.appendChild(bar);
   $("#pl-restart", bar).addEventListener("click", () => location.reload());
   $("#pl-meet", bar).addEventListener("click", simMeeting);

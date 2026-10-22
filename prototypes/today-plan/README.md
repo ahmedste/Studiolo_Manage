@@ -44,6 +44,22 @@ The layout is one fixed frame, and nothing moves around on its own:
    - **A meeting lands on Thursday** adds a busy time, and the session under it moves itself.
    - **Skip to Sunday** plays the week out, so *Plan next week* has real results to work from.
 
+## Routines: learning that fits what you're already doing
+
+Tell the copilot about a habit, such as *"I drive to work every weekday, 7:00 to 7:30"* or *"I cycle on Saturday mornings, 8 to 9"*. It becomes a **routine**: a teal band on the calendar with its mode's icon.
+
+- **A routine only holds formats that suit it.**
+  - Driving and walking take **dialogues** (audio only, two voices) and **spoken reviews** (questions read out and answered aloud).
+  - Cycling takes dialogues only, with nothing to answer.
+  - Screen formats (Lumens, reading Lumens, live sessions, quizzes, course parts, Library items) never go into a routine, even when you drag them there.
+- **Routine time is extra.** It doesn't count towards your daily maximum, but it does count towards each topic's weekly time.
+- **What's already in the way gets sorted.** When a new routine overlaps planned sessions:
+  - a Lumen whose sub-topic works by ear **turns into a dialogue** in the same slot (*Hypostyle halls*);
+  - one that needs pictures **moves to the evening** (*Glare*: "it's about what you see").
+- **Which topic fills the slot:** each sub-topic has a by-ear rating (good, fair or poor, with a reason). Dialogues come from the topic that's shortest of its weekly time, preferring "good" sub-topics. Their length fits the window, leaving 5 minutes spare: 25 minutes in a 30-minute drive, two 25-minute chapters in an hour's ride.
+- **The loop between desk and routine:** after an evening session at your desk, the next drive opens with a 10-minute **spoken review** of it, then a shorter dialogue. For example, Wednesday's thermal mass reading becomes Thursday's "Thermal mass · answer aloud".
+- Routines are listed under **Learning time**. The dialogues themselves are out of scope here: the prototype only plans them (and plays a stand-in with chapters).
+
 ## Real or simulated
 
 - **Real, when you allow it:** Claude writes the copilot's plans (JSON lines of add, move, drop, link and goal, checked against your learning time, busy times and daily maximum before they're shown). It also writes any reading Lumen other than the thermal mass one, as you open it. This uses the `sample` capability on your own Claude usage, and the first use asks you.
