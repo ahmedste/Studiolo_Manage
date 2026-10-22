@@ -28,3 +28,5 @@ Open `dist/learn-live-prototype.html`. It's published as a claude.ai artifact th
 ## Build
 
 `node build.mjs` bundles `../live-lumens/capture/snap.json` (the captured screens and CSS), `src/learn.css` and `src/learn.js` into `dist/learn-live-prototype.html`.
+
+`learn.js` also reads optional hooks from `window.LearnExt`. [`../learn-dialogues`](../learn-dialogues/README.md) uses them to add Dialogues; this build has none, so nothing changes here.

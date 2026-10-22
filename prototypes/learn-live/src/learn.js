@@ -29,6 +29,8 @@
     pause: '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
   };
   const now = () => new Date().toTimeString().slice(0, 5);
+  // Other Learn prototypes plug in through window.LearnExt (set before this script runs). Slice 1 has none.
+  const EXT = window.LearnExt || null;
 
   /* ================================================================ slides (the player's own markup) */
   const SL = {
@@ -121,8 +123,9 @@
   ];
 
   /* ================================================================ app state */
+  const MODES = [["lumen", "Lumen"], ["live", '<span class="xp-dot" aria-hidden="true"></span>Live'], ...(EXT?.modes || [])];
   let mode0 = "live"; try { mode0 = localStorage.getItem("ll-mode") || "live"; } catch { /* private */ }
-  const S = { mode2: mode0 === "lumen" ? "lumen" : "live", view: "home", tab: "home", ai: null, audio: true, filter: { area: "All", made: "all", state: "all", q: "" }, journal: [], line: false, secs: 0, run: 0 };
+  const S = { mode2: MODES.some(([k]) => k === mode0) ? mode0 : "live", view: "home", tab: "home", ai: null, audio: true, filter: { area: "All", made: "all", state: "all", q: "" }, journal: [], line: false, secs: 0, run: 0 };
   const BROWSER_OK = (() => { const u = navigator.userAgent; return /Chrome\/|Edg\//.test(u) && !/Mobile|Android|iPhone|iPad|OPR\//.test(u); })();
   (async () => { try { S.ai = window.claude ? await window.claude.use("sample") : null; } catch { S.ai = null; } aiBadge(); })();
 
@@ -140,6 +143,7 @@
     fitStages();
   }
   const TABS = [["home", "Home"], ["lumens", "Lumens"], ["courses", "Courses"], ["sessions", "Live sessions"]];
+  if (EXT?.tabs) TABS.splice(2, 0, ...EXT.tabs);
   const header = (sub) => `<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><span>${esc(sub)}</span></div><nav aria-label="Learn sections" class="destination-tabs">${TABS.map(([k, l]) => `<a class="destination-tab" href="#${k}" data-tab="${k}"${S.tab === k ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav></header>`;
 
   const poster = (L, extra = "") => `<div class="lx-poster"><div class="xp-box"><div class="xp-stage" style="${STAGE}">${SL.title(L.title, L.q, L.subject, L.meta || L.dur + " · narrated")}</div></div>${extra}</div>`;
@@ -150,7 +154,7 @@
     const prog = L.progress ? `<div class="lx-prog"><i style="width:${L.progress * 100}%"></i></div>` : "";
     const making = L.status === "making";
     const over = making ? `<span class="lx-making"><span class="lx-dot" aria-hidden="true"></span><span class="ll-wr">${esc(L.writingLabel || "Writing")}</span></span>` : `<span class="lx-dur">${L.dur}</span>`;
-    const acts = making ? `<button class="button button-quiet ll-live-btn" type="button" data-livenow="${L.id}">${I.mic}Talk it through live instead</button>` : `<button class="button button-quiet ll-live-btn" type="button" data-golive="${L.id}">${I.mic}Go live</button>`;
+    const acts = (making ? `<button class="button button-quiet ll-live-btn" type="button" data-livenow="${L.id}">${I.mic}Talk it through live instead</button>` : `<button class="button button-quiet ll-live-btn" type="button" data-golive="${L.id}">${I.mic}Go live</button>`) + (making ? "" : EXT?.cardExtra?.(L) || "");
     return `<article class="lx-card" data-lumen="${L.id}">${poster(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#play-${L.id}">${esc(L.title)}</a></h3>
       <div class="ll-acts">${acts}</div>
       <div class="lx-ft"><span>${L.dur} · ${esc(L.when)}</span>${status(L)}</div></div></article>`;
@@ -172,14 +176,17 @@
   const HINT = {
     lumen: "<b>Make a Lumen</b> · Studiolo writes and voices a 2–6 minute Lumen in the background. Watch it when it's ready; go live on it any time.",
     live: "<b>Start a live session</b> · Studiolo talks you through it now, drawing slides as it goes. Interrupt any time, and keep it as a Lumen at the end. Uses voice minutes.",
+    ...(EXT?.hints || {}),
   };
+  const GO = { lumen: "Make a Lumen", live: '<span class="xp-dot" aria-hidden="true"></span>Start live session', ...(EXT?.go || {}) };
+  const PH = { lumen: "What should the Lumen explain?", live: "Ask, or hold the mic and talk", ...(EXT?.placeholders || {}) };
   function setKind(k) {
     S.mode2 = k; try { localStorage.setItem("ll-mode", k); } catch { /* private */ }
     const f = $('[data-form="hero"]', root); if (!f) return;
     f.dataset.kind = k;
     $$("[data-kind]", f).forEach((b) => b.setAttribute("aria-checked", String(b.dataset.kind === k)));
-    $(".ll-go", f).innerHTML = k === "live" ? '<span class="xp-dot" aria-hidden="true"></span>Start live session' : "Make a Lumen";
-    $("#ll-hero-in", root).placeholder = k === "live" ? "Ask, or hold the mic and talk" : "What should the Lumen explain?";
+    $(".ll-go", f).innerHTML = GO[k];
+    $("#ll-hero-in", root).placeholder = PH[k];
     $(".ll-hint", root).innerHTML = HINT[k];
   }
   /** Lumens being made from this bar (and ones just finished), right under it, so the result is never out of sight. */
@@ -190,7 +197,7 @@
       ? `<div class="ll-work" data-work="${l.id}"><span class="lx-dot" aria-hidden="true"></span><span class="t"><b>Making a Lumen</b> · ${esc(l.title)}</span><span class="ll-wr">${esc(l.writingLabel || "Writing")}</span><button class="ll-chip" type="button" data-livenow="${l.id}">Talk it through live instead</button></div>`
       : `<div class="ll-work is-ready" data-work="${l.id}"><span class="ok" aria-hidden="true">✓</span><span class="t"><b>Lumen ready</b> · ${esc(l.title)} · ${esc(l.dur)}</span><a class="button" href="#play-${l.id}">Play</a><button class="button button-quiet ll-live-btn" type="button" data-golive="${l.id}">${I.mic}Go live</button></div>`).join("")}</div>`;
   }
-  const explain = (q, anchor) => (S.mode2 === "lumen" ? makeLumen(q, anchor) : startNew(q, anchor));
+  const explain = (q, anchor) => (EXT?.explain?.[S.mode2] ? EXT.explain[S.mode2](q, anchor) : S.mode2 === "lumen" ? makeLumen(q, anchor) : startNew(q, anchor));
   function renderHome() {
     S.view = "home"; S.tab = "home";
     const starters = [["How do wind catchers actually cool a house?", "Climate-responsive design"], ["Why do four iwans face one court?", "Islamic architecture"], ["Explain thermal mass to me like a builder", "My Focus"], ["What's the golden section really for?", "Proportion and order"]];
@@ -200,15 +207,16 @@
           ${lastOpen() ? `<button class="ll-resume-link" type="button" data-resume="${lastOpen().id}">${I.mic}<span>Resume live session · <b>${esc(lastOpen().title)}</b> · slide ${lastOpen().i + 1}</span></button>` : ""}
           <button class="ll-more" type="button" data-tab="sessions">All sessions →</button></div>
         <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
-          <span class="ll-mode" role="radiogroup" aria-label="What to make"><button type="button" role="radio" data-kind="lumen" aria-checked="${S.mode2 === "lumen"}">Lumen</button><button type="button" role="radio" data-kind="live" aria-checked="${S.mode2 === "live"}"><span class="xp-dot" aria-hidden="true"></span>Live</button></span>
-          <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${S.mode2 === "live" ? "Ask, or hold the mic and talk" : "What should the Lumen explain?"}">
-          <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${S.mode2 === "live" ? '<span class="xp-dot" aria-hidden="true"></span>Start live session' : "Make a Lumen"}</button></form>
+          <span class="ll-mode" role="radiogroup" aria-label="What to make">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${l}</button>`).join("")}</span>
+          <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${PH[S.mode2]}">
+          <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
         <p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p>
         <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
         ${worksRows()}
       </section>
       <article class="lx-cont" data-lumen="malqaf">${poster(MALQAF, `<span class="lx-dur">2:48</span><div class="lx-prog"><i style="width:88%"></i></div>`)}<div><p class="lx-lab">Continue</p><h2 class="lx-cont-title"><a class="lx-link" href="#play-malqaf">How a malqaf moves air</a></h2><p class="lx-cont-meta">Stopped at 2:28 of 2:48 · slide 4 · made today</p>
         <div class="lx-row" style="position:relative;z-index:2"><a class="lx-resume" href="#play-malqaf">▶ Resume</a><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live from slide 4</button>${tag(MALQAF)}</div></div></article>
+      ${EXT?.homeSection?.() || ""}
       <section class="ll-sec"><p class="ll-h">Courses <span>${COURSES.length}</span><button class="ll-more" type="button" data-tab="courses">All courses →</button></p><div class="ll-courses">${COURSES.map(courseCard).join("")}</div></section>
       <section class="ll-sec"><p class="ll-h">Recent Lumens <span>${LUMENS.length} this week and earlier</span><button class="ll-more" type="button" data-tab="lumens">All Lumens →</button></p><div class="lx-grid">${LUMENS.slice(0, 6).map(card).join("")}</div></section>`);
     dock({ ctx: "Learn · Home", chips: ["How do wind catchers actually cool a house?", "Go live on How a malqaf moves air", "What should I watch next?"] });
@@ -283,6 +291,7 @@
   let held = null;
   function holdStart(where) {
     if (held) return;
+    EXT?.onHold?.(where);
     if (speaking) { speaking.cut(null); }
     const phrase = where === "hero" ? ($("#ll-hero-in", root)?.value || "How do wind catchers actually cool a house?") : (LD.chips.querySelector("button[data-kind=interrupt]") ? "Why does the air get cooler at the bottom?" : LD.chips.querySelector("button")?.textContent || "What should I watch next?");
     const words = phrase.split(/\s+/);
@@ -307,7 +316,7 @@
     ld.dataset.captioning = "false";
     if (h.k < 2) { setState("listening"); TX.interim(null); return; }
     const said = h.phrase.split(/\s+/).slice(0, Math.max(h.k, h.phrase.split(/\s+/).length)).join(" ");
-    if (h.where === "hero") { TX.interim(null); if (S.mode2 === "lumen") { const i = $("#ll-hero-in", root); if (i) { i.value = said; i.focus(); } return; } return startNew(said); }
+    if (h.where === "hero") { TX.interim(null); if (S.mode2 !== "live") { const i = $("#ll-hero-in", root); if (i) { i.value = said; i.focus(); } return; } return startNew(said); }
     TX.interim(null);
     deliver(said, { spoken: true });
   }
@@ -463,6 +472,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   const SES = {
     L: null, beats: [], i: 0, mode: "recorded", asides: 0, rewrites: 0, kept: false, streaming: false, ctl: null, secs: 0, tick: null, origin: null,
     open(L, { mode, from = 0, origin = "lumen" }) {
+      EXT?.pause?.();
       leaveStudio();
       this.sid = null; this.lastSaid = null; this.heard = null;
       this.L = L; this.mode = mode; this.i = from; this.asides = 0; this.rewrites = 0; this.kept = false; this.origin = origin; this.secs = 0;
@@ -852,6 +862,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
 
   /* what the talk bar does outside a session */
   function route(text) {
+    if (EXT?.route?.(text)) return;
     const t = text.toLowerCase();
     if (/go live on this part|take part 2|part 2 of origin/.test(t)) { SES.open(DARWIN, { mode: "recorded", from: 1 }); return begin(() => SES.goLive()); }
     if (/go live on how a malqaf|malqaf/.test(t)) { SES.open(MALQAF, { mode: "recorded", from: 3 }); return begin(() => SES.goLive()); }
@@ -865,6 +876,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   /* ================================================================ clicks */
   document.addEventListener("click", (e) => {
     if (e.target.closest(".ld, .graph-dialog, .vtoasts, .td-proto")) return;
+    if (EXT?.onClick?.(e)) return;
     const a = e.target.closest("a[href]");
     const b = e.target.closest("button");
     if (a) {
@@ -916,7 +928,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     SES.open(deck, { mode: "recorded", from: L.id === "malqaf" ? 3 : 0 });
     begin(() => SES.playRecorded());
   }
-  function openTab(k) { leaveStudio(); S.run++; hush(); clearInterval(SES.tick); ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions })[k](); window.scrollTo(0, 0); }
+  function openTab(k) { leaveStudio(); S.run++; hush(); clearInterval(SES.tick); ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions, ...(EXT?.renderers || {}) })[k](); window.scrollTo(0, 0); }
 
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
@@ -926,6 +938,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   $("#ll-restart", bar).addEventListener("click", () => location.reload());
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
+  EXT?.init?.({ root, S, I, STAGE, LEARNER, LUMENS, DECKS, ld, LD, learnShell, header, poster, tag, dock, setChips, setState, toast, openTab, startNew, leaveStudio, streamLines, aiBadge, hush, nextId: () => ++uid });
   function aiBadge() { const el = $("#ll-ai"); if (!el) return; el.dataset.on = String(!!S.ai); el.textContent = S.ai ? "Live answers: written by Claude" : "Live answers: scripted sample"; }
 
   renderHome();
