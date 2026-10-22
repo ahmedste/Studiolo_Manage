@@ -35,6 +35,23 @@ Open `dist/learn-lumens-prototype.html`. It's published as a claude.ai artifact 
    - Watch: go live, interruptions, Keep, resume live sessions.
    - Listen: ask the hosts, marks, Walk and Drive modes, the mini player, the recall question.
 
+## Design notes
+
+- **Each format has a colour,** from the app's own tokens: Watch is the accent blue, Listen amber, Read green, and Live red. It shows on:
+  - the poster's flag;
+  - the format pills;
+  - the page switcher;
+  - the Lumens format filter;
+  - the Home bar, where the Make button takes the chosen format's colour.
+- **The posters differ by kind:**
+  - Watch shows its title slide;
+  - Listen shows the two hosts on a dark cover;
+  - Read shows a paper title page with a green spine.
+- **The dock is one card.**
+  - Its suggestions sit in one row that scrolls sideways.
+  - A **transcription strip** on top of the input shows who's speaking (Studiolo or You) and up to two lines, lit word by word, while the input stays usable.
+  - In a live session the strip is the only live caption (the slide's caption steps aside, and the transcript keeps the history), and the card turns live-red.
+
 ## Real or simulated
 
 - **Real, when you allow it:** Claude writes new Watch slides, Listen chapters, the opening of a Read, live answers, the hosts' answers and recall feedback (the `sample` capability, on your own Claude usage).

@@ -190,8 +190,8 @@
   /** The formats on a card: made ones open it, missing ones offer to make it ("+ Listen"). */
   function fmtPills(L) {
     return `<span class="lf-pills" role="group" aria-label="Formats">${formats(L).map(([k, label, has, meta]) => has
-      ? `<button type="button" class="lf-pill" data-fmt="${k}" data-lumen-id="${L.id}" title="${label} · ${esc(meta)}">${I[k]}<b>${label}</b><span${k === "listen" ? ` data-dl-meta="${L.listen}"` : ""}>${esc(meta)}</span></button>`
-      : L.making === k ? `<span class="lf-pill making">${I[k]}<b>${label}</b><span class="ll-wr">${esc(meta || "Writing")}</span></span>`
+      ? `<button type="button" class="lf-pill" data-k="${k}" data-fmt="${k}" data-lumen-id="${L.id}" title="${label} · ${esc(meta)}">${I[k]}<b>${label}</b><span${k === "listen" ? ` data-dl-meta="${L.listen}"` : ""}>${esc(meta)}</span></button>`
+      : L.making === k ? `<span class="lf-pill making" data-k="${k}">${I[k]}<b>${label}</b><span class="ll-wr">${esc(meta || "Writing")}</span></span>`
       : `<button type="button" class="lf-pill add" data-addfmt="${k}" data-lumen-id="${L.id}" title="Make a ${label.toLowerCase()} version">${I.plus}${label}</button>`).join("")}</span>`;
   }
   /** The same switcher at the top of every Lumen page: its three formats, then Live (talk it through now).
@@ -199,25 +199,27 @@
   function fmtSwitch(L, cur, { studio } = {}) {
     const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
     const btn = ([k, label, has, meta]) => studio && k === "watch"
-      ? `<button type="button" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
-      : `<button type="button" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
+      ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
+      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
     const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
-    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
+    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
   }
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
-  const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><span class="k">${I.read}Long read</span><b>${esc(L.title)}</b><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
+  const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><b>${esc(L.title)}</b><span class="lf-read-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
+  /** The poster follows the Lumen's main format, and carries that format's flag so the kinds read apart at a glance. */
   function posterFor(L, extra = "") {
-    const k = L.making === "watch" ? "watch" : primary(L);
-    if (k === "listen" && EXT?.cover) return `<div class="lx-poster lf-poster-listen">${EXT.cover(L.listen)}${extra}</div>`;
-    if (k === "read" || (!hasWatch(L) && L.making === "read")) return readPoster(L);
-    return poster(L, extra);
+    const k = L.making === "watch" ? "watch" : L.making && !hasWatch(L) && !L.listen && !L.read ? L.making : primary(L);
+    const flag = `<span class="lf-flag" data-k="${k}">${I[k]}${FMT[k]}</span>`;
+    if (k === "listen" && EXT?.cover) return `<div class="lx-poster lf-poster-listen">${EXT.cover(L.listen)}${flag}${extra}</div>`;
+    if (k === "read") return readPoster(L).replace(/<\/div>$/, `${flag}</div>`);
+    return poster(L, `${flag}${extra}`);
   }
   function card(L) {
     const badge = L.made === "live" ? '<span class="lx-badge">Live · 2 asides</span>' : "";
     const prog = L.progress ? `<div class="lx-prog"><i style="width:${L.progress * 100}%"></i></div>` : "";
     const over = L.making === "watch" ? `<span class="lx-making"><span class="lx-dot" aria-hidden="true"></span><span class="ll-wr">${esc(L.writingLabel || "Writing")}</span></span>` : hasWatch(L) ? `<span class="lx-dur">${L.dur}</span>` : "";
     const live = hasWatch(L) ? `<button class="lf-live" type="button" data-golive="${L.id}" title="Talk it through live">${I.mic}<span>Live</span></button>` : "";
-    return `<article class="lx-card" data-lumen="${L.id}">${posterFor(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#open-${L.id}">${esc(L.title)}</a></h3>
+    return `<article class="lx-card" data-lumen="${L.id}" data-k="${L.making === "watch" ? "watch" : primary(L)}">${posterFor(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#open-${L.id}">${esc(L.title)}</a></h3>
       <div class="ll-acts lf-acts">${fmtPills(L)}${live}</div>
       <div class="lx-ft"><span>${esc(L.when)}${L.goal ? ` · for ${esc(L.goal.split(" · ")[0].toLowerCase())}` : ""}</span>${status(L)}</div></div></article>`;
   }
@@ -345,17 +347,19 @@
   /* ================================================================ the talk bar (Learn and the Graph only) */
   const ld = document.createElement("section");
   ld.className = "ld"; ld.setAttribute("aria-label", "Talk to Studiolo");
+  // One card: the live line (what's being said, by whom) in its own strip, over the input, which stays usable.
   ld.innerHTML = `<div class="ld-chips" role="group" aria-label="Things you could say"></div>
+    <div class="ld-card"><div class="ld-cap"><span class="ld-who" aria-hidden="true"><i>S</i><b></b></span><p class="ld-live" aria-live="off"></p></div>
     <form class="ld-bar"><span class="ld-ctx"></span><span class="ld-meter" aria-hidden="true">${"<i></i>".repeat(7)}</span>
-      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"><p class="ld-live" aria-live="off"></p></span>
+      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"></span>
       <span class="ld-state" role="status"></span>
       <button class="ld-btn ld-audio" type="button" aria-pressed="true" aria-label="Narrator sound" title="Narrator sound">${I.speaker}</button>
       <button class="ll-mic" type="button" data-mic="dock" aria-label="Hold to talk" title="Hold to talk (or hold Space)">${I.mic}</button>
-      <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form>`;
+      <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form></div>`;
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
   function dock({ ctx, chips, right = 0 }) {
-    ld.hidden = false; ld.dataset.view = S.view; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
+    ld.hidden = false; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
     requestAnimationFrame(placeDock);
   }
   function placeDock() {
@@ -381,7 +385,7 @@
     const words = phrase.split(/\s+/);
     held = { where, phrase, k: 0, t: null };
     $$(`[data-mic="${where}"]`).forEach((m) => (m.dataset.held = "true"));
-    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you";
+    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
     // Words arrive a beat behind the voice, and the last one is revised once, as real speech-to-text does.
     held.t = setInterval(() => {
       if (!held) return;
@@ -433,7 +437,8 @@
       let shown = -1, k = 0, done = false, last = 0;
       const draw = (n) => {
         if (n === shown) return; shown = n;
-        LD.live.innerHTML = `<span>${words.slice(Math.max(0, n - 12), n + 1).map((w) => `<b>${esc(w)}</b>`).join(" ")} ${words.slice(n + 1, n + 5).map(esc).join(" ")}</span>`;
+        const from = Math.max(0, n - 16);
+        LD.live.innerHTML = `<span>${from ? "… " : ""}${words.slice(from, n + 1).map((w) => `<b>${esc(w)}</b>`).join(" ")} ${words.slice(n + 1, n + 9).map(esc).join(" ")}</span>`;
         STG.caption(words, n);
         if (entry) entry.querySelector(".tx").innerHTML = words.map((w, i) => (i <= n ? `<b>${esc(w)}</b>` : esc(w))).join(" ");
         for (const [at, a] of cues) if (n >= at) STG.light(a);
@@ -525,7 +530,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     },
     caption(words, k) {
       const c = this.el && $(".xp-caption", this.el); if (!c) return;
-      if (!words) { c.dataset.visible = "false"; return; }
+      if (!words || SES.mode === "live") { c.dataset.visible = "false"; return; } // live: the dock's strip is the caption
       const from = Math.max(0, k - 9), to = Math.min(words.length, from + 18);
       c.innerHTML = words.slice(from, to).map((w, i) => (from + i <= k ? `<span>${i ? " " : ""}<b>${esc(w)}</b></span>` : `<span> ${esc(w)}</span>`)).join("");
       c.dataset.visible = "true";
@@ -601,7 +606,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     playing(on) { const b = $(".xp-ib-play", root); if (b) { b.innerHTML = on ? I.pause : I.play; b.setAttribute("aria-label", on ? "Pause" : "Play"); } },
     paintMode() {
       const live = this.mode === "live";
-      S.line = live;
+      S.line = live; ld.dataset.live = String(live); LD.ctx.textContent = `${live ? "Live" : "Watch"} · ${this.L.title}`;
       $$("[data-mode]", root).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === this.mode)));
       const pill = $(".ll-livepill", root); if (pill) { pill.dataset.state = live ? "live" : "ended"; pill.lastChild.textContent = live ? ` Live session · ${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")}` : " Lumen · recording"; }
       LD.input.placeholder = live ? "Say or type: stop, a question, another way…" : "Type a question for a written answer, or go live";
@@ -682,7 +687,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     async loop(intro, recap) {
       const INT = ["Stop", "Explain that another way", "Simpler", "Go deeper", "From my field", "Test me", "Skip", "Back", "End live"];
       this.playing(true);
-      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); const r = await this.say(recap || (this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like."), e, []); if (r.heard) this.heard = r.heard; }
+      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); const r = await this.say(recap || (this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like."), e, []); if (r.heard) this.heard = r.heard; if (r.stopped) return; }
       while (this.mode === "live") {
         if (this.heard) { const h = this.heard; this.heard = null; await this.handle(h, true); continue; }
         if (this.i >= this.beats.length) {

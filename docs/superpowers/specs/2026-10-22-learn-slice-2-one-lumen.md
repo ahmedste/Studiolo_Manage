@@ -55,6 +55,38 @@ Owner direction (22 Oct): *a Dialogue is a Lumen in itself; a Lumen can be audio
    - with the formats already made shown as "Already made".
 4. **Other entry points** (a topic on Loci, Library items, the talk bar) open the same brief with their context filled in. "I'm about to drive" opens a drive edition.
 
+## Telling the formats apart
+
+Each format has one colour, taken from the app's own tokens:
+
+| Format | Colour (token) | Poster |
+|---|---|---|
+| Watch | accent blue (`--accent`) | Its title slide |
+| Listen | amber (`--myfocus-ink`) | The two hosts on a dark cover |
+| Read | green (`--entity-work`) | A paper title page with a green spine |
+| Live | red (`--warn`) | A talked-through slide |
+
+The colour shows wherever a format is named:
+- the flag on the poster;
+- the format pills;
+- the page switcher (the selected format is tinted);
+- the Lumens format filter;
+- the Home bar, where the Make button takes the chosen format's colour.
+
+## The dock (talk bar) and live transcription
+
+- **Suggestions are one row.** They're centred when they fit and scroll sideways with faded edges when they don't, so the dock never grows taller.
+- **The dock is one card.** A **transcription strip** sits on top of the input:
+  - it names who is speaking (Studiolo or You);
+  - it shows up to two lines, with words lit as they're said;
+  - the input below stays usable, so you can type while it talks.
+- **In a live session, live transcription has one home:**
+  - **the strip is the caption.** The slide's own caption steps aside; it's for recordings.
+  - **The transcript panel keeps the history.**
+  - **The card is outlined in red** and its label reads "Live · title" while the line is open.
+  - **Between turns** the strip keeps the last line, dimmed, or says "The line is open. Speak, type, or pick a suggestion."
+- **Fixed from slice 1:** cutting in during the narrator's opening line now stops it. Before, it carried on to the slide and talked over you.
+
 ## Port notes
 
 - **Data.**

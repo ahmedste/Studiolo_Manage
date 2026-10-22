@@ -25501,25 +25501,42 @@ html.theme-switching::view-transition-new(root) {
 /* ---------- the talk bar (the dock, in Learn and on the Graph) ---------- */
 .ld { position: fixed; z-index: 130; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: calc(var(--ld-left, var(--t-rail)) + (100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px)) / 2); transform: translateX(-50%); width: min(640px, calc(100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px) - 32px)); display: flex; flex-direction: column; transition: left var(--dur-move) var(--ease-standard), width var(--dur-move) var(--ease-standard); }
 .ld[hidden] { display: none; }
-.ld-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 8px; }
+.ld-chips { display: flex; flex-wrap: nowrap; gap: 6px; margin: 0 0 8px; padding: 2px 2px 4px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); }
+.ld-chips::-webkit-scrollbar { display: none; }
+.ld-chips button { flex: none; }
+.ld-chips button:first-child { margin-left: auto; }
+.ld-chips button:last-child { margin-right: auto; }
 .ld-chips:empty { display: none; }
-.ld[data-view="studio"] .ld-chips { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; padding: 2px; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
-.ld[data-view="studio"] .ld-chips button { flex: none; }
-.ld-chips button { all: unset; cursor: pointer; font-size: 12.5px; padding: 5px 11px; border-radius: 14px; background: var(--surface-float); color: var(--ink-2); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--rule); }
+.ld-chips button { all: unset; flex: none; cursor: pointer; font-size: 12.5px; padding: 6px 12px; border-radius: 15px; white-space: nowrap; background: var(--surface-float); color: var(--ink-2); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--rule); }
 .ld-chips button:hover { color: var(--ink); }
 .ld-chips button[data-kind="interrupt"] { color: var(--accent); background: var(--accent-soft); box-shadow: none; }
 .ld-chips button:focus-visible { outline: var(--focus-ring); }
-.ld-bar { display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 10px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 28px; min-height: 54px; }
-.ld-ctx { flex: none; max-width: 200px; font-size: 11.5px; padding: 3px 9px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.ld-card { background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 26px; overflow: hidden; transition: box-shadow var(--dur-standard) var(--ease-standard); }
+.ld-bar { display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 10px; min-height: 54px; box-sizing: border-box; }
+/* The live line's home: who is speaking, and up to two lines of what they're saying, lit word by word. */
+.ld-cap { display: none; align-items: flex-start; gap: 12px; padding: 13px 18px 11px; border-bottom: 1px solid var(--rule); }
+.ld[data-captioning="true"] .ld-cap, .ld[data-live="true"] .ld-cap { display: flex; }
+.ld-who { flex: none; display: inline-flex; align-items: center; gap: 6px; min-width: 84px; padding-top: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.ld-who i { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; background: var(--ink); color: var(--on-ink); font-family: var(--read); font-size: 12px; font-style: normal; letter-spacing: 0; text-transform: none; }
+.ld-who b { font-weight: 600; }
+.ld-who b::after { content: "Studiolo"; }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who { color: var(--accent); }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who i { display: none; }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who b::after { content: "You"; }
+.ld-ctx { flex: none; max-width: 190px; font-size: 11.5px; padding: 4px 10px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .ld-mid { flex: 1; min-width: 0; position: relative; }
 .ld-mid input { width: 100%; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--ink); padding: 6px 2px; }
 .ld-mid input::placeholder { color: var(--ink-2); }
-.ld-live { display: none; margin: 0; font-family: var(--read); font-size: 15px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; color: color-mix(in srgb, var(--text) 45%, transparent); }
-.ld-live span { direction: ltr; unicode-bidi: isolate; }
+.ld-live { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; flex: 1; min-width: 0; margin: 0; overflow: hidden; font-family: var(--read); font-size: 16.5px; line-height: 1.4; color: color-mix(in srgb, var(--text) 38%, transparent); }
 .ld-live b { color: var(--text); font-weight: 400; }
-.ld-live[data-who="you"] { font-family: var(--ui); font-size: 14px; font-style: italic; color: var(--ink-2); }
-.ld[data-captioning="true"] .ld-live { display: block; }
-.ld[data-captioning="true"] .ld-mid input { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.ld-live[data-who="you"] { font-family: var(--ui); font-size: 14.5px; color: var(--ink); }
+.ld[data-captioning="false"] .ld-live { opacity: 0.6; }
+.ld-hear { color: var(--ink-2); font-style: italic; }
+.ld-live:empty::before { content: "The line is open. Speak, type, or pick a suggestion."; font-family: var(--ui); font-size: 13px; color: var(--ink-2); }
+/* Live: the card says the line is open. */
+.ld[data-live="true"] .ld-card { box-shadow: var(--shadow-float), inset 0 0 0 1.5px color-mix(in srgb, var(--warn) 55%, transparent); }
+.ld[data-live="true"] .ld-ctx { background: var(--warn-soft); color: var(--warn); }
+.ld[data-live="true"] .ld-ctx::before { content: "● "; }
 .ld-meter { display: none; align-items: center; gap: 2px; height: 22px; flex: none; }
 .ld-meter i { display: block; width: 3px; border-radius: 2px; background: var(--accent); height: 4px; }
 .ld[data-state="hearing"] .ld-meter { display: inline-flex; }
@@ -25600,9 +25617,11 @@ html.theme-switching::view-transition-new(root) {
 .lf-poster-listen .dl-cover { height: 100%; padding: 0 22px; }
 .lf-poster-listen .dl-cover .dl-disc { width: 44px; height: 44px; font-size: 21px; }
 .lf-poster-read { background: var(--quote-paper); }
-.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 6px; padding: 0 22px; border-left: 3px solid var(--quote-rule); }
-.lf-read-cover .k { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
-.lf-read-cover .k svg { width: 13px; height: 13px; }
+.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 10px; padding: 0 26px; border-left: 4px solid var(--fmt-read); }
+.lf-read-lines { display: grid; gap: 6px; width: 72%; }
+.lf-read-lines i { height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.lf-read-lines i:nth-child(2) { width: 88%; }
+.lf-read-lines i:nth-child(3) { width: 58%; }
 .lf-read-cover b { font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.15; color: var(--ink); text-wrap: balance; }
 .lf-read-cover .m { font-size: 12px; color: var(--ink-2); }
 /* The format switcher, the same on every Lumen page. */
@@ -25672,6 +25691,52 @@ html.theme-switching::view-transition-new(root) {
   .ll-ask input { flex: 1 1 160px; }
   .lf-also { margin-top: -14px; }
 }
+
+/* ---------- format identities: each kind of Lumen reads apart at a glance ----------
+   Watch is the app's accent blue (the player's own), Listen the warm amber of its covers, Read the green of paper and
+   ink, and Live the red of an open line. All app tokens. Anything carrying data-k="…" gets --k and --k-soft. */
+:root {
+  --fmt-watch: var(--accent); --fmt-watch-soft: var(--accent-soft);
+  --fmt-listen: var(--myfocus-ink); --fmt-listen-soft: var(--myfocus-paper);
+  --fmt-read: var(--entity-work); --fmt-read-soft: color-mix(in srgb, var(--entity-work) 13%, var(--panel));
+  --fmt-live: var(--warn); --fmt-live-soft: var(--warn-soft);
+}
+[data-k="watch"], .ll-ask[data-kind="watch"] { --k: var(--fmt-watch); --k-soft: var(--fmt-watch-soft); }
+[data-k="listen"], .ll-ask[data-kind="listen"] { --k: var(--fmt-listen); --k-soft: var(--fmt-listen-soft); }
+[data-k="read"], .ll-ask[data-kind="read"] { --k: var(--fmt-read); --k-soft: var(--fmt-read-soft); }
+[data-k="live"], .ll-ask[data-kind="live"] { --k: var(--fmt-live); --k-soft: var(--fmt-live-soft); }
+/* the flag on every poster */
+.lf-flag { position: absolute; z-index: 1; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 11px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--k); background: var(--k-soft); box-shadow: 0 0 0 1px color-mix(in srgb, var(--k) 28%, transparent); }
+.lf-flag svg { width: 13px; height: 13px; }
+.lf-poster-listen .lf-flag { box-shadow: none; }
+/* pills */
+.lf-pill[data-k] svg { color: var(--k); }
+.lf-pill[data-k]:not(.making):hover { box-shadow: inset 0 0 0 1px var(--k); }
+.lf-pill.making[data-k] { background: var(--k-soft); }
+.lf-pill.making[data-k] .ll-wr { color: var(--k); }
+/* the switcher on every Lumen page */
+.lf-switch button[data-k] svg { color: var(--k); }
+.lf-switch button[data-k].add svg { color: var(--ink-3); }
+.lf-switch button[data-k][aria-pressed="true"] { background: var(--k-soft); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 40%, transparent); }
+.lf-switch button[data-k][aria-pressed="true"] small { color: var(--k); }
+/* the Home bar: the chosen format colours the bar's focus, its mic and its button */
+.ll-ask .ll-mode button[aria-checked="true"] svg { color: var(--k); }
+.ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--k, var(--ink-3)); }
+.ll-ask .ll-go { background: var(--k, var(--accent)); transition: background var(--dur-standard) var(--ease-standard); }
+.ll-ask .ll-mic { color: var(--k, var(--accent)); box-shadow: inset 0 0 0 1px var(--k-soft, var(--accent-soft)); }
+.ll-ask .ll-mic:hover { background: var(--k-soft, var(--accent-soft)); }
+/* the Lumens format filter: a chosen format fills with its colour */
+.lf-tools [data-f="fmt"][data-v="watch"] svg { color: var(--fmt-watch); }
+.lf-tools [data-f="fmt"][data-v="listen"] svg { color: var(--fmt-listen); }
+.lf-tools [data-f="fmt"][data-v="read"] svg { color: var(--fmt-read); }
+.lf-tools [data-f="fmt"][data-v="watch"][aria-pressed="true"] { background: var(--fmt-watch); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="listen"][aria-pressed="true"] { background: var(--fmt-listen); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="read"][aria-pressed="true"] { background: var(--fmt-read); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="sessions"][aria-pressed="true"] { background: var(--fmt-live); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][aria-pressed="true"] svg { color: currentColor; }
+/* in progress and making rows */
+.lf-also-row svg { color: var(--fmt-listen); }
+.lf-also-row:hover { box-shadow: inset 0 0 0 1px var(--fmt-listen); }
 </style>
 <style>/* Learn, Dialogues (prototype). Long-form audio in Learn: the Home shelf, the Dialogues tab, the composer, the
    player page, walk mode and the mini player. NEW parts use the prefix `dl-` and only the app's tokens. The player's
@@ -27201,8 +27266,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   /** The formats on a card: made ones open it, missing ones offer to make it ("+ Listen"). */
   function fmtPills(L) {
     return `<span class="lf-pills" role="group" aria-label="Formats">${formats(L).map(([k, label, has, meta]) => has
-      ? `<button type="button" class="lf-pill" data-fmt="${k}" data-lumen-id="${L.id}" title="${label} · ${esc(meta)}">${I[k]}<b>${label}</b><span${k === "listen" ? ` data-dl-meta="${L.listen}"` : ""}>${esc(meta)}</span></button>`
-      : L.making === k ? `<span class="lf-pill making">${I[k]}<b>${label}</b><span class="ll-wr">${esc(meta || "Writing")}</span></span>`
+      ? `<button type="button" class="lf-pill" data-k="${k}" data-fmt="${k}" data-lumen-id="${L.id}" title="${label} · ${esc(meta)}">${I[k]}<b>${label}</b><span${k === "listen" ? ` data-dl-meta="${L.listen}"` : ""}>${esc(meta)}</span></button>`
+      : L.making === k ? `<span class="lf-pill making" data-k="${k}">${I[k]}<b>${label}</b><span class="ll-wr">${esc(meta || "Writing")}</span></span>`
       : `<button type="button" class="lf-pill add" data-addfmt="${k}" data-lumen-id="${L.id}" title="Make a ${label.toLowerCase()} version">${I.plus}${label}</button>`).join("")}</span>`;
   }
   /** The same switcher at the top of every Lumen page: its three formats, then Live (talk it through now).
@@ -27210,25 +27275,27 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   function fmtSwitch(L, cur, { studio } = {}) {
     const fs = L ? formats(L) : [["watch", "Watch", true, ""]];
     const btn = ([k, label, has, meta]) => studio && k === "watch"
-      ? `<button type="button" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
-      : `<button type="button" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
+      ? `<button type="button" data-k="watch" data-mode="recorded" aria-pressed="${cur === "watch"}">${I.watch}<b>Watch</b><small>${esc(meta || "recording")}</small></button>`
+      : `<button type="button" data-k="${k}" ${has ? `data-fmt="${k}"` : L.making === k ? "disabled" : `data-addfmt="${k}"`} data-lumen-id="${L.id}" aria-pressed="${cur === k}" class="${has ? "" : "add"}">${I[k]}<b>${label}</b><small>${has ? esc(meta) : L.making === k ? esc(meta || "Writing") : "+ make"}</small></button>`;
     const live = studio ? 'data-mode="live"' : L && hasWatch(L) ? `data-golive="${L.id}"` : `data-livenow="${L?.id || ""}"`;
-    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
+    return `<span class="lf-switch" role="group" aria-label="Format">${fs.map(btn).join("")}<i class="lf-sw-sep" aria-hidden="true"></i><button type="button" class="lf-sw-live" data-k="live" ${live} aria-pressed="${cur === "live"}" title="Studiolo talks you through it now; cut in any time"><span class="xp-dot" aria-hidden="true"></span><b>Live</b><small>talk it through</small></button></span>`;
   }
   const goalTag = (L) => (L.goal ? `<span class="dl-goal"><i aria-hidden="true">◎</i>For: ${esc(L.goal)}</span>` : "");
-  const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><span class="k">${I.read}Long read</span><b>${esc(L.title)}</b><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
+  const readPoster = (L) => `<div class="lx-poster lf-poster-read"><div class="lf-read-cover"><b>${esc(L.title)}</b><span class="lf-read-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="m">${L.read ? `${L.read.mins} min read · ${L.read.sections.length} sections` : "Being written"}</span></div></div>`;
+  /** The poster follows the Lumen's main format, and carries that format's flag so the kinds read apart at a glance. */
   function posterFor(L, extra = "") {
-    const k = L.making === "watch" ? "watch" : primary(L);
-    if (k === "listen" && EXT?.cover) return `<div class="lx-poster lf-poster-listen">${EXT.cover(L.listen)}${extra}</div>`;
-    if (k === "read" || (!hasWatch(L) && L.making === "read")) return readPoster(L);
-    return poster(L, extra);
+    const k = L.making === "watch" ? "watch" : L.making && !hasWatch(L) && !L.listen && !L.read ? L.making : primary(L);
+    const flag = `<span class="lf-flag" data-k="${k}">${I[k]}${FMT[k]}</span>`;
+    if (k === "listen" && EXT?.cover) return `<div class="lx-poster lf-poster-listen">${EXT.cover(L.listen)}${flag}${extra}</div>`;
+    if (k === "read") return readPoster(L).replace(/<\/div>$/, `${flag}</div>`);
+    return poster(L, `${flag}${extra}`);
   }
   function card(L) {
     const badge = L.made === "live" ? '<span class="lx-badge">Live · 2 asides</span>' : "";
     const prog = L.progress ? `<div class="lx-prog"><i style="width:${L.progress * 100}%"></i></div>` : "";
     const over = L.making === "watch" ? `<span class="lx-making"><span class="lx-dot" aria-hidden="true"></span><span class="ll-wr">${esc(L.writingLabel || "Writing")}</span></span>` : hasWatch(L) ? `<span class="lx-dur">${L.dur}</span>` : "";
     const live = hasWatch(L) ? `<button class="lf-live" type="button" data-golive="${L.id}" title="Talk it through live">${I.mic}<span>Live</span></button>` : "";
-    return `<article class="lx-card" data-lumen="${L.id}">${posterFor(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#open-${L.id}">${esc(L.title)}</a></h3>
+    return `<article class="lx-card" data-lumen="${L.id}" data-k="${L.making === "watch" ? "watch" : primary(L)}">${posterFor(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#open-${L.id}">${esc(L.title)}</a></h3>
       <div class="ll-acts lf-acts">${fmtPills(L)}${live}</div>
       <div class="lx-ft"><span>${esc(L.when)}${L.goal ? ` · for ${esc(L.goal.split(" · ")[0].toLowerCase())}` : ""}</span>${status(L)}</div></div></article>`;
   }
@@ -27356,17 +27423,19 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   /* ================================================================ the talk bar (Learn and the Graph only) */
   const ld = document.createElement("section");
   ld.className = "ld"; ld.setAttribute("aria-label", "Talk to Studiolo");
+  // One card: the live line (what's being said, by whom) in its own strip, over the input, which stays usable.
   ld.innerHTML = `<div class="ld-chips" role="group" aria-label="Things you could say"></div>
+    <div class="ld-card"><div class="ld-cap"><span class="ld-who" aria-hidden="true"><i>S</i><b></b></span><p class="ld-live" aria-live="off"></p></div>
     <form class="ld-bar"><span class="ld-ctx"></span><span class="ld-meter" aria-hidden="true">${"<i></i>".repeat(7)}</span>
-      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"><p class="ld-live" aria-live="off"></p></span>
+      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"></span>
       <span class="ld-state" role="status"></span>
       <button class="ld-btn ld-audio" type="button" aria-pressed="true" aria-label="Narrator sound" title="Narrator sound">${I.speaker}</button>
       <button class="ll-mic" type="button" data-mic="dock" aria-label="Hold to talk" title="Hold to talk (or hold Space)">${I.mic}</button>
-      <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form>`;
+      <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form></div>`;
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
   function dock({ ctx, chips, right = 0 }) {
-    ld.hidden = false; ld.dataset.view = S.view; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
+    ld.hidden = false; ld.dataset.view = S.view; ld.dataset.live = "false"; LD.ctx.textContent = ctx; setChips(chips); ld.style.setProperty("--ld-right", right + "px");
     requestAnimationFrame(placeDock);
   }
   function placeDock() {
@@ -27392,7 +27461,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     const words = phrase.split(/\s+/);
     held = { where, phrase, k: 0, t: null };
     $$(`[data-mic="${where}"]`).forEach((m) => (m.dataset.held = "true"));
-    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you";
+    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
     // Words arrive a beat behind the voice, and the last one is revised once, as real speech-to-text does.
     held.t = setInterval(() => {
       if (!held) return;
@@ -27444,7 +27513,8 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
       let shown = -1, k = 0, done = false, last = 0;
       const draw = (n) => {
         if (n === shown) return; shown = n;
-        LD.live.innerHTML = `<span>${words.slice(Math.max(0, n - 12), n + 1).map((w) => `<b>${esc(w)}</b>`).join(" ")} ${words.slice(n + 1, n + 5).map(esc).join(" ")}</span>`;
+        const from = Math.max(0, n - 16);
+        LD.live.innerHTML = `<span>${from ? "… " : ""}${words.slice(from, n + 1).map((w) => `<b>${esc(w)}</b>`).join(" ")} ${words.slice(n + 1, n + 9).map(esc).join(" ")}</span>`;
         STG.caption(words, n);
         if (entry) entry.querySelector(".tx").innerHTML = words.map((w, i) => (i <= n ? `<b>${esc(w)}</b>` : esc(w))).join(" ");
         for (const [at, a] of cues) if (n >= at) STG.light(a);
@@ -27536,7 +27606,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     },
     caption(words, k) {
       const c = this.el && $(".xp-caption", this.el); if (!c) return;
-      if (!words) { c.dataset.visible = "false"; return; }
+      if (!words || SES.mode === "live") { c.dataset.visible = "false"; return; } // live: the dock's strip is the caption
       const from = Math.max(0, k - 9), to = Math.min(words.length, from + 18);
       c.innerHTML = words.slice(from, to).map((w, i) => (from + i <= k ? `<span>${i ? " " : ""}<b>${esc(w)}</b></span>` : `<span> ${esc(w)}</span>`)).join("");
       c.dataset.visible = "true";
@@ -27612,7 +27682,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     playing(on) { const b = $(".xp-ib-play", root); if (b) { b.innerHTML = on ? I.pause : I.play; b.setAttribute("aria-label", on ? "Pause" : "Play"); } },
     paintMode() {
       const live = this.mode === "live";
-      S.line = live;
+      S.line = live; ld.dataset.live = String(live); LD.ctx.textContent = `${live ? "Live" : "Watch"} · ${this.L.title}`;
       $$("[data-mode]", root).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === this.mode)));
       const pill = $(".ll-livepill", root); if (pill) { pill.dataset.state = live ? "live" : "ended"; pill.lastChild.textContent = live ? ` Live session · ${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")}` : " Lumen · recording"; }
       LD.input.placeholder = live ? "Say or type: stop, a question, another way…" : "Type a question for a written answer, or go live";
@@ -27693,7 +27763,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     async loop(intro, recap) {
       const INT = ["Stop", "Explain that another way", "Simpler", "Go deeper", "From my field", "Test me", "Skip", "Back", "End live"];
       this.playing(true);
-      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); const r = await this.say(recap || (this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like."), e, []); if (r.heard) this.heard = r.heard; }
+      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); const r = await this.say(recap || (this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like."), e, []); if (r.heard) this.heard = r.heard; if (r.stopped) return; }
       while (this.mode === "live") {
         if (this.heard) { const h = this.heard; this.heard = null; await this.handle(h, true); continue; }
         if (this.i >= this.beats.length) {

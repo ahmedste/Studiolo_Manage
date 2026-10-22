@@ -210,25 +210,42 @@
 /* ---------- the talk bar (the dock, in Learn and on the Graph) ---------- */
 .ld { position: fixed; z-index: 130; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: calc(var(--ld-left, var(--t-rail)) + (100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px)) / 2); transform: translateX(-50%); width: min(640px, calc(100vw - var(--ld-left, var(--t-rail)) - var(--ld-right, 0px) - 32px)); display: flex; flex-direction: column; transition: left var(--dur-move) var(--ease-standard), width var(--dur-move) var(--ease-standard); }
 .ld[hidden] { display: none; }
-.ld-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 8px; }
+.ld-chips { display: flex; flex-wrap: nowrap; gap: 6px; margin: 0 0 8px; padding: 2px 2px 4px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 24px), transparent); }
+.ld-chips::-webkit-scrollbar { display: none; }
+.ld-chips button { flex: none; }
+.ld-chips button:first-child { margin-left: auto; }
+.ld-chips button:last-child { margin-right: auto; }
 .ld-chips:empty { display: none; }
-.ld[data-view="studio"] .ld-chips { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; padding: 2px; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
-.ld[data-view="studio"] .ld-chips button { flex: none; }
-.ld-chips button { all: unset; cursor: pointer; font-size: 12.5px; padding: 5px 11px; border-radius: 14px; background: var(--surface-float); color: var(--ink-2); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--rule); }
+.ld-chips button { all: unset; flex: none; cursor: pointer; font-size: 12.5px; padding: 6px 12px; border-radius: 15px; white-space: nowrap; background: var(--surface-float); color: var(--ink-2); box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--rule); }
 .ld-chips button:hover { color: var(--ink); }
 .ld-chips button[data-kind="interrupt"] { color: var(--accent); background: var(--accent-soft); box-shadow: none; }
 .ld-chips button:focus-visible { outline: var(--focus-ring); }
-.ld-bar { display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 10px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 28px; min-height: 54px; }
-.ld-ctx { flex: none; max-width: 200px; font-size: 11.5px; padding: 3px 9px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.ld-card { background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 26px; overflow: hidden; transition: box-shadow var(--dur-standard) var(--ease-standard); }
+.ld-bar { display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 10px; min-height: 54px; box-sizing: border-box; }
+/* The live line's home: who is speaking, and up to two lines of what they're saying, lit word by word. */
+.ld-cap { display: none; align-items: flex-start; gap: 12px; padding: 13px 18px 11px; border-bottom: 1px solid var(--rule); }
+.ld[data-captioning="true"] .ld-cap, .ld[data-live="true"] .ld-cap { display: flex; }
+.ld-who { flex: none; display: inline-flex; align-items: center; gap: 6px; min-width: 84px; padding-top: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.ld-who i { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 4px; background: var(--ink); color: var(--on-ink); font-family: var(--read); font-size: 12px; font-style: normal; letter-spacing: 0; text-transform: none; }
+.ld-who b { font-weight: 600; }
+.ld-who b::after { content: "Studiolo"; }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who { color: var(--accent); }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who i { display: none; }
+.ld-cap:has(.ld-live[data-who="you"]) .ld-who b::after { content: "You"; }
+.ld-ctx { flex: none; max-width: 190px; font-size: 11.5px; padding: 4px 10px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .ld-mid { flex: 1; min-width: 0; position: relative; }
 .ld-mid input { width: 100%; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--ink); padding: 6px 2px; }
 .ld-mid input::placeholder { color: var(--ink-2); }
-.ld-live { display: none; margin: 0; font-family: var(--read); font-size: 15px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; color: color-mix(in srgb, var(--text) 45%, transparent); }
-.ld-live span { direction: ltr; unicode-bidi: isolate; }
+.ld-live { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; flex: 1; min-width: 0; margin: 0; overflow: hidden; font-family: var(--read); font-size: 16.5px; line-height: 1.4; color: color-mix(in srgb, var(--text) 38%, transparent); }
 .ld-live b { color: var(--text); font-weight: 400; }
-.ld-live[data-who="you"] { font-family: var(--ui); font-size: 14px; font-style: italic; color: var(--ink-2); }
-.ld[data-captioning="true"] .ld-live { display: block; }
-.ld[data-captioning="true"] .ld-mid input { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.ld-live[data-who="you"] { font-family: var(--ui); font-size: 14.5px; color: var(--ink); }
+.ld[data-captioning="false"] .ld-live { opacity: 0.6; }
+.ld-hear { color: var(--ink-2); font-style: italic; }
+.ld-live:empty::before { content: "The line is open. Speak, type, or pick a suggestion."; font-family: var(--ui); font-size: 13px; color: var(--ink-2); }
+/* Live: the card says the line is open. */
+.ld[data-live="true"] .ld-card { box-shadow: var(--shadow-float), inset 0 0 0 1.5px color-mix(in srgb, var(--warn) 55%, transparent); }
+.ld[data-live="true"] .ld-ctx { background: var(--warn-soft); color: var(--warn); }
+.ld[data-live="true"] .ld-ctx::before { content: "● "; }
 .ld-meter { display: none; align-items: center; gap: 2px; height: 22px; flex: none; }
 .ld-meter i { display: block; width: 3px; border-radius: 2px; background: var(--accent); height: 4px; }
 .ld[data-state="hearing"] .ld-meter { display: inline-flex; }
@@ -309,9 +326,11 @@
 .lf-poster-listen .dl-cover { height: 100%; padding: 0 22px; }
 .lf-poster-listen .dl-cover .dl-disc { width: 44px; height: 44px; font-size: 21px; }
 .lf-poster-read { background: var(--quote-paper); }
-.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 6px; padding: 0 22px; border-left: 3px solid var(--quote-rule); }
-.lf-read-cover .k { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
-.lf-read-cover .k svg { width: 13px; height: 13px; }
+.lf-read-cover { position: absolute; inset: 0; display: grid; align-content: center; gap: 10px; padding: 0 26px; border-left: 4px solid var(--fmt-read); }
+.lf-read-lines { display: grid; gap: 6px; width: 72%; }
+.lf-read-lines i { height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.lf-read-lines i:nth-child(2) { width: 88%; }
+.lf-read-lines i:nth-child(3) { width: 58%; }
 .lf-read-cover b { font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.15; color: var(--ink); text-wrap: balance; }
 .lf-read-cover .m { font-size: 12px; color: var(--ink-2); }
 /* The format switcher, the same on every Lumen page. */
@@ -381,3 +400,49 @@
   .ll-ask input { flex: 1 1 160px; }
   .lf-also { margin-top: -14px; }
 }
+
+/* ---------- format identities: each kind of Lumen reads apart at a glance ----------
+   Watch is the app's accent blue (the player's own), Listen the warm amber of its covers, Read the green of paper and
+   ink, and Live the red of an open line. All app tokens. Anything carrying data-k="…" gets --k and --k-soft. */
+:root {
+  --fmt-watch: var(--accent); --fmt-watch-soft: var(--accent-soft);
+  --fmt-listen: var(--myfocus-ink); --fmt-listen-soft: var(--myfocus-paper);
+  --fmt-read: var(--entity-work); --fmt-read-soft: color-mix(in srgb, var(--entity-work) 13%, var(--panel));
+  --fmt-live: var(--warn); --fmt-live-soft: var(--warn-soft);
+}
+[data-k="watch"], .ll-ask[data-kind="watch"] { --k: var(--fmt-watch); --k-soft: var(--fmt-watch-soft); }
+[data-k="listen"], .ll-ask[data-kind="listen"] { --k: var(--fmt-listen); --k-soft: var(--fmt-listen-soft); }
+[data-k="read"], .ll-ask[data-kind="read"] { --k: var(--fmt-read); --k-soft: var(--fmt-read-soft); }
+[data-k="live"], .ll-ask[data-kind="live"] { --k: var(--fmt-live); --k-soft: var(--fmt-live-soft); }
+/* the flag on every poster */
+.lf-flag { position: absolute; z-index: 1; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px 3px 7px; border-radius: 11px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--k); background: var(--k-soft); box-shadow: 0 0 0 1px color-mix(in srgb, var(--k) 28%, transparent); }
+.lf-flag svg { width: 13px; height: 13px; }
+.lf-poster-listen .lf-flag { box-shadow: none; }
+/* pills */
+.lf-pill[data-k] svg { color: var(--k); }
+.lf-pill[data-k]:not(.making):hover { box-shadow: inset 0 0 0 1px var(--k); }
+.lf-pill.making[data-k] { background: var(--k-soft); }
+.lf-pill.making[data-k] .ll-wr { color: var(--k); }
+/* the switcher on every Lumen page */
+.lf-switch button[data-k] svg { color: var(--k); }
+.lf-switch button[data-k].add svg { color: var(--ink-3); }
+.lf-switch button[data-k][aria-pressed="true"] { background: var(--k-soft); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 40%, transparent); }
+.lf-switch button[data-k][aria-pressed="true"] small { color: var(--k); }
+/* the Home bar: the chosen format colours the bar's focus, its mic and its button */
+.ll-ask .ll-mode button[aria-checked="true"] svg { color: var(--k); }
+.ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--k, var(--ink-3)); }
+.ll-ask .ll-go { background: var(--k, var(--accent)); transition: background var(--dur-standard) var(--ease-standard); }
+.ll-ask .ll-mic { color: var(--k, var(--accent)); box-shadow: inset 0 0 0 1px var(--k-soft, var(--accent-soft)); }
+.ll-ask .ll-mic:hover { background: var(--k-soft, var(--accent-soft)); }
+/* the Lumens format filter: a chosen format fills with its colour */
+.lf-tools [data-f="fmt"][data-v="watch"] svg { color: var(--fmt-watch); }
+.lf-tools [data-f="fmt"][data-v="listen"] svg { color: var(--fmt-listen); }
+.lf-tools [data-f="fmt"][data-v="read"] svg { color: var(--fmt-read); }
+.lf-tools [data-f="fmt"][data-v="watch"][aria-pressed="true"] { background: var(--fmt-watch); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="listen"][aria-pressed="true"] { background: var(--fmt-listen); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="read"][aria-pressed="true"] { background: var(--fmt-read); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][data-v="sessions"][aria-pressed="true"] { background: var(--fmt-live); color: var(--on-accent); }
+.lf-tools [data-f="fmt"][aria-pressed="true"] svg { color: currentColor; }
+/* in progress and making rows */
+.lf-also-row svg { color: var(--fmt-listen); }
+.lf-also-row:hover { box-shadow: inset 0 0 0 1px var(--fmt-listen); }
