@@ -60,8 +60,8 @@
     live: { k: "Live", noun: "Live session", go: "Go live" },
     review: { k: "Review", noun: "Review quiz", go: "Start the review" },
     course: { k: "Course", noun: "Course part", go: "Watch the part" },
-    library: { k: "Library", noun: "From your Library", go: "Open in Library" },
-    plan: { k: "Plan", noun: "Weekly plan", go: "Plan with the copilot" },
+    library: { k: "Source", noun: "From your Commonplace", go: "Open in Commonplace" },
+    plan: { k: "Plan", noun: "Weekly plan", go: "Plan with Loci" },
     listen: { k: "Listen", noun: "Dialogue", go: "Listen" },
     aloud: { k: "Aloud", noun: "Spoken review", go: "Start, hands-free" },
   };
@@ -87,7 +87,7 @@
     ver: [["Wind catchers: arguing with the wind", "Wind catchers"], ["A day in the life of a courtyard", "Courtyard houses"], ["Thermal mass, the night shift", "Thermal mass"], ["Why the court has a pool", "Courtyard houses"], ["A city of towers: the badgirs of Yazd", "Wind catchers"]],
     day: [["Mashrabiya: shade you can hear through", "Mashrabiya screens"], ["Screens around the world: jali, mashrabiya, brise-soleil", "Mashrabiya screens"], ["Light shelves: bouncing daylight deep into a room", "Light shelves"]],
   };
-  const MADE = { ready: "Ready · made last night", evening: "Made the evening before · nothing is spent until then", exists: "Already in your Library", course: "Made when you reach it, like every course part", none: "" };
+  const MADE = { ready: "Ready · made last night", evening: "Made the evening before · nothing is spent until then", exists: "Already in your Commonplace", course: "Made when you reach it, like every course part", none: "" };
   const B = (id, d, s, m, kind, title, tr, topic, st, x = {}) => ({ id, d, s, m, kind, title, tr, topic, st, made: "evening", why: "", also: null, ...x });
   const START_BLOCKS = [
     B("b1", 0, 1140, 30, "read", "Courtyard houses: how the court works", "ver", "Courtyard houses", "done", { made: "ready", res: "Read to the end" }),
@@ -102,10 +102,10 @@
     B("b10", 4, 420, 20, "watch", "Hypostyle halls: a forest of columns", "plan", "Hypostyle hall", "planned", { why: "Plan types & ritual, after the four-iwan plan" }),
     B("b11", 5, 570, 40, "library", "Architecture for the Poor · from p. 41", "ver", "Courtyard houses", "planned", { made: "exists", why: "You stopped at p. 41 on Wednesday" }),
     B("b12", 5, 615, 20, "live", "Talk it through: light shelves or mashrabiya?", "day", "Light shelves", "planned", { made: "none", why: "Compare the two before the shading part of the course" }),
-    B("b13", 6, 1050, 15, "plan", "Plan next week with the copilot", null, null, "planned", { made: "none", why: "Ten minutes on Sunday: what happened, and what next week should hold" }),
+    B("b13", 6, 1050, 15, "plan", "Plan next week with Loci", null, null, "planned", { made: "none", why: "Ten minutes on Sunday: what happened, and what next week should hold" }),
     B("b14", 7, 1140, 30, "course", "Daylighting · Part 3: Shading devices", "day", "Sun angles", "planned", { made: "course", why: "The next part of your Daylighting course" }),
     B("b15", 8, 420, 25, "watch", "Glare, part 2: veiling reflections", "day", "Glare", "planned", { why: "Follows Glare: where it comes from" }),
-    B("b16", 13, 1050, 15, "plan", "Plan next week with the copilot", null, null, "planned", { made: "none", why: "Your weekly plan" }),
+    B("b16", 13, 1050, 15, "plan", "Plan next week with Loci", null, null, "planned", { made: "none", why: "Your weekly plan" }),
   ];
   // Busy times read from the learner's calendar (titles are never read, only busy and free).
   const START_BUSY = [
@@ -115,10 +115,10 @@
   // What else happened (the old activity log, kept above the now line).
   const LOG = [
     { d: 0, at: 760, title: "Bait Ur Rouf Mosque, Marina Tabassum", sub: "Video · to 12:34" },
-    { d: 1, at: 545, title: "Daylight & shading", sub: "Copilot · 3 messages" },
+    { d: 1, at: 545, title: "Daylight & shading", sub: "Loci · 3 messages" },
     { d: 2, at: 455, title: "Wind catchers and the courtyard", sub: "Lumen · 4 min, not planned" },
     { d: 2, at: 540, title: "Mihrab tolerances on site", sub: "Note saved" },
-    { d: 2, at: 590, title: "Plan types & ritual", sub: "Copilot · 2 messages" },
+    { d: 2, at: 590, title: "Plan types & ritual", sub: "Loci · 2 messages" },
     { d: 2, at: 780, title: "Architecture for the Poor", sub: "PDF · read to p. 41" },
   ];
   const LIBRARY = ["Architecture for the Poor, Hassan Fathy (PDF, read to p. 41)", "Bait Ur Rouf Mosque, Marina Tabassum (video, 12:34 of 48:10)", "Mihrab tolerances on site (your note)"];
@@ -195,12 +195,15 @@
     root.innerHTML = DATA.screens.today;
     $$(".navigation-rail .navigation-link[href], .tab-bar .tab-bar-link[href]", root).forEach((a) => a.removeAttribute("aria-current"));
     $$('.navigation-rail .navigation-link[href="/today"], .tab-bar .tab-bar-link[href="/today"]', root).forEach((a) => a.setAttribute("aria-current", "page"));
+    const NAMES = { Library: "Commonplace", Graph: "Loci" }; // studiolo @ 5fbb7f2, src/components/shell/destinations.ts
+    $$(".rail-label, .tab-bar-link span", root).forEach((el) => { if (NAMES[el.textContent]) el.textContent = NAMES[el.textContent]; });
+    $$("[title], [aria-label]", root).forEach((el) => ["title", "aria-label"].forEach((k) => { const v = el.getAttribute(k); if (NAMES[v]) el.setAttribute(k, NAMES[v]); }));
   }
   const main = () => $("main", root);
   const wide = () => matchMedia("(min-width: 1000px)").matches;
   const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
       <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
-      <button class="button" type="button" data-copilot aria-pressed="${S.panel}">${I.spark}Plan with the copilot</button>
+      <button class="cp-reopen pl-ask${S.panel ? " is-away" : ""}" type="button" data-copilot${S.panel ? ' tabindex="-1" aria-hidden="true"' : ""}><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
       <time>${h12(S.now.m)}</time></div></header>`;
   const shownWeek = () => (S.view === "week" ? S.wk : Math.floor(S.sel / 7));
 
@@ -215,7 +218,7 @@
     const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
     layout(days);
     main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
-      <aside class="pl-side" aria-label="${docked ? "Copilot" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
+      <aside class="pl-side" aria-label="${docked ? "Ask Loci" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
       <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div></section></div></div>`;
     placePanel();
     if (keep.cal != null) $(".pl-calscroll", root).scrollTop = keep.cal;
@@ -230,7 +233,7 @@
     if (side) { side.appendChild(cpw); cpw.classList.add("is-docked"); }
     else { if (cpw.parentElement !== document.body) document.body.appendChild(cpw); cpw.classList.remove("is-docked"); }
     document.documentElement.classList.toggle("pl-sheet", S.panel && !side);
-    $$("[data-copilot]", root).forEach((b) => b.setAttribute("aria-pressed", String(S.panel)));
+    $$(".pl-ask", root).forEach((b) => { b.classList.toggle("is-away", S.panel); if (S.panel) { b.setAttribute("tabindex", "-1"); b.setAttribute("aria-hidden", "true"); } else { b.removeAttribute("tabindex"); b.removeAttribute("aria-hidden"); } });
   }
   function calNav(w) {
     const thisW = Math.floor(S.now.d / 7), wk = S.view === "week";
@@ -340,7 +343,7 @@
   function upNext() {
     const { b, started } = nextUp();
     const cont = started && started.id !== b?.id ? `<p class="pl-cont">Continue <button class="pl-linkbtn" type="button" data-start="${started.id}">${esc(started.title)}</button><span>${esc(started.res || "")}</span></p>` : "";
-    if (!b) return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next")}<p class="pl-empty">Nothing planned yet. Ask the copilot to plan your week.</p>${cont}</section>`;
+    if (!b) return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next")}<p class="pl-empty">Nothing planned yet. Ask Loci to plan your week.</p>${cont}</section>`;
     const t = track(b.tr), K = KIND[b.kind];
     const when = b.d === S.now.d ? "Today" : b.d === S.now.d + 1 ? "Tomorrow" : DN[wd(b.d)];
     const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m);
@@ -376,7 +379,7 @@
     if (!b) return;
     const K = KIND[b.kind], t = track(b.tr), a2 = b.also ? track(b.also) : null;
     const can = !ghost && (b.st === "planned" || b.st === "started");
-    const status = ghost ? "Proposed by the copilot · not on your calendar until you apply the plan" : { done: `Done · ${b.res || "finished"}`, started: `Started · ${b.res || ""}`, moved: "Moved", skipped: "Skipped", planned: isPast(b.d, b.s + b.m) ? "Not done" : "Planned" }[b.st];
+    const status = ghost ? "Proposed by Loci · not on your calendar until you apply the plan" : { done: `Done · ${b.res || "finished"}`, started: `Started · ${b.res || ""}`, moved: "Moved", skipped: "Skipped", planned: isPast(b.d, b.s + b.m) ? "Not done" : "Planned" }[b.st];
     popEl = document.createElement("div"); popEl.className = "pl-pop"; popEl.setAttribute("role", "dialog"); popEl.setAttribute("aria-label", b.title);
     popEl.innerHTML = `<button class="icb x" type="button" data-px aria-label="Close">×</button>
       <span class="pl-kind" data-tr="${t ? t.tr : "a"}">${K.noun.startsWith(K.k) ? esc(K.noun) : `${esc(K.k)} · ${esc(K.noun)}`}</span>
@@ -477,9 +480,9 @@
   /* ================================================================ the copilot panel */
   const cpw = document.createElement("div");
   cpw.className = "cpwrap pl-cpwrap"; cpw.hidden = true;
-  cpw.innerHTML = `<section class="cp" aria-label="Copilot: planning" tabindex="-1"><div class="cp-head pl-sh is-top"><h2>${I.spark}Copilot</h2><span>Planning</span><button class="icb" type="button" data-cpx aria-label="Close the copilot">×</button></div>
+  cpw.innerHTML = `<section class="cp" aria-label="Ask Loci" tabindex="-1"><div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Loci · Today</span><button aria-label="Fold the panel away" class="icb" data-cpx title="Fold away (/ brings it back)" type="button"><svg aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.7" viewBox="0 0 24 24"><path d="M13 6l6 6-6 6M5 6v12"/></svg></button></div><div class="cp-title"><h2>Your plan</h2></div></div>
     <div class="cp-body"><div class="cp-thread" aria-live="polite"></div></div>
-    <div class="cp-comp"><div class="prompts"></div><form class="box"><label class="visually-hidden" for="pl-in">Ask the copilot about your plan</label><textarea id="pl-in" rows="2" maxlength="1200" placeholder="Plan my week, or tell me about a deadline…"></textarea><div class="tools"><small id="pl-ai2"></small><span class="grow"></span><button aria-label="Send" class="send" type="submit" disabled>${I.send}</button></div></form></div></section>`;
+    <div class="cp-comp"><div class="prompts"></div><form class="box"><label class="visually-hidden" for="pl-in">Ask Loci</label><textarea id="pl-in" rows="2" maxlength="4000" placeholder="Ask about your plan…"></textarea><div class="tools"><span class="grow"></span><button aria-label="Send" class="send" type="submit" disabled>${I.send}</button></div></form></div></section>`;
   document.body.appendChild(cpw);
   const thread = $(".cp-thread", cpw), input = $("#pl-in", cpw), sendBtn = $(".send", cpw);
   const PROMPTS = ["Plan the rest of my week", "I drive to work every weekday, 7:00 to 7:30", "I'm presenting a courtyard house to a client on 6 November", "I cycle on Saturday mornings, 8 to 9", "Make Saturday lighter", "Plan next week"];
@@ -494,10 +497,10 @@
   const scrollThread = () => { const b = $(".cp-body", cpw); b.scrollTop = b.scrollHeight; };
   function addMsg(role, html) {
     const el = document.createElement("div"); el.className = `msg ${role}`;
-    el.innerHTML = role === "user" ? `<p>${esc(html)}</p>` : `<div class="who"><span class="av" aria-hidden="true">S</span>Studiolo</div><div class="txt">${html}</div>`;
+    el.innerHTML = role === "user" ? `<p>${esc(html)}</p>` : `<div class="who"><span aria-hidden="true" class="av">✦</span>Loci</div><div class="txt">${html}</div>`;
     thread.appendChild(el); scrollThread(); return el;
   }
-  function thinking(text) { const el = document.createElement("div"); el.className = "thinking"; el.innerHTML = `<span class="dots" aria-hidden="true"><span></span><span></span><span></span></span><span>${esc(text)}</span>`; thread.appendChild(el); scrollThread(); return el; }
+  function thinking(text) { const el = document.createElement("div"); el.className = "msg ai"; el.innerHTML = `<div class="who"><span aria-hidden="true" class="av">✦</span>Loci</div><span class="thinking">${esc(text)}<span aria-hidden="true" class="dots"><span></span><span></span><span></span></span></span>`; thread.appendChild(el); scrollThread(); return el; }
   function greet() {
     const w = Math.floor(S.now.d / 7), n = S.blocks.filter((b) => Math.floor(b.d / 7) === w && live(b) && b.kind !== "plan");
     const short = S.tracks.find((t) => !t.goal && weekMins(w, t.id) < t.target);
@@ -740,12 +743,12 @@
       "Learning time: weekdays 07:00–08:00 and 19:00–21:00; Saturday 09:00–12:00; Sunday 17:00–19:00. At most " + S.maxDay + " minutes a day.",
       `Busy in their calendar: ${S.busy.filter((z) => z.d >= S.now.d && z.d < (w + 2) * 7).map((z) => `${wkLabel(z.d)} ${DN[wd(z.d)].slice(0, 3)} ${hm(z.s)}–${hm(z.e)}`).join("; ")}.`,
       `Sessions (id | week day time | minutes | kind | title | topic id | also | status | result):\n${bl.map((b) => `${b.id} | ${wkLabel(b.d)} ${DN[wd(b.d)].slice(0, 3)} ${hm(b.s)} | ${b.m} | ${b.kind} | ${b.title} | ${b.tr || "-"} | ${b.also || "-"} | ${b.st}${isPast(b.d, b.s) && b.st === "planned" ? " (time has passed)" : ""} | ${b.res || (b.score != null ? `${b.score} of 3 first try` : "-")}`).join("\n")}`,
-      `Library: ${LIBRARY.join("; ")}.`,
+      `Commonplace (their saved sources): ${LIBRARY.join("; ")}.`,
       `Routines (only audio kinds go there; routine time doesn't count towards the daily maximum): ${routines().map((r) => `${r.name}, ${r.mode}, ${daysLabel(r.days)} ${hm(r.s)}–${hm(r.e)}, allows ${MODES[r.mode].kinds.join(" and ")}`).join("; ") || "none yet"}.`,
       `How well sub-topics work by ear: ${Object.entries(FIT).map(([k, [f]]) => `${k} ${f}`).join("; ")}.`,
     ].join("\n");
   }
-  const FORMAT = `Session kinds: watch (a narrated video Lumen, 4–25 min), read (a reading Lumen: a long illustrated lesson page with a short quiz, 15–40 min), live (a live session: the narrator talks it through and the learner interrupts, 15–30 min), review (a short spaced quiz, 5–15 min), course (the next part of a course), library (an item from their Library), listen (an audio-only dialogue between two voices, 10–30 min, for routines like driving or cycling), aloud (a spoken review: questions read out and answered aloud, 5–10 min, for driving and walking).
+  const FORMAT = `Session kinds: watch (a narrated video Lumen, 4–25 min), read (a reading Lumen: a long illustrated lesson page with a short quiz, 15–40 min), live (a live session: the narrator talks it through and the learner interrupts, 15–30 min), review (a short spaced quiz, 5–15 min), course (the next part of a course), library (an item from their Commonplace, their saved sources), listen (an audio-only dialogue between two voices, 10–30 min, for routines like driving or cycling), aloud (a spoken review: questions read out and answered aloud, 5–10 min, for driving and walking).
 New Lumens can be planned on any sub-topic; they're made the evening before, so planning costs nothing.
 Reply with JSON Lines only: one object per line, no prose, no code fences.
 Line 1: {"say":"1 to 3 short, plain sentences to the learner. Say what you'd change and why. No lists."}
@@ -760,8 +763,8 @@ Then any of:
 {"convert":{"id":"b10","kind":"listen","title":"…","mins":25,"why":"…"}}   changes a planned session's format to fit a routine
 Rules: change only sessions that are planned and still ahead; keep to learning time, outside busy times, at most ${S.maxDay} minutes a day; prefer small changes (at most 8) unless asked to plan a whole week or a routine; never put watch, read, live, review, course or library sessions inside a routine (move them, or convert them to listen if the sub-topic works by ear); never invent results the records don't show.`;
   async function askClaude(text) {
-    const hist = S.msgs.slice(-6).map((m) => `${m.role === "user" ? "Learner" : "Copilot"}: ${m.content}`).join("\n");
-    const prompt = `You are Studiolo's copilot, planning a learner's study week on their calendar.\n\n${stateForAI()}\n\nConversation so far:\n${hist || "(none)"}\n\nLearner: ${text}\n\n${FORMAT}`;
+    const hist = S.msgs.slice(-6).map((m) => `${m.role === "user" ? "Learner" : "Loci"}: ${m.content}`).join("\n");
+    const prompt = `You are Loci, Studiolo's copilot, planning a learner's study week on their calendar.\n\n${stateForAI()}\n\nConversation so far:\n${hist || "(none)"}\n\nLearner: ${text}\n\n${FORMAT}`;
     const out = { say: "", wishes: [], goal: null, review: [], routine: null };
     let pend = "";
     const dayIdx = (wk, day) => { const i = DN.findIndex((n) => n.slice(0, 3).toLowerCase() === String(day || "").slice(0, 3).toLowerCase()); if (i < 0) return null; return (Math.floor(S.now.d / 7) + (wk === "next" ? 1 : 0)) * 7 + i; };
@@ -829,11 +832,11 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     if (b.kind === "aloud") return openAloud(b);
     if (b.kind === "review") return openReview(b);
     const t = track(b.tr);
-    const titles = { watch: "Playing the Lumen", course: "Playing the course part", live: "Live session", library: "Opening in your Library" };
-    const sub = { watch: "Simulated playback. In the app this opens the Lumen player.", course: "Simulated playback. In the app this opens the course viewer at this part.", live: "In the app this opens Learn's live studio: the narrator talks it through and you can cut in (see the Learn, Live prototype). Simulated here.", library: "In the app this opens the item in your Library where you stopped." }[b.kind];
+    const titles = { watch: "Playing the Lumen", course: "Playing the course part", live: "Live session", library: "Opening in your Commonplace" };
+    const sub = { watch: "Simulated playback. In the app this opens the Lumen player.", course: "Simulated playback. In the app this opens the course viewer at this part.", live: "In the app this opens Learn's live studio: the narrator talks it through and you can cut in (see the Learn, Live prototype). Simulated here.", library: "In the app this opens the item in your Commonplace where you stopped." }[b.kind];
     const p0 = b.prog || 0;
     openDlg(`<h3>${esc(titles[b.kind])}</h3><p class="sub">${esc(sub)}</p>
-      <div class="pl-screen"><span class="kk"><span class="brand-mark" aria-hidden="true">S</span>${b.kind === "library" ? "Your Library" : b.kind === "live" ? "Studiolo · Live" : "Studiolo Lumen"}</span><h4>${esc(b.title)}</h4><p>${t ? `${esc(t.name)} › ${esc(b.topic)}` : ""}</p></div>
+      <div class="pl-screen"><span class="kk"><span class="brand-mark" aria-hidden="true">S</span>${b.kind === "library" ? "Your Commonplace" : b.kind === "live" ? "Studiolo · Live" : "Studiolo Lumen"}</span><h4>${esc(b.title)}</h4><p>${t ? `${esc(t.name)} › ${esc(b.topic)}` : ""}</p></div>
       <div class="pl-prog" aria-hidden="true"><i style="width:${p0 * 100}%"></i></div>
       <div class="acts"><button class="button button-quiet" type="button" data-dx>Stop here</button><button class="button" type="button" data-fin disabled>${b.kind === "live" ? "End live" : b.kind === "library" ? "Mark as read" : "Mark as watched"}</button></div>`, (e) => { if (e.target.closest("[data-fin]")) finish(b, { watch: "Watched", course: "Watched", live: "8 min live · 2 questions asked", library: "Read to p. 58" }[b.kind]); });
     const bar = $(".pl-prog i", dlg), fin = $("[data-fin]", dlg); let p = p0; const my = dlg;
@@ -883,7 +886,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   function openReview(b) {
     const qs = QUIZ[b.topic] || QUIZ[Object.keys(QUIZ).find((k) => b.title.includes(k.split(" ")[0])) || "Courtyard houses"];
     let right = 0, answered = 0;
-    openDlg(`<h3>${esc(b.title)}</h3><p class="sub">A spaced review: answers feed what the copilot plans next.</p><div class="pl-quiz">${qs.map(([q, o], i) => `<div class="pl-q" data-q="${i}"><p>${i + 1}. ${esc(q)}</p><div class="opts">${o.map((x, j) => `<button type="button" data-a="${j}">${esc(x)}</button>`).join("")}</div></div>`).join("")}</div><div class="acts"><button class="button button-quiet" type="button" data-dx>Later</button><button class="button" type="button" data-fin disabled>Done</button></div>`, (e) => {
+    openDlg(`<h3>${esc(b.title)}</h3><p class="sub">A spaced review: answers feed what Loci plans next.</p><div class="pl-quiz">${qs.map(([q, o], i) => `<div class="pl-q" data-q="${i}"><p>${i + 1}. ${esc(q)}</p><div class="opts">${o.map((x, j) => `<button type="button" data-a="${j}">${esc(x)}</button>`).join("")}</div></div>`).join("")}</div><div class="acts"><button class="button button-quiet" type="button" data-dx>Later</button><button class="button" type="button" data-fin disabled>Done</button></div>`, (e) => {
       const a = e.target.closest("[data-a]");
       if (a && !a.disabled) {
         const qi = +a.closest("[data-q]").dataset.q, [, , ok, why] = qs[qi], good = +a.dataset.a === ok;
@@ -946,7 +949,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
       <ul class="say"><li>“The thick walls don't keep the heat out for ever; they hold it back until night, when we let it go.”</li><li>“Every night the court fills with cool air, and the shade keeps it there through the morning.”</li><li>“The house has one rule: closed by day, open by night.”</li></ul>
       <h2 id="s8">Check yourself</h2>
       ${QZ(QUIZ["Thermal mass"])}
-      <div class="src"><p><b>From your Library.</b> Architecture for the Poor, Hassan Fathy (PDF): his account of building with mud brick at New Gourna. You're at p. 41.</p><p><b>From general knowledge.</b> The physics of time lag and night ventilation, and the indicative figures above, come from the model's general knowledge, not your sources. They're marked so you can check them.</p></div>`;
+      <div class="src"><p><b>From your Commonplace.</b> Architecture for the Poor, Hassan Fathy (PDF): his account of building with mud brick at New Gourna. You're at p. 41.</p><p><b>From general knowledge.</b> The physics of time lag and night ventilation, and the indicative figures above, come from the model's general knowledge, not your sources. They're marked so you can check them.</p></div>`;
   }
   const OUTLINE = {
     "Daylight in deep courtyard plans": ["How much sky a deep court sees", "Light that bounces: floors, walls and the iwan", "Rooms two layers back from the court", "Glare at the court's edge", "What to show the client"],
@@ -1019,9 +1022,9 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   /* ================================================================ learning time, and the simulations */
   function openLT() {
     const rows = [["Weekdays", AVAIL[0]], ["Saturday", AVAIL[5]], ["Sunday", AVAIL[6]]];
-    openDlg(`<h3>Learning time</h3><p class="sub">When the copilot may plan sessions. You can still move any session anywhere by hand.</p>
+    openDlg(`<h3>Learning time</h3><p class="sub">When Loci may plan sessions. You can still move any session anywhere by hand.</p>
       <div class="pl-lt">${rows.map(([n, ws]) => `<div class="pl-lt-row"><span>${n}</span><span class="slots">${ws.map(([a, e]) => `<i>${hm(a)}–${hm(e)}</i>`).join("")}</span></div>`).join("")}
-        <div class="pl-lt-row"><span>Routines</span><span class="slots">${S.routines.length ? S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)}</i>`).join("") : '<small>None yet. Tell the copilot, for example “I drive to work 7:00 to 7:30”. Routines hold audio only and don’t count towards the daily maximum.</small>'}</span></div>
+        <div class="pl-lt-row"><span>Routines</span><span class="slots">${S.routines.length ? S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)}</i>`).join("") : '<small>None yet. Tell Loci, for example “I drive to work 7:00 to 7:30”. Routines hold audio only and don’t count towards the daily maximum.</small>'}</span></div>
         <div class="pl-lt-row"><span>Each day</span><span><label for="pl-max">At most <select id="pl-max">${[60, 90, 120].map((m) => `<option value="${m}"${m === S.maxDay ? " selected" : ""}>${len(m)}</option>`).join("")}</select></label></span></div>
         <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times in my calendar<small>Google Calendar, connected (simulated). Studiolo reads only busy and free, never event titles.</small></span></label>
         <label><input type="checkbox" id="pl-auto"${S.autoMove ? " checked" : ""}><span>When something new lands on a session, move the session to the next free time<small>Otherwise the session stays and is marked as clashing.</small></span></label></div>
@@ -1082,7 +1085,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   }
   function aiBadge() {
     const t = S.ai ? "Plans written by Claude" : "Scripted answers";
-    const el = $("#pl-ai"); if (el) { el.dataset.on = String(!!S.ai); el.textContent = S.ai ? "Copilot: Claude writes the plans" : "Copilot: scripted sample"; }
+    const el = $("#pl-ai"); if (el) { el.dataset.on = String(!!S.ai); el.textContent = S.ai ? "Loci: Claude writes the plans" : "Loci: scripted sample"; }
     const e2 = $("#pl-ai2", cpw); if (e2) e2.textContent = t;
   }
 
@@ -1171,12 +1174,16 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); } });
   let wasWide = wide();
   window.addEventListener("resize", () => { if (wide() !== wasWide) { wasWide = wide(); render(); } });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") && !dlg) { e.preventDefault(); if (S.panel) input.focus(); else openPanel(); }
+  });
+  input.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); input.blur(); } });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (dlg) closeDlg(); else if (popEl) hidePop(); } });
 
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
   bar.className = "td-proto pl-proto"; bar.setAttribute("aria-label", "Prototype");
-  bar.innerHTML = '<div class="row"><b>Prototype · planning</b><button type="button" id="pl-how" aria-expanded="false">How to try it</button><button type="button" id="pl-meet">A meeting lands on Thursday</button><button type="button" id="pl-sun">Skip to Sunday</button><button type="button" id="pl-restart">Start again</button><span class="ai" id="pl-ai">Checking for Claude…</span></div><p class="hint" hidden>Open <b>Plan with the copilot</b> and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a lighter Saturday, then next week. Tell it about a <b>routine</b> (“I drive to work every weekday, 7:00 to 7:30”) and it fills the drive with dialogues and spoken reviews, moving anything that needs a screen. Changes show as dashed ghosts until you apply them. Drag sessions on the week; click one to start it. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time. <b>Skip to Sunday</b> plays the week out so you can plan next week from what happened. The 19:00 reading Lumen today is a full lesson.</p>';
+  bar.innerHTML = '<div class="row"><b>Prototype · planning</b><button type="button" id="pl-how" aria-expanded="false">How to try it</button><button type="button" id="pl-meet">A meeting lands on Thursday</button><button type="button" id="pl-sun">Skip to Sunday</button><button type="button" id="pl-restart">Start again</button><span class="ai" id="pl-ai">Checking for Claude…</span></div><p class="hint" hidden>Open <b>✦ Ask Loci</b> (or press /) and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a lighter Saturday, then next week. Tell it about a <b>routine</b> (“I drive to work every weekday, 7:00 to 7:30”) and it fills the drive with dialogues and spoken reviews, moving anything that needs a screen. Changes show as dashed ghosts until you apply them. Drag sessions on the week; click one to start it. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time. <b>Skip to Sunday</b> plays the week out so you can plan next week from what happened. The 19:00 reading Lumen today is a full lesson.</p>';
   document.body.appendChild(bar);
   $("#pl-restart", bar).addEventListener("click", () => location.reload());
   $("#pl-meet", bar).addEventListener("click", simMeeting);

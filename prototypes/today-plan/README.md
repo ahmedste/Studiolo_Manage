@@ -1,21 +1,30 @@
 # Today, planned: interactive prototype
 
-Today grows into a **learning-planning calendar** that the copilot plans with you. It's built on **Studiolo's real Today screen and styles**: the shell, `.td-*`, the copilot panel (`.cp-*`), buttons and toasts are the app's own, captured read-only from `studiolo` @ `48412aa`. Nothing there is changed.
+Today grows into a **learning-planning calendar** that Loci plans with you. It's built on **Studiolo's real Today screen and styles**: the shell, `.td-*`, Loci panel (`.cp-*`), buttons and toasts are the app's own, captured read-only from `studiolo` @ `48412aa`. Nothing there is changed.
 
-This is the owner's T4 direction (Craft *Today*; `studiolo` `docs/superpowers/specs/2026-10-16-today-design.md` §0 and §7: "the calendar is meant to be a learning planning calendar"), taken further: the copilot plans and re-plans the week, and sessions can be Lumens, reading Lumens or live sessions.
+This is the owner's T4 direction (Craft *Today*; `studiolo` `docs/superpowers/specs/2026-10-16-today-design.md` §0 and §7: "the calendar is meant to be a learning planning calendar"), taken further: Loci plans and re-plans the week, and sessions can be Lumens, reading Lumens or live sessions.
 
 Open `dist/today-plan-prototype.html`. It's also published as a claude.ai artifact that may use Claude.
+
+## Loci, as in the live app
+
+The copilot here is **Loci**, as it is in the live app (`studiolo` @ `5fbb7f2`). It uses the app's own pieces:
+
+- The **"✦ Ask Loci /"** pill opens it, and so does the `/` key. Escape leaves the field.
+- Open, it's Loci's own panel card (`graph.css` `.cp`): the "LOCI · TODAY" kicker with the fold button, a serif title, replies signed "✦ Loci", and Loci's composer.
+- The pill steps aside while the panel is open, and the fold button puts the panel away, as on the map.
+- The rail and tab bar use the live names: Today, Learn, Commonplace, Loci. "From your Library" sessions now read "From your Commonplace".
 
 ## The layout
 
 The layout is one fixed frame, and nothing moves around on its own:
 
-- **The head** (Learning time, Plan with the copilot) never moves.
-- **The calendar** is on the left. **The side column** on the right, behind one hairline, holds three sections with the same small heading: **My Focus** (a colour key for the calendar: one line per topic with this week's time), **Up next** (drawn like the session on the calendar, with Continue under it) and **The Big Picture**. The copilot opens in the same column, with its heading on the calendar toolbar's line, on the right as it does on the Graph.
+- **The head** (Learning time, ✦ Ask Loci) never moves.
+- **The calendar** is on the left. **The side column** on the right, behind one hairline, holds three sections with the same small heading: **My Focus** (a colour key for the calendar: one line per topic with this week's time), **Up next** (drawn like the session on the calendar, with Continue under it) and **The Big Picture**. Loci opens in the same column, with its heading on the calendar toolbar's line, on the right as it does on the Graph.
 - **The calendar** has a **Day | Week** switch. Both views share one hour axis, so switching only changes the number of columns: the 7:00 line stays at the same height.
-- **Plan with the copilot** puts the copilot *in the side column's place*. The calendar keeps its size, position and view, and the copilot never switches the view for you. A card's **Show on the week** does that when you want it.
+- **✦ Ask Loci** puts Loci *in the side column's place*. The calendar keeps its size, position and view, and Loci never switches the view for you. A card's **Show on the week** does that when you want it.
 - Scroll positions are kept across every change. Hours fold only around learning time and sessions already on the calendar, never around proposals, so ghosts don't shift the axis.
-- Under 1000 px the side column stacks above the calendar and the copilot becomes a bottom sheet.
+- Under 1000 px the side column stacks above the calendar and Loci becomes a bottom sheet.
 
 ## Try it
 
@@ -24,7 +33,7 @@ The layout is one fixed frame, and nothing moves around on its own:
    - **My Focus** shows this week's time per topic: planned, done, the weekly target, and how short a topic is.
    - **The Big Picture** is still written from records, with no AI.
    - The **Day calendar** has a strip of the week's days. What you did sits above the now line (the old activity log). The plan sits below it, with learning time tinted and busy times from your calendar hatched.
-2. **Plan with the copilot** opens the copilot in the side column. Switch the calendar to **Week** to see the whole plan, then try the suggestions in order:
+2. **✦ Ask Loci** opens Loci in the side column. Switch the calendar to **Week** to see the whole plan, then try the suggestions in order:
    - *Plan the rest of my week*: fills the topic that's short.
    - *I'm presenting a courtyard house to a client on 6 November*: becomes a **goal** that draws on two topics. Its sessions count for both topics and for the goal, shown as a two-colour edge. That's the "overlapping" plan.
    - *Make Saturday lighter*: revises the plan. The earlier card reads "Replaced by a newer plan".
@@ -46,7 +55,7 @@ The layout is one fixed frame, and nothing moves around on its own:
 
 ## Routines: learning that fits what you're already doing
 
-Tell the copilot about a habit, such as *"I drive to work every weekday, 7:00 to 7:30"* or *"I cycle on Saturday mornings, 8 to 9"*. It becomes a **routine**: a teal band on the calendar with its mode's icon.
+Tell Loci about a habit, such as *"I drive to work every weekday, 7:00 to 7:30"* or *"I cycle on Saturday mornings, 8 to 9"*. It becomes a **routine**: a teal band on the calendar with its mode's icon.
 
 - **A routine only holds formats that suit it.**
   - Driving and walking take **dialogues** (audio only, two voices) and **spoken reviews** (questions read out and answered aloud).
@@ -62,8 +71,8 @@ Tell the copilot about a habit, such as *"I drive to work every weekday, 7:00 to
 
 ## Real or simulated
 
-- **Real, when you allow it:** Claude writes the copilot's plans (JSON lines of add, move, drop, link and goal, checked against your learning time, busy times and daily maximum before they're shown). It also writes any reading Lumen other than the thermal mass one, as you open it. This uses the `sample` capability on your own Claude usage, and the first use asks you.
-- **Scripted when Claude isn't available:** the badge says "Copilot: scripted sample". The four suggestions above have scripted answers that still go through the same scheduler.
+- **Real, when you allow it:** Claude writes Loci's plans (JSON lines of add, move, drop, link and goal, checked against your learning time, busy times and daily maximum before they're shown). It also writes any reading Lumen other than the thermal mass one, as you open it. This uses the `sample` capability on your own Claude usage, and the first use asks you.
+- **Scripted when Claude isn't available:** the badge says "Loci: scripted sample". The four suggestions above have scripted answers that still go through the same scheduler.
 - **Simulated:**
   - the clock (Wednesday 21 October 2026, 15:35);
   - the calendar connection;
@@ -72,7 +81,7 @@ Tell the copilot about a habit, such as *"I drive to work every weekday, 7:00 to
 
 ## Design choices worth deciding
 
-1. **Today is the planner.** There's no separate Planner page: Day and Week are two views of Today. Learn stays the shelf, and Loci (the Graph) stays the map.
+1. **Today is the planner.** There's no separate Planner page: Day and Week are two views of Today. Learn stays the shelf, Commonplace keeps your sources, and Loci stays the map.
 2. **The activity log stays, above the now line.** This answers the Today spec's open question of whether the log stays beside the plan.
 3. **Goals span topics.** A deadline becomes a goal drawing on existing My Focus topics, and its sessions count for both. The alternative is a separate track per goal.
 4. **Nothing is spent by planning.** Lumens are made the evening before (course parts when reached), as the course engine's one-lesson-ahead rule says.

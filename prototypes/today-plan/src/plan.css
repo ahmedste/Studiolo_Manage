@@ -55,7 +55,9 @@ body { background: var(--surface-page); }
 .pl-seg button:hover:not([aria-pressed="true"]) { background: var(--hover-fill); }
 .pl-seg button:focus-visible, .pl-linkbtn:focus-visible, .pl-b:focus-visible, .pl-wd:focus-visible, .pl-tools .button:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .pl-tools .button { min-height: 32px; padding: 6px 12px; font-size: 13px; }
-.pl-tools .button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--accent-strong); }
+/* "✦ Ask Loci /": Loci's own pill (graph.css .cp-reopen), placed in the head; it steps aside while the panel is open. */
+.pl-tools .pl-ask { position: static; animation: none; }
+.pl-tools .pl-ask.is-away { visibility: hidden; }
 .pl-ic { width: 15px; height: 15px; flex: none; }
 .pl-linkbtn { all: unset; cursor: pointer; color: var(--accent); }
 .pl-linkbtn:hover { text-decoration: underline; }
@@ -226,24 +228,13 @@ body { background: var(--surface-page); }
 .pl-cpwrap { position: fixed; z-index: 45; top: 0; bottom: 0; right: env(safe-area-inset-right, 0px); }
 .pl-cpwrap[hidden] { display: none !important; }
 .pl-cpwrap.is-docked { position: relative; inset: auto; width: auto; height: 100%; z-index: auto; pointer-events: auto; }
-.pl-cpwrap.is-docked .cp { inset: 0; background: transparent; box-shadow: none; border-radius: 0; }
-.pl-cpwrap .cp-head.pl-sh { display: flex; align-items: center; background: transparent; border: 0; padding: 0; }
-.pl-cpwrap .cp-head.pl-sh > span { margin-left: 0; }
-.pl-cpwrap .cp-head .icb { margin-left: auto; }
-.pl-cpwrap .cp-head h2 .pl-ic { color: var(--accent); }
-.pl-cpwrap:not(.is-docked) .cp-head.pl-sh { padding: 12px 12px 10px 16px; margin: 0; border-bottom: 1px solid var(--rule); }
-.pl-cpwrap.is-docked .cp-body { padding: 4px 4px 16px 0; }
-.pl-cpwrap.is-docked .cp-comp { padding: 10px 0 0; border-top: 1px solid var(--line); }
-.pl-cpwrap .cp-kicker { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
-.pl-cpwrap .cp-title { margin: 6px 0 2px; }
-.pl-cpwrap .cp-title h2 { font-size: 21px; }
-.pl-cpwrap .cp-sub { margin: 4px 0 0; color: var(--ink-2); font-size: 12.5px; }
+/* Docked, Loci's own panel card (graph.css .cp) fills the side column: same card, head, thread and composer as on Loci. */
+.pl-cpwrap.is-docked .cp { inset: 0; }
+.pl-side:has(> .pl-cpwrap.is-docked) { border-left-color: transparent; }
 .pl-cpwrap .cp-thread { display: grid; gap: 14px; }
-.pl-cpwrap .cp-comp .prompts { flex-wrap: wrap; -webkit-mask-image: none; mask-image: none; overflow: visible; }
 .pl-cpwrap .cp-comp textarea { width: 100%; box-sizing: border-box; border: 0; background: none; resize: none; font: inherit; font-size: 13.5px; color: var(--ink); outline: none; }
 .pl-cpwrap .cp-comp .tools { display: flex; align-items: center; gap: 8px; }
 .pl-cpwrap .cp-comp .tools .grow { flex: 1; }
-.pl-cpwrap .cp-comp .tools small { color: var(--ink-2); font-size: 11px; }
 .pl-cpwrap .send:disabled { opacity: .35; cursor: default; }
 .pl-cpwrap .send:focus-visible, .pl-cpwrap .icb:focus-visible, .pl-cpwrap .prompts button:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .pl-cpwrap .msg.ai .txt p { margin: 0 0 6px; }
