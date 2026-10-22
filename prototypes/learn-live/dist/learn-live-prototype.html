@@ -25308,7 +25308,8 @@ html.theme-switching::view-transition-new(root) {
 
 /* ---------- the live hero (Home) ---------- */
 /* Slim: a title line, one input bar, one line of ideas. No card; the bar is the only raised element. */
-.ll-hero { display: grid; gap: 10px; margin: 2px 0 30px; }
+.ll-hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 2px 0 30px; }
+.ll-hero > * { min-width: 0; }
 .ll-hero-top { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .ll-hero h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; min-width: 0; font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.2; }
 .ll-kick { display: inline-flex; align-items: center; gap: 6px; flex: none; font-family: var(--ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn); transform: translateY(-2px); }
@@ -25320,6 +25321,40 @@ html.theme-switching::view-transition-new(root) {
 .ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--ink-3); }
 .ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 0; }
 .ll-ask input::placeholder { color: var(--ink-2); }
+.ll-mode { display: inline-flex; flex: none; gap: 2px; padding: 3px; margin-left: -12px; border-radius: 20px; background: var(--surface-board); }
+.ll-mode button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 16px; font-size: 13px; color: var(--ink-2); }
+.ll-mode button:hover { color: var(--ink); }
+.ll-mode button[aria-checked="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); font-weight: 500; }
+.ll-mode button:focus-visible { outline: var(--focus-ring); }
+.ll-mode .xp-dot { width: 6px; height: 6px; color: var(--warn); }
+.ll-mode button[aria-checked="false"] .xp-dot { animation: none; opacity: 0.5; }
+.ll-go .xp-dot { width: 6px; height: 6px; margin-right: 7px; color: var(--on-accent); vertical-align: 1px; }
+.ll-works { display: grid; gap: 6px; margin-top: 4px; }
+.ll-work { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 7px 8px 7px 14px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; }
+.ll-work .lx-dot { flex: none; color: var(--accent); }
+.ll-work .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+.ll-work .t b { font-weight: 600; color: var(--ink); }
+.ll-work .ll-wr { flex: none; font-size: 12px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.ll-work .ll-chip { flex: none; }
+.ll-work.is-ready { box-shadow: inset 0 0 0 1px var(--accent-soft); background: color-mix(in srgb, var(--accent-soft) 45%, var(--panel)); }
+.ll-work .ok { flex: none; color: var(--ok); font-weight: 600; }
+.ll-work .button { flex: none; min-height: 0; padding: 5px 12px; font-size: 12.5px; border-radius: 2px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.ll-work .button svg { width: 14px; height: 14px; }
+.ll-hint { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.ll-hint b { font-weight: 600; color: var(--ink); }
+.ll-resume-link { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-width: 0; margin-left: auto; padding: 4px 11px 4px 8px; border-radius: 14px; font-size: 12.5px; color: var(--accent); background: var(--accent-soft); white-space: nowrap; overflow: hidden; }
+.ll-resume-link span { overflow: hidden; text-overflow: ellipsis; }
+.ll-resume-link b { font-weight: 600; }
+.ll-resume-link svg { flex: none; width: 14px; height: 14px; }
+.ll-resume-link:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.ll-resume-link:focus-visible { outline: var(--focus-ring); }
+.ll-resume-link + .ll-more { margin-left: 12px !important; }
+.ll-srow .ll-keep { margin: 6px 0 0; display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-2); }
+.ll-srow .ll-acts { margin: 0; }
+.ll-srow .ll-acts .button { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.ll-srow .ll-acts svg { width: 14px; height: 14px; }
+.ll-t.ev.resumed { justify-content: center; margin: 4px 0; color: var(--accent); font-weight: 500; }
+.ll-t.ev.resumed::before { content: "↻"; color: var(--accent); }
 .ll-ask .ll-mic { width: 40px; height: 40px; background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); }
 .ll-ask .ll-mic:hover { background: var(--accent-soft); filter: none; }
 .ll-go { all: unset; box-sizing: border-box; cursor: pointer; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--accent); color: var(--on-accent); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
@@ -25519,6 +25554,16 @@ html.theme-switching::view-transition-new(root) {
 @media (max-width: 760px) {
   .ll-hero h2 { font-size: 19px; }
   .ll-hero-top .ll-more { display: none; }
+  .ll-hero-top { flex-wrap: wrap; }
+  .ll-resume-link { margin-left: 0; max-width: 100%; }
+  .ll-mode { margin-left: -8px; }
+  .ll-mode button { padding: 5px 9px; }
+  .ll-go { padding: 0 12px; font-size: 12.5px; }
+  .ll-go .xp-dot { display: none; }
+  .ll-ask [data-mic="hero"] { display: none; }
+  .ll-hint { padding-left: 0; }
+  .ll-work { flex-wrap: wrap; }
+  .ll-work .t { white-space: normal; flex-basis: 100%; }
   .ll-ask { padding-left: 14px; }
   .ll-go { padding: 0 12px; }
   .ll-starters { padding-left: 0; }
@@ -25638,13 +25683,27 @@ html.theme-switching::view-transition-new(root) {
     { id: "proportion", title: "Proportion and order", by: "From Design & Composition", parts: ["Overview", "Ratios you can see", "The golden section, honestly", "Modular grids", "Le Corbusier's Modulor", "Proportion today"], done: 0, now: 0, q: "Why do some buildings feel calm before we know why?" },
     { id: "defeat", title: "Architecture of Defeat", by: "Kengo Kuma · from your library", parts: ["Overview", "Against the object", "Weak architecture", "Materials that disappear", "Particles", "What defeat builds"], done: 1, now: 1, q: "Why would an architect argue architecture should accept defeat?" },
   ];
+  const MASS = {
+    id: "mass", title: "Mass, air and humidity", q: "Why do heavy walls stop working in humid places?", subject: "Climate-responsive design", anchor: ["Culture & Context", "Climate-responsive design"], dur: "5:10", meta: "Live session",
+    intro: "Heavy walls cool a building by storing the day's heat and losing it at night. That needs a cool night.",
+    beats: [
+      { type: "cards", title: "It depends on the night", cards: [["Hot and dry", "35° by day, 18° at night"], ["Hot and humid", "32° by day, 27° at night"], ["So", "In humid places the heat has nowhere to go"]], say: "Thick walls soak up the day's heat and lose it at night. In a dry climate the night drops to eighteen degrees, so it works. In a humid one it only drops to twenty-seven, and the heat has nowhere to go.", cues: ["thick", "humid", "nowhere"] },
+      { type: "table", title: "What works where", head: ["", "Hot and dry", "Hot and humid"], rows: [["Night drop", "About 17°", "About 5°"], ["What cools you", "Thermal mass", "Moving air"], ["What it looks like", "Thick walls, courtyards", "Light walls, cross-breezes"]], say: "So dry climates use mass: thick walls, small windows, courtyards. Humid climates use moving air: light walls, deep shade, and breezes straight through.", cues: ["night", "mass", "air"] },
+      { type: "ol", title: "What to check on site", items: ["How far it cools at night", "Where the breeze comes from", "Shade first, then mass"], say: "Three things to check on site: how far it cools at night, where the breeze comes from, and shade before mass, always.", cues: ["cools", "breeze", "shade"] },
+    ],
+  };
+  DECKS.mass = MASS;
+  // Live sessions are saved when you end them or leave the page, and can be resumed for 30 days.
   const SESSIONS = [
-    { title: "Mass, air and humidity", when: "Yesterday · 6 min", said: "Can you explain that like a bath?", kept: true, n: 2, meta: "Live · 2 asides" },
-    { title: "Four iwans: how the madrasa plan works", when: "Tuesday · 3 min", said: "Is Sultan Hassan built like this?", kept: false, n: 1, meta: "Went live from slide 2" },
+    { id: "s-iwans", L: IWANS, title: IWANS.title, i: 2, total: 4, when: "Tuesday", mins: 3, said: "Is Sultan Hassan built like this?", kept: false, asides: 1, rewrites: 0, days: 28,
+      seed: [["ev", "Live from slide 2. The line is open; you can cut in at any point."], ["n", 2, IWANS.beats[0].say], ["you", "Is Sultan Hassan built like this?"], ["n", null, "Good question. Yes: Sultan Hassan in Cairo is the classic case, with four iwans around one court and a madrasa in each corner."], ["ev", "Your question became an aside."], ["n", 3, IWANS.beats[1].say], ["ev", "You left at slide 3. Session saved."]] },
+    { id: "s-mass", L: MASS, title: MASS.title, i: 3, total: 4, when: "Yesterday", mins: 6, said: "Can you explain that like a bath?", kept: true, lumen: "kept1", asides: 2, rewrites: 1, days: 29,
+      seed: [["n", 1, MASS.intro], ["n", 2, MASS.beats[0].say], ["you", "Can you explain that like a bath?"], ["ev", "Slide 2 rewritten as a bath."], ["n", 3, MASS.beats[1].say], ["ev", "Kept as a Lumen. Session ended at slide 4."]] },
   ];
 
   /* ================================================================ app state */
-  const S = { view: "home", tab: "home", ai: null, audio: true, filter: { area: "All", made: "all", state: "all", q: "" }, journal: [], line: false, secs: 0, run: 0 };
+  let mode0 = "live"; try { mode0 = localStorage.getItem("ll-mode") || "live"; } catch { /* private */ }
+  const S = { mode2: mode0 === "lumen" ? "lumen" : "live", view: "home", tab: "home", ai: null, audio: true, filter: { area: "All", made: "all", state: "all", q: "" }, journal: [], line: false, secs: 0, run: 0 };
   const BROWSER_OK = (() => { const u = navigator.userAgent; return /Chrome\/|Edg\//.test(u) && !/Mobile|Android|iPhone|iPad|OPR\//.test(u); })();
   (async () => { try { S.ai = window.claude ? await window.claude.use("sample") : null; } catch { S.ai = null; } aiBadge(); })();
 
@@ -25666,12 +25725,15 @@ html.theme-switching::view-transition-new(root) {
 
   const poster = (L, extra = "") => `<div class="lx-poster"><div class="xp-box"><div class="xp-stage" style="${STAGE}">${SL.title(L.title, L.q, L.subject, L.meta || L.dur + " · narrated")}</div></div>${extra}</div>`;
   const tag = (L) => !L.item && !L.anchor ? "" : L.item ? `<span class="lx-tag" title="From your library">${I.file}<b>${esc(L.item)}</b></span>` : `<span class="lx-tag" title="${esc(L.anchor.join(" › "))}">${I.topic}<span>${esc(L.anchor[0])} › </span><b>${esc(L.anchor[1])}</b></span>`;
-  const status = (L) => ({ new: '<b class="acc">New</b>', in: "<b>In progress</b>", watched: "<b>Watched</b>", kept: '<b class="live">Live · kept</b>' })[L.status];
+  const status = (L) => ({ new: '<b class="acc">New</b>', in: "<b>In progress</b>", watched: "<b>Watched</b>", kept: '<b class="live">Live · kept</b>', making: '<b class="acc">Being made</b>' })[L.status];
   function card(L) {
     const badge = L.made === "live" ? '<span class="lx-badge">Live · 2 asides</span>' : "";
     const prog = L.progress ? `<div class="lx-prog"><i style="width:${L.progress * 100}%"></i></div>` : "";
-    return `<article class="lx-card" data-lumen="${L.id}">${poster(L, `${badge}<span class="lx-dur">${L.dur}</span>${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#play-${L.id}">${esc(L.title)}</a></h3>
-      <div class="ll-acts"><button class="button button-quiet ll-live-btn" type="button" data-golive="${L.id}">${I.mic}Go live</button></div>
+    const making = L.status === "making";
+    const over = making ? `<span class="lx-making"><span class="lx-dot" aria-hidden="true"></span><span class="ll-wr">${esc(L.writingLabel || "Writing")}</span></span>` : `<span class="lx-dur">${L.dur}</span>`;
+    const acts = making ? `<button class="button button-quiet ll-live-btn" type="button" data-livenow="${L.id}">${I.mic}Talk it through live instead</button>` : `<button class="button button-quiet ll-live-btn" type="button" data-golive="${L.id}">${I.mic}Go live</button>`;
+    return `<article class="lx-card" data-lumen="${L.id}">${poster(L, `${badge}${over}${prog}`)}<div class="lx-body">${tag(L)}<h3 class="lx-title"><a class="lx-link" href="#play-${L.id}">${esc(L.title)}</a></h3>
+      <div class="ll-acts">${acts}</div>
       <div class="lx-ft"><span>${L.dur} · ${esc(L.when)}</span>${status(L)}</div></div></article>`;
   }
   function courseCard(C) {
@@ -25681,18 +25743,50 @@ html.theme-switching::view-transition-new(root) {
       <p class="ll-next" style="margin:0">Next: <b>${C.now ? `Part ${C.now} · ${esc(C.parts[C.now])}` : "the overview"}</b></p>
       <div class="lx-ft"><span>${esc(C.by)}</span><b>${C.done} of ${C.parts.length} watched</b></div></div></article>`;
   }
-  const sessionRow = (s, compact) => `<article class="ll-srow${compact ? " ll-compact" : ""}">${poster({ title: s.title, q: "", subject: "Live", meta: s.meta })}<div><h4>${esc(s.title)}</h4><p>${esc(s.when)}${compact ? "" : ` · you asked <q>${esc(s.said)}</q>`}</p></div>${compact ? "" : `<span class="tag${s.kept ? " saved" : ""}">${s.kept ? "Kept as a Lumen" : "Nothing kept"}</span>`}</article>`;
+  const sessionRow = (s) => `<article class="ll-srow" data-session="${s.id}">${poster({ title: s.title, q: "", subject: "Live session", meta: `Slide ${s.i + 1} of ${s.total}` }, `<div class="lx-prog"><i style="width:${Math.round(((s.i + 1) / s.total) * 100)}%"></i></div>`)}
+    <div><h4>${esc(s.title)}</h4><p>Stopped at slide ${s.i + 1} of ${s.total} · ${esc(s.when)} · ${s.mins} min live${s.said ? ` · you asked <q>${esc(s.said)}</q>` : ""}</p>
+      <p class="ll-keep">${s.kept ? '<span class="tag saved">Kept as a Lumen</span>' : '<span class="tag">Not kept</span>'} Resumable for ${s.days} more days</p></div>
+    <div class="ll-acts"><button class="button" type="button" data-resume="${s.id}">${I.mic}Resume</button>${s.kept && s.lumen ? `<a class="button button-quiet" href="#play-${s.lumen}">Play the Lumen</a>` : ""}</div></article>`;
+  const lastOpen = () => SESSIONS.find((x) => !x.ended) || null;
 
   let heroIO = null;
+  const HINT = {
+    lumen: "<b>Make a Lumen</b> · Studiolo writes and voices a 2–6 minute Lumen in the background. Watch it when it's ready; go live on it any time.",
+    live: "<b>Start a live session</b> · Studiolo talks you through it now, drawing slides as it goes. Interrupt any time, and keep it as a Lumen at the end. Uses voice minutes.",
+  };
+  function setKind(k) {
+    S.mode2 = k; try { localStorage.setItem("ll-mode", k); } catch { /* private */ }
+    const f = $('[data-form="hero"]', root); if (!f) return;
+    f.dataset.kind = k;
+    $$("[data-kind]", f).forEach((b) => b.setAttribute("aria-checked", String(b.dataset.kind === k)));
+    $(".ll-go", f).innerHTML = k === "live" ? '<span class="xp-dot" aria-hidden="true"></span>Start live session' : "Make a Lumen";
+    $("#ll-hero-in", root).placeholder = k === "live" ? "Ask, or hold the mic and talk" : "What should the Lumen explain?";
+    $(".ll-hint", root).innerHTML = HINT[k];
+  }
+  /** Lumens being made from this bar (and ones just finished), right under it, so the result is never out of sight. */
+  function worksRows() {
+    const rows = LUMENS.filter((l) => l.status === "making" || l.fresh);
+    if (!rows.length) return "";
+    return `<div class="ll-works" role="status">${rows.map((l) => l.status === "making"
+      ? `<div class="ll-work" data-work="${l.id}"><span class="lx-dot" aria-hidden="true"></span><span class="t"><b>Making a Lumen</b> · ${esc(l.title)}</span><span class="ll-wr">${esc(l.writingLabel || "Writing")}</span><button class="ll-chip" type="button" data-livenow="${l.id}">Talk it through live instead</button></div>`
+      : `<div class="ll-work is-ready" data-work="${l.id}"><span class="ok" aria-hidden="true">✓</span><span class="t"><b>Lumen ready</b> · ${esc(l.title)} · ${esc(l.dur)}</span><a class="button" href="#play-${l.id}">Play</a><button class="button button-quiet ll-live-btn" type="button" data-golive="${l.id}">${I.mic}Go live</button></div>`).join("")}</div>`;
+  }
+  const explain = (q, anchor) => (S.mode2 === "lumen" ? makeLumen(q, anchor) : startNew(q, anchor));
   function renderHome() {
     S.view = "home"; S.tab = "home";
     const starters = [["How do wind catchers actually cool a house?", "Climate-responsive design"], ["Why do four iwans face one court?", "Islamic architecture"], ["Explain thermal mass to me like a builder", "My Focus"], ["What's the golden section really for?", "Proportion and order"]];
     learnShell(`${header("Lumens, courses and live sessions")}
       <section class="ll-hero" aria-labelledby="ll-hero-t">
-        <div class="ll-hero-top"><h2 id="ll-hero-t"><span class="ll-kick"><span class="xp-dot" aria-hidden="true"></span>Live</span>What do you want to understand?</h2>
-          <button class="ll-more" type="button" data-tab="sessions">${SESSIONS.length} recent sessions →</button></div>
-        <form class="ll-ask" data-form="hero"><label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="Ask, or hold the mic and talk. Cut in any time."><button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">Explain live</button></form>
+        <div class="ll-hero-top"><h2 id="ll-hero-t">What do you want to understand?</h2>
+          ${lastOpen() ? `<button class="ll-resume-link" type="button" data-resume="${lastOpen().id}">${I.mic}<span>Resume live session · <b>${esc(lastOpen().title)}</b> · slide ${lastOpen().i + 1}</span></button>` : ""}
+          <button class="ll-more" type="button" data-tab="sessions">All sessions →</button></div>
+        <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
+          <span class="ll-mode" role="radiogroup" aria-label="What to make"><button type="button" role="radio" data-kind="lumen" aria-checked="${S.mode2 === "lumen"}">Lumen</button><button type="button" role="radio" data-kind="live" aria-checked="${S.mode2 === "live"}"><span class="xp-dot" aria-hidden="true"></span>Live</button></span>
+          <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${S.mode2 === "live" ? "Ask, or hold the mic and talk" : "What should the Lumen explain?"}">
+          <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${S.mode2 === "live" ? '<span class="xp-dot" aria-hidden="true"></span>Start live session' : "Make a Lumen"}</button></form>
+        <p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p>
         <div class="ll-starters" role="group" aria-label="Ideas"><span class="ll-try">Try</span>${starters.map(([t]) => `<button type="button" data-start="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+        ${worksRows()}
       </section>
       <article class="lx-cont" data-lumen="malqaf">${poster(MALQAF, `<span class="lx-dur">2:48</span><div class="lx-prog"><i style="width:88%"></i></div>`)}<div><p class="lx-lab">Continue</p><h2 class="lx-cont-title"><a class="lx-link" href="#play-malqaf">How a malqaf moves air</a></h2><p class="lx-cont-meta">Stopped at 2:28 of 2:48 · slide 4 · made today</p>
         <div class="lx-row" style="position:relative;z-index:2"><a class="lx-resume" href="#play-malqaf">▶ Resume</a><button class="button button-quiet ll-live-btn" type="button" data-golive="malqaf">${I.mic}Go live from slide 4</button>${tag(MALQAF)}</div></div></article>
@@ -25729,7 +25823,7 @@ html.theme-switching::view-transition-new(root) {
   }
   function renderSessions() {
     S.view = "sessions"; S.tab = "sessions";
-    learnShell(`${header("Live sessions")}<p class="ll-lede" style="margin:0 0 16px;max-width:64ch;font-size:13.5px;color:var(--ink-2)">Every time you go live. What you kept is in Lumens, with your questions as asides; the rest is listed here for 30 days.</p><div class="ll-sessions">${SESSIONS.map((s) => sessionRow(s)).join("")}</div>`);
+    learnShell(`${header("Live sessions")}<p class="ll-lede" style="margin:0 0 16px;max-width:66ch;font-size:13.5px;line-height:1.5;color:var(--ink-2)">A live session is Studiolo talking you through something, with you cutting in. Each one is saved here when you end it or leave, for 30 days. <b style="color:var(--ink);font-weight:500">Resume</b> picks up at the slide where you stopped, with everything said so far. What you keep becomes a Lumen.</p><div class="ll-sessions">${SESSIONS.map((s) => sessionRow(s)).join("")}</div>`);
     dock({ ctx: "Learn · Live sessions", chips: ["How do wind catchers actually cool a house?"] });
   }
 
@@ -25794,7 +25888,7 @@ html.theme-switching::view-transition-new(root) {
     ld.dataset.captioning = "false";
     if (h.k < 2) { setState("listening"); TX.interim(null); return; }
     const said = h.phrase.split(/\s+/).slice(0, Math.max(h.k, h.phrase.split(/\s+/).length)).join(" ");
-    if (h.where === "hero") { TX.interim(null); return startNew(said); }
+    if (h.where === "hero") { TX.interim(null); if (S.mode2 === "lumen") { const i = $("#ll-hero-in", root); if (i) { i.value = said; i.focus(); } return; } return startNew(said); }
     TX.interim(null);
     deliver(said, { spoken: true });
   }
@@ -25950,6 +26044,8 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   const SES = {
     L: null, beats: [], i: 0, mode: "recorded", asides: 0, rewrites: 0, kept: false, streaming: false, ctl: null, secs: 0, tick: null, origin: null,
     open(L, { mode, from = 0, origin = "lumen" }) {
+      leaveStudio();
+      this.sid = null; this.lastSaid = null; this.heard = null;
       this.L = L; this.mode = mode; this.i = from; this.asides = 0; this.rewrites = 0; this.kept = false; this.origin = origin; this.secs = 0;
       this.beats = L.beats ? [titleBeat(L), ...L.beats.map((b) => beat(b))] : [titleBeat(L)];
       S.view = "studio";
@@ -25959,13 +26055,13 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       dock({ ctx: `Lumen · ${L.title}`, chips: [] });
       this.rail(); this.show(this.i);
       clearInterval(this.tick);
-      this.tick = setInterval(() => { if (this.mode === "live") { this.secs++; const p = $(".ll-livepill", root); if (p) p.lastChild.textContent = ` Live · ${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")}`; } }, 1000);
+      this.tick = setInterval(() => { if (this.mode === "live") { this.secs++; const p = $(".ll-livepill", root); if (p) p.lastChild.textContent = ` Live session · ${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")}`; } }, 1000);
       this.paintMode();
     },
     markup() {
       const L = this.L;
       return `<header class="destination-header"><div class="destination-crumb"><strong>Learn</strong><i aria-hidden="true">/</i><span>Lumens</span><i aria-hidden="true">/</i><span>${esc(L.title)}</span></div></header>
-        <div class="ll-studio-head"><h1>${esc(L.title)}</h1><span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
+        <div class="ll-studio-head"><h1>${esc(L.title)}</h1><span class="ll-livepill" data-state="ended"><span class="xp-dot" aria-hidden="true"></span> Lumen · recording</span>${L.anchor ? tag(L) : ""}<span class="sp"></span>
           <span class="ll-seg" role="group" aria-label="Mode"><button type="button" data-mode="recorded" aria-pressed="true">Recording</button><button type="button" data-mode="live" aria-pressed="false">Live</button></span>
           <button class="button button-quiet" type="button" data-act="keep" disabled title="Keep becomes available once you've changed the Lumen live">Keep this version</button></div>
         <div class="ll-studio"><div class="ll-stagecol">
@@ -25995,7 +26091,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       const live = this.mode === "live";
       S.line = live;
       $$("[data-mode]", root).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === this.mode)));
-      const pill = $(".ll-livepill", root); if (pill) { pill.dataset.state = live ? "live" : "ended"; pill.lastChild.textContent = live ? " Live · 0:00" : " Recording"; }
+      const pill = $(".ll-livepill", root); if (pill) { pill.dataset.state = live ? "live" : "ended"; pill.lastChild.textContent = live ? ` Live session · ${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")}` : " Lumen · recording"; }
       LD.input.placeholder = live ? "Say or type: stop, a question, another way…" : "Type a question for a written answer, or go live";
       if (!live) setChips(["Go live from this slide", "What's on this slide?", "Play the recording"]);
     },
@@ -26034,23 +26130,47 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     },
 
     /* Live mode. */
-    async goLive(from) {
+    async goLive(from, { recap } = {}) {
       if (!BROWSER_OK && !(await browserNote())) return;
       if (from !== undefined) this.i = from;
+      if (!this.sid) this.sid = "s" + ++uid;
       this.mode = "live"; this.paintMode();
-      TX.event(`Live from slide ${this.i + 1}. The line is open; you can cut in at any point.`);
-      await this.loop(true);
+      if (!recap) TX.event(`Live session from slide ${this.i + 1}. The line is open; you can cut in at any point.`);
+      await this.loop(true, recap);
+    },
+    /** Saves this live session so it can be resumed: where it stopped, the slides as changed, everything said. */
+    save(note) {
+      if (!this.sid) return;
+      let s = SESSIONS.find((x) => x.id === this.sid);
+      if (!s) { s = { id: this.sid, days: 30 }; SESSIONS.unshift(s); }
+      if (note) TX.event(note);
+      Object.assign(s, { L: this.L, saved: this.beats.slice(), i: Math.min(this.i, this.beats.length - 1), total: this.beats.length, title: this.L.title, when: "Today", mins: Math.max(1, Math.round(this.secs / 60)), secs: this.secs, said: this.lastSaid || s.said || "", kept: this.kept, lumen: this.kept ? this.L.id + "-kept" : s.lumen, asides: this.asides, rewrites: this.rewrites, tx: TX.body ? TX.body.innerHTML : s.tx, ended: false });
+    },
+    resume(s) {
+      this.open(s.L || MASS, { mode: "recorded" });
+      if (s.saved) this.beats = s.saved.slice();
+      this.sid = s.id; this.i = Math.min(s.i, this.beats.length - 1);
+      this.asides = s.asides || 0; this.rewrites = s.rewrites || 0; this.kept = !!s.kept; this.secs = s.secs || s.mins * 60; this.lastSaid = s.said;
+      if (s.tx) TX.body.innerHTML = s.tx;
+      else for (const [k, a, b] of s.seed || []) { if (k === "ev") TX.event(a); else if (k === "you") TX.you(a, "said"); else { const e = TX.narrator(a, b); e.classList.add("done"); } }
+      TX.add(`Resumed · ${s.when === "Today" ? "today" : s.when}'s session, at slide ${this.i + 1}`, "ev resumed");
+      if (this.kept) { const k = $('[data-act="keep"]', root); if (k) { k.disabled = true; k.textContent = "Kept"; } }
+      else if (this.asides + this.rewrites) this.changed();
+      this.show(this.i);
+      const at = this.beats[this.i];
+      begin(() => this.goLive(undefined, { recap: `Welcome back. We stopped at slide ${this.i + 1}, ${at.title}.${s.said ? ` Last time you asked: ${s.said}` : ""} I'll carry on from there.` }));
     },
     async endLive() {
       this.mode = "recorded"; this.paintMode(); hush(); this.playing(false); STG.writing(null);
       const changes = this.asides + this.rewrites;
-      TX.card(`<h5>Back to the recording</h5><dl><dt>This session</dt><dd>${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")} live · ${this.asides} question${this.asides === 1 ? "" : "s"} · ${this.rewrites} slide${this.rewrites === 1 ? "" : "s"} reworded</dd><dt>Keep</dt><dd>${changes ? "Keep this version saves the Lumen as you shaped it, with your questions as asides. It's voiced the first time you play it." : "Nothing changed, so there's nothing to keep."}</dd></dl>`);
-      SESSIONS.unshift({ title: this.L.title, when: `Today · ${Math.max(1, Math.round(this.secs / 60))} min`, said: this.lastSaid || "—", kept: false, n: this.asides, meta: "Live session" });
+      this.save();
+      TX.card(`<h5>Back to the recording</h5><dl><dt>This session</dt><dd>${Math.floor(this.secs / 60)}:${String(this.secs % 60).padStart(2, "0")} live · ${this.asides} question${this.asides === 1 ? "" : "s"} · ${this.rewrites} slide${this.rewrites === 1 ? "" : "s"} reworded</dd><dt>Keep</dt><dd>${changes ? "Keep this version saves the Lumen as you shaped it, with your questions as asides. It's voiced the first time you play it." : "Nothing changed, so there's nothing to keep."}</dd><dt>Saved</dt><dd>This session is in Learn → Live sessions for 30 days. Resume picks up at slide ${this.i + 1}.</dd></dl>`);
+      this.save();
     },
-    async loop(intro) {
+    async loop(intro, recap) {
       const INT = ["Stop", "Explain that another way", "Simpler", "Go deeper", "From my field", "Test me", "Skip", "Back", "End live"];
       this.playing(true);
-      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); await this.say(this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like.", e, []); }
+      if (intro) { setChips(INT, "interrupt"); const e = TX.narrator(this.i + 1, ""); const r = await this.say(recap || (this.i === 0 ? `${this.L.intro || this.L.q} Cut in whenever you like.` : "I'll take it from this slide. Cut in whenever you like."), e, []); if (r.heard) this.heard = r.heard; }
       while (this.mode === "live") {
         if (this.heard) { const h = this.heard; this.heard = null; await this.handle(h, true); continue; }
         if (this.i >= this.beats.length) {
@@ -26191,7 +26311,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       const k = $('[data-act="keep"]', root); if (k) { k.disabled = true; k.textContent = "Kept"; k.className = "button button-quiet"; }
       const topic = this.L.anchor ? this.L.anchor[1] : "your map";
       S.journal.push({ topic, html: `Live session on <b>${esc(this.L.title)}</b>: ${this.asides} question${this.asides === 1 ? "" : "s"}, ${this.rewrites} slide${this.rewrites === 1 ? "" : "s"} reworded. Kept as a Lumen.` });
-      if (SESSIONS[0]?.title === this.L.title) SESSIONS[0].kept = true;
+      this.save();
       if (!LUMENS.some((l) => l.id === this.L.id + "-kept")) LUMENS.unshift({ ...this.L, id: this.L.id + "-kept", beats: null, status: "kept", made: "live", when: "Today", meta: `Live · ${this.asides} asides`, dur: this.L.dur || "5:00" });
       toast("Kept as a Lumen.", `Your version, with ${this.asides} aside${this.asides === 1 ? "" : "s"}, is in Learn and on ${esc(topic)}. It's voiced the first time you play it.`);
       TX.event(`Kept. A line was added to ${topic}'s journal in Loci; its chat is untouched.`);
@@ -26204,9 +26324,10 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     if (!BROWSER_OK && !(await browserNote())) return;
     const L = { id: "new" + ++uid, title: q.replace(/\?$/, "").slice(0, 60), q, subject: anchor || "Live", anchor: anchor ? ["Culture & Context", anchor] : null, dur: "≈4:00", meta: "Live Lumen · being written", intro: "", beats: null };
     SES.open(L, { mode: "recorded", origin: "new" });
+    SES.sid = "s" + ++uid;
     SES.mode = "live"; SES.paintMode();
     TX.you(q, "said");
-    TX.event("Making a Lumen. It's performed live as it's written, and saved to Learn when you keep it.");
+    TX.event("Live session started. Studiolo writes the slides as it talks; keep it at the end to save it as a Lumen.");
     SES.streaming = true; SES.rail();
     // The writer belongs to this Lumen, not to a turn: interrupting the narrator never stops the slides being written.
     const mine = () => SES.L === L;
@@ -26241,6 +26362,34 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     writer.catch(() => {});
   }
 
+  /** "Make a Lumen": the normal explain. Written and voiced in the background; nothing to talk to until you go live. */
+  async function makeLumen(q, anchor) {
+    q = String(q || "").trim(); if (!q) return;
+    const L = { id: "made" + ++uid, title: q.replace(/\?$/, "").slice(0, 60), q, subject: anchor || "Asked in Learn", anchor: null, dur: "…", when: "Today", status: "making", made: "topic", area: "Asked in Learn", meta: "Being made", writingLabel: "Writing", beats: [] };
+    LUMENS.unshift(L); DECKS[L.id] = L;
+    const hi = $("#ll-hero-in", root); if (hi) hi.value = "";
+    if (S.view === "home") renderHome();
+    toast("Making your Lumen.", "It's being written and voiced. Keep working; it'll be ready in Recent Lumens in about a minute.");
+    const label = (t) => { L.writingLabel = t; $$(`[data-lumen="${L.id}"] .ll-wr`, root).forEach((x) => (x.textContent = t)); };
+    if (S.ai) {
+      let n = 0;
+      try {
+        await streamLines(`${LEARNER}\nMake a Lumen: a narrated slide explainer for this learner to watch later.\n${anchor ? `It's about their topic "${anchor}".\n` : ""}They asked: "${q}"\nReply with JSON Lines only. First line: {"title":"at most 7 words","question":"the question in one line","intro":"one spoken opening sentence, under 25 words"}. Then 5 slide lines, using at least two slide types, building from the basics to one practical takeaway.\n${FORMAT}`, (o) => {
+          if (o.question !== undefined && !L.intro) { L.title = o.title || L.title; L.q = o.question || q; L.intro = o.intro || ""; $$(`[data-lumen="${L.id}"] .lx-title a`, root).forEach((x) => (x.textContent = L.title)); return; }
+          if (o.title && o.say) { L.beats.push(o); label(`Writing · slide ${++n + 1}`); }
+        });
+      } catch (e) { try { aiFail(e); } catch { /* stopped */ } }
+    }
+    if (L.beats.length < 2) {
+      Object.assign(L, { title: MALQAF.title, q: MALQAF.q, intro: MALQAF.intro, subject: MALQAF.subject, anchor: MALQAF.anchor, quiz: MALQAF.quiz, answers: MALQAF.answers, whats: MALQAF.whats, beats: [] });
+      for (let i = 0; i < MALQAF.beats.length; i++) { await sleep(1300); L.beats.push(MALQAF.beats[i]); label(`Writing · slide ${i + 2}`); }
+    }
+    label("Voicing");
+    await sleep(1800);
+    L.status = "new"; L.fresh = true; L.dur = `${Math.max(2, Math.round(L.beats.length * 0.7))}:${String((L.beats.length * 17) % 60).padStart(2, "0")}`; L.meta = `${L.dur} · narrated`;
+    if (S.view === "home" || S.view === "lumens") (S.view === "home" ? renderHome : renderLumens)();
+    toast("Your Lumen is ready.", `“${esc(L.title)}” is in Recent Lumens. <a href="#play-${L.id}" class="vtoast-action">Play it</a>`);
+  }
   function browserNote() {
     return new Promise((resolve) => {
       const w = document.createElement("div");
@@ -26254,22 +26403,30 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     const h = document.createElement("div"); h.className = "vtoasts start ll-t"; h.setAttribute("role", "status");
     h.style.cssText = "bottom:96px;left:calc(var(--t-rail) + 16px)";
     h.innerHTML = `<div class="vtoast"><b>${title}</b><button aria-label="Dismiss" type="button">×</button><p>${body}</p></div>`;
-    h.addEventListener("click", (e) => { if (e.target.closest("button")) h.remove(); });
+    h.addEventListener("click", (e) => { const a = e.target.closest('a[href^="#play-"]'); if (a) { e.preventDefault(); h.remove(); return playLumen(a.getAttribute("href").slice(6)); } if (e.target.closest("button")) h.remove(); });
     document.body.appendChild(h); setTimeout(() => h.remove(), 8000);
   }
 
   /* ================================================================ other screens */
-  function goToday() { S.view = "today"; S.run++; hush(); shell("today"); railCurrent("/today"); ld.hidden = true; }
-  function goLibrary() { S.view = "library"; S.run++; hush(); shell("library"); railCurrent("/library"); ld.hidden = true; }
+  /** Leaving the studio while live (another tab, page or Lumen) saves the session so it can be resumed. */
+  function leaveStudio() {
+    if (S.view === "studio" && SES.sid && SES.mode === "live") {
+      SES.save(`You left at slide ${SES.i + 1}. Session saved.`);
+      SES.mode = "recorded"; S.line = false; hush(); if (speaking) speaking.cut(null);
+      toast("Live session saved.", "Resume it from Learn → Home or Live sessions, at the slide where you stopped.");
+    }
+  }
+  function goToday() { leaveStudio(); S.view = "today"; S.run++; hush(); shell("today"); railCurrent("/today"); ld.hidden = true; }
+  function goLibrary() { leaveStudio(); S.view = "library"; S.run++; hush(); shell("library"); railCurrent("/library"); ld.hidden = true; }
   function goGraph() {
-    S.view = "graph"; S.run++; hush(); shell("climate"); railCurrent("/graph");
+    leaveStudio(); S.view = "graph"; S.run++; hush(); shell("climate"); railCurrent("/graph");
     const body = $(".cp .cp-body", root);
     const lines = S.journal.filter((j) => j.topic === "Climate-responsive design");
     if (body && lines.length) { body.insertAdjacentHTML("beforeend", `<div class="cp-thread" role="log"><div class="day">Today</div>${lines.map((j) => `<div class="msg jl"><span aria-hidden="true" class="ico">✓</span><span>${j.html}</span></div>`).join("")}</div>`); $(".cp-empty", body)?.remove(); }
     dock({ ctx: "Loci · Climate-responsive design", chips: ["Explain Climate-responsive design live", "Go live on How a malqaf moves air"] });
   }
   function goCourse() {
-    S.view = "course"; S.run++; hush(); shell("course"); railCurrent("/learn");
+    leaveStudio(); S.view = "course"; S.run++; hush(); shell("course"); railCurrent("/learn");
     const ask = $(".xp-askbtn", root); if (ask) ask.insertAdjacentHTML("beforebegin", `<button class="button button-quiet ll-live-btn" type="button" data-golive="darwin2" style="min-height:0;padding:5px 10px;font-size:12.5px;margin-right:6px">${I.mic}Go live</button>`);
     dock({ ctx: "Course · Origin of Species, part 2", chips: ["Go live on this part", "Quiz me on part 2"] });
   }
@@ -26299,7 +26456,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       if (h === "/today" || a.matches(".brand-row")) return goToday();
       if (h === "/library") return goLibrary();
       if (h === "/graph") return goGraph();
-      if (h.startsWith("#play-")) { const L = LUMENS.find((x) => x.id === h.slice(6)) || MALQAF; const deck = DECKS[L.id] || (L.id.endsWith("-kept") ? DECKS[L.id.replace("-kept", "")] : null) || { ...MALQAF, ...L, beats: MALQAF.beats }; SES.open(deck, { mode: "recorded", from: L.id === "malqaf" ? 3 : 0 }); return begin(() => SES.playRecorded()); }
+      if (h.startsWith("#play-")) return playLumen(h.slice(6));
       if (h.startsWith("#course-")) return goCourse();
       if (/^Learn$|Lumens/.test(a.textContent.trim()) && S.view === "course") return openTab("lumens");
       return;
@@ -26312,8 +26469,11 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
       return;
     }
     if (b.dataset.tab) return openTab(b.dataset.tab);
-    if (b.dataset.golive) { const L = DECKS[b.dataset.golive] || { ...MALQAF, ...LUMENS.find((x) => x.id === b.dataset.golive), beats: MALQAF.beats }; SES.open(L, { mode: "recorded", from: b.dataset.golive === "malqaf" ? 3 : 1 }); return begin(() => SES.goLive()); }
-    if (b.dataset.start) return startNew(b.dataset.start, b.querySelector("small")?.textContent);
+    if (b.dataset.golive) { const made = LUMENS.find((x) => x.id === b.dataset.golive); if (made?.fresh) made.fresh = false; const L = DECKS[b.dataset.golive] || { ...MALQAF, ...LUMENS.find((x) => x.id === b.dataset.golive), beats: MALQAF.beats }; SES.open(L, { mode: "recorded", from: b.dataset.golive === "malqaf" ? 3 : 1 }); return begin(() => SES.goLive()); }
+    if (b.dataset.start) return explain(b.dataset.start);
+    if (b.dataset.kind && b.closest(".ll-mode")) return setKind(b.dataset.kind);
+    if (b.dataset.resume) { const ss = SESSIONS.find((x) => x.id === b.dataset.resume); if (ss) return SES.resume(ss); return; }
+    if (b.dataset.livenow) { const L = LUMENS.find((x) => x.id === b.dataset.livenow); return startNew(L ? L.q : ""); }
     if (b.dataset.area !== undefined) { S.filter.area = b.dataset.area; return renderLumens(); }
     if (b.dataset.f) { S.filter[b.dataset.f] = b.dataset.v; return renderLumens(); }
     if (b.dataset.mode && S.view === "studio") { if (b.dataset.mode === "live" && SES.mode !== "live") return begin(() => SES.goLive()); if (b.dataset.mode === "recorded" && SES.mode === "live") return begin(() => SES.endLive()); return; }
@@ -26326,10 +26486,18 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   document.addEventListener("submit", (e) => {
     const f = e.target.closest('[data-form="hero"]');
     e.preventDefault();
-    if (f) startNew($("#ll-hero-in", root).value);
+    if (f) { const v = $("#ll-hero-in", root).value; if (v.trim()) explain(v); else $("#ll-hero-in", root).focus(); }
   });
   document.addEventListener("input", (e) => { if (e.target.id === "ll-q") { S.filter.q = e.target.value; clearTimeout(S.qT); S.qT = setTimeout(() => { renderLumens(); const i = $("#ll-q", root); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); } });
-  function openTab(k) { S.run++; hush(); clearInterval(SES.tick); ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions })[k](); window.scrollTo(0, 0); }
+  function playLumen(id) {
+    const L = LUMENS.find((x) => x.id === id) || MALQAF;
+    if (L.status !== "making") L.fresh = false;
+    if (L.status === "making") { toast("Still being written.", `“${esc(L.title)}” will be ready in about a minute. Or talk it through live now.`); return; }
+    const deck = DECKS[L.id] || (L.id === "kept1" ? MASS : null) || (L.id.endsWith("-kept") ? DECKS[L.id.replace("-kept", "")] : null) || { ...MALQAF, ...L, beats: MALQAF.beats };
+    SES.open(deck, { mode: "recorded", from: L.id === "malqaf" ? 3 : 0 });
+    begin(() => SES.playRecorded());
+  }
+  function openTab(k) { leaveStudio(); S.run++; hush(); clearInterval(SES.tick); ({ home: renderHome, lumens: renderLumens, courses: renderCourses, sessions: renderSessions })[k](); window.scrollTo(0, 0); }
 
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");

@@ -33,13 +33,34 @@ Status: **draft for owner review**, 22 October 2026. This is a design and protot
 
 ## Screens
 
+### Two ways to explain: a Lumen or a live session
+
+The two are named differently everywhere and never share a button label.
+
+| | **Make a Lumen** (the default) | **Start a live session** |
+|---|---|---|
+| What happens | Studiolo writes and voices a normal 2–6 minute Lumen **in the background**, as it does today. You keep working. | Studiolo **talks you through it now**, drawing slides as it goes. You can cut in at any point. |
+| Where it shows | A "Making a Lumen · *question*" row under the bar ("Writing", then "Voicing"). It turns into "Lumen ready · Play · Go live", and a toast says "Your Lumen is ready" with a Play link. The card in Recent Lumens is marked "Being made". | The studio opens in Live mode straight away. |
+| Cost | The usual Lumen cost. No voice minutes. | Voice minutes (the `voice_session` hold). |
+| Afterwards | It's a Lumen like any other: play it, or **Go live** on it later. | It's saved as a live session (see Resume). **Keep this version** turns it into a Lumen. |
+
+- **How you choose:** a two-way switch at the start of the Home bar, **Lumen | Live**. The button follows it ("Make a Lumen" or "Start live session"). A one-line hint under the bar says what the choice does, and in Live mode it adds "Uses voice minutes". The switch remembers your last choice.
+- **Switching late:** while a Lumen is being made, its row offers **Talk it through live instead**.
+- **The mic:** in Lumen mode, holding the mic fills in the question. In Live mode, it starts the session.
+- The same names are used elsewhere: **Go live** on a Lumen and **Take Part N live** on a course both start a live session.
+
+### Resuming a live session
+
+- **Saved automatically.** A live session is saved when you press **End live**, and also when you leave the studio (another tab, Today, the Library or Loci). Leaving shows the toast "Live session saved". What's saved: the slides as they were (rewrites and asides included), the slide you stopped on, and the transcript.
+- **Kept for 30 days.** Each session lists how many days are left. **Keep this version** makes a permanent Lumen, so a kept session can be resumed *and* played.
+- **Where to resume from:**
+  1. **Learn Home:** "Resume live session · *title* · slide N", next to the bar. It shows only when there's a session from the last 30 days.
+  2. **Live sessions tab:** one row per session ("Stopped at slide N of M · Tuesday · 3 min live · you asked …", kept or not, "Resumable for N more days") with **Resume**, and **Play the Lumen** when it was kept.
+- **What Resume does:** it opens the studio on the saved slides and transcript, adds a "Resumed" line, and goes live with a short recap: "Welcome back. We stopped at slide 3, *title*. Last time you asked: … I'll carry on from there." This recap is a small narrator call with the saved transcript as context.
+
 ### Learn Home
-1. **Live bar (slim):** a one-line title ("Live · What do you want to understand?") with a link to recent sessions, one input bar (hold-to-talk mic and **Explain live**), and one line of ideas. No card. On Home the floating talk bar stays hidden until this bar scrolls out of view.
-   *Earlier draft (replaced):*
-   - "What do you want to understand?" with an input, a hold-to-talk mic and **Explain live**.
-   - Starter ideas from My Focus, the map and courses.
-   - A three-step "how it works" (talk or type, cut in, keep it).
-   - Recent live sessions.
+1. **The bar (slim):** "What do you want to understand?" with the Resume link and "All sessions →" beside it. Then one input bar: the **Lumen | Live** switch, the question, the hold-to-talk mic and the action button. Then the hint line and one line of ideas. No card. Below the bar sit the Lumens being made or just ready. On Home the floating talk bar stays hidden until this bar scrolls out of view.
+   *Earlier drafts (replaced):* a single **Explain live** button; before that, a card with a three-step "how it works" and the recent sessions.
 2. **Continue:** the existing `.lx-cont` card, with **Go live from slide N** beside Resume.
 3. **Courses:** cards with a segmented parts bar (watched, current, to come) and the next part.
 4. **Recent Lumens:** the existing `.lx-card` grid. Each card gains **Go live**, and kept live versions are badged "Live · N asides".
@@ -51,7 +72,7 @@ The existing area chips (`.lx-filter`), plus search, "Made from" (A topic, Your 
 One row per course: poster, progress bar, **Continue: Part N** and **Take Part N live**, and the outline with watched and current parts.
 
 ### Live sessions
-Each time you went live: what you asked, whether anything was kept, and a 30-day list.
+Each time you went live, kept for 30 days, with **Resume** on every row (see "Resuming a live session").
 
 ### The studio (the Lumen player, Recording / Live)
 - **Head:**
@@ -94,5 +115,6 @@ Each time you went live: what you asked, whether anything was kept, and a 30-day
 
 1. Asides as a new node kind or a flag on `say` nodes (migration, HIGH tier).
 2. Whether Keep replaces the original Lumen or saves alongside it. **Recommendation:** alongside, linked as "Live version of …".
-3. How long Live sessions are kept (the prototype says 30 days) and whether transcripts are stored at all. Earlier recommendation V-D6: only if kept.
+3. How long Live sessions are kept (the prototype says 30 days). Resume needs the session's slides and transcript stored for that time, which changes earlier recommendation V-D6 (store transcripts only if kept). **Recommendation:** store them for 30 days, then delete unless kept.
 4. Whether Explain live on Loci opens Learn's studio (the prototype does) or plays in the Loci player panel. **Recommendation:** Learn's studio for slice 1.
+5. Whether the Home switch defaults to **Lumen** every time (the prototype remembers your last choice). **Recommendation:** remember it, but start new users on Lumen.

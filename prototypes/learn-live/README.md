@@ -6,12 +6,15 @@ Open `dist/learn-live-prototype.html`. It's published as a claude.ai artifact th
 
 ## Try it
 
-1. **Learn → Home.** Type a question, or hold the mic (or hold Space) and watch your words appear as you "speak". Then press **Explain live**. A Lumen is written and performed live, slide by slide.
-2. **While it talks**, cut in from the talk bar: Stop, Explain that another way, Simpler, Go deeper, From my field, Test me, Skip, Back. You can also type or "say" a question (it becomes an aside slide), or **tap part of a slide** to ask what it is.
-3. **Go live** on any Lumen card, or "Go live from slide 4" on Continue. **End live** goes back to the recording. **Keep this version** saves it with your questions as asides and adds a journal line to the topic in Loci.
-4. **In Recording mode**, typing a question gets a written answer, which uses no voice minutes.
-5. **Lumens**, **Courses** and **Live sessions** tabs: browse, filter, "Take Part N live".
-6. The **talk bar** shows only in Learn and on the Graph (Loci). Today and the Library don't have it.
+1. **Learn → Home: choose Lumen or Live** with the switch at the start of the bar.
+   - **Lumen** (the normal explain): type a question and press **Make a Lumen**. It's written and voiced in the background. A "Making a Lumen" row shows progress, then "Lumen ready · Play · Go live", and a toast links to it.
+   - **Live**: press **Start live session** (or hold the mic, or hold Space, and watch your words appear as you "speak"). A Lumen is written and performed live, slide by slide.
+2. **Resume a live session:** use the "Resume live session" link on Home, or **Resume** on any row in the **Live sessions** tab. The narrator recaps where you stopped and what you asked, then carries on. Sessions are saved when you end one or leave the studio.
+3. **While it talks**, cut in from the talk bar: Stop, Explain that another way, Simpler, Go deeper, From my field, Test me, Skip, Back. You can also type or "say" a question (it becomes an aside slide), or **tap part of a slide** to ask what it is.
+4. **Go live** on any Lumen card, or "Go live from slide 4" on Continue. **End live** goes back to the recording. **Keep this version** saves it with your questions as asides and adds a journal line to the topic in Loci.
+5. **In Recording mode**, typing a question gets a written answer, which uses no voice minutes.
+6. **Lumens**, **Courses** and **Live sessions** tabs: browse, filter, "Take Part N live".
+7. The **talk bar** shows only in Learn and on the Graph (Loci). Today and the Library don't have it.
 
 ## Real or simulated
 

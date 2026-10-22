@@ -17,7 +17,8 @@
 
 /* ---------- the live hero (Home) ---------- */
 /* Slim: a title line, one input bar, one line of ideas. No card; the bar is the only raised element. */
-.ll-hero { display: grid; gap: 10px; margin: 2px 0 30px; }
+.ll-hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 2px 0 30px; }
+.ll-hero > * { min-width: 0; }
 .ll-hero-top { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
 .ll-hero h2 { display: flex; align-items: baseline; gap: 10px; margin: 0; min-width: 0; font-family: var(--read); font-size: 22px; font-weight: 400; line-height: 1.2; }
 .ll-kick { display: inline-flex; align-items: center; gap: 6px; flex: none; font-family: var(--ui); font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn); transform: translateY(-2px); }
@@ -29,6 +30,40 @@
 .ll-ask:focus-within { box-shadow: var(--shadow-lift), inset 0 0 0 1px var(--ink-3); }
 .ll-ask input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-family: var(--read); font-size: 17px; color: var(--ink); padding: 0; }
 .ll-ask input::placeholder { color: var(--ink-2); }
+.ll-mode { display: inline-flex; flex: none; gap: 2px; padding: 3px; margin-left: -12px; border-radius: 20px; background: var(--surface-board); }
+.ll-mode button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 16px; font-size: 13px; color: var(--ink-2); }
+.ll-mode button:hover { color: var(--ink); }
+.ll-mode button[aria-checked="true"] { background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-pic); font-weight: 500; }
+.ll-mode button:focus-visible { outline: var(--focus-ring); }
+.ll-mode .xp-dot { width: 6px; height: 6px; color: var(--warn); }
+.ll-mode button[aria-checked="false"] .xp-dot { animation: none; opacity: 0.5; }
+.ll-go .xp-dot { width: 6px; height: 6px; margin-right: 7px; color: var(--on-accent); vertical-align: 1px; }
+.ll-works { display: grid; gap: 6px; margin-top: 4px; }
+.ll-work { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 7px 8px 7px 14px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; }
+.ll-work .lx-dot { flex: none; color: var(--accent); }
+.ll-work .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+.ll-work .t b { font-weight: 600; color: var(--ink); }
+.ll-work .ll-wr { flex: none; font-size: 12px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.ll-work .ll-chip { flex: none; }
+.ll-work.is-ready { box-shadow: inset 0 0 0 1px var(--accent-soft); background: color-mix(in srgb, var(--accent-soft) 45%, var(--panel)); }
+.ll-work .ok { flex: none; color: var(--ok); font-weight: 600; }
+.ll-work .button { flex: none; min-height: 0; padding: 5px 12px; font-size: 12.5px; border-radius: 2px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.ll-work .button svg { width: 14px; height: 14px; }
+.ll-hint { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.ll-hint b { font-weight: 600; color: var(--ink); }
+.ll-resume-link { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-width: 0; margin-left: auto; padding: 4px 11px 4px 8px; border-radius: 14px; font-size: 12.5px; color: var(--accent); background: var(--accent-soft); white-space: nowrap; overflow: hidden; }
+.ll-resume-link span { overflow: hidden; text-overflow: ellipsis; }
+.ll-resume-link b { font-weight: 600; }
+.ll-resume-link svg { flex: none; width: 14px; height: 14px; }
+.ll-resume-link:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.ll-resume-link:focus-visible { outline: var(--focus-ring); }
+.ll-resume-link + .ll-more { margin-left: 12px !important; }
+.ll-srow .ll-keep { margin: 6px 0 0; display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-2); }
+.ll-srow .ll-acts { margin: 0; }
+.ll-srow .ll-acts .button { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.ll-srow .ll-acts svg { width: 14px; height: 14px; }
+.ll-t.ev.resumed { justify-content: center; margin: 4px 0; color: var(--accent); font-weight: 500; }
+.ll-t.ev.resumed::before { content: "↻"; color: var(--accent); }
 .ll-ask .ll-mic { width: 40px; height: 40px; background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); }
 .ll-ask .ll-mic:hover { background: var(--accent-soft); filter: none; }
 .ll-go { all: unset; box-sizing: border-box; cursor: pointer; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--accent); color: var(--on-accent); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
@@ -228,6 +263,16 @@
 @media (max-width: 760px) {
   .ll-hero h2 { font-size: 19px; }
   .ll-hero-top .ll-more { display: none; }
+  .ll-hero-top { flex-wrap: wrap; }
+  .ll-resume-link { margin-left: 0; max-width: 100%; }
+  .ll-mode { margin-left: -8px; }
+  .ll-mode button { padding: 5px 9px; }
+  .ll-go { padding: 0 12px; font-size: 12.5px; }
+  .ll-go .xp-dot { display: none; }
+  .ll-ask [data-mic="hero"] { display: none; }
+  .ll-hint { padding-left: 0; }
+  .ll-work { flex-wrap: wrap; }
+  .ll-work .t { white-space: normal; flex-basis: 100%; }
   .ll-ask { padding-left: 14px; }
   .ll-go { padding: 0 12px; }
   .ll-starters { padding-left: 0; }
