@@ -2,6 +2,8 @@ HIGH (a programme of seven phases; each phase states its own tier)
 
 # Learn v2: one Lumen, three formats, then Live. Implementation overview
 
+> **Superseded for order and scope** by [`2026-10-23-learn-roadmap-design.md`](2026-10-23-learn-roadmap-design.md) (the owner's five phases, 23 Oct 2026). Its reuse map (§3) and Listen and Live detail (§6) are still useful references.
+
 **For:** the agent implementing this in `studiolo`. Read it first, then the prototype. **Status:** recommendation by Claude, 22 Oct 2026, for owner approval phase by phase. Nothing here is approved until the owner says so in the conversation.
 
 **Checked against:** `studiolo` main @ `5fbb7f2` (read-only). Every path below exists on that commit unless marked *new*.
