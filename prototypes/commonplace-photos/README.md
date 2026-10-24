@@ -9,8 +9,8 @@ An interactive prototype of the proposal in [`docs/superpowers/specs/2026-10-24-
 | Proposal phase | In the prototype |
 |---|---|
 | 1 The viewer | Open any photo: scroll or pinch to zoom, drag to pan, `Z` for 1:1, `+` `−` `0`, `F` full screen (dark mat), `Space` from the wall, facts block, Copy image |
-| 2 The photo wall | **Photos** chip: Rows, Masonry and Grid, a size slider (`Ctrl +` / `Ctrl −`), sort, group, captions, colour, shape and light filters, colour placeholders while loading |
-| 3 Sorting a pile | **Unsorted**, **Sort photos** (numbers for topics, `K` kind, `P` pick, `A` whole album, `⌫` undo), **Picks**, saved **Views**, Select with a drag box and bulk actions |
+| 2 The photo wall | **Photos** chip opens one slim bar: All · Unsorted · Picks, then **Colour**, **Topic** and **More** (shape, light). On the right: layout icons (Rows, Masonry, Grid) and **Display** (size, sort, group, captions; `Ctrl +` / `Ctrl −`). Kinds stay in the main chip row. Colour placeholders while loading |
+| 3 Sorting a pile | **Unsorted** with **Sort these N** (numbers for topics, `K` kind, `P` pick, `A` whole album, `⌫` undo), **Picks**, saved **Views** as chips in the main row (`⋯` → Save as a View), Select with a drag box and bulk actions |
 | 4 Notes on a detail | In the viewer press `N` and drag a box; `R` shows or hides the boxes |
 | 5 Photos in Loci | Loci → Map: key picture, mood strip, a topic's colours, "See all N photos", **Show on Loci** from any photo filter, the optional key picture in the centre |
 | Shelves | One shelf per photo kind with prints, "Open as a photo wall", an **Unsorted** shelf and a Sorting slot on the desk |

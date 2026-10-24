@@ -153,15 +153,27 @@ button { cursor: pointer; }
 kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); color: var(--ink-2); }
 
 /* ---------- photos mode ---------- */
-.pbar { display: flex; flex-direction: column; gap: 10px; margin: -6px 0 22px; padding: 14px 16px; background: var(--panel); border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); }
-.prow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.prow .chip { height: 28px; font-size: 13px; padding: 0 10px; }
-.prow .grow { flex: 1; }
-.prow label.ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
-.prow select { height: 28px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper); padding: 0 6px; font-size: 12.5px; color: var(--ink); }
-.prow input[type=range] { width: 110px; accent-color: var(--accent); }
-.prow .seg button { height: 26px; font-size: 12.5px; padding: 0 9px; }
-.prow .lab { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 4px 0 6px; }
+.pbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: -10px 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.pbar .seg { padding: 2px; }
+.pbar .seg button { height: 26px; font-size: 12.5px; padding: 0 10px; }
+.pbar .seg .n { color: var(--ink-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.pbar .seg.icons button { padding: 0 7px; }
+.pbar .seg.icons svg { width: 15px; height: 15px; }
+.pbar .vr { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+.pbar .grow { flex: 1; }
+.pbar .star { color: var(--pick); }
+.fbtn { display: inline-flex; align-items: center; height: 30px; border-radius: 15px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.fbtn button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 15px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.fbtn button:hover { color: var(--ink); }
+.fbtn button:focus-visible { outline: 2px solid var(--accent); }
+.fbtn.on { background: var(--accent-soft); box-shadow: none; }
+.fbtn.on button { color: var(--accent-strong); }
+.fbtn .x { padding: 0 10px 0 0; font-size: 11px; }
+.rainbow { background: conic-gradient(#b23a2c, #c99a52, #7c8452, #2f7563, #3f6f87, #6a5a8c, #b23a2c); }
+.dgrid { display: grid; grid-template-columns: 70px 190px; gap: 10px 12px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.pop select { height: 30px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); padding: 0 6px; font-size: 13px; color: var(--ink); width: 100%; }
+.pop input[type=range] { width: 100%; accent-color: var(--accent); }
+.pop .seg button { height: 28px; font-size: 12.5px; }
 .swatch { width: 18px; height: 18px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); flex: none; }
 .chip.active-filter { background: var(--accent-soft); color: var(--accent-strong); }
 .chip.active-filter .x { opacity: .7; margin-left: 2px; }
@@ -424,10 +436,9 @@ kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); borde
   .guide-btn { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
   .guide { bottom: calc(114px + env(safe-area-inset-bottom, 0px)); }
   .bulk { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
-  .prow { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-  .prow > * { flex: none; }
-  .prow .grow { display: none; }
-  .pbar { padding: 10px 12px; gap: 8px; }
+  .pbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .pbar > * { flex: none; }
+  .pbar .grow { display: none; }
   .hud-l { display: none; }
   .qv-hud { left: 8px; right: 8px; top: 8px; justify-content: space-between; }
 }
@@ -686,53 +697,63 @@ function updateCount() {
   else { const n = wallItems().length; el.textContent = `${n} entries · newest first`; }
 }
 function chipsHTML() {
-  const c = S.chip;
-  const chip = (id, label, extra = "") => `<button class="chip" aria-pressed="${c === id}" data-act="chip" data-chip="${id}">${extra}${label}</button>`;
+  const c = S.chip, photos = inPhotosMode();
+  const chip = (id, label, extra = "") => `<button class="chip" aria-pressed="${c === id && !(photos && S.pf.view)}" data-act="chip" data-chip="${id}">${extra}${label}</button>`;
   return `<div class="chips" role="group" aria-label="Filter">
     ${chip("all", "All")}
     ${COLLS.map(k => chip("coll:" + k.id, k.name)).join("")}
     ${KINDS.map(k => chip("kind:" + k.id, k.name)).join("")}
     <span class="sep"></span><span class="lab">Type</span>
     ${chip("type:note", "Notes")}${chip("type:quote", "Quotes")}${chip("type:photo", "Photos")}${chip("type:source", "Sources")}
+    <span class="sep"></span><span class="lab">Views</span>
+    ${S.views.map(v => `<button class="chip view" aria-pressed="${photos && S.pf.view === v.id}" data-act="openview" data-view="${v.id}">${esc(v.name)}</button>`).join("")}
   </div>`;
 }
+const LAYOUT_ICONS = {
+  rows: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="6" height="5" rx="1"/><rect x="8" y="2" width="7" height="5" rx="1"/><rect x="1" y="9" width="9" height="5" rx="1"/><rect x="11" y="9" width="4" height="5" rx="1"/></svg>',
+  masonry: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="8" rx="1"/><rect x="9" y="1" width="6" height="5" rx="1"/><rect x="1" y="11" width="6" height="4" rx="1"/><rect x="9" y="8" width="6" height="7" rx="1"/></svg>',
+  grid: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>',
+};
+const SHAPES = [["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"], ["panorama", "Panorama"]];
+// One slim line: what to show (All, Unsorted, Picks), the three filters that matter, then how to show it.
 function pbarHTML() {
   const f = S.pf, base = PHOTOS.filter(matchesQ);
-  const scope = (id, label, n, cls = "") => `<button class="chip ${cls}" aria-pressed="${f.scope === id && !f.kind && !f.view}" data-act="scope" data-scope="${id}">${label} <span class="n">${n}</span></button>`;
-  const kinds = KINDS.map(k => `<button class="chip" aria-pressed="${f.kind === k.id}" data-act="kind" data-kind="${k.id}">${k.name} <span class="n">${base.filter(p => p.kind === k.id).length}</span></button>`).join("");
-  const views = S.views.map(v => `<button class="chip view" aria-pressed="${f.view === v.id}" data-act="openview" data-view="${v.id}">${esc(v.name)}</button>`).join("");
-  const active = [];
-  if (f.topic) active.push(`<button class="chip active-filter" data-act="clear" data-k="topic">Topic: ${esc(T[f.topic].name)} <span class="x">✕</span></button>`);
-  if (f.colour) active.push(`<button class="chip active-filter" data-act="clear" data-k="colour"><span class="swatch" style="background:${f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex}"></span>${f.colour === "custom" ? "Your colour" : COLOURS.find(c => c.id === f.colour).name} <span class="x">✕</span></button>`);
-  const sel = (id, label, opts, val) => `<label class="ctl">${label}<select id="${id}" data-act="pref" data-k="${id.slice(2)}">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? "selected" : ""}>${l}</option>`).join("")}</select></label>`;
+  const unsorted = base.filter(p => !p.topics.length).length;
+  const scope = (id, label, n) => `<button aria-pressed="${f.scope === id}" data-act="scope" data-scope="${id}">${label} <span class="n">${n}</span></button>`;
+  const fbtn = (on, act, label, k) => `<span class="fbtn ${on ? "on" : ""}"><button data-act="${act}" aria-haspopup="dialog">${label}</button>${on ? `<button class="x" data-act="clear" data-k="${k}" aria-label="Clear">✕</button>` : ""}</span>`;
+  const colourHex = f.colour ? (f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex) : null;
+  const colourLabel = f.colour ? `<span class="swatch" style="background:${colourHex};width:14px;height:14px"></span>${f.colour === "custom" ? "Your colour" : COLOURS.find(c => c.id === f.colour).name}` : `<span class="swatch rainbow" style="width:14px;height:14px"></span>Colour`;
+  const more = [f.shape && SHAPES.find(s => s[0] === f.shape)[1], f.light && (f.light === "dark" ? "Dark" : "Light")].filter(Boolean).join(" · ");
   return `<section class="pbar" aria-label="Photos">
-    <div class="prow">
-      ${scope("all", "All photos", base.length)}
-      ${scope("unsorted", "Unsorted", base.filter(p => !p.topics.length).length, "unsorted")}
-      ${scope("picks", '<span class="star">★</span> Picks', base.filter(p => p.picked).length, "picks")}
-      <span class="lab">Kind</span>${kinds}
-      <span class="lab">Views <span class="new">new</span></span>${views}
-      <button class="chip" data-act="saveview" title="Save these filters as a View">+ Save view</button>
-    </div>
-    <div class="prow">
-      <button class="chip" data-act="colourpop" aria-haspopup="dialog"><span class="swatch" style="background:conic-gradient(#b23a2c,#c99a52,#7c8452,#2f7563,#3f6f87,#6a5a8c,#b23a2c)"></span>Colour</button>
-      <button class="chip" data-act="topicpop" aria-haspopup="dialog">Topic ▾</button>
-      ${sel("f-shape", "Shape", [["", "Any"], ["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"], ["panorama", "Panorama"]], f.shape || "")}
-      ${sel("f-light", "Light", [["", "Any"], ["light", "Light"], ["dark", "Dark"]], f.light || "")}
-      ${active.join("")}
-      <span class="grow"></span>
-      <button class="btn small line" data-act="sortmode" title="Sort the unsorted photos with the keyboard">Sort photos <span class="new">new</span></button>
-      <button class="btn small line" data-act="showloci" title="Highlight the topics that hold these photos">Show on Loci</button>
-    </div>
-    <div class="prow">
-      <div class="seg" role="group" aria-label="Layout">${[["rows", "Rows"], ["masonry", "Masonry"], ["grid", "Grid"]].map(([v, l]) => `<button aria-pressed="${S.ph.layout === v}" data-act="layout" data-v="${v}">${l}</button>`).join("")}</div>
-      <label class="ctl">Size <input id="size" type="range" min="120" max="460" step="10" value="${S.ph.size}" aria-label="Photo size"></label>
-      <span class="grow"></span>
-      ${sel("p-sort", "Sort", [["newest", "Newest"], ["oldest", "Oldest"], ["taken", "Date taken"], ["colour", "Colour"], ["shape", "Shape"], ["res", "Resolution"], ["title", "Title"], ["shuffle", "Shuffle"]], S.ph.sort)}
-      ${sel("p-group", "Group", [["none", "None"], ["area", "Area"], ["topic", "Topic"], ["kind", "Kind"], ["album", "Album"], ["month", "Month taken"], ["colour", "Colour"]], S.ph.group)}
-      ${sel("p-caps", "Captions", [["show", "Show"], ["hover", "On hover"], ["hide", "Hide"]], S.ph.caps)}
-    </div>
+    <div class="seg scope" role="group" aria-label="Show">${scope("all", "All", base.length)}${scope("unsorted", "Unsorted", unsorted)}${scope("picks", '<span class="star">★</span> Picks', base.filter(p => p.picked).length)}</div>
+    <span class="vr"></span>
+    ${fbtn(!!f.colour, "colourpop", colourLabel, "colour")}
+    ${fbtn(!!f.topic, "topicpop", f.topic ? esc(T[f.topic].name) : "Topic ▾", "topic")}
+    ${fbtn(!!more, "morepop", more || "More ▾", "more")}
+    ${f.scope === "unsorted" && unsorted ? `<button class="btn small primary" data-act="sortmode">Sort these ${unsorted}</button>` : ""}
+    <span class="grow"></span>
+    <button class="icon-btn" data-act="menupop" title="Save as view, Show on Loci, Sort photos" aria-label="More actions" aria-haspopup="menu">⋯</button>
+    <div class="seg icons" role="group" aria-label="Layout">${["rows", "masonry", "grid"].map(v => `<button aria-pressed="${S.ph.layout === v}" data-act="layout" data-v="${v}" title="${v[0].toUpperCase() + v.slice(1)}" aria-label="${v}">${LAYOUT_ICONS[v]}</button>`).join("")}</div>
+    <button class="btn small line" data-act="displaypop" aria-haspopup="dialog">Display ▾</button>
   </section>`;
+}
+function displayPopHTML() {
+  const sel = (id, label, opts, val) => `<label for="${id}">${label}</label><select id="${id}" data-act="pref" data-k="${id.slice(2)}">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  return `<h4>Display</h4><div class="dgrid">
+    <label for="size">Size</label><input id="size" type="range" min="120" max="460" step="10" value="${S.ph.size}">
+    ${sel("p-sort", "Sort", [["newest", "Newest"], ["oldest", "Oldest"], ["taken", "Date taken"], ["colour", "Colour"], ["shape", "Shape"], ["res", "Resolution"], ["title", "Title"], ["shuffle", "Shuffle"]], S.ph.sort)}
+    ${sel("p-group", "Group", [["none", "None"], ["area", "Area"], ["topic", "Topic"], ["kind", "Kind"], ["album", "Album"], ["month", "Month taken"], ["colour", "Colour"]], S.ph.group)}
+    ${sel("p-caps", "Captions", [["show", "Show"], ["hover", "On hover"], ["hide", "Hide"]], S.ph.caps)}
+  </div><p class="keys" style="margin:10px 0 0"><kbd>Ctrl</kbd> <kbd>+</kbd> / <kbd>−</kbd> changes the size</p>`;
+}
+function morePopHTML() {
+  const f = S.pf, seg = (k, opts) => `<div class="seg">${[["", "Any"], ...opts].map(([v, l]) => `<button data-pv="${k}:${v}" aria-pressed="${(f[k] || "") === v}">${l}</button>`).join("")}</div>`;
+  return `<h4>Shape</h4>${seg("shape", SHAPES)}<h4 style="margin-top:14px">Light</h4>${seg("light", [["light", "Light"], ["dark", "Dark"]])}`;
+}
+function openSaveView(b) {
+  openPop(b, `<h4>Save as a View</h4><p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-2)">${esc(filterLabel())}, with this layout. A View holds no photos, only the question.</p><form id="vform"><input type="text" id="vname" placeholder="Name this view" aria-label="View name" value=""><div class="row"><span style="flex:1"></span><button class="btn small primary" type="submit">Save view</button></div></form>`, () => { });
+  document.getElementById("vform").addEventListener("submit", ev => { ev.preventDefault(); const name = document.getElementById("vname").value.trim() || filterLabel(); const v = { id: "v" + Date.now(), name, f: { ...S.pf, view: null } }; S.views.push(v); S.pf.view = v.id; closePop(); render(); toast(`Saved the View “${name}”. It sits with your chips.`); });
+  document.getElementById("vname").focus();
 }
 
 /* ================= render: wall ================= */
@@ -1106,7 +1127,7 @@ function openPop(anchor, html, onClick) {
   const r = anchor.getBoundingClientRect(), pw = popEl.offsetWidth, ph = popEl.offsetHeight;
   let left = Math.min(window.innerWidth - pw - 16, Math.max(16, r.left)), top = r.bottom + 6; if (top + ph > window.innerHeight - 10) top = Math.max(10, r.top - ph - 6);
   popEl.style.left = left + "px"; popEl.style.top = top + window.scrollY + "px"; popEl.style.position = "absolute";
-  popEl.addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) onClick(b.dataset.pv, b, e); });
+  popEl.addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) { e.stopPropagation(); onClick(b.dataset.pv, b, e); } });
   (popEl.querySelector("input,button") || popEl).focus?.();
 }
 function topicListHTML(checked = [], withSearch = true) {
@@ -1147,12 +1168,12 @@ document.addEventListener("click", e => {
     case "toast": toast(b.dataset.msg); break;
     case "view": S.view = b.dataset.v; S.sel.on = false; render(); renderBulk(); break;
     case "chip": setChip(b.dataset.chip); break;
-    case "scope": S.pf = { ...S.pf, scope: b.dataset.scope, kind: null, view: null }; S.chip = "type:photo"; render(); break;
+    case "scope": S.pf = { ...S.pf, scope: b.dataset.scope, view: null }; render(); break;
     case "scope-unsorted": enterPhotos({ scope: "unsorted" }); break;
     case "kind": S.pf = { ...S.pf, kind: S.pf.kind === b.dataset.kind ? null : b.dataset.kind, view: null }; S.chip = S.pf.kind ? "kind:" + S.pf.kind : "type:photo"; render(); break;
     case "openkind": enterPhotos({ kind: b.dataset.kind }); break;
     case "openview": { const v = S.views.find(v => v.id === b.dataset.view); S.pf = { custom: null, ...v.f, view: v.id }; S.chip = "type:photo"; render(); break; }
-    case "clear": S.pf[b.dataset.k] = null; S.pf.view = null; render(); break;
+    case "clear": if (b.dataset.k === "more") { S.pf.shape = null; S.pf.light = null; } else S.pf[b.dataset.k] = null; S.pf.view = null; render(); break;
     case "resetpf": enterPhotos({}); break;
     case "layout": S.ph.layout = b.dataset.v; savePrefs(); render(); break;
     case "open": openQV(id); break;
@@ -1162,8 +1183,10 @@ document.addEventListener("click", e => {
     case "colourpop": openPop(b, `<h4>Colour</h4><div class="swgrid">${COLOURS.map(c => `<button data-pv="${c.id}" style="background:${c.hex}" title="${c.name}" aria-label="${c.name}" aria-pressed="${S.pf.colour === c.id}"></button>`).join("")}</div><div class="row"><input type="color" id="custom-c" value="${S.pf.custom || "#b26a3a"}" aria-label="Pick any colour"> Any colour <span style="flex:1"></span>${S.pf.colour ? '<button class="btn small" data-pv="none">Clear</button>' : ""}</div>`, v => { S.pf.view = null; S.pf.colour = v === "none" ? null : v; closePop(); render(); });
       document.getElementById("custom-c")?.addEventListener("change", ev => { S.pf.colour = "custom"; S.pf.custom = ev.target.value; S.pf.view = null; closePop(); render(); }); break;
     case "topicpop": openPop(b, `<h4>Topic</h4>${topicListHTML(S.pf.topic ? [S.pf.topic] : [])}`, v => { S.pf.topic = S.pf.topic === v ? null : v; S.pf.view = null; closePop(); render(); }); hookTopicSearch(); break;
-    case "saveview": openPop(b, `<h4>Save as a View</h4><p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-2)">${esc(filterLabel())}, with this layout. A View holds no photos, only the question.</p><form id="vform"><input type="text" id="vname" placeholder="Name this view" aria-label="View name" value=""><div class="row"><span style="flex:1"></span><button class="btn small primary" type="submit">Save view</button></div></form>`, () => { });
-      document.getElementById("vform").addEventListener("submit", ev => { ev.preventDefault(); const name = document.getElementById("vname").value.trim() || filterLabel(); const v = { id: "v" + Date.now(), name, f: { ...S.pf, view: null } }; S.views.push(v); S.pf.view = v.id; closePop(); render(); toast(`Saved the View “${name}”.`); }); document.getElementById("vname").focus(); break;
+    case "saveview": openSaveView(b); break;
+    case "displaypop": openPop(b, displayPopHTML(), () => { }); break;
+    case "morepop": openPop(b, morePopHTML(), v => { const [k, val] = v.split(":"); S.pf[k] = val || null; S.pf.view = null; closePop(); render(); }); break;
+    case "menupop": openPop(b, `<div class="list" role="menu"><button data-pv="save" role="menuitem">Save as a View…</button><button data-pv="loci" role="menuitem">Show these on Loci</button><button data-pv="sort" role="menuitem">Sort unsorted photos</button></div>`, v => { closePop(); if (v === "save") openSaveView(b); if (v === "loci") showOnLoci(); if (v === "sort") openSM(); }); break;
     case "sortmode": openSM(); break;
     case "showloci": showOnLoci(); break;
     case "close": closeQV(); break;
@@ -1321,10 +1344,10 @@ document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === 
 const TRIES = [
   ["zoom", "Zoom into a photo", "Scroll or pinch to zoom, drag to pan, Z for 1:1, F for full screen."],
   ["detail", "Write a note on a detail", "In the viewer, press N and drag a box."],
-  ["wall", "The photo wall", "Photos chip: Rows, Masonry or Grid, a size slider, nothing cropped."],
-  ["colour", "Find by colour", "Pick a swatch, or click a colour in any photo's panel."],
+  ["wall", "The photo wall", "Photos chip: one slim bar. Layout icons and Display on the right; nothing cropped."],
+  ["colour", "Find by colour", "Colour, Topic and More are the only filters. Or click a colour in a photo's panel."],
   ["sort", "Sort a pile with the keyboard", "Unsorted photos, numbers for topics, P to pick."],
-  ["views", "Views and Picks", "Saved searches and keepers, never folders."],
+  ["views", "Views and Picks", "Saved searches sit with the chips; ⋯ saves a new one. Never folders."],
   ["shelves", "Photo shelves", "Shelves by kind, plus an Unsorted shelf."],
   ["loci", "Photos in Loci", "Key picture, mood strip, topic colours, Show on Loci."],
 ];
