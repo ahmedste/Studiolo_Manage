@@ -8,7 +8,7 @@ An interactive prototype of the proposal in [`docs/superpowers/specs/2026-10-24-
 
 | Proposal phase | In the prototype |
 |---|---|
-| Header (all types) | One command row: an **area** picker inside the search field, the search itself (`/`), **Views ▾**, Select, Wall/Shelves. A type row underneath (All, Notes, Sources, Photos) where the chosen type opens its collections. One slim bar for every type: All · Unsorted · Picks, Topic, then the type's own filter (Photos: Colour and More; Sources: Status; Notes: Style), the count and Display |
+| Header (all types) | **Select** sits at the right of the tabs row. Below it, one full-width search bar holds the **area** picker, the search (`/`), **Views ▾** and the Wall/Shelves switch. A type row underneath (All, Notes, Sources, Photos) where the chosen type opens its collections. One slim bar for every type: All · Unsorted · Picks, Topic, then the type's own filter (Photos: Colour and More; Sources: Status; Notes: Style), the count and Display |
 | 1 The viewer | Open any photo: scroll or pinch to zoom, drag to pan, `Z` for 1:1, `+` `−` `0`, `F` full screen (dark mat), `Space` from the wall, facts block, Copy image |
 | 2 The photo wall | **Photos** chip opens one slim bar: All · Unsorted · Picks, then **Colour**, **Topic** and **More** (shape, light). On the right: layout icons (Rows, Masonry, Grid) and **Display** (size, sort, group, captions; `Ctrl +` / `Ctrl −`). Kinds stay in the main chip row. Colour placeholders while loading |
 | 3 Sorting a pile | **Unsorted** with **Sort these N** (numbers for topics, `K` kind, `P` pick, `A` whole album, `⌫` undo), **Picks**, saved **Views** for any type under **Views ▾** (or `⋯` → Save as a View), Select with a drag box and bulk actions |
