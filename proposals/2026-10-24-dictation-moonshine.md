@@ -64,7 +64,9 @@ Easier option: `COEP: credentialless` loads cross-origin resources without cooki
 
 ### Step 0: spike in this repo (half a day to a day)
 
-`prototypes/dictation/`: a standalone page in the same style as the other prototypes.
+**Built** in the current Learn prototype rather than a separate page: `prototypes/learn-lumens/src/dictation.js`, served isolated by `prototypes/learn-lumens/serve.mjs`. Checked in headless Chromium: the page is cross-origin isolated, the Moonshine runtime loads from the npm package and requests the model from `download.moonshine.ai`, a failed download falls back to browser speech with a note, and tap, hold, Space, Escape and Send behave as designed. **Not yet checked:** real speech through a Moonshine model, because this sandbox can't reach the model CDN. The measurements below are still to do, on real devices.
+
+What the spike covers:
 1. `npm install @moonshine-ai/moonshine-wasm@0.1.5`. Serve with COOP/COEP headers; Moonshine's `examples/web/serve.mjs` shows how.
 2. Copy the flow from Moonshine's own finished dictation app, `examples/web/dictation/index.html`: `MicTranscriber` + `onText` for the grey provisional text, `onLine` for committed text, and `onProgress` driving the ring.
 3. Measure on a mid-range Android phone, an iPhone in Safari, and a laptop:

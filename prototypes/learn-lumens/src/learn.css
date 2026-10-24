@@ -543,3 +543,15 @@ a.lf-ntitle:hover { color: var(--accent); }
 .lf-shared .lf-trow { top: calc(36px - var(--lf-pt)); }
 .lf-shared [data-act="keep"], .lf-shared .ll-livepill, .lf-shared [data-dl-act="mark"], .lf-shared [data-dl-act="drive-edition"], .lf-shared .dl-marks-sec, .lf-shared .dl-ways, .lf-shared .dl-goal { display: none !important; }
 @media (max-width: 699.98px) { .lf-sharebar { top: var(--m-bar); } .lf-shared .lf-trow { top: calc(var(--m-bar) + 52px); } }
+
+/* ---------- dictation (src/dictation.js): tap to dictate, hold to talk */
+.ll-mic[data-held="true"][data-mode="tap"] { transform: none; animation: ll-dict 1.4s ease-in-out infinite; }
+@keyframes ll-dict { 0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); } 50% { box-shadow: 0 0 0 8px var(--accent-soft); } }
+/* The first tap downloads the on-device model once: the ring fills with it. */
+.ll-mic[data-loading] { animation: none; background: conic-gradient(var(--accent) calc(var(--dl, 0) * 1turn), var(--accent-soft) 0); color: var(--on-accent); }
+.ll-ask .ll-mic[data-loading] { box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .ll-mic[data-held="true"][data-mode="tap"] { animation: none; box-shadow: 0 0 0 6px var(--accent-soft); } }
+.td-proto.ll-proto .eng { font-size: 11px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 4px; }
+.td-proto.ll-proto .eng select { font: inherit; font-size: 11px; color: var(--ink); background: transparent; border: 1px solid var(--line, currentColor); border-radius: 6px; padding: 1px 4px; max-width: 190px; }
+.td-proto.ll-proto .eng-why { font-size: 11px; color: var(--ink-2); }
+.td-proto.ll-proto .eng-why:empty { display: none; }

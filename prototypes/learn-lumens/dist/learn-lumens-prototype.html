@@ -1,6 +1,6 @@
 <title>Learn, One Lumen</title>
 <meta name="description" content="Studiolo's Learn with one kind of thing, the Lumen, in three formats: watch it, listen to it, or read it. Made from one brief, kept in one place.">
-<!-- Screens and styles: studiolo /dev/specimens, captured read-only. Learn: src/learn.js. Listen and the brief: src/listen.js. Read: src/read.js. -->
+<!-- Screens and styles: studiolo /dev/specimens, captured read-only. Learn: src/learn.js. Listen and the brief: src/listen.js. Read: src/read.js. Dictation: src/dictation.js. -->
 <style>
 :root {
   --lightningcss-light: initial;
@@ -25834,6 +25834,18 @@ a.lf-ntitle:hover { color: var(--accent); }
 .lf-shared .lf-trow { top: calc(36px - var(--lf-pt)); }
 .lf-shared [data-act="keep"], .lf-shared .ll-livepill, .lf-shared [data-dl-act="mark"], .lf-shared [data-dl-act="drive-edition"], .lf-shared .dl-marks-sec, .lf-shared .dl-ways, .lf-shared .dl-goal { display: none !important; }
 @media (max-width: 699.98px) { .lf-sharebar { top: var(--m-bar); } .lf-shared .lf-trow { top: calc(var(--m-bar) + 52px); } }
+
+/* ---------- dictation (src/dictation.js): tap to dictate, hold to talk */
+.ll-mic[data-held="true"][data-mode="tap"] { transform: none; animation: ll-dict 1.4s ease-in-out infinite; }
+@keyframes ll-dict { 0%, 100% { box-shadow: 0 0 0 3px var(--accent-soft); } 50% { box-shadow: 0 0 0 8px var(--accent-soft); } }
+/* The first tap downloads the on-device model once: the ring fills with it. */
+.ll-mic[data-loading] { animation: none; background: conic-gradient(var(--accent) calc(var(--dl, 0) * 1turn), var(--accent-soft) 0); color: var(--on-accent); }
+.ll-ask .ll-mic[data-loading] { box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .ll-mic[data-held="true"][data-mode="tap"] { animation: none; box-shadow: 0 0 0 6px var(--accent-soft); } }
+.td-proto.ll-proto .eng { font-size: 11px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 4px; }
+.td-proto.ll-proto .eng select { font: inherit; font-size: 11px; color: var(--ink); background: transparent; border: 1px solid var(--line, currentColor); border-radius: 6px; padding: 1px 4px; max-width: 190px; }
+.td-proto.ll-proto .eng-why { font-size: 11px; color: var(--ink-2); }
+.td-proto.ll-proto .eng-why:empty { display: none; }
 </style>
 <style>/* Learn, Dialogues (prototype). Long-form audio in Learn: the Home shelf, the Dialogues tab, the composer, the
    player page, walk mode and the mini player. NEW parts use the prefix `dl-` and only the app's tokens. The player's
@@ -27425,6 +27437,155 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   window.LearnRead = { article, mount };
 })();
 </script>
+<script>/* Dictation for Learn: the mic turns speech into text in the input, live, word by word.
+   Engines, best first (proposals/2026-10-24-dictation-moonshine.md):
+   - Moonshine Streaming, on-device through WebAssembly (@moonshine-ai/moonshine-wasm). Free, private, live. It needs
+     SharedArrayBuffer, so the page must be cross-origin isolated: serve it with `node serve.mjs`.
+   - The browser's Web Speech API (Chrome and Safari; Chrome sends the audio to Google).
+   - A simulation that streams a fixed phrase, so the prototype still works with no microphone.
+   Sets window.Dictation before learn.js runs. */
+(() => {
+  const VERSION = "0.1.5";
+  // serve.mjs serves the npm package here when it's installed; otherwise the same version comes from jsDelivr.
+  const LOCAL = "/vendor/moonshine/index.js";
+  const CDN = `https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine-wasm@${VERSION}/dist/index.js`;
+  const KEY = "studiolo.dictation.engine";
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const ENGINES = [
+    ["auto", "Auto"],
+    ["moonshine-tiny", "Moonshine Tiny (on-device, ~40 MB)"],
+    ["moonshine-small", "Moonshine Small (on-device, ~130 MB)"],
+    ["moonshine-medium", "Moonshine Medium (on-device, ~255 MB)"],
+    ["web-speech", "Browser speech"],
+    ["simulated", "Simulated"],
+  ];
+  const ARCH = { "moonshine-tiny": "TinyStreaming", "moonshine-small": "SmallStreaming", "moonshine-medium": "MediumStreaming" };
+  const SHORT = { "moonshine-tiny": "on-device · Tiny", "moonshine-small": "on-device · Small", "moonshine-medium": "on-device · Medium", "web-speech": "browser speech", simulated: "simulated" };
+
+  const canMoonshine = () => !!(window.crossOriginIsolated && typeof SharedArrayBuffer !== "undefined" && navigator.mediaDevices?.getUserMedia);
+  // Phones and low-memory machines get Tiny; the rest get Small (decision D1).
+  const smallDevice = () => (navigator.deviceMemory && navigator.deviceMemory <= 4) || /iPhone|iPad|Android/i.test(navigator.userAgent);
+  const read = () => { try { return localStorage.getItem(KEY) || "auto"; } catch { return "auto"; } };
+  let choice = ENGINES.some(([id]) => id === read()) ? read() : "auto";
+  let failed = new Set(); // engines that broke this page load; the next best takes over
+  let keyterms = [];
+
+  /** Which engine `choice` gives here, and why if it had to fall back. */
+  function resolve() {
+    const fallback = () => (SR && !failed.has("web-speech") ? "web-speech" : "simulated");
+    let id = choice, why = "";
+    if (id === "auto") id = canMoonshine() ? (smallDevice() ? "moonshine-tiny" : "moonshine-small") : fallback();
+    if (ARCH[id] && (!canMoonshine() || failed.has(id))) { why = failed.has(id) ? "Moonshine didn't load" : "Moonshine needs node serve.mjs"; id = fallback(); }
+    if (id === "web-speech" && (!SR || failed.has(id))) { why = why || "No browser speech here"; id = "simulated"; }
+    return { id, short: SHORT[id], onDevice: !!ARCH[id], why };
+  }
+
+  /* ---------- Moonshine: one MicTranscriber per model, kept loaded so the second tap starts at once */
+  let mod = null;
+  const mics = {};
+  let cur = null; // the session the shared Moonshine callbacks report to
+  async function moonshine() {
+    if (mod) return mod;
+    try { mod = await import(LOCAL); } catch { mod = await import(CDN); }
+    return mod;
+  }
+  function startMoonshine(id, h) {
+    const s = { lines: [], partial: "", stopped: false, h };
+    const text = () => [...s.lines, s.partial].filter(Boolean).join(" ");
+    s.text = (t) => { s.partial = t; h.onText(text()); };
+    s.line = (t) => { if (t) s.lines.push(t.trim()); s.partial = ""; h.onText(text()); };
+    cur = s;
+    s.ready = (async () => {
+      if (!mics[id]) {
+        h.onState("loading", { fraction: 0 });
+        // One download per model, even if the mic is tapped again while it runs.
+        mics[id] = moonshine().then(async (m) => {
+          const mic = new m.MicTranscriber().modelArch(m.ModelArch[ARCH[id]])
+            .onText((t) => cur?.text(t))
+            .onLine((l) => cur?.line(l.text))
+            .onProgress((f) => cur?.h.onState("loading", { fraction: f }))
+            .onError((e) => cur?.h.onError(e));
+          await mic.load();
+          return mic;
+        });
+        mics[id].catch(() => delete mics[id]);
+      }
+      const mic = await mics[id];
+      if (keyterms.length) { try { mic.setKeyterms(keyterms); } catch { /* only streaming models take key terms */ } }
+      if (s.stopped) return;
+      await mic.start();
+      if (s.stopped) { await mic.stop(); return; }
+      s.mic = mic;
+      h.onState("listening");
+    })();
+    s.ready.catch((e) => { failed.add(id); if (!s.stopped) h.onError(e); });
+    const release = () => { s.stopped = true; if (cur === s) cur = null; };
+    return {
+      // Stopping while the model still downloads returns at once; the download carries on into the cache.
+      async stop() {
+        s.stopped = true;
+        await s.mic?.stop(); // flushes the line being spoken through onLine
+        release();
+        return text();
+      },
+      cancel() { s.mic?.stop(); release(); },
+    };
+  }
+
+  /* ---------- Web Speech: interim results give the same live line */
+  function startWebSpeech(h) {
+    const r = new SR();
+    r.lang = navigator.language || "en-GB"; r.interimResults = true; r.continuous = true;
+    let said = "", live = true, done;
+    const ended = new Promise((res) => (done = res));
+    r.onstart = () => h.onState("listening");
+    r.onresult = (e) => { said = Array.from(e.results, (x) => x[0].transcript).join("").replace(/\s+/g, " ").trim(); h.onText(said); };
+    r.onerror = (e) => { if (e.error === "no-speech" || e.error === "aborted") return; if (e.error === "not-allowed" || e.error === "service-not-allowed") failed.add("web-speech"); h.onError(new Error(e.error)); };
+    // Chrome ends recognition by itself after a long silence: tell the caller so the mic doesn't look on.
+    r.onend = () => { done(); if (live) h.onEnd?.(); };
+    try { r.start(); } catch (e) { failed.add("web-speech"); setTimeout(() => h.onError(e)); }
+    return {
+      async stop() { live = false; try { r.stop(); } catch { /* already ended */ } await Promise.race([ended, new Promise((res) => setTimeout(res, 1500))]); return said; },
+      cancel() { live = false; try { r.abort(); } catch { /* already ended */ } },
+    };
+  }
+
+  /* ---------- Simulated: words arrive a beat behind, and one is revised, as real speech-to-text does */
+  function startSimulated(h) {
+    const words = (h.phrase || "What should I watch next?").split(/\s+/);
+    let k = 0;
+    setTimeout(() => h.onState("listening"));
+    const t = setInterval(() => {
+      k = Math.min(words.length, k + 1);
+      let shown = words.slice(0, k).join(" ");
+      if (k < words.length && k > 2 && k % 3 === 0) shown += " " + words[k].slice(0, Math.max(2, words[k].length - 3)) + "…";
+      h.onText(shown);
+    }, 260);
+    return {
+      async stop() { clearInterval(t); return k < 2 ? "" : words.join(" "); },
+      cancel() { clearInterval(t); },
+    };
+  }
+
+  window.Dictation = {
+    engines: ENGINES,
+    choice: () => choice,
+    setChoice(id) { choice = id; failed = new Set(); try { localStorage.setItem(KEY, id); } catch { /* private window */ } },
+    resolve,
+    /** Words the model is unlikely to produce on its own: product names, the subjects on screen. */
+    setKeyterms(list) { keyterms = [...new Set(list.filter(Boolean))]; },
+    /**
+     * Starts listening. `h`: onText(textSoFar), onState("loading", {fraction}) | onState("listening"), onError(err),
+     * onEnd() when the engine stops by itself, and `phrase` for the simulation. Returns { stop() → final text, cancel() }.
+     */
+    start(h) {
+      const { id } = resolve();
+      return ARCH[id] ? startMoonshine(id, h) : id === "web-speech" ? startWebSpeech(h) : startSimulated(h);
+    },
+  };
+})();
+</script>
 <script>/* Learn, slice 2 (prototype): one Lumen, three formats.
    - A Lumen is one idea, explained for you. It comes as Watch (slides and a narrator), Listen (two voices, 10–30 min;
      src/listen.js) or Read (a long read). Live isn't a format: it's talking any Lumen through.
@@ -27440,8 +27601,9 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
    - Typed questions get written answers (no voice minutes). The talk bar appears only in Learn and on the Graph.
    The shell, header, cards and slides are the app's own DOM and CSS, captured read-only from studiolo's
    /dev/specimens. When this page may use Claude (the `sample` capability), Live Lumens, answers and rewrites are
-   written by Claude in real time; otherwise a scripted Lumen plays. There is no microphone: holding the mic simulates
-   live transcription, and the browser's speech voice stands in for the ElevenLabs narrator. */
+   written by Claude in real time; otherwise a scripted Lumen plays. The mic dictates for real (src/dictation.js:
+   Moonshine on-device, else the browser's speech, else a simulation), and the browser's speech voice stands in
+   for the ElevenLabs narrator. */
 (() => {
   "use strict";
   const DATA = JSON.parse(document.getElementById("vx-data").textContent);
@@ -27685,7 +27847,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
     live: "Studiolo talks it through now, and you can cut in · uses voice minutes",
   };
   const GO = { watch: "Make a Lumen", listen: "Make a Lumen", read: "Make a Lumen", live: '<span class="xp-dot" aria-hidden="true"></span>Start live session' };
-  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or hold the mic and talk" };
+  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or tap the mic and talk" };
   function setKind(k) {
     S.mode2 = k; try { localStorage.setItem("ll-format", k); } catch { /* private */ }
     const f = $('[data-form="hero"]', root); if (!f) return;
@@ -27751,7 +27913,7 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
         <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
           <span class="ll-mode" role="radiogroup" aria-label="Format">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${I[k] || ""}${l}</button>`).join("")}</span>
           <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${PH[S.mode2]}">
-          <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
+          <button class="ll-mic" type="button" data-mic="hero" aria-label="Dictate" title="Tap to dictate, or hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
         <div class="lf-under"><p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p><button class="lf-golive" type="button" data-livego${S.mode2 === "live" ? " hidden" : ""}><span class="xp-dot" aria-hidden="true"></span>or talk it through live</button></div>
         ${worksRows()}
       </section>
@@ -27810,10 +27972,10 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   ld.innerHTML = `<div class="ld-chips" role="group" aria-label="Things you could say"></div>
     <div class="ld-card"><div class="ld-cap"><span class="ld-who" aria-hidden="true"><i>S</i><b></b></span><p class="ld-live" aria-live="off"></p></div>
     <form class="ld-bar"><span class="ld-ctx"></span><span class="ld-meter" aria-hidden="true">${"<i></i>".repeat(7)}</span>
-      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"></span>
+      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or tap the mic to dictate"></span>
       <span class="ld-state" role="status"></span>
       <button class="ld-btn ld-audio" type="button" aria-pressed="true" aria-label="Narrator sound" title="Narrator sound">${I.speaker}</button>
-      <button class="ll-mic" type="button" data-mic="dock" aria-label="Hold to talk" title="Hold to talk (or hold Space)">${I.mic}</button>
+      <button class="ll-mic" type="button" data-mic="dock" aria-label="Dictate" title="Tap to dictate, or hold to talk (or hold Space)">${I.mic}</button>
       <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form></div>`;
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
@@ -27834,43 +27996,91 @@ Reply with JSON Lines only, one turn per line: {"who":"A" or "B","say":"…","sr
   // Typing shows up in the transcript as you type: the same live line speech would make.
   LD.input.addEventListener("input", () => TX.interim(LD.input.value, true));
 
-  /* ---------- hold to talk: simulated live transcription */
+  /* ---------- the mic: dictation (src/dictation.js). Words appear in the input as you speak.
+     Tap to start and tap again to stop; the text waits in the input to be read, edited and sent.
+     Hold to talk (or hold Space) and release: the same, except in a live session, where it goes straight in. */
+  const DICT = window.Dictation;
+  const HOLD_MS = 350;
+  DICT.setKeyterms(["Studiolo", "Lumen", "Lumens", "Commonplace", "Loci", "malqaf", "barjeel", "iwan", "iwans", "qibla", "madrasa", "Sultan Hassan", "Mamluk", "Hillenbrand", "Darwin", ...LUMENS.map((L) => L.subject)]);
   let held = null;
-  function holdStart(where) {
+  const fieldFor = (where) => (where === "hero" ? $("#ll-hero-in", root) : LD.input);
+  function micsFor(where, f) { $$(`[data-mic="${where}"]`).forEach(f); }
+  function holdStart(where, how = "hold") {
     if (held) return;
     EXT?.onHold?.(where);
     if (speaking) { speaking.cut(null); }
     const phrase = where === "hero" ? ($("#ll-hero-in", root)?.value || "How do wind catchers actually cool a house?") : (LD.chips.querySelector("button[data-kind=interrupt]") ? "Why does the air get cooler at the bottom?" : LD.chips.querySelector("button")?.textContent || "What should I watch next?");
-    const words = phrase.split(/\s+/);
-    held = { where, phrase, k: 0, t: null };
-    $$(`[data-mic="${where}"]`).forEach((m) => (m.dataset.held = "true"));
-    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
-    // Words arrive a beat behind the voice, and the last one is revised once, as real speech-to-text does.
-    held.t = setInterval(() => {
-      if (!held) return;
-      held.k = Math.min(words.length, held.k + 1);
-      let shown = words.slice(0, held.k).join(" ");
-      if (held.k < words.length && held.k > 2 && held.k % 3 === 0) shown += " " + words[held.k].slice(0, Math.max(2, words[held.k].length - 3)) + "…";
-      LD.live.innerHTML = `<span>${esc(shown)}</span>`;
-      if (where === "hero") { const i = $("#ll-hero-in", root); if (i) i.value = shown; }
-      TX.interim(shown);
-    }, 260);
+    const field = fieldFor(where);
+    // Dictation adds to what's already typed. On Home the simulation "says" what's typed, so it replaces it there.
+    const base = !(where === "hero" && DICT.resolve().id === "simulated") && field?.value.trim() ? field.value.trim() + " " : "";
+    const h = (held = { where, how, t0: Date.now(), base, field, text: "" });
+    micsFor(where, (m) => { m.dataset.held = "true"; m.dataset.mode = how; m.setAttribute("aria-pressed", "true"); });
+    setState("hearing", `Hearing you · ${DICT.resolve().short}`); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
+    h.session = DICT.start({
+      phrase,
+      onText: (t) => {
+        if (held !== h) return;
+        h.text = t;
+        LD.live.innerHTML = `<span>${esc(t)}</span>`;
+        if (h.field) h.field.value = h.base + t;
+        TX.interim(h.base + t);
+      },
+      onState: (st, info) => {
+        if (held !== h) return;
+        const loading = st === "loading";
+        micsFor(where, (m) => { m.toggleAttribute("data-loading", loading); m.style.setProperty("--dl", String(info?.fraction || 0)); });
+        if (loading) setState("hearing", `Getting the speech model${info?.fraction ? ` · ${Math.round(info.fraction * 100)}%` : "…"}`);
+        else setState("hearing", `Hearing you · ${DICT.resolve().short}`);
+      },
+      onError: (err) => {
+        if (held !== h) return;
+        const denied = /not-?allowed|permission|denied/i.test(String(err?.name) + String(err?.message));
+        toast(denied ? "The microphone is blocked." : "Dictation stopped.", denied ? "Allow the microphone for this page in the browser's address bar, then try again." : `${esc(err?.message || "The speech engine failed")}. The next tap uses ${esc(DICT.resolve().short)}.`);
+        holdEnd("stop"); engBadge();
+      },
+      onEnd: () => { if (held === h) holdEnd("stop"); },
+    });
   }
-  function holdEnd() {
-    if (!held) return;
-    const h = held; held = null; clearInterval(h.t);
-    $$("[data-mic]").forEach((m) => (m.dataset.held = "false"));
+  /** Releases the mic. `how` is "stop" for a second tap, Send, Escape or the engine ending; otherwise it's a pointer or key release. */
+  async function holdEnd(how) {
+    const h = held;
+    if (!h) return;
+    // A quick press is a tap: dictation keeps running until the next tap.
+    if (!how && h.how === "hold" && Date.now() - h.t0 < HOLD_MS) { h.how = "tap"; micsFor(h.where, (m) => (m.dataset.mode = "tap")); return; }
+    held = null;
+    micsFor(h.where, (m) => { m.dataset.held = "false"; m.removeAttribute("data-loading"); m.removeAttribute("aria-pressed"); });
     ld.dataset.captioning = "false";
-    if (h.k < 2) { setState("listening"); TX.interim(null); return; }
-    const said = h.phrase.split(/\s+/).slice(0, Math.max(h.k, h.phrase.split(/\s+/).length)).join(" ");
-    if (h.where === "hero") { TX.interim(null); if (S.mode2 !== "live") { const i = $("#ll-hero-in", root); if (i) { i.value = said; i.focus(); } return; } return startNew(said); }
+    const said = ((await h.session.stop()) || "").trim();
     TX.interim(null);
-    deliver(said, { spoken: true });
+    setState(S.line ? "listening" : "");
+    if (!said) { if (h.field) h.field.value = h.base.trim(); return; }
+    // Pushed to talk during a live session: straight in, as before. Holding the Home mic in Live starts the session.
+    if (h.how !== "tap" && h.where === "dock" && S.line) { LD.input.value = h.base.trim(); return deliver(said, { spoken: true }); }
+    if (h.how !== "tap" && h.where === "hero" && S.mode2 === "live") return startNew(h.base + said);
+    if (h.field) { h.field.value = h.base + said; h.field.focus(); h.field.setSelectionRange(h.field.value.length, h.field.value.length); }
   }
-  document.addEventListener("pointerdown", (e) => { const m = e.target.closest("[data-mic]"); if (m) { e.preventDefault(); holdStart(m.dataset.mic); } });
-  document.addEventListener("pointerup", holdEnd);
-  document.addEventListener("keydown", (e) => { if (e.code === "Space" && !e.repeat && !e.target.closest("input, textarea, button, select") && !ld.hidden) { e.preventDefault(); holdStart("dock"); } });
-  document.addEventListener("keyup", (e) => { if (e.code === "Space" && held) { e.preventDefault(); holdEnd(); } });
+  /** Send while dictating: keep what's in the input and drop the mic. */
+  function dropMic() {
+    const h = held;
+    if (!h) return;
+    held = null;
+    micsFor(h.where, (m) => { m.dataset.held = "false"; m.removeAttribute("data-loading"); m.removeAttribute("aria-pressed"); });
+    ld.dataset.captioning = "false"; TX.interim(null);
+    h.session.cancel();
+  }
+  document.addEventListener("pointerdown", (e) => {
+    const m = e.target.closest("[data-mic]"); if (!m) return;
+    e.preventDefault();
+    if (held?.how === "tap") return holdEnd("stop");
+    holdStart(m.dataset.mic);
+  });
+  document.addEventListener("pointerup", () => holdEnd());
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && held) return holdEnd("stop");
+    if (e.code === "Space" && !e.repeat && !e.target.closest("input, textarea, button, select") && !ld.hidden) { e.preventDefault(); holdStart("dock", "key"); }
+  });
+  document.addEventListener("keyup", (e) => { if (e.code === "Space" && held?.how === "key") { e.preventDefault(); holdEnd(); } });
+  document.addEventListener("submit", dropMic, true);
 
   /* ================================================================ speaking */
   let voice = null;
@@ -28577,9 +28787,17 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
   bar.className = "td-proto ll-proto"; bar.setAttribute("aria-label", "Prototype");
-  bar.innerHTML = '<b>Prototype · slice 1</b><button type="button" id="ll-restart">Start again</button><button type="button" id="ll-how" aria-expanded="false">How to try it</button><span class="ai" id="ll-ai">Checking for Claude…</span><span class="hint" hidden>Learn → Home: ask “How do wind catchers actually cool a house?” and press Explain live, or hold the mic. While it talks, cut in from the bar: Stop, Explain that another way, Go deeper, Test me, or tap part of a slide. Every Lumen card has Go live; ending goes back to the recording, and Keep saves your version. The talk bar shows only in Learn and on the Graph (Loci).</span>';
+  bar.innerHTML = '<b>Prototype · slice 1</b><button type="button" id="ll-restart">Start again</button><button type="button" id="ll-how" aria-expanded="false">How to try it</button><span class="ai" id="ll-ai">Checking for Claude…</span><label class="eng">Mic <select id="ll-eng" aria-label="Dictation engine"></select></label><span class="eng-why" id="ll-eng-why"></span><span class="hint" hidden>Learn → Home: ask “How do wind catchers actually cool a house?” and press Explain live, or hold the mic. While it talks, cut in from the bar: Stop, Explain that another way, Go deeper, Test me, or tap part of a slide. Every Lumen card has Go live; ending goes back to the recording, and Keep saves your version. The talk bar shows only in Learn and on the Graph (Loci).</span>';
   document.body.appendChild(bar);
   $("#ll-restart", bar).addEventListener("click", () => location.reload());
+  const eng = $("#ll-eng", bar);
+  function engBadge() {
+    const r = DICT.resolve();
+    eng.innerHTML = DICT.engines.map(([id, label]) => `<option value="${id}"${id === DICT.choice() ? " selected" : ""}>${esc(id === "auto" ? `Auto (${r.short})` : label)}</option>`).join("");
+    $("#ll-eng-why", bar).textContent = r.why ? `${r.why}: using ${r.short}` : "";
+  }
+  eng.addEventListener("change", () => { dropMic(); DICT.setChoice(eng.value); engBadge(); });
+  engBadge();
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
   EXT?.init?.({ root, S, I, STAGE, LEARNER, LUMENS, DECKS, ld, LD, learnShell, header, poster, tag, dock, setChips, setState, toast, openTab, startNew, leaveStudio, streamLines, aiBadge, hush, nextId: () => ++uid,

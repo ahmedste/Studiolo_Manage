@@ -13,8 +13,9 @@
    - Typed questions get written answers (no voice minutes). The talk bar appears only in Learn and on the Graph.
    The shell, header, cards and slides are the app's own DOM and CSS, captured read-only from studiolo's
    /dev/specimens. When this page may use Claude (the `sample` capability), Live Lumens, answers and rewrites are
-   written by Claude in real time; otherwise a scripted Lumen plays. There is no microphone: holding the mic simulates
-   live transcription, and the browser's speech voice stands in for the ElevenLabs narrator. */
+   written by Claude in real time; otherwise a scripted Lumen plays. The mic dictates for real (src/dictation.js:
+   Moonshine on-device, else the browser's speech, else a simulation), and the browser's speech voice stands in
+   for the ElevenLabs narrator. */
 (() => {
   "use strict";
   const DATA = JSON.parse(document.getElementById("vx-data").textContent);
@@ -258,7 +259,7 @@
     live: "Studiolo talks it through now, and you can cut in · uses voice minutes",
   };
   const GO = { watch: "Make a Lumen", listen: "Make a Lumen", read: "Make a Lumen", live: '<span class="xp-dot" aria-hidden="true"></span>Start live session' };
-  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or hold the mic and talk" };
+  const PH = { watch: "What should it explain?", listen: "What should two voices talk through?", read: "What should it go into, at length?", live: "Ask, or tap the mic and talk" };
   function setKind(k) {
     S.mode2 = k; try { localStorage.setItem("ll-format", k); } catch { /* private */ }
     const f = $('[data-form="hero"]', root); if (!f) return;
@@ -324,7 +325,7 @@
         <form class="ll-ask" data-form="hero" data-kind="${S.mode2}">
           <span class="ll-mode" role="radiogroup" aria-label="Format">${MODES.map(([k, l]) => `<button type="button" role="radio" data-kind="${k}" aria-checked="${S.mode2 === k}">${I[k] || ""}${l}</button>`).join("")}</span>
           <label class="visually-hidden" for="ll-hero-in">What do you want to understand?</label><input id="ll-hero-in" autocomplete="off" placeholder="${PH[S.mode2]}">
-          <button class="ll-mic" type="button" data-mic="hero" aria-label="Hold to talk" title="Hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
+          <button class="ll-mic" type="button" data-mic="hero" aria-label="Dictate" title="Tap to dictate, or hold to talk">${I.mic}</button><button class="ll-go" type="submit">${GO[S.mode2]}</button></form>
         <div class="lf-under"><p class="ll-hint" aria-live="polite">${HINT[S.mode2]}</p><button class="lf-golive" type="button" data-livego${S.mode2 === "live" ? " hidden" : ""}><span class="xp-dot" aria-hidden="true"></span>or talk it through live</button></div>
         ${worksRows()}
       </section>
@@ -383,10 +384,10 @@
   ld.innerHTML = `<div class="ld-chips" role="group" aria-label="Things you could say"></div>
     <div class="ld-card"><div class="ld-cap"><span class="ld-who" aria-hidden="true"><i>S</i><b></b></span><p class="ld-live" aria-live="off"></p></div>
     <form class="ld-bar"><span class="ld-ctx"></span><span class="ld-meter" aria-hidden="true">${"<i></i>".repeat(7)}</span>
-      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or hold the mic to talk"></span>
+      <span class="ld-mid"><label class="visually-hidden" for="ld-in">Ask Studiolo</label><input id="ld-in" autocomplete="off" placeholder="Type a question, or tap the mic to dictate"></span>
       <span class="ld-state" role="status"></span>
       <button class="ld-btn ld-audio" type="button" aria-pressed="true" aria-label="Narrator sound" title="Narrator sound">${I.speaker}</button>
-      <button class="ll-mic" type="button" data-mic="dock" aria-label="Hold to talk" title="Hold to talk (or hold Space)">${I.mic}</button>
+      <button class="ll-mic" type="button" data-mic="dock" aria-label="Dictate" title="Tap to dictate, or hold to talk (or hold Space)">${I.mic}</button>
       <button class="ld-btn ld-send" type="submit" aria-label="Send">${I.send}</button></form></div>`;
   document.body.appendChild(ld);
   const LD = { chips: $(".ld-chips", ld), ctx: $(".ld-ctx", ld), input: $("#ld-in", ld), live: $(".ld-live", ld), state: $(".ld-state", ld) };
@@ -407,43 +408,91 @@
   // Typing shows up in the transcript as you type: the same live line speech would make.
   LD.input.addEventListener("input", () => TX.interim(LD.input.value, true));
 
-  /* ---------- hold to talk: simulated live transcription */
+  /* ---------- the mic: dictation (src/dictation.js). Words appear in the input as you speak.
+     Tap to start and tap again to stop; the text waits in the input to be read, edited and sent.
+     Hold to talk (or hold Space) and release: the same, except in a live session, where it goes straight in. */
+  const DICT = window.Dictation;
+  const HOLD_MS = 350;
+  DICT.setKeyterms(["Studiolo", "Lumen", "Lumens", "Commonplace", "Loci", "malqaf", "barjeel", "iwan", "iwans", "qibla", "madrasa", "Sultan Hassan", "Mamluk", "Hillenbrand", "Darwin", ...LUMENS.map((L) => L.subject)]);
   let held = null;
-  function holdStart(where) {
+  const fieldFor = (where) => (where === "hero" ? $("#ll-hero-in", root) : LD.input);
+  function micsFor(where, f) { $$(`[data-mic="${where}"]`).forEach(f); }
+  function holdStart(where, how = "hold") {
     if (held) return;
     EXT?.onHold?.(where);
     if (speaking) { speaking.cut(null); }
     const phrase = where === "hero" ? ($("#ll-hero-in", root)?.value || "How do wind catchers actually cool a house?") : (LD.chips.querySelector("button[data-kind=interrupt]") ? "Why does the air get cooler at the bottom?" : LD.chips.querySelector("button")?.textContent || "What should I watch next?");
-    const words = phrase.split(/\s+/);
-    held = { where, phrase, k: 0, t: null };
-    $$(`[data-mic="${where}"]`).forEach((m) => (m.dataset.held = "true"));
-    setState("hearing"); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
-    // Words arrive a beat behind the voice, and the last one is revised once, as real speech-to-text does.
-    held.t = setInterval(() => {
-      if (!held) return;
-      held.k = Math.min(words.length, held.k + 1);
-      let shown = words.slice(0, held.k).join(" ");
-      if (held.k < words.length && held.k > 2 && held.k % 3 === 0) shown += " " + words[held.k].slice(0, Math.max(2, words[held.k].length - 3)) + "…";
-      LD.live.innerHTML = `<span>${esc(shown)}</span>`;
-      if (where === "hero") { const i = $("#ll-hero-in", root); if (i) i.value = shown; }
-      TX.interim(shown);
-    }, 260);
+    const field = fieldFor(where);
+    // Dictation adds to what's already typed. On Home the simulation "says" what's typed, so it replaces it there.
+    const base = !(where === "hero" && DICT.resolve().id === "simulated") && field?.value.trim() ? field.value.trim() + " " : "";
+    const h = (held = { where, how, t0: Date.now(), base, field, text: "" });
+    micsFor(where, (m) => { m.dataset.held = "true"; m.dataset.mode = how; m.setAttribute("aria-pressed", "true"); });
+    setState("hearing", `Hearing you · ${DICT.resolve().short}`); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
+    h.session = DICT.start({
+      phrase,
+      onText: (t) => {
+        if (held !== h) return;
+        h.text = t;
+        LD.live.innerHTML = `<span>${esc(t)}</span>`;
+        if (h.field) h.field.value = h.base + t;
+        TX.interim(h.base + t);
+      },
+      onState: (st, info) => {
+        if (held !== h) return;
+        const loading = st === "loading";
+        micsFor(where, (m) => { m.toggleAttribute("data-loading", loading); m.style.setProperty("--dl", String(info?.fraction || 0)); });
+        if (loading) setState("hearing", `Getting the speech model${info?.fraction ? ` · ${Math.round(info.fraction * 100)}%` : "…"}`);
+        else setState("hearing", `Hearing you · ${DICT.resolve().short}`);
+      },
+      onError: (err) => {
+        if (held !== h) return;
+        const denied = /not-?allowed|permission|denied/i.test(String(err?.name) + String(err?.message));
+        toast(denied ? "The microphone is blocked." : "Dictation stopped.", denied ? "Allow the microphone for this page in the browser's address bar, then try again." : `${esc(err?.message || "The speech engine failed")}. The next tap uses ${esc(DICT.resolve().short)}.`);
+        holdEnd("stop"); engBadge();
+      },
+      onEnd: () => { if (held === h) holdEnd("stop"); },
+    });
   }
-  function holdEnd() {
-    if (!held) return;
-    const h = held; held = null; clearInterval(h.t);
-    $$("[data-mic]").forEach((m) => (m.dataset.held = "false"));
+  /** Releases the mic. `how` is "stop" for a second tap, Send, Escape or the engine ending; otherwise it's a pointer or key release. */
+  async function holdEnd(how) {
+    const h = held;
+    if (!h) return;
+    // A quick press is a tap: dictation keeps running until the next tap.
+    if (!how && h.how === "hold" && Date.now() - h.t0 < HOLD_MS) { h.how = "tap"; micsFor(h.where, (m) => (m.dataset.mode = "tap")); return; }
+    held = null;
+    micsFor(h.where, (m) => { m.dataset.held = "false"; m.removeAttribute("data-loading"); m.removeAttribute("aria-pressed"); });
     ld.dataset.captioning = "false";
-    if (h.k < 2) { setState("listening"); TX.interim(null); return; }
-    const said = h.phrase.split(/\s+/).slice(0, Math.max(h.k, h.phrase.split(/\s+/).length)).join(" ");
-    if (h.where === "hero") { TX.interim(null); if (S.mode2 !== "live") { const i = $("#ll-hero-in", root); if (i) { i.value = said; i.focus(); } return; } return startNew(said); }
+    const said = ((await h.session.stop()) || "").trim();
     TX.interim(null);
-    deliver(said, { spoken: true });
+    setState(S.line ? "listening" : "");
+    if (!said) { if (h.field) h.field.value = h.base.trim(); return; }
+    // Pushed to talk during a live session: straight in, as before. Holding the Home mic in Live starts the session.
+    if (h.how !== "tap" && h.where === "dock" && S.line) { LD.input.value = h.base.trim(); return deliver(said, { spoken: true }); }
+    if (h.how !== "tap" && h.where === "hero" && S.mode2 === "live") return startNew(h.base + said);
+    if (h.field) { h.field.value = h.base + said; h.field.focus(); h.field.setSelectionRange(h.field.value.length, h.field.value.length); }
   }
-  document.addEventListener("pointerdown", (e) => { const m = e.target.closest("[data-mic]"); if (m) { e.preventDefault(); holdStart(m.dataset.mic); } });
-  document.addEventListener("pointerup", holdEnd);
-  document.addEventListener("keydown", (e) => { if (e.code === "Space" && !e.repeat && !e.target.closest("input, textarea, button, select") && !ld.hidden) { e.preventDefault(); holdStart("dock"); } });
-  document.addEventListener("keyup", (e) => { if (e.code === "Space" && held) { e.preventDefault(); holdEnd(); } });
+  /** Send while dictating: keep what's in the input and drop the mic. */
+  function dropMic() {
+    const h = held;
+    if (!h) return;
+    held = null;
+    micsFor(h.where, (m) => { m.dataset.held = "false"; m.removeAttribute("data-loading"); m.removeAttribute("aria-pressed"); });
+    ld.dataset.captioning = "false"; TX.interim(null);
+    h.session.cancel();
+  }
+  document.addEventListener("pointerdown", (e) => {
+    const m = e.target.closest("[data-mic]"); if (!m) return;
+    e.preventDefault();
+    if (held?.how === "tap") return holdEnd("stop");
+    holdStart(m.dataset.mic);
+  });
+  document.addEventListener("pointerup", () => holdEnd());
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && held) return holdEnd("stop");
+    if (e.code === "Space" && !e.repeat && !e.target.closest("input, textarea, button, select") && !ld.hidden) { e.preventDefault(); holdStart("dock", "key"); }
+  });
+  document.addEventListener("keyup", (e) => { if (e.code === "Space" && held?.how === "key") { e.preventDefault(); holdEnd(); } });
+  document.addEventListener("submit", dropMic, true);
 
   /* ================================================================ speaking */
   let voice = null;
@@ -1150,9 +1199,17 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
   bar.className = "td-proto ll-proto"; bar.setAttribute("aria-label", "Prototype");
-  bar.innerHTML = '<b>Prototype · slice 1</b><button type="button" id="ll-restart">Start again</button><button type="button" id="ll-how" aria-expanded="false">How to try it</button><span class="ai" id="ll-ai">Checking for Claude…</span><span class="hint" hidden>Learn → Home: ask “How do wind catchers actually cool a house?” and press Explain live, or hold the mic. While it talks, cut in from the bar: Stop, Explain that another way, Go deeper, Test me, or tap part of a slide. Every Lumen card has Go live; ending goes back to the recording, and Keep saves your version. The talk bar shows only in Learn and on the Graph (Loci).</span>';
+  bar.innerHTML = '<b>Prototype · slice 1</b><button type="button" id="ll-restart">Start again</button><button type="button" id="ll-how" aria-expanded="false">How to try it</button><span class="ai" id="ll-ai">Checking for Claude…</span><label class="eng">Mic <select id="ll-eng" aria-label="Dictation engine"></select></label><span class="eng-why" id="ll-eng-why"></span><span class="hint" hidden>Learn → Home: ask “How do wind catchers actually cool a house?” and press Explain live, or hold the mic. While it talks, cut in from the bar: Stop, Explain that another way, Go deeper, Test me, or tap part of a slide. Every Lumen card has Go live; ending goes back to the recording, and Keep saves your version. The talk bar shows only in Learn and on the Graph (Loci).</span>';
   document.body.appendChild(bar);
   $("#ll-restart", bar).addEventListener("click", () => location.reload());
+  const eng = $("#ll-eng", bar);
+  function engBadge() {
+    const r = DICT.resolve();
+    eng.innerHTML = DICT.engines.map(([id, label]) => `<option value="${id}"${id === DICT.choice() ? " selected" : ""}>${esc(id === "auto" ? `Auto (${r.short})` : label)}</option>`).join("");
+    $("#ll-eng-why", bar).textContent = r.why ? `${r.why}: using ${r.short}` : "";
+  }
+  eng.addEventListener("change", () => { dropMic(); DICT.setChoice(eng.value); engBadge(); });
+  engBadge();
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
   EXT?.init?.({ root, S, I, STAGE, LEARNER, LUMENS, DECKS, ld, LD, learnShell, header, poster, tag, dock, setChips, setState, toast, openTab, startNew, leaveStudio, streamLines, aiBadge, hush, nextId: () => ++uid,
