@@ -1,0 +1,1502 @@
+<meta charset="utf-8">
+<title>Studiolo Work</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the app's shell (58 px rail + main stage) with a proposed fifth destination, Work, and its touchpoints on
+   Today, Learn, Commonplace and Loci. Tokens are Studiolo's own (src/styles/tokens.css), as in the photos prototype. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --float: #fbfbf9; --hover: #ecece6; --mat: #e4e4de; --scrim: rgba(243, 243, 239, .74);
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5;
+  --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a; --ok-soft: #e2efe7;
+  --pick: #b7791f; --pick-soft: #fbf3df;
+  --work: #7a5a2e; --work-soft: #f3ecdf;
+  --decision-paper: #f6f3ea; --decision-rule: #c9b48a;
+  --on-media: #ffffff; --media-badge: rgba(0, 0, 0, .64);
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, .07), 0 8px 22px rgba(34, 48, 58, .09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, .08), 0 16px 36px rgba(34, 48, 58, .15);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, .06), 0 18px 48px rgba(34, 48, 58, .16);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-q: 130ms; --dur-s: 220ms; --dur-m: 380ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --accent-soft: #263156; --accent-strong: #c3cff8;
+    --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+    --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a;
+    --work: #d9b57c; --work-soft: #352b1c; --decision-paper: #27251e; --decision-rule: #7d6a45;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --accent-soft: #263156; --accent-strong: #c3cff8;
+  --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a;
+  --work: #d9b57c; --work-soft: #352b1c; --decision-paper: #27251e; --decision-rule: #7d6a45;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-q: 1ms; --dur-s: 1ms; --dur-m: 1ms; } }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { text-wrap: balance; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- shell ---------- */
+.rail { position: fixed; inset: 0 auto 0 0; width: 58px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: calc(16px + env(safe-area-inset-top, 0px)) 0 calc(16px + env(safe-area-inset-bottom, 0px)); padding-left: env(safe-area-inset-left, 0px); border-right: 1px solid var(--line); background: var(--paper); z-index: 20; }
+.rail .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 17px var(--read); margin-bottom: 20px; }
+.rail button { all: unset; width: 40px; height: 36px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); cursor: pointer; position: relative; }
+.rail button:hover { background: var(--hover); color: var(--ink); }
+.rail button[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.rail button:focus-visible { outline: 2px solid var(--accent); }
+.rail button .tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-size: 12px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--dur-q); }
+.rail button:hover .tip, .rail button:focus-visible .tip { opacity: 1; }
+.rail .newdot { position: absolute; right: 4px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--work); }
+.rail .grow { flex: 1; }
+.rail .me { width: 26px; height: 26px; border-radius: 50%; background: var(--board); font-size: 11px; font-weight: 500; display: grid; place-items: center; }
+.rail svg { width: 18px; height: 18px; }
+.stage { margin-left: 58px; min-width: 0; padding-block: 32px 140px; padding-left: max(44px, env(safe-area-inset-left, 0px)); padding-right: max(44px, env(safe-area-inset-right, 0px)); max-width: 1440px; }
+.dest-head { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; color: var(--ink-2); margin: 0 0 14px; flex-wrap: wrap; }
+.dest-head b { color: var(--ink); font-weight: 500; }
+.dest-head button { all: unset; cursor: pointer; color: var(--ink); font-weight: 500; }
+.dest-head button:hover { text-decoration: underline; }
+.dest-head .sep { color: var(--ink-3); }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 26px; overflow-x: auto; scrollbar-width: none; }
+.tabs button { all: unset; cursor: pointer; padding: 7px 12px 9px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); font-weight: 500; border-color: var(--accent); }
+.tabs button:hover { color: var(--ink); }
+.tabs .n { color: var(--ink-3); font-size: 12px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+/* ---------- atoms ---------- */
+.btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 4px; font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.btn:hover { background: var(--hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); }
+.btn.line { box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.btn.line:hover { background: var(--hover); }
+.btn.primary { background: var(--accent); color: var(--paper); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.small { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn.tiny { height: 24px; padding: 0 8px; font-size: 12px; }
+.btn.quiet { color: var(--ink-2); font-weight: 400; }
+.btn.link { height: auto; padding: 0; color: var(--accent); font-weight: 500; }
+.btn.link:hover { background: none; text-decoration: underline; }
+.btn svg { width: 15px; height: 15px; flex: none; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.seg { display: inline-flex; background: var(--board); padding: 3px; border-radius: 8px; gap: 2px; }
+.seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 6px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(34, 48, 58, .08); }
+.seg button:focus-visible { outline: 2px solid var(--accent); }
+.new { display: inline-block; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--work); background: var(--work-soft); padding: 1px 5px; border-radius: 3px; vertical-align: 2px; margin-left: 6px; }
+.kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0; font-weight: 500; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+.sdot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-3); display: inline-block; flex: none; }
+.sdot.s1 { background: var(--status-1); border-color: var(--status-1); }
+.sdot.s2 { background: var(--status-3); border-color: var(--status-3); }
+.tchip { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px 0 8px; border-radius: 12px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; color: var(--ink); white-space: nowrap; }
+.tchip:hover { background: var(--hover); }
+.tchip.gap { box-shadow: inset 0 0 0 1px var(--warn); color: var(--warn); background: transparent; border-style: dashed; }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.state { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 3px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.state.open { background: var(--board); color: var(--ink-2); }
+.state.exploring { background: var(--accent-soft); color: var(--accent-strong); }
+.state.decided { background: var(--ok-soft); color: var(--ok); }
+.state.parked { background: transparent; color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
+.src { font-size: 11.5px; color: var(--ink-2); }
+.src b { font-weight: 500; color: var(--ink); }
+.cite { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--accent); white-space: nowrap; }
+.cite:hover { text-decoration: underline; }
+.cite img, .cite .sw { width: 18px; height: 18px; border-radius: 3px; object-fit: cover; flex: none; background: var(--mat); }
+hr.rule { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
+.section-h h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.section-h .muted { font-size: 12.5px; }
+
+/* ---------- Work home ---------- */
+.w-hero { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: start; margin-bottom: 36px; }
+.w-ask h1 { font: 400 30px/1.2 var(--read); margin: 0 0 14px; letter-spacing: -.005em; }
+.askbox { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 7px 0 18px; border-radius: 12px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.askbox:focus-within { box-shadow: inset 0 0 0 1.5px var(--accent), 0 0 0 4px var(--accent-soft); }
+.askbox input { flex: 1; min-width: 0; border: 0; background: transparent; font: 19px/1.2 var(--read); height: 44px; }
+.askbox input:focus { outline: none; }
+.askbox input::placeholder { color: var(--ink-2); }
+.ask-hint { font-size: 12.5px; color: var(--ink-2); margin: 10px 2px 0; }
+.ask-hint button { all: unset; cursor: pointer; color: var(--accent); }
+.ask-hint button:hover { text-decoration: underline; }
+.next-card { background: var(--panel); border-left: 3px solid var(--accent); padding: 18px 20px 18px 22px; box-shadow: inset 0 0 0 1px var(--line); border-radius: 0 6px 6px 0; }
+.next-card .kicker { margin-bottom: 6px; }
+.next-card h3 { font: 400 21px/1.3 var(--read); margin: 0 0 8px; }
+.next-card .meta { font-size: 12.5px; color: var(--ink-2); margin: 0 0 14px; }
+.next-card .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; margin-bottom: 40px; }
+.pcard { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 10px; }
+.pcard .cover { position: relative; aspect-ratio: 16 / 10; border-radius: 6px; overflow: hidden; background: var(--mat); box-shadow: var(--shadow-pic); transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease); }
+.pcard .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pcard:hover .cover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.pcard:focus-visible .cover { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pcard .cover .badge { position: absolute; left: 10px; top: 10px; background: var(--media-badge); color: var(--on-media); font-size: 11.5px; padding: 2px 7px; border-radius: 3px; }
+.pcard h3 { font: 400 19px/1.25 var(--read); margin: 0; }
+.pcard .meta { font-size: 12.5px; color: var(--ink-2); }
+.stages { display: flex; gap: 3px; }
+.stages i { flex: 1; height: 3px; border-radius: 2px; background: var(--line); }
+.stages i.done { background: var(--status-2); }
+.stages i.now { background: var(--accent); }
+.pcard.newp .cover { display: grid; place-items: center; background: transparent; box-shadow: inset 0 0 0 1px var(--line); border: 1px dashed var(--ink-3); color: var(--ink-2); font-size: 13.5px; }
+.loopwrap { display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: 36px; align-items: center; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 8px; padding: 24px 28px; margin-bottom: 36px; }
+.loopwrap h2 { font: 400 22px/1.25 var(--read); margin: 0 0 8px; }
+.loopwrap p { margin: 0 0 12px; color: var(--ink-2); max-width: 62ch; }
+.loop-svg { width: 100%; height: auto; display: block; }
+.loop-svg .node circle { fill: var(--paper); stroke: var(--line); stroke-width: 1.2; }
+.loop-svg .node.work circle { stroke: var(--work); stroke-width: 1.6; }
+.loop-svg .node text { fill: var(--ink); font: 500 13px var(--ui); text-anchor: middle; }
+.loop-svg .node .sub { fill: var(--ink-2); font: 400 10.5px var(--ui); }
+.loop-svg .edge path { fill: none; stroke: var(--ink-3); stroke-width: 1.3; }
+.loop-svg .edge.nw path { stroke: var(--work); stroke-width: 1.6; }
+.loop-svg .spoke { fill: none; stroke: var(--status-2); stroke-width: 1; stroke-dasharray: 2 4; opacity: .7; }
+.loop-svg .edge text { fill: var(--ink-2); font: 400 13px var(--ui); }
+.loop-svg .edge.nw text { fill: var(--work); font-weight: 500; }
+.loop-svg .edge { cursor: pointer; }
+.loop-svg .edge path.hit, .loop-svg .edge:hover path.hit, .loop-svg .edge.on path.hit { stroke: transparent; stroke-width: 16; }
+.loop-svg .edge:focus-visible { outline: none; }
+.loop-svg .edge:focus-visible text { text-decoration: underline; }
+.loop-svg .edge:hover path, .loop-svg .edge.on path { stroke-width: 2.6; }
+.loop-svg .edge.on text { fill: var(--ink); }
+.loop-svg .core circle { fill: var(--accent-soft); stroke: none; }
+.loop-svg .core text { fill: var(--accent-strong); font: 500 12px var(--ui); text-anchor: middle; }
+.loop-svg .core .sub { font: 400 10px var(--ui); fill: var(--accent-strong); opacity: .8; }
+.loop-svg marker path { fill: var(--ink-3); }
+.loop-svg marker.nw path { fill: var(--work); }
+.edge-note { min-height: 92px; padding: 14px 16px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; }
+.edge-note b { font-weight: 600; }
+.edge-note .where { color: var(--ink-2); font-size: 12.5px; margin-top: 4px; }
+.loopstats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 14px; }
+.loopstats div { display: flex; flex-direction: column; }
+.loopstats b { font: 400 24px/1 var(--read); font-variant-numeric: tabular-nums; }
+.loopstats span { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+.projectish { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); flex-wrap: wrap; }
+.projectish p { margin: 0; flex: 1; min-width: 220px; font-size: 13px; }
+
+/* ---------- project ---------- */
+.p-head { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; }
+.p-head .cv { width: 112px; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; background: var(--mat); flex: none; box-shadow: var(--shadow-pic); }
+.p-head .cv img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.p-head .tt { flex: 1; min-width: 240px; }
+.p-head h1 { font: 400 30px/1.15 var(--read); margin: 2px 0 8px; }
+.p-head .sub { font-size: 13px; color: var(--ink-2); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.p-head .stages { max-width: 320px; margin-top: 10px; }
+.p-head .stagelbl { display: flex; max-width: 320px; font-size: 10.5px; color: var(--ink-3); margin-top: 5px; }
+.p-head .stagelbl span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-head .stagelbl span.now { color: var(--accent); font-weight: 600; }
+.p-head .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.ov { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
+.ov-main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.brief p { font: 400 17px/1.55 var(--read); margin: 0; max-width: 68ch; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.facts div { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.facts dt { font-size: 11.5px; color: var(--ink-2); margin-bottom: 2px; }
+.facts dd { margin: 0; font-size: 13.5px; }
+.side { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.sidebox { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 16px 18px; }
+.sidebox h4 { margin: 0 0 10px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.sidebox h4 .btn { font-weight: 500; }
+.loopmini { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+.loopmini button { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 5px; background: var(--paper); }
+.loopmini button:hover { background: var(--hover); }
+.loopmini b { font: 400 22px/1 var(--read); font-variant-numeric: tabular-nums; }
+.loopmini span { font-size: 11.5px; color: var(--ink-2); }
+.loopmini .lbl { font-size: 12px; color: var(--ink); font-weight: 500; }
+.uselist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.uselist li { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--line); }
+.uselist li:last-child { border-bottom: 0; }
+.uselist .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uselist .ct { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.uselist .gapline { color: var(--warn); }
+
+/* questions */
+.qlist { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.qrow { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 6px; border-bottom: 1px solid var(--line); }
+.qrow:hover { background: var(--hover); }
+.qrow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.qrow h3 { font: 400 17.5px/1.35 var(--read); margin: 0 0 6px; }
+.qrow .meta { font-size: 12px; color: var(--ink-2); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.qrow .counts { font-size: 12px; color: var(--ink-3); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.addq { display: flex; gap: 8px; margin-top: 14px; }
+.addq input { flex: 1; min-width: 0; height: 38px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 16px var(--read); padding: 0 2px; }
+.addq input:focus { outline: none; border-color: var(--accent); }
+
+/* question view */
+.qv-head { margin-bottom: 18px; }
+.qv-head h2 { font: 400 27px/1.25 var(--read); margin: 8px 0 12px; max-width: 30ch; }
+.qv { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 36px; align-items: start; }
+.qv-main { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+.block h3 { margin: 0 0 4px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.block .lede { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-2); }
+.edge-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+.edge-tag.w { color: var(--work); }
+.knows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.knows li { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 8px 10px; border-radius: 5px; }
+.knows li:nth-child(odd) { background: var(--panel); }
+.knows .slot { font-size: 11.5px; color: var(--ink-2); }
+.knows .slot.rv { color: var(--warn); }
+.knows .slot.lm { color: var(--accent); }
+.knows .tx { font-size: 13.5px; }
+.knows .tx .src { display: block; margin-top: 2px; }
+.knows li.fresh { animation: fresh 1.6s var(--ease); }
+@keyframes fresh { from { background: var(--accent-soft); } }
+.ev { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; }
+.evc { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.evc .pic { aspect-ratio: 4 / 3; border-radius: 5px; overflow: hidden; background: var(--mat); box-shadow: var(--shadow-pic); }
+.evc .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.evc .txt { aspect-ratio: 4 / 3; border-radius: 5px; padding: 12px 13px; overflow: hidden; font: 400 14.5px/1.4 var(--read); background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); }
+.evc .txt.note { background: var(--note-paper); box-shadow: inset 0 0 0 1px var(--line); font: 13px/1.45 var(--ui); }
+.evc .txt.link { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font: 13px/1.4 var(--ui); }
+.evc .txt .site { display: block; font-size: 11px; color: var(--ink-3); margin-bottom: 6px; }
+.evc .t { font-size: 12.5px; font-weight: 500; line-height: 1.3; }
+.evc .why { font: italic 400 13px/1.35 var(--read); color: var(--ink-2); }
+.evc.sugg .pic, .evc.sugg .txt { opacity: .78; outline: 1.5px dashed var(--ink-3); outline-offset: 3px; box-shadow: none; }
+.evc .sugg-acts { display: flex; gap: 6px; align-items: center; }
+.evc .madebadge, .bcard .madebadge { position: absolute; right: 8px; top: 8px; background: var(--work); color: var(--paper); font-size: 10.5px; font-weight: 600; padding: 2px 6px; border-radius: 3px; letter-spacing: .02em; }
+.evc .open { all: unset; cursor: pointer; display: block; }
+.evc .open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 5px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.opt { display: flex; flex-direction: column; background: var(--panel); border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; min-width: 0; }
+.opt.chosen { box-shadow: inset 0 0 0 2px var(--ok); }
+.opt .pic { aspect-ratio: 16 / 10; background: var(--mat); overflow: hidden; position: relative; }
+.opt .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.opt .pic .lt { position: absolute; right: 10px; top: 10px; width: 24px; height: 24px; border-radius: 50%; background: var(--panel); color: var(--ink); display: grid; place-items: center; font: 500 13px var(--read); box-shadow: var(--shadow-pic); }
+.opt .bd { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.opt h4 { margin: 0; font: 400 16.5px/1.3 var(--read); }
+.pc { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.pc li { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 6px; }
+.pc .m { font-weight: 600; }
+.pc .m.p { color: var(--ok); }
+.pc .m.c { color: var(--warn); }
+.opt .ft { display: flex; gap: 6px; margin-top: auto; padding-top: 4px; flex-wrap: wrap; }
+.crit { grid-column: 1 / -1; background: var(--paper); border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); padding: 14px 16px 14px 16px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; }
+.crit .av { width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 14px var(--read); }
+.crit p { margin: 0 0 8px; font: 400 15px/1.55 var(--read); max-width: 70ch; }
+.crit .cites { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.crit .who { font-size: 12px; color: var(--ink-2); margin-bottom: 4px; }
+.typing { display: inline-flex; gap: 4px; }
+.typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); animation: bl 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes bl { 50% { opacity: .25; } }
+.gapcard { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: 6px; border: 1px dashed var(--warn); background: var(--warn-soft); flex-wrap: wrap; }
+.gapcard .g { flex: 1; min-width: 220px; }
+.gapcard b { font-weight: 600; }
+.gapcard p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); }
+.gapcard .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.gapcard.closed { border-style: solid; border-color: var(--line); background: var(--panel); }
+.decision { background: var(--decision-paper); border-left: 3px solid var(--decision-rule); padding: 16px 18px; border-radius: 0 6px 6px 0; }
+.decision .kicker { color: var(--work); }
+.decision h4 { font: 400 18px/1.4 var(--read); margin: 6px 0 10px; }
+.decision ul { margin: 0 0 10px; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.decision .foot { font-size: 12px; color: var(--ink-2); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.qv-side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: calc(20px + env(safe-area-inset-top, 0px)); }
+.offer { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 14px 16px; font-size: 13px; }
+.offer .kicker { margin-bottom: 6px; }
+.offer p { margin: 0 0 10px; }
+.offer .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.offer.mem { border-left: 3px solid var(--status-2); border-radius: 0 6px 6px 0; }
+
+/* check */
+.check { margin-top: 8px; padding: 12px 14px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); grid-column: 1 / -1; }
+.check p { margin: 0 0 10px; font: 400 15px/1.45 var(--read); }
+.check .ans { display: flex; flex-direction: column; gap: 6px; }
+.check .ans button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 5px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; }
+.check .ans button:hover { background: var(--hover); }
+.check .ans button.right { box-shadow: inset 0 0 0 1.5px var(--ok); color: var(--ok); }
+.check .ans button.wrong { box-shadow: inset 0 0 0 1.5px var(--warn); color: var(--warn); }
+.check .fb { margin-top: 10px; font-size: 13px; }
+
+/* board */
+.boardbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.boardbar .grow { flex: 1; }
+.mason { display: flex; gap: 18px; align-items: flex-start; }
+.mason .col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.bgroup { margin-bottom: 34px; }
+.bgroup > h3 { font: 400 18px/1.3 var(--read); margin: 0 0 4px; }
+.bgroup > .muted { font-size: 12.5px; margin: 0 0 14px; }
+.bcard { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.bcard .pic { border-radius: 6px; overflow: hidden; background: var(--mat); box-shadow: var(--shadow-pic); transition: transform var(--dur-s) var(--ease); }
+.bcard .pic img { width: 100%; display: block; }
+.bcard:hover .pic { transform: translateY(-2px); }
+.bcard .txt { border-radius: 6px; padding: 14px 15px; font: 400 16px/1.4 var(--read); background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); }
+.bcard .txt.note { background: var(--note-paper); box-shadow: inset 0 0 0 1px var(--line); font: 13.5px/1.5 var(--ui); }
+.bcard .txt.link { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font: 13.5px/1.45 var(--ui); }
+.bcard .txt.decision-c { background: var(--decision-paper); box-shadow: none; border-left: 3px solid var(--decision-rule); border-radius: 0 6px 6px 0; font: 15px/1.45 var(--read); }
+.bcard .txt .site { display: block; font-size: 11px; color: var(--ink-3); margin-bottom: 6px; font-family: var(--ui); }
+.bcard .t { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.bcard .why { font: italic 400 13.5px/1.4 var(--read); color: var(--ink-2); }
+.bcard .from { font-size: 11.5px; color: var(--ink-3); }
+.bcard .open { all: unset; cursor: pointer; display: block; }
+.bcard .open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+/* drawer */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--float); box-shadow: var(--shadow-float); z-index: 40; display: flex; flex-direction: column; padding: calc(20px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) 22px; animation: slidein var(--dur-m) var(--ease); }
+@keyframes slidein { from { transform: translateX(30px); opacity: 0; } }
+.drawer .dh { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.drawer .dh h3 { margin: 0; font: 400 20px var(--read); }
+.drawer .dsearch { height: 40px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 17px var(--read); padding: 0 2px; margin-bottom: 12px; width: 100%; }
+.drawer .dsearch:focus { outline: none; border-color: var(--accent); }
+.drawer .dlist { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 2px; margin: 0 -8px; padding: 0 8px; }
+.drow { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px; border-radius: 6px; }
+.drow:hover { background: var(--hover); }
+.drow .th { width: 52px; height: 40px; border-radius: 4px; overflow: hidden; background: var(--mat); display: grid; place-items: center; font: 400 16px var(--read); color: var(--ink-2); }
+.drow .th img { width: 100%; height: 100%; object-fit: cover; }
+.drow .t { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.drow .s { font-size: 11.5px; color: var(--ink-2); }
+.drow .reason { grid-column: 2 / -1; display: flex; gap: 6px; }
+.drow .reason input { flex: 1; min-width: 0; height: 30px; border: 0; border-bottom: 1px solid var(--accent); background: transparent; font: italic 14px var(--read); }
+.drow .reason input:focus { outline: none; }
+.dlab { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 12px 0 4px; }
+
+/* uses / apply */
+.uses { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 36px; align-items: start; }
+.areagrp { margin-bottom: 22px; }
+.areagrp h4 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; font-weight: 500; }
+.urow { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 10px; border-top: 1px solid var(--line); }
+.urow:hover { background: var(--hover); }
+.urow .nm { font-size: 14px; font-weight: 500; }
+.urow .rs { font: italic 400 13.5px/1.35 var(--read); color: var(--ink-2); }
+.urow .mt { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+.urow.gapr .nm { color: var(--warn); }
+.constel { background: var(--panel); border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); padding: 14px; position: sticky; top: calc(20px + env(safe-area-inset-top, 0px)); }
+.constel svg { width: 100%; height: auto; display: block; }
+.constel .cap { font-size: 12px; color: var(--ink-2); margin: 8px 2px 2px; }
+.apply { max-width: 980px; }
+.apply-head { display: flex; align-items: flex-start; gap: 16px; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; }
+.apply-head h2 { font: 400 27px/1.2 var(--read); margin: 6px 0 6px; }
+.apply-head .sub { font-size: 13px; color: var(--ink-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.apply-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 36px; }
+.apply-grid .full { grid-column: 1 / -1; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.rules li { padding-left: 14px; border-left: 2px solid var(--line); }
+.rules q { font: 400 16px/1.45 var(--read); quotes: none; display: block; }
+.rules .src { margin-top: 3px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.checks label { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 8px; border-radius: 5px; cursor: pointer; font-size: 13.5px; }
+.checks label:hover { background: var(--hover); }
+.checks input { margin: 2px 0 0; accent-color: var(--accent); width: 15px; height: 15px; }
+.checks .why { display: block; font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.checks input:checked + span { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+
+/* log */
+.log { position: relative; display: flex; flex-direction: column; gap: 0; max-width: 820px; }
+.lrow { display: grid; grid-template-columns: 78px 22px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 0; }
+.lrow .d { font-size: 12px; color: var(--ink-2); text-align: right; padding-top: 2px; font-variant-numeric: tabular-nums; }
+.lrow .ic { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--board); color: var(--ink-2); }
+.lrow .ic svg { width: 12px; height: 12px; }
+.lrow .ic.learn { background: var(--accent-soft); color: var(--accent-strong); }
+.lrow .ic.save { background: var(--board); color: var(--ink); }
+.lrow .ic.made { background: var(--work-soft); color: var(--work); }
+.lrow .ic.decided { background: var(--ok-soft); color: var(--ok); }
+.lrow .ic.stage { background: var(--ink); color: var(--paper); }
+.lrow .b { font-size: 13.5px; }
+.lrow .b .muted { font-size: 12.5px; display: block; margin-top: 2px; }
+.stagebox { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 20px; flex-wrap: wrap; }
+.stagebox p { margin: 0; flex: 1; min-width: 220px; font-size: 13px; }
+
+/* sheet (modal) */
+.scrim { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 50; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); animation: fade var(--dur-s) var(--ease); }
+@keyframes fade { from { opacity: 0; } }
+.sheet { width: min(760px, 100%); max-height: calc(100% - 20px); overflow-y: auto; background: var(--float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 26px 28px 24px; animation: rise var(--dur-m) var(--ease); }
+.sheet.wide { width: min(980px, 100%); }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } }
+.sheet .sh { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.sheet .sh h2 { margin: 4px 0 0; font: 400 24px/1.25 var(--read); }
+.sheet .x { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); flex: none; }
+.sheet .x:hover { background: var(--hover); color: var(--ink); }
+.sheet .x:focus-visible { outline: 2px solid var(--accent); }
+.sheet .foot { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; align-items: center; }
+.sheet .foot .grow { flex: 1; font-size: 12px; color: var(--ink-2); min-width: 160px; }
+.steps { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+.steps li { display: flex; gap: 10px; align-items: center; color: var(--ink-3); transition: color var(--dur-s); }
+.steps li.on { color: var(--ink); }
+.steps li.done { color: var(--ink-2); }
+.steps li .tk { width: 16px; text-align: center; }
+.draft { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 28px; }
+.draft .full { grid-column: 1 / -1; }
+.draft h4 { margin: 0 0 8px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.draft .bp { font: 400 16px/1.5 var(--read); margin: 0; }
+.draft ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.draft label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.draft input[type=checkbox] { accent-color: var(--accent); margin-top: 3px; }
+.dref { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; }
+.dref .th { width: 44px; height: 34px; border-radius: 4px; overflow: hidden; background: var(--mat); }
+.dref .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dref .why { font: italic 13px/1.35 var(--read); color: var(--ink-2); }
+.briefparts { display: grid; grid-template-columns: 120px minmax(0, 1fr); border-top: 1px solid var(--line); }
+.briefparts dt, .briefparts dd { padding: 9px 0; border-bottom: 1px solid var(--line); margin: 0; font-size: 13px; }
+.briefparts dt { color: var(--ink-2); }
+.briefparts dd.newp { background: linear-gradient(90deg, var(--work-soft), transparent 70%); padding-left: 8px; }
+.fmt { display: flex; gap: 6px; margin: 16px 0 0; flex-wrap: wrap; }
+/* lumen player */
+.player { border-radius: 8px; overflow: hidden; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.slide { aspect-ratio: 16 / 9; padding: 32px 40px; display: flex; flex-direction: column; justify-content: center; gap: 12px; background: var(--note-paper); position: relative; }
+.slide h3 { font: 400 28px/1.2 var(--read); margin: 0; max-width: 24ch; }
+.slide p { font: 400 16px/1.5 var(--read); margin: 0; max-width: 52ch; color: var(--ink-2); }
+.slide svg { width: 100%; max-height: 74%; }
+.slide .tagfor { position: absolute; top: 16px; left: 20px; }
+.pctl { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.pctl .bar { flex: 1; min-width: 80px; height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.pctl .bar i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-m) var(--ease); }
+.pctl .cap { font-size: 12.5px; color: var(--ink-2); }
+.endcard { padding: 22px 24px; display: flex; flex-direction: column; gap: 10px; }
+.endcard h3 { margin: 0; font: 400 22px var(--read); }
+.endcard .tk { font: 400 16px/1.5 var(--read); padding-left: 14px; border-left: 2px solid var(--status-2); margin: 4px 0; }
+.forproj { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 8px; border-radius: 10px; background: var(--work-soft); color: var(--work); font-size: 11.5px; font-weight: 500; white-space: nowrap; }
+.forproj svg { width: 11px; height: 11px; }
+/* decide */
+.decide textarea { width: 100%; min-height: 76px; border: 0; border-radius: 6px; background: var(--decision-paper); border-left: 3px solid var(--decision-rule); padding: 12px 14px; font: 400 17px/1.45 var(--read); resize: vertical; }
+.decide textarea:focus { outline: 2px solid var(--accent); }
+.because { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.because label { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; padding: 7px 8px; border-radius: 5px; cursor: pointer; font-size: 13.5px; }
+.because label:hover { background: var(--hover); }
+.because input { accent-color: var(--accent); margin-top: 3px; }
+.because .src { display: block; }
+/* quick view (commonplace) */
+.qview { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 26px; }
+.qview .pic { border-radius: 6px; overflow: hidden; background: var(--mat); align-self: start; }
+.qview .pic img { width: 100%; display: block; }
+.qview h2 { font: 400 22px/1.25 var(--read); margin: 0 0 6px; }
+.qview .cap { font: 400 15px/1.5 var(--read); color: var(--ink-2); margin: 0 0 12px; }
+.qview .row { font-size: 12.5px; color: var(--ink-2); padding: 8px 0; border-top: 1px solid var(--line); }
+.qview .row b { color: var(--ink); font-weight: 500; display: block; margin-bottom: 4px; font-size: 12px; }
+.usein { margin-top: 10px; padding: 12px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); display: flex; flex-direction: column; gap: 8px; }
+.usein select, .usein input { height: 34px; border-radius: 5px; border: 0; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); padding: 0 10px; font-size: 13px; width: 100%; }
+.usein input { font: italic 14px var(--read); }
+.usein label { font-size: 11.5px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
+.usedin { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.usedin li { font-size: 13px; color: var(--ink); }
+.usedin .why { font: italic 13px var(--read); color: var(--ink-2); display: block; }
+/* debrief */
+.lesson { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 14px 0; border-top: 1px solid var(--line); }
+.lesson .pr { font-size: 12px; color: var(--ink-2); font-weight: 500; }
+.lesson textarea { width: 100%; min-height: 54px; border: 0; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 10px 12px; font: 400 15.5px/1.45 var(--read); resize: vertical; }
+.lesson textarea:focus { outline: 2px solid var(--accent); }
+.lesson .to { display: flex; gap: 8px; align-items: center; font-size: 12.5px; color: var(--ink-2); flex-wrap: wrap; }
+
+/* touchpoint screens */
+.tp-note { display: flex; gap: 10px; align-items: center; padding: 10px 14px; margin-bottom: 22px; border-radius: 6px; background: var(--work-soft); color: var(--work); font-size: 12.5px; flex-wrap: wrap; }
+.tp-note b { font-weight: 600; }
+.today { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; max-width: 1100px; }
+.today h1 { grid-column: 1 / -1; font: 600 22px var(--ui); margin: 0 0 4px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.today h1 span { font-weight: 400; color: var(--ink-2); }
+.cont-card { background: var(--panel); border-left: 3px solid var(--accent); padding: 18px 20px; box-shadow: inset 0 0 0 1px var(--line); border-radius: 0 6px 6px 0; }
+.cont-card .kicker { margin-bottom: 6px; text-transform: none; letter-spacing: 0; font-size: 12px; }
+.cont-card h3 { font: 400 21px/1.3 var(--read); margin: 0 0 8px; }
+.cont-card p { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; }
+.cont-card.work { border-left-color: var(--work); }
+.agenda { grid-column: 1 / -1; display: flex; flex-direction: column; border-top: 1px solid var(--line); max-width: 640px; }
+.agenda div { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.agenda .d { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.learnbar { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 7px 0 7px; border-radius: 12px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 10px; max-width: 1100px; }
+.learnbar .fmtseg { flex: none; }
+.learnbar input { flex: 1; min-width: 0; border: 0; background: transparent; font: 19px var(--read); height: 44px; }
+.learnbar input:focus { outline: none; }
+.forsel { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 17px; background: var(--work-soft); color: var(--work); font-size: 13px; font-weight: 500; white-space: nowrap; flex: none; }
+.forsel svg { width: 13px; height: 13px; }
+.goalcols { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; max-width: 1100px; }
+.goalcol { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.goalcol.proj { box-shadow: inset 0 0 0 1px var(--work); }
+.goalcol h3 { margin: 0; font: 400 18px/1.3 var(--read); display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.goalcol h3 span { font: 400 12px var(--ui); color: var(--ink-2); white-space: nowrap; }
+.goalcol .it { border-top: 1px solid var(--line); padding-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.goalcol .it .f { font-size: 11.5px; color: var(--ink-2); }
+.goalcol .it .tt { font-size: 14px; }
+.cwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
+.cwall .bcard .open { cursor: pointer; }
+.chips { display: flex; align-items: center; gap: 4px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.chip { all: unset; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 4px; font-size: 13.5px; color: var(--ink-2); white-space: nowrap; }
+.chip:hover { color: var(--ink); background: var(--hover); }
+.chip[aria-pressed="true"] { color: var(--ink); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.chip:focus-visible { outline: 2px solid var(--accent); }
+.chip .n { color: var(--ink-3); font-size: 12px; }
+.loci { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 28px; align-items: start; }
+.mapbox { background: var(--panel); border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); padding: 10px; overflow-x: auto; }
+.mapbox svg { width: 100%; min-width: 560px; height: auto; display: block; }
+.mapbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.tpanel { background: var(--panel); border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.tpanel h2 { font: 400 22px/1.25 var(--read); margin: 0; }
+.tpanel .path { font-size: 12px; color: var(--ink-2); }
+.tpanel .st { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.usedbox { border-radius: 6px; background: var(--work-soft); padding: 12px 14px; font-size: 13px; display: flex; flex-direction: column; gap: 8px; }
+.usedbox .why { font: italic 14px var(--read); color: var(--ink-2); }
+.map-node { cursor: pointer; }
+.map-node text { font: 12px var(--ui); fill: var(--ink); }
+.map-node.area text { font: 600 12.5px var(--ui); }
+.map-node.dim { opacity: .28; }
+.map-node:focus-visible { outline: none; }
+.map-node:focus-visible circle { stroke: var(--accent); stroke-width: 2.5; }
+
+/* toast, proto bar, guide */
+.toast { position: fixed; left: 50%; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); border-radius: 8px; padding: 10px 12px 10px 16px; display: flex; gap: 12px; align-items: center; font-size: 13px; z-index: 70; box-shadow: var(--shadow-lift); max-width: calc(100% - 32px); animation: rise var(--dur-m) var(--ease); }
+.toast button { all: unset; cursor: pointer; color: var(--status-1); font-weight: 600; padding: 4px 6px; border-radius: 4px; white-space: nowrap; }
+.toast button:hover { background: rgba(255, 255, 255, .1); }
+.proto { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); z-index: 30; display: flex; gap: 4px; align-items: center; background: var(--float); box-shadow: var(--shadow-float); border-radius: 8px; padding: 5px 6px 5px 12px; font-size: 12.5px; }
+.proto .lbl { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; color: var(--accent); margin-right: 6px; }
+.guide { position: fixed; top: calc(58px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); width: min(400px, calc(100% - 24px)); max-height: calc(100% - 80px); overflow-y: auto; z-index: 31; background: var(--float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 18px 20px; font-size: 13px; animation: rise var(--dur-s) var(--ease); }
+.guide h3 { margin: 0 0 4px; font: 400 19px var(--read); }
+.guide ol { padding-left: 18px; margin: 10px 0 0; display: flex; flex-direction: column; gap: 9px; }
+.guide li button { all: unset; cursor: pointer; color: var(--accent); font-weight: 500; }
+.guide li button:hover { text-decoration: underline; }
+.guide .foot { margin-top: 14px; font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* ---------- narrow ---------- */
+@media (max-width: 1100px) {
+  .w-hero, .ov, .qv, .uses, .loci { grid-template-columns: minmax(0, 1fr); }
+  .loopwrap { grid-template-columns: minmax(0, 1fr); }
+  .loopwrap .loop-svg { max-width: 440px; }
+  .qv-side, .constel { position: static; }
+}
+@media (max-width: 720px) {
+  .rail { inset: auto 0 0 0; width: auto; height: calc(56px + env(safe-area-inset-bottom, 0px)); flex-direction: row; justify-content: space-around; padding: 0 max(8px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(8px, env(safe-area-inset-left, 0px)); border-right: 0; border-top: 1px solid var(--line); }
+  .rail .logo, .rail .grow, .rail .me, .rail .cap-btn, .rail .tip { display: none; }
+  .stage { margin-left: 0; padding-block: 64px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .w-ask h1, .p-head h1 { font-size: 25px; }
+  .qv-head h2, .apply-head h2 { font-size: 23px; }
+  .apply-grid, .draft, .today, .qview { grid-template-columns: minmax(0, 1fr); }
+  .qrow { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .qrow .counts { text-align: left; }
+  .knows li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .mason { flex-direction: column; }
+  .sheet { padding: 20px 18px; }
+  .slide { padding: 20px 22px; }
+  .slide h3 { font-size: 21px; }
+  .briefparts { grid-template-columns: 90px minmax(0, 1fr); }
+  .lrow { grid-template-columns: 56px 22px minmax(0, 1fr); gap: 8px; }
+  .learnbar { height: auto; flex-wrap: wrap; padding: 7px; }
+  .learnbar input { flex-basis: 100%; }
+  .askbox { height: auto; flex-wrap: wrap; padding: 6px 8px 8px 14px; }
+  .askbox input { flex-basis: 100%; }
+  .loopstats { gap: 16px; }
+  .toast { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+}
+</style>
+
+<div id="app"></div>
+<script>
+const IMG = /*IMG*/{};
+</script>
+<script>
+/* Work (prototype). A fifth destination where a learner uses what they've learned and saved on something they're
+   making, and where that work feeds Learn, Commonplace and Loci back. Spec: docs/superpowers/specs/2026-10-24-work-design.md.
+   Everything is example data for one learner: an architect working on a prayer hall in Dubai (the same learner as the
+   memory and photos prototypes). Loci's words are scripted. Nothing is saved; Start again resets. */
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+/* ------------------------------------------------------------------ icons (lucide shapes) */
+const ICON = {
+  plus: '<circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  learn: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  library: '<path d="m16 6 4 14M12 6v14M8 8v12M4 4v16"/>',
+  work: '<path d="M3 21V3l18 18z"/><path d="M7.5 16.5v-4.6l4.6 4.6z"/><path d="M3 8h2M3 12h2"/>',
+  graph: '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  back: '<path d="m15 18-6-6 6-6"/>',
+  map: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="10" cy="18" r="2.5"/><path d="m8.2 7.2 7.5.6M7 8.3l2.2 7.4M16.6 10.1l-5 6"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  play: '<path d="M7 4v16l13-8z"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  pencil: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  bookmark: '<path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  flag: '<path d="M4 22V4a1 1 0 0 1 1-1h11l-2 4 2 4H5"/>',
+  dot: '<circle cx="12" cy="12" r="4"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+};
+const ic = (k, cls = "") => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+
+/* ------------------------------------------------------------------ hand-drawn sketches ("made here" items) */
+function sketch(kind) {
+  const ink = "#2c3640", paper = "#f6f5ef", soft = "#c9a86a", L = (d, w = 1.4) => `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const label = (x, y, t, s = 11) => `<text x="${x}" y="${y}" font-family="Courier New, monospace" font-size="${s}" fill="${ink}" letter-spacing="1">${t}</text>`;
+  let body = "", w = 640, h = 440;
+  if (kind === "plan") {
+    body += L("M80 60h480v250H80z", 2) + L("M80 310h480v100H80", 1);
+    let dots = "";
+    for (let i = 0; i < 9; i++) for (let j = 0; j < 7; j++) { const x = 120 + i * 50 + (i > 3 ? 14 : 0) - (i > 4 ? 14 : 0); const y = 90 + j * 34; dots += `<circle cx="${x}" cy="${y}" r="3" fill="${ink}"/>`; }
+    body += dots + L("M300 62v246M340 62v246", .8) + L("M300 60c0-26 40-26 40 0", 1.6);
+    body += `<rect x="296" y="340" width="48" height="40" fill="none" stroke="${soft}" stroke-width="1.4" stroke-dasharray="4 4"/>`;
+    body += L("M590 120v-36M590 84l-6 12M590 84l6 12", 1.2) + label(584, 136, "N");
+    body += label(80, 40, "PLAN 1:500  ·  7 × 9 BAYS ON A 6 M GRID") + label(286, 52, "MIHRAB", 9) + label(250, 404, "COURT", 10);
+  } else if (kind === "slot") {
+    body += L("M40 380h560", 1.2) + L("M110 380V120h20V380", 2) + L("M130 140h420", 2.2) + L("M150 140V110h40v30", 1.6) + L("M150 110h-40", 1.4);
+    for (let i = 0; i < 6; i++) body += L(`M${160 + i * 7} ${108 - i * 2}l${-28 + i * 2} ${230 - i * 18}`, .7);
+    body += `<rect x="130" y="150" width="14" height="230" fill="${soft}" opacity=".35"/>`;
+    for (let i = 0; i < 5; i++) { const x = 280 + i * 60; body += L(`M${x} 380v-34M${x - 7} 360h14`, 1) + `<circle cx="${x}" cy="338" r="6" fill="none" stroke="${ink}" stroke-width="1"/>`; }
+    body += L("M560 380V140", 1.2) + label(40, 56, "SECTION  ·  ROOF SLOT OVER THE QIBLA WALL") + label(70, 100, "BAFFLE", 9) + label(150, 410, "QIBLA WALL, LIT FROM ABOVE", 9) + label(400, 120, "88° JUNE NOON", 9);
+  } else if (kind === "canopy") {
+    body += L("M40 380h560", 1.2) + L("M80 380V170h70v210M490 380V170h70v210", 1.8) + L("M80 170h70M490 170h70", 2.2);
+    body += L("M150 150q170 -40 340 0", 1.6) + L("M150 150v20M490 150v20M320 120v-6", 1);
+    body += `<path d="M160 380h320l-20-210H180z" fill="${soft}" opacity=".22"/>`;
+    body += `<circle cx="372" cy="56" r="14" fill="none" stroke="${ink}" stroke-width="1.4"/>` + L("M366 72l-42 302", .8) + L("M380 72l-36 302", .8);
+    body += label(40, 40, "COURT  ·  12:00, AUGUST  ·  SUN 79°") + label(92, 160, "ARCADE", 9) + label(270, 106, "TENSILE CANOPY", 9) + label(250, 410, "SHADE AT NOON COMES FROM ABOVE", 9);
+  }
+  return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><rect width="${w}" height="${h}" fill="${paper}"/>${body}</svg>`);
+}
+const SK = { plan: { src: sketch("plan"), r: 640 / 440 }, slot: { src: sketch("slot"), r: 640 / 440 }, canopy: { src: sketch("canopy"), r: 640 / 440 } };
+const pic = (k) => IMG[k] || SK[k] || null;
+
+/* ------------------------------------------------------------------ the learner's map (Loci) */
+const ST = ["Not started", "Learning", "Learned"];
+const TOPICS = [
+  { id: "hist", name: "History & Theory", parent: null },
+  { id: "islamic", name: "Islamic architecture", parent: "hist", st: 2, level: "Regular" },
+  { id: "plantypes", name: "Plan types & ritual", parent: "islamic", st: 1 },
+  { id: "hypo", name: "Arcades & hypostyle", parent: "islamic", st: 1 },
+  { id: "court", name: "Courtyards", parent: "islamic", st: 2 },
+  { id: "culture", name: "Culture & Context", parent: null },
+  { id: "climate", name: "Climate-responsive design", parent: "culture", st: 1, level: "Basics" },
+  { id: "wind", name: "Wind towers", parent: "climate", st: 1 },
+  { id: "shading", name: "Shading & screens", parent: "climate", st: 0 },
+  { id: "design", name: "Design & Composition", parent: null },
+  { id: "light", name: "Light & threshold", parent: "design", st: 2, level: "Regular" },
+  { id: "glare", name: "Daylight & glare", parent: "light", st: 0 },
+  { id: "envelope", name: "Envelope & Facade", parent: null },
+  { id: "facades", name: "Facade systems", parent: "envelope", st: 1, level: "Regular" },
+  { id: "precast", name: "Precast", parent: "facades", st: 1, level: "Basics" },
+  { id: "materials", name: "Materials & Construction", parent: null },
+  { id: "brick", name: "Brick", parent: "materials", st: 1 },
+  { id: "earth", name: "Earth", parent: "materials", st: 0 },
+  { id: "stone", name: "Tile & stone", parent: "materials", st: 0 },
+  { id: "practice", name: "Practice & Delivery", parent: null },
+  { id: "housing", name: "Housing study", parent: "practice", st: 0, projectish: true },
+  { id: "struct", name: "Structures", parent: null },
+  { id: "concrete", name: "Concrete & precast", parent: "struct", st: 0 },
+];
+const TP = Object.fromEntries(TOPICS.map((t) => [t.id, t]));
+const ORIG_ST = Object.fromEntries(TOPICS.map((t) => [t.id, t.st]));
+const areaOf = (id) => { let t = TP[id]; while (t && t.parent) t = TP[t.parent]; return t; };
+const pathOf = (id) => { const out = []; let t = TP[id]; while (t) { out.unshift(t.name); t = TP[t.parent]; } return out.join(" › "); };
+
+/* ------------------------------------------------------------------ Commonplace (the same items as the photos prototype) */
+const I = (id, type, title, caption, topics, date, extra = {}) => ({ id, type, title, caption, topics, date, ...extra });
+const ITEMS = [
+  I("courtyard-morning", "photo", "Courtyard toward the prayer hall", "Morning, from the north gate. The pool sits on the axis of the wider central bay.", ["court", "hypo"], "12 Sep", { kind: "Site visits", img: "courtyard-morning", picked: true }),
+  I("courtyard-noon", "photo", "Arcade at noon", "Shade only inside the arcade at this hour; the court itself is a heat trap.", ["court", "shading"], "12 Sep", { kind: "Site visits", img: "courtyard-noon" }),
+  I("hypostyle", "photo", "Hypostyle hall, light through the roof", "Openings in the roof slab, not windows: light arrives in pools between the columns.", ["hypo", "light"], "12 Sep", { kind: "Site visits", img: "hypostyle", picked: true }),
+  I("colonnade-dusk", "photo", "Colonnade at dusk", "The colonnade keeps its rhythm long after the court goes dark.", ["hypo"], "12 Sep", { kind: "Site visits", img: "colonnade-dusk" }),
+  I("windtowers", "photo", "Wind towers over the old quarter", "Each tower faces the summer wind; the slots are on one side only.", ["wind"], "3 Apr", { kind: "Site visits", img: "windtowers", picked: true }),
+  I("vaults", "photo", "Vaulted roofs, mud brick", "Barrel vaults in a row, a dome at the end. No formwork used.", ["earth", "court"], "4 Apr", { kind: "Site visits", img: "vaults" }),
+  I("stepwell", "photo", "Stepwell, looking down", "", [], "4 Apr", { kind: "Site visits", img: "stepwell" }),
+  I("screen-shadow", "photo", "Mashrabiya shadow on the floor", "Late afternoon in a Cairo house. The screen draws on the floor for an hour.", ["shading", "light"], "18 Feb", { kind: "Site visits", img: "screen-shadow", picked: true }),
+  I("brick-hall", "photo", "Brick prayer hall, light from above", "Saved for the way light comes down the brick, not across it.", ["brick", "light"], "22 Aug", { kind: "References", img: "brick-hall", picked: true, site: "archdaily.com" }),
+  I("stair-light", "photo", "Stair under a roof light", "Board-marked concrete, one slot of light at the top.", ["light"], "29 Aug", { kind: "References", img: "stair-light", site: "archdaily.com" }),
+  I("reading-room", "photo", "Reading room with clerestory", "North clerestory, no direct sun on the tables.", ["light"], "15 Oct", { kind: "Renders", img: "reading-room", picked: true }),
+  I("pavilion-a", "photo", "Massing option A: one long roof", "Reading hall under a single roof plane, closed to the north.", [], "14 Oct", { kind: "Renders", img: "pavilion-a", picked: true }),
+  I("pavilion-b", "photo", "Massing option B: open both sides", "Same roof, colonnade both sides. Too much glare in the afternoon.", [], "14 Oct", { kind: "Renders", img: "pavilion-b" }),
+  I("vault-study", "photo", "Vault study, clay model", "Testing barrel vaults over the stacks.", ["earth"], "16 Oct", { kind: "Renders", img: "vault-study" }),
+  I("plan-courtyard", "photo", "Courtyard house, ground floor plan", "Liwan to the west, majlis to the east. Columns only on the court.", ["court", "housing"], "28 Sep", { kind: "Drawings", img: "plan-courtyard", picked: true }),
+  I("tplan", "photo", "T-plan prayer hall, column grid", "The wider axial aisle meets the qibla transept.", ["hypo", "plantypes"], "15 Sep", { kind: "Drawings", img: "tplan" }),
+  I("section-windtower", "photo", "Section through a wind tower", "Cool air down the tower, warm air out through the high openings.", ["wind"], "10 Apr", { kind: "Drawings", img: "section-windtower", picked: true }),
+  I("arcade-elevation", "photo", "Arcade elevation, bay proportions", "Bay 3.8 m, spring 3.2 m. Worth testing at 1:20.", ["hypo"], "16 Sep", { kind: "Drawings", img: "arcade-elevation" }),
+  I("mat-jali", "photo", "Perforated brick screen", "Half-bricks left out. Light and air, no glass.", ["brick", "shading"], "3 Jul", { kind: "Materials", img: "mat-jali", picked: true }),
+  I("mat-zellige", "photo", "Zellige, green glaze", "Each tile slightly different. The joints stay wide.", ["stone"], "2 Jul", { kind: "Materials", img: "mat-zellige" }),
+  I("mat-travertine", "photo", "Travertine, vein cut", "", [], "12 Oct", { kind: "Materials", img: "mat-travertine" }),
+  I("mat-concrete", "photo", "Board-marked concrete", "", [], "20 Oct", { kind: "Materials", img: "mat-concrete" }),
+  I("q-shade", "quote", "Shade first, then mass, then air.", "", ["climate"], "21 Oct", { src: "Studio course · Climate and Architecture: lecture notes, p. 3", picked: true }),
+  I("q-fathy", "quote", "We have to design for the climate, not against it.", "", ["climate"], "2 May", { src: "Hassan Fathy" }),
+  I("q-field", "quote", "The eye never quite finds the end of the field.", "", ["hypo"], "20 Sep", { src: "Studio lecture · Córdoba, 10:05" }),
+  I("n-mihrab", "note", "Mihrab tolerances on site", "Precaster says ±3 mm on the mihrab panel faces, ±6 mm on the joints. Ask for a mock-up before the review.", ["precast"], "21 Oct"),
+  I("l-rouf", "link", "Bait Ur Rouf Mosque, Marina Tabassum", "Brick, no dome, light from above.", ["light", "brick"], "22 Aug", { site: "archdaily.com" }),
+  I("ln-hassan", "note", "What I took from Sultan Hassan", "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.", ["court"], "2 Aug"),
+];
+const IT = () => Object.fromEntries(S.items.map((i) => [i.id, i]));
+
+/* ------------------------------------------------------------------ memory (what Loci knows at each place; from the memory prototype) */
+const MEMORY = [
+  { place: "islamic", slot: "working_on", text: "The mihrab and the light on the qibla wall", basis: "said", when: "20 Oct", how: "you said, in this topic's chat" },
+  { place: "islamic", slot: "known", text: "Hypostyle and four-iwan plans", basis: "showed", when: "23 Oct", how: "two checks right, three days apart" },
+  { place: "light", slot: "status", text: "Light & threshold: Learned", basis: "said", when: "14 Oct", how: "you chose it" },
+  { place: "climate", slot: "known", text: "The stack effect", basis: "showed", when: "21 Oct", how: "from a check, right twice" },
+  { place: "climate", slot: "known", text: "How a malqaf catches the wind", basis: "showed", when: "19 Oct", how: "from a quiz" },
+  { place: "climate", slot: "revisit", text: "Evaporative cooling helps little in humid air", basis: "showed", when: "22 Oct", how: "from a check you missed", check: "evap" },
+  { place: "climate", slot: "prefer", text: "Sections before photos", basis: "said", when: "20 Oct", how: "you said" },
+  { place: "precast", slot: "known", text: "Panel joints", basis: "showed", when: "22 Oct", how: "from a check" },
+  { place: "precast", slot: "known", text: "Tolerances", basis: "showed", when: "22 Oct", how: "from a check" },
+  { place: "precast", slot: "revisit", text: "Thermal bridging at panel fixings", basis: "showed", when: "23 Oct", how: "from a check you missed", check: "bridge" },
+];
+const SLOTNAME = { working_on: "Working on", known: "You know", revisit: "To revisit", prefer: "You like", status: "Status", lumen: "From a Lumen", did: "You did" };
+const CHECKS = {
+  evap: { q: "Where does a wet jar, a pool or a fountain cool the air the most?", a: ["Dry desert in June, humidity 15 %", "Humid coast in August, humidity 70 %", "About the same in both"], right: 0,
+    yes: "Right. Water cools air by evaporating, and humid air can take very little more. In Dubai in August the pool in your court will look cool and do little. Moved from To revisit to You know.",
+    no: "Not quite. Humid air can barely take more water, so evaporation, and the cooling with it, stalls. It stays in To revisit." },
+  bridge: { q: "Through a precast panel wall, what is usually the main path for heat?", a: ["The joint sealant between panels", "The steel fixings and brackets that cross the insulation", "The concrete face of the panel"], right: 1,
+    yes: "Right. Steel conducts heat about 1,000 times better than insulation, so every bracket is a small bridge. Ask the precaster for thermally broken fixings. Moved to You know.",
+    no: "Not quite. The sealant is thin and the face is outside the insulation; the steel brackets cross it. It stays in To revisit." },
+};
+
+/* ------------------------------------------------------------------ projects */
+const FACTS_P1 = [["Site", "Corner plot, Al Barsha 2, Dubai · 25.1° N"], ["Worshippers", "About 600: 450 in the hall, 150 in the women's gallery"], ["Qibla", "258°, west-southwest"], ["Climate", "Hot desert on a humid coast: 46 °C in August, night humidity to 90 %"], ["Structure", "Precast concrete frame and panels"], ["Programme", "14 months on site"], ["Client", "A neighbourhood community trust"], ["Next", "Concept review, Thursday 29 October"]];
+const STAGES = ["Brief", "Concept", "Developed", "Technical", "Site", "Done"];
+const SEED = {
+  projects: [
+    { id: "p1", title: "Prayer hall, Al Barsha", cover: "hypostyle", status: "active", stage: 1, due: "Concept review · Thu 29 Oct",
+      brief: "A neighbourhood mosque for about 600 worshippers on a corner plot in Al Barsha. A prayer hall with a women's gallery, a shaded court for the overflow on Fridays and at Eid, ablutions and an imam's room. The client wants it calm and cool without leaning on air conditioning in the court, and a qibla wall people remember. Precast concrete, to keep the programme to fourteen months.",
+      facts: FACTS_P1,
+      uses: [
+        { topic: "light", reason: "The qibla wall has to be the brightest surface in the hall" },
+        { topic: "plantypes", reason: "Rows, the mihrab and the women's gallery" },
+        { topic: "hypo", reason: "A precast grid of columns, light in pools" },
+        { topic: "court", reason: "Overflow on Fridays and at Eid" },
+        { topic: "climate", reason: "A court that stays usable in August" },
+        { topic: "wind", reason: "Air through the hall without machines" },
+        { topic: "shading", reason: "Screens for the gallery and the court" },
+        { topic: "precast", reason: "The whole structure and the mihrab panel" },
+        { topic: "glare", reason: "Asr and Maghrib are prayed facing the low sun" },
+      ],
+      gaps: [{ id: "g-acou", name: "Room acoustics", why: "600 people should hear the imam clearly; your map has nothing on it" }, { id: "g-humid", name: "Comfort in humid heat", why: "Night humidity reaches 90 %; your map only covers dry climates" }],
+      questions: [
+        { id: "q1", text: "How do we bring daylight onto the qibla wall without glare?", state: "exploring", uses: ["light", "plantypes", "glare"], added: "19 Oct" },
+        { id: "q2", text: "Can the court stay usable at noon in August?", state: "exploring", uses: ["climate", "court", "wind", "shading"], added: "19 Oct" },
+        { id: "q3", text: "Where does the panel joint go on the mihrab?", state: "open", uses: ["precast", "facades"], added: "21 Oct" },
+        { id: "q4", text: "Hypostyle, or one clear span?", state: "decided", uses: ["hypo", "plantypes", "precast"], added: "18 Oct", decided: "22 Oct" },
+        { id: "q5", text: "How do 600 people hear the imam without loud speakers?", state: "open", uses: [], gap: "g-acou", added: "22 Oct" },
+      ],
+      refs: [
+        { item: "brick-hall", q: "q1", reason: "Light down the brick: the effect we want on the qibla wall" },
+        { item: "hypostyle", q: "q1", reason: "Light in pools between the columns, no windows" },
+        { item: "stair-light", q: "q1", reason: "One slot at the top: option A in one picture" },
+        { item: "l-rouf", q: "q1", reason: "A mosque that already does it" },
+        { item: "reading-room", q: "q1", reason: "From the Riyadh competition: option B" },
+        { item: "courtyard-noon", q: "q2", reason: "Your own note: the open court is a heat trap at noon" },
+        { item: "q-shade", q: "q2", reason: "The order to design the court in" },
+        { item: "windtowers", q: "q2", reason: "Slots that face the summer wind" },
+        { item: "section-windtower", q: "q2", reason: "How the air moves through a tower" },
+        { item: "courtyard-morning", q: "q2", reason: "A pool on the axis: does it cool, or only look cool?" },
+        { item: "n-mihrab", q: "q3", reason: "The precaster's numbers" },
+        { item: "mat-concrete", q: "q3", reason: "The finish the client liked" },
+        { item: "tplan", q: "q4", reason: "The wider axial aisle meets the qibla transept" },
+        { item: "colonnade-dusk", q: "q4", reason: "What a repeated bay feels like" },
+        { item: "arcade-elevation", q: "q4", reason: "Bay proportions to test against a 6 m grid" },
+        { item: "mat-travertine", q: null, reason: "Floor of the hall: cool underfoot" },
+        { item: "mat-zellige", q: null, reason: "The ablutions wall" },
+      ],
+      suggested: { q1: [{ item: "mat-jali", reason: "Tagged Shading & screens: light in without a view of the sun" }, { item: "screen-shadow", reason: "Low western sun through a screen: what option C would do" }], q2: [{ item: "vaults", reason: "Thick roofs keep the heat out: tagged Earth" }, { item: "stepwell", reason: "No topic yet. Deep, shaded and cool: worth a look" }], q3: [] },
+      made: [
+        { id: "m-plan", type: "photo", title: "Plan sketch: 7 × 9 bays to the qibla", caption: "Wider axial aisle to the mihrab. Court to the east.", img: "plan", date: "22 Oct", topics: ["hypo", "plantypes"], kind: "Drawings", q: "q4" },
+        { id: "m-slot", type: "photo", title: "Section: roof slot over the qibla wall", caption: "Light grazes the wall from above. A baffle against the June noon sun.", img: "slot", date: "24 Oct", topics: ["light"], kind: "Drawings", q: "q1" },
+        { id: "m-canopy", type: "photo", title: "Court canopy study, noon in August", caption: "At 79° the walls can't shade the court. Shade has to come from above.", img: "canopy", date: "24 Oct", topics: ["climate", "shading"], kind: "Drawings", q: "q2" },
+        { id: "m-site", type: "photo", title: "Site visit: the plot, looking toward the qibla", caption: "The long side of the plot runs at 258°. Neighbours are two floors high.", img: "earth-wall", date: "19 Oct", topics: [], kind: "Site visits", q: null },
+      ],
+      options: {
+        q1: [
+          { id: "A", title: "A roof slot along the qibla wall", img: "slot", pros: [["Light grazes the wall from above", "brick-hall"], ["No sun in anyone's eyes at Asr or Maghrib", null]], cons: [["The slot sees the sky: a stripe of hard light at noon in June (88°)", null]] },
+          { id: "B", title: "A north clerestory over the hall", img: "reading-room", pros: [["Even light with no sun on the tables", "reading-room"]], cons: [["Lights the room, not the qibla wall", null]] },
+          { id: "C", title: "A side court behind a screen", img: "screen-shadow", pros: [["Patterned light and air through the screen", "mat-jali"]], cons: [["Low western sun comes in across the rows at Asr", null]] },
+        ],
+        q2: [
+          { id: "A", title: "Deep arcades on all four sides", img: "courtyard-noon", pros: [["Shade where people actually stand", "courtyard-noon"]], cons: [["The middle of the court is still in full sun at noon", null]] },
+          { id: "B", title: "A tensile canopy over the court", img: "canopy", pros: [["At 79° only shade from above works", null]], cons: [["Traps hot air unless it's lifted clear of the arcade", null]] },
+          { id: "C", title: "Trees and a pool on the axis", img: "courtyard-morning", pros: [["Looks and feels cool in the morning", "courtyard-morning"]], cons: [["A pool cools little in humid August air", null]] },
+        ],
+      },
+      crit: {
+        "q1:A": { text: ["This is the strongest of the three for your brief. It's the move in <i>Brick prayer hall, light from above</i> and <i>Bait Ur Rouf Mosque</i>: the wall is lit and the sun is never seen.", "Two things to check before Thursday. In June the sun is 88° up at noon, so the slot will throw a hard stripe straight down the wall at midday; a deep upstand or a baffle turns it into a glow. And your <i>Precast</i> card says Basics, with <i>thermal bridging at panel fixings</i> to revisit: a slot along the wall is a long junction between roof and panels. Ask the precaster."], cites: [["item", "brick-hall"], ["item", "l-rouf"], ["mem", "Precast · to revisit"]] },
+        "q1:B": { text: ["Good light in the wrong place. Your own caption on <i>Reading room with clerestory</i> says it: no direct sun on the tables. That's the aim in a library.", "Here the brief asks for a qibla wall people remember. A north clerestory lights the whole hall evenly, so the qibla wall ends up one of the darker surfaces in view. If you keep B, add light aimed at the wall."], cites: [["item", "reading-room"], ["fact", "Brief"]] },
+        "q1:C": { text: ["The qibla is at 258°, west-southwest, so Asr and Maghrib are prayed facing almost into the low sun. A screen in a side court lets that sun in at a raking angle across the rows.", "Your <i>Mashrabiya shadow on the floor</i> is exactly that late-afternoon light: beautiful on the floor, but it arrives at eye height. C suits the women's gallery or the court, not the qibla."], cites: [["item", "screen-shadow"], ["fact", "Qibla 258°"]] },
+        "q2:A": { text: ["You wrote the answer yourself at Kairouan: shade only inside the arcade at noon; the court is a heat trap. Arcades give people somewhere to stand, but at 79° the sun clears any wall you can build, so the centre stays in full sun.", "Keep the arcades for Fridays and Eid, when the rows spill out, and decide separately what covers the middle."], cites: [["item", "courtyard-noon"], ["fact", "Sun 79°, August noon"]] },
+        "q2:B": { text: ["This is the only option that shades the middle of the court at noon, which is what your own rule asks for first: shade, then mass, then air.", "Lift the canopy clear of the arcade roofs so hot air escapes at the edges; your wind tower section shows the same idea, warm air out high."], cites: [["item", "q-shade"], ["item", "section-windtower"]] },
+        "q2:C": { text: ["Careful here. Your memory card for Climate-responsive design has <i>evaporative cooling helps little in humid air</i> to revisit, and Dubai's August is humid. The pool will look cool and do little to the air.", "Trees help with shade, if they get water. Try the check on To revisit before you lean on the pool."], cites: [["mem", "Climate-responsive design · to revisit"], ["item", "courtyard-morning"]] },
+      },
+      decisions: [{ id: "d4", q: "q4", text: "A hypostyle of 7 × 9 bays on a 6 m precast grid, with a wider axial aisle to the mihrab.", because: [["Light can come through the roof in pools between columns", "hypostyle"], ["A repeated bay suits precast: one column, one beam, one roof unit", null], ["The wider aisle leads the eye to the mihrab", "tplan"]], date: "22 Oct", uses: ["hypo", "plantypes", "precast"] }],
+      known: { q1: [], q2: [], q3: [] },
+      log: [
+        { d: "24 Oct", k: "made", t: "Made <b>Court canopy study, noon in August</b>", s: "Saved to Commonplace › Drawings, made in this project" },
+        { d: "24 Oct", k: "made", t: "Made <b>Section: roof slot over the qibla wall</b>", s: "Saved to Commonplace › Drawings" },
+        { d: "23 Oct", k: "learn", t: "Watched <b>Wind catchers and the courtyard</b> for this project", s: "Lumen · 4 min · filed on Wind towers" },
+        { d: "23 Oct", k: "save", t: "Used 3 references from <b>Climate-responsive design</b>", s: "Arcade at noon, Wind towers over the old quarter, Shade first, then mass, then air." },
+        { d: "22 Oct", k: "decided", t: "Decided <b>Hypostyle, or one clear span?</b>", s: "A hypostyle of 7 × 9 bays on a 6 m precast grid" },
+        { d: "22 Oct", k: "made", t: "Made <b>Plan sketch: 7 × 9 bays to the qibla</b>", s: "Saved to Commonplace › Drawings" },
+        { d: "21 Oct", k: "learn", t: "Answered a check on <b>Precast</b>: panel joints and tolerances", s: "From the Lumen Precast joints. Remembered on Precast" },
+        { d: "19 Oct", k: "made", t: "Visited the site", s: "1 photo, Site visits" },
+        { d: "18 Oct", k: "stage", t: "<b>Brief</b> closed", s: "Debrief: 2 lessons filed on Loci" },
+      ],
+      checks: {},
+    },
+    { id: "p2", title: "Riyadh library competition", cover: "reading-room", status: "done", stage: 5, due: "Submitted 20 Oct · debrief waiting",
+      brief: "An open competition for a district library in Riyadh: a reading hall, children's library and garden on 4,000 m². Submitted on 20 October.", facts: [["Site", "Riyadh, 24.7° N"], ["Area", "4,000 m²"], ["Result", "Waiting"]],
+      uses: [{ topic: "light", reason: "North light for reading" }, { topic: "earth", reason: "Vaults over the stacks" }, { topic: "glare", reason: "The colonnade's afternoon glare" }], gaps: [], questions: [{ id: "r1", text: "One long roof, or open both sides?", state: "decided", uses: ["light"], added: "10 Oct", decided: "15 Oct" }], refs: [{ item: "pavilion-a", q: "r1", reason: "Option A" }, { item: "pavilion-b", q: "r1", reason: "Option B" }, { item: "reading-room", q: null, reason: "The reading room" }, { item: "vault-study", q: null, reason: "Stack roofs" }], suggested: {}, made: [], options: {}, crit: {}, decisions: [], known: {}, log: [{ d: "20 Oct", k: "stage", t: "<b>Submitted</b>", s: "Debrief waiting" }], checks: {} },
+    { id: "p3", title: "Thesis: a Dubai courtyard house", cover: "plan-courtyard", status: "paused", stage: 0, due: "Due March · paused",
+      brief: "Master's thesis: a family courtyard house for Dubai's climate today, drawing on the liwan and majlis plan.", facts: [["Due", "March 2027"]],
+      uses: [{ topic: "court", reason: "The type itself" }, { topic: "wind", reason: "One tower, the tall wing" }, { topic: "housing", reason: "Family life around the court" }], gaps: [], questions: [{ id: "t1", text: "Which rooms face the court, and which the street?", state: "open", uses: ["court"], added: "1 Oct" }], refs: [{ item: "plan-courtyard", q: null, reason: "Starting plan" }], suggested: {}, made: [], options: {}, crit: {}, decisions: [], known: {}, log: [], checks: {} },
+  ],
+};
+
+/* ------------------------------------------------------------------ apply cards (a topic in work mode, for Prayer hall) */
+const APPLY = {
+  light: {
+    rules: [["Light comes down the brick, not across it.", "brick-hall", "your caption"], ["Openings in the roof slab, not windows: light arrives in pools between the columns.", "hypostyle", "your caption, Kairouan"], ["Brick, no dome, light from above.", "l-rouf", "your link"], ["One slot of light at the top.", "stair-light", "your caption"]],
+    checks: [["No openings in the qibla wall below 3 m", "Asr and Maghrib are prayed facing 258°, into the low sun"], ["Light the qibla wall from above or from behind the rows, never from in front", "From your rules and the qibla bearing"], ["The mihrab is the brightest point on the wall", "The brief: a qibla wall people remember"], ["Test option A in a 1:50 daylight model before Developed design", "Glare isn't on your map yet"]],
+    q: ["q1"],
+  },
+  climate: {
+    rules: [["Shade first, then mass, then air.", "q-shade", "your quote · lecture notes p. 3"], ["Shade only inside the arcade at this hour; the court itself is a heat trap.", "courtyard-noon", "your caption, Kairouan"], ["Each tower faces the summer wind; the slots are on one side only.", "windtowers", "your caption, Yazd"], ["Cool air down the tower, warm air out through the high openings.", "section-windtower", "your drawing"]],
+    checks: [["Shade the middle of the court from above at noon", "The sun is 79° up at noon in August"], ["Arcades at least 4 m deep on the south and west", "From Arcade at noon"], ["Don't count on the pool to cool the court from June to September", "To revisit: humid air"], ["Point wind-tower slots at the shamal, the north-west summer wind", "From Wind towers over the old quarter"]],
+    q: ["q2"],
+  },
+  precast: {
+    rules: [["Precaster says ±3 mm on the mihrab panel faces, ±6 mm on the joints.", "n-mihrab", "your note"]],
+    checks: [["Keep panel joints off the mihrab's axis", "A joint on the axis is the one everyone looks at"], ["Ask for thermally broken fixings", "To revisit: thermal bridging at panel fixings"], ["Mock-up of the mihrab panel before the review", "Your note, 21 Oct"]],
+    q: ["q3"],
+  },
+};
+function applyFor(tid) {
+  if (APPLY[tid]) return APPLY[tid];
+  const t = TP[tid], items = S.items.filter((i) => i.topics.includes(tid));
+  return { rules: items.filter((i) => i.caption || i.type === "quote").slice(0, 3).map((i) => [i.type === "quote" ? i.title : i.caption, i.id, i.type === "quote" ? "your quote" : "your caption"]),
+    checks: t.st === 0 ? [[`Learn the basics of ${t.name} before Developed design`, "Not started on your map"]] : [[`Note one rule from ${t.name} on the qibla or court drawings`, "So the decision can cite it"]], q: [] };
+}
+
+/* ------------------------------------------------------------------ state */
+let S;
+function reset() {
+  S = { screen: "work", pid: "p1", tab: "overview", qid: null, apply: null, group: "question", drawer: null, sheet: null, toast: null, guide: false, edge: "save-work",
+    items: clone(ITEMS), projects: clone(SEED.projects), memory: clone(MEMORY), cfilter: "all", lociSel: "light", lociShow: true, checkAns: {}, critOpen: {}, lastDecision: null, offers: [], debriefDone: false, newDraft: null, lumenMade: false, checkOpen: null, extraLog: [], dq: "", dpick: null, debriefTexts: DEBRIEF.map((l) => l.text) };
+  for (const t of TOPICS) t.st = ORIG_ST[t.id];
+  for (const p of S.projects) for (const m of p.made) S.items.push({ ...m, madeIn: p.id });
+  S.items.push({ id: "d4", type: "decision", title: "A hypostyle of 7 × 9 bays on a 6 m precast grid, with a wider axial aisle to the mihrab.", caption: "", topics: ["hypo", "plantypes", "precast"], date: "22 Oct", madeIn: "p1", q: "q4" });
+}
+
+const P = () => S.projects.find((p) => p.id === S.pid);
+const Q = () => P().questions.find((q) => q.id === S.qid);
+
+/* ------------------------------------------------------------------ small renderers */
+const sdot = (tid) => { const t = TP[tid]; return `<span class="sdot ${t && t.st ? "s" + t.st : ""}" title="${t ? ST[t.st || 0] : ""}"></span>`; };
+const tchip = (tid) => `<button class="tchip" data-act="loci-topic" data-id="${tid}">${sdot(tid)}${esc(TP[tid].name)}</button>`;
+const forproj = (p = "Prayer hall") => `<span class="forproj">${ic("work")}for ${esc(p)}</span>`;
+const stageBar = (p) => `<div class="stages" aria-label="Stage ${p.stage + 1} of ${STAGES.length}: ${STAGES[p.stage]}">${STAGES.map((_, i) => `<i class="${i < p.stage ? "done" : i === p.stage ? "now" : ""}"></i>`).join("")}</div>`;
+const imgTag = (k, alt = "") => { const p = pic(k); return p ? `<img src="${p.src}" alt="${esc(alt)}" loading="lazy">` : ""; };
+function citeItem(id) { const it = IT()[id]; if (!it) return ""; const p = it.img ? pic(it.img) : null; return `<button class="cite" data-act="item" data-id="${id}">${p ? `<img src="${p.src}" alt="">` : `<span class="sw"></span>`}${esc(it.title.length > 44 ? it.title.slice(0, 42) + "…" : it.title)}</button>`; }
+function textCard(it, cls = "") {
+  if (it.type === "quote") return `<div class="txt ${cls}">“${esc(it.title)}”<span class="site" style="margin:8px 0 0">${esc(it.src || "")}</span></div>`;
+  if (it.type === "note") return `<div class="txt note ${cls}"><b style="font-weight:500">${esc(it.title)}</b><br>${esc(it.caption)}</div>`;
+  if (it.type === "link") return `<div class="txt link ${cls}"><span class="site">${esc(it.site)}</span><b style="font-weight:500">${esc(it.title)}</b><br><span class="muted">${esc(it.caption)}</span></div>`;
+  if (it.type === "decision") return `<div class="txt decision-c ${cls}"><span class="site" style="color:var(--work);font-weight:600;letter-spacing:.06em">DECISION</span>${esc(it.title)}</div>`;
+  return "";
+}
+
+/* ------------------------------------------------------------------ screens */
+function render() {
+  const app = $("#app");
+  const scrollKeep = window.scrollY;
+  app.innerHTML = rail() + `<main class="stage" id="stage">${screen()}</main>` + proto() + (S.guide ? guide() : "") + (S.drawer ? drawer() : "") + (S.sheet ? sheetHtml() : "") + (S.toast ? toastHtml() : "");
+  if (render.keep) window.scrollTo(0, scrollKeep); else window.scrollTo(0, 0);
+  render.keep = false;
+  afterRender();
+}
+function rail() {
+  const b = (k, label, scr, extra = "") => `<button aria-label="${label}" ${S.screen === scr || (scr === "work" && S.screen === "project") ? 'aria-current="page"' : ""} data-act="nav" data-to="${scr}">${ic(k)}<span class="tip">${label}</span>${extra}</button>`;
+  return `<nav class="rail" aria-label="Primary"><div class="logo" aria-hidden="true">S</div>
+    <button class="cap-btn" aria-label="Capture" data-act="nav" data-to="commonplace">${ic("plus")}<span class="tip">Capture</span></button>
+    ${b("sun", "Today", "today")}${b("learn", "Learn", "learn")}${b("library", "Commonplace", "commonplace")}${b("work", "Work", "work", '<span class="newdot"></span>')}${b("graph", "Loci", "loci")}
+    <div class="grow"></div><div class="me" aria-hidden="true">S</div></nav>`;
+}
+function proto() {
+  return `<div class="proto" role="region" aria-label="Prototype controls"><span class="lbl">PROTOTYPE · WORK</span><button class="btn small quiet" data-act="reset">Start again</button><button class="btn small quiet" data-act="guide" aria-expanded="${S.guide}">How to try it</button></div>`;
+}
+function guide() {
+  const st = (label, act, extra = "") => `<button data-act="${act}" ${extra}>${label}</button>`;
+  return `<div class="guide" role="dialog" aria-label="How to try it"><h3>How to try it</h3>
+    <p class="muted" style="margin:0">One learner, an architect designing a prayer hall in Dubai. The same person as the memory and photos prototypes. Loci's words are scripted examples.</p>
+    <ol>
+      <li><b>The loop.</b> ${st("Work home", "nav", 'data-to="work"')}: hover each arrow of the loop to see the action and where it lives. Orange arrows are new.</li>
+      <li><b>A project.</b> ${st("Open Prayer hall", "open-project", 'data-id="p1"')}: brief, facts, stages, what it uses, and what to work on next.</li>
+      <li><b>A question, worked.</b> ${st("The qibla wall", "open-q", 'data-id="q1"')}: what you already know (from memory), your evidence, options A–C. Press <b>Crit this</b> on an option, <b>Make a Lumen for this question</b> in Gaps, then <b>Decide</b>.</li>
+      <li><b>Learn inside work.</b> ${st("The court in August", "open-q", 'data-id="q2"')}: a line to revisit sits right where it matters. Press <b>Check me</b>.</li>
+      <li><b>Apply a topic.</b> ${st("Climate-responsive design, applied", "open-apply", 'data-id="climate"')}: rules of thumb from your own saves, checks for this project, gaps.</li>
+      <li><b>Bring things in.</b> ${st("The board", "tab", 'data-tab="board"')}: <b>Add from Commonplace</b>, suggestions first, each with a reason.</li>
+      <li><b>Start from a sentence.</b> ${st("Start a project", "start")}: Loci drafts a project from your map and Commonplace.</li>
+      <li><b>Close the loop.</b> ${st("Debrief Riyadh", "debrief")}: lessons go back onto your map; the project can become an Object.</li>
+      <li><b>Everywhere else.</b> ${st("Today", "nav", 'data-to="today"')}, ${st("Learn", "nav", 'data-to="learn"')}, ${st("Commonplace", "nav", 'data-to="commonplace"')} and ${st("Loci", "nav", 'data-to="loci"')} show only the new Work touchpoints.</li>
+    </ol>
+    <div class="foot">Nothing is saved. Proposal: docs/superpowers/specs/2026-10-24-work-design.md in Studiolo_Manage.</div></div>`;
+}
+function screen() {
+  switch (S.screen) {
+    case "work": return workHome();
+    case "project": return project();
+    case "today": return today();
+    case "learn": return learn();
+    case "commonplace": return commonplace();
+    case "loci": return loci();
+  }
+  return "";
+}
+
+/* ---------- Work home */
+const EDGES = {
+  "learn-save": { from: "Learn", to: "Save", name: "Mark it", exists: true, what: "Mark a moment in a Lumen or a course and it lands in Commonplace, tagged on the topic.", where: "Lumen player, course parts, Live" },
+  "save-learn": { from: "Save", to: "Learn", name: "Explain this", exists: true, what: "Make a Lumen from a saved item or a topic's items.", where: "Item page, quick view, Make a Lumen" },
+  "save-work": { from: "Save", to: "Work", name: "Use in a project", what: "Bring any Commonplace item to a project with a one-line reason, and to a question if you like. The item keeps its one record; the project only points at it.", where: "Item ⋯ menu, quick view, Select, the board's Add from Commonplace" },
+  "work-save": { from: "Work", to: "Save", name: "Keep what you made", what: "Sketches, site photos, drawings and decisions made in a project are saved to Commonplace with Made in: Prayer hall. They outlive the project.", where: "Project Add, options, Decide" },
+  "learn-work": { from: "Learn", to: "Work", name: "Apply", what: "Turn a topic into rules of thumb, checks and gaps for one project, from your own saves and what you know. A Lumen's end card offers Use in Prayer hall.", where: "Loci topic panel, Lumen end card, project Uses" },
+  "work-learn": { from: "Work", to: "Learn", name: "Learn this for the project", what: "A gap in a question becomes a Lumen whose brief includes the project and the question. It's filed on its topic as usual.", where: "Question Gaps, Uses (Not started topics), Crit" },
+};
+function loopSvg() {
+  const NODE = { Learn: [120, 84, "Lumens · courses"], Save: [480, 84, "Commonplace"], Work: [300, 390, "projects"] }, C = [300, 186], R = 44;
+  const arrow = (k, a, b, side, lx, ly, anchor, isNew, label) => {
+    const [ax, ay] = NODE[a], [bx, by] = NODE[b], dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+    let nx = -uy, ny = ux; const mx = (ax + bx) / 2, my = (ay + by) / 2; if ((C[0] - mx) * nx + (C[1] - my) * ny < 0) { nx = -nx; ny = -ny; }
+    const o = side === "in" ? 8 : -8, sx = ax + ux * (R + 6) + nx * o, sy = ay + uy * (R + 6) + ny * o, ex = bx - ux * (R + 10) + nx * o, ey = by - uy * (R + 10) + ny * o;
+    const d = `M${sx.toFixed(1)} ${sy.toFixed(1)}L${ex.toFixed(1)} ${ey.toFixed(1)}`, on = S.edge === k ? " on" : "";
+    return `<g class="edge${isNew ? " nw" : ""}${on}" data-act="edge" data-id="${k}" tabindex="0" role="button" aria-label="${a} to ${b}: ${EDGES[k].name}"><path d="${d}" marker-end="url(#ar${isNew ? "n" : ""})"/><path class="hit" d="${d}"/><text x="${lx}" y="${ly}" text-anchor="${anchor}">${label}</text></g>`;
+  };
+  const N = (k, cls = "") => { const [x, y, sub] = NODE[k]; return `<g class="node ${cls}"><circle cx="${x}" cy="${y}" r="${R}"/><text x="${x}" y="${y + 1}">${k}</text><text class="sub" x="${x}" y="${y + 16}">${sub}</text></g>`; };
+  const spoke = (k) => { const [x, y] = NODE[k], dx = C[0] - x, dy = C[1] - y, l = Math.hypot(dx, dy); return `<path d="M${x + dx / l * (R + 4)} ${y + dy / l * (R + 4)}L${C[0] - dx / l * 34} ${C[1] - dy / l * 34}" class="spoke"/>`; };
+  return `<svg class="loop-svg" viewBox="0 0 600 450" role="group" aria-label="The loop: Learn, Save and Work around Loci. Choose an arrow to read about it.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker><marker id="arn" class="nw" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs>
+    ${spoke("Learn")}${spoke("Save")}${spoke("Work")}
+    <g class="core"><circle cx="${C[0]}" cy="${C[1]}" r="30"/><text x="${C[0]}" y="${C[1] + 1}">Loci</text><text class="sub" x="${C[0]}" y="${C[1] + 14}">remembers</text></g>
+    ${arrow("learn-save", "Learn", "Save", "out", 300, 54, "middle", false, "Mark it →")}
+    ${arrow("save-learn", "Save", "Learn", "in", 300, 112, "middle", false, "← Explain this")}
+    ${arrow("save-work", "Save", "Work", "out", 412, 250, "start", true, "↓ Use in a project")}
+    ${arrow("work-save", "Work", "Save", "in", 412, 272, "start", true, "↑ Keep what you made")}
+    ${arrow("learn-work", "Learn", "Work", "out", 188, 250, "end", true, "Apply ↓")}
+    ${arrow("work-learn", "Work", "Learn", "in", 188, 272, "end", true, "Learn this for it ↑")}
+    ${N("Learn")}${N("Save")}${N("Work", "work")}
+  </svg>`;
+}
+function edgeNote() {
+  const e = EDGES[S.edge];
+  return `<div class="edge-note" aria-live="polite"><span class="kicker">${esc(e.from)} → ${esc(e.to)}${e.exists ? " · exists today" : '<span class="new">new</span>'}</span><div style="margin-top:6px"><b>${esc(e.name)}.</b> ${esc(e.what)}</div><div class="where">Where: ${esc(e.where)}</div></div>`;
+}
+function workHome() {
+  const p = S.projects.find((x) => x.id === "p1"), q = p.questions.find((x) => x.state !== "decided");
+  const extra = S.projects.filter((x) => !["p1", "p2", "p3"].includes(x.id));
+  const pc = (x) => `<button class="pcard" data-act="open-project" data-id="${x.id}"><div class="cover">${imgTag(x.cover)}${x.status !== "active" ? `<span class="badge">${x.status === "done" ? "Done" : "Paused"}</span>` : ""}</div>${stageBar(x)}<div><h3>${esc(x.title)}</h3><div class="meta">${esc(STAGES[x.stage])} · ${esc(x.due)}</div><div class="meta">${x.questions.filter((y) => y.state !== "decided").length} open questions · ${x.refs.length + x.made.length} on the board · uses ${x.uses.length} topics</div></div></button>`;
+  return `<div class="dest-head"><b>Work</b><span class="sep">/</span><span>What you're making, with what you know</span></div>
+  <div class="w-hero">
+    <div class="w-ask"><h1>What are you working on?</h1>
+      <form class="askbox" data-form="start"><label class="vh" for="ask">Describe a project in a sentence</label><input id="ask" name="ask" autocomplete="off" placeholder="A small library in Sharjah, two floors, with a reading garden…"><button class="btn primary" type="submit">Start a project</button></form>
+      <p class="ask-hint">Loci drafts a brief, the first questions, the topics it uses from your map and references from your Commonplace. You keep what you want. <button data-act="start">Try the example</button></p>
+    </div>
+    <div class="next-card"><p class="kicker">Work on next · ${esc(p.title)}</p><h3>${esc(q.text)}</h3><p class="meta">${esc(p.due)} · ${p.refs.filter((r) => r.q === q.id).length} references · 3 options · 1 gap</p><div class="acts"><button class="btn primary" data-act="open-q" data-id="${q.id}">Open the question</button><button class="btn line" data-act="open-project" data-id="p1">Project</button></div></div>
+  </div>
+  <section class="loopwrap" aria-labelledby="loop-h">
+    ${loopSvg()}
+    <div><h2 id="loop-h">Learn, save, work, in any order</h2>
+      <p>Today Studiolo has two halves: you learn and you save, and Loci holds both. Work adds the third. A project uses what you've saved and learned, shows you what you don't know yet, and everything it makes goes back.</p>
+      ${edgeNote()}
+      <div class="loopstats" aria-label="This week, across your projects"><div><b>3</b><span>learned for work</span></div><div><b>9</b><span>saves used</span></div><div><b>4</b><span>things made</span></div><div><b>1</b><span>decision</span></div></div>
+    </div>
+  </section>
+  <div class="section-h"><h3>Your projects</h3><span class="muted">A project points at your items and topics. It never holds them.</span></div>
+  <div class="pgrid">${[...extra, ...S.projects.filter((x) => ["p1", "p2", "p3"].includes(x.id))].map(pc).join("")}<button class="pcard newp" data-act="start"><div class="cover">+ Start a project</div></button></div>
+  <div class="section-h"><h3>On your map, but really a project</h3></div>
+  <div class="projectish"><span class="sdot"></span><p><b>Housing study</b> sits under Practice & Delivery on your map with 1 item. It reads like something you're making rather than something you're learning.</p><button class="btn line small" data-act="toast" data-msg="In the app: Housing study becomes a project; its item comes over as a reference and the topic is removed from your map, with Undo.">Turn into a project</button><button class="btn small quiet" data-act="toast" data-msg="Kept as a topic.">Keep as a topic</button></div>`;
+}
+
+/* ---------- project */
+function project() {
+  const p = P();
+  const openQ = p.questions.filter((q) => q.state !== "decided").length;
+  const tabs = [["overview", "Overview"], ["questions", "Questions", p.questions.length], ["board", "Board", p.refs.length + p.made.length + p.decisions.length], ["uses", "Uses", p.uses.length], ["log", "Log"]];
+  const head = `<div class="dest-head"><button data-act="nav" data-to="work">Work</button><span class="sep">/</span><span>${esc(p.title)}</span></div>
+  <div class="p-head"><div class="cv">${imgTag(p.cover)}</div><div class="tt"><p class="kicker">Project${p.status === "done" ? " · done" : p.status === "paused" ? " · paused" : ""}</p><h1>${esc(p.title)}</h1>
+    <div class="sub"><span>${esc(STAGES[p.stage])}, stage ${p.stage + 1} of ${STAGES.length}</span><span class="faint">·</span><span>${esc(p.due)}</span><span class="faint">·</span><span>${openQ} open question${openQ === 1 ? "" : "s"}</span></div>
+    ${stageBar(p)}<div class="stagelbl">${STAGES.map((s, i) => `<span class="${i === p.stage ? "now" : ""}">${s}</span>`).join("")}</div></div>
+    <div class="acts"><button class="btn line" data-act="nav" data-to="loci">${ic("map")}Show on Loci</button>${p.status === "done" ? `<button class="btn primary" data-act="debrief">Debrief</button>` : `<button class="btn line" data-act="drawer">${ic("plus")}Add from Commonplace</button>`}</div></div>
+  <div class="tabs" role="tablist">${tabs.map(([k, l, n]) => `<button role="tab" aria-selected="${S.tab === k}" data-act="tab" data-tab="${k}">${l}${n != null ? `<span class="n">${n}</span>` : ""}</button>`).join("")}</div>`;
+  let body = "";
+  if (S.tab === "overview") body = overview(p);
+  if (S.tab === "questions") body = S.qid ? questionView(p, Q()) : questions(p);
+  if (S.tab === "board") body = board(p);
+  if (S.tab === "uses") body = S.apply ? applyView(p, S.apply) : uses(p);
+  if (S.tab === "log") body = logView(p);
+  return head + body;
+}
+function overview(p) {
+  const q = p.questions.find((x) => x.state === "exploring") || p.questions.find((x) => x.state === "open");
+  const learned = p.log.filter((l) => l.k === "learn").length + (S.lumenMade ? 1 : 0), made = p.made.length, decided = p.questions.filter((x) => x.state === "decided").length;
+  return `<div class="ov"><div class="ov-main">
+    ${q ? `<div class="next-card"><p class="kicker">Work on next${p.status === "active" ? " · before " + esc(p.due.split("·")[0].trim()) : ""}</p><h3>${esc(q.text)}</h3><p class="meta">${p.refs.filter((r) => r.q === q.id).length} references · ${(p.options[q.id] || []).length} options · uses ${q.uses.map((t) => esc(TP[t].name)).join(", ") || "nothing on your map yet"}</p><div class="acts"><button class="btn primary" data-act="open-q" data-id="${q.id}">Open the question</button></div></div>` : ""}
+    ${p.status === "done" ? `<div class="stagebox"><p><b>Debrief waiting.</b> What did this project teach you? Three questions; each answer goes onto your map, and the project can become an Object in Commonplace.</p><button class="btn primary" data-act="debrief">Debrief</button></div>` : ""}
+    <section class="brief"><div class="section-h"><h3>Brief</h3><button class="btn small quiet" data-act="toast" data-msg="In the app the brief edits in place.">${ic("pencil")}Edit</button></div><p>${esc(p.brief)}</p></section>
+    <section><div class="section-h"><h3>Facts</h3><span class="muted">Up to eight, like a collection's fields. Loci reads them.</span></div><dl class="facts">${p.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></section>
+  </div>
+  <aside class="side">
+    <div class="sidebox"><h4>The loop on this project</h4><div class="loopmini">
+      <button data-act="tab" data-tab="log"><span class="lbl">Learned</span><b>${learned}</b><span>Lumens and checks for it</span></button>
+      <button data-act="tab" data-tab="board"><span class="lbl">Used</span><b>${p.refs.length}</b><span>from Commonplace</span></button>
+      <button data-act="tab" data-tab="board"><span class="lbl">Made</span><b>${made}</b><span>saved back to Commonplace</span></button>
+      <button data-act="tab" data-tab="questions"><span class="lbl">Decided</span><b>${decided}</b><span>as Decision notes</span></button></div></div>
+    <div class="sidebox"><h4>Uses <button class="btn link small" data-act="tab" data-tab="uses">All ${p.uses.length}</button></h4><ul class="uselist">
+      ${p.uses.slice(0, 6).map((u) => `<li>${sdot(u.topic)}<span class="nm">${esc(TP[u.topic].name)}</span><span class="ct">${ST[TP[u.topic].st || 0]}</span></li>`).join("")}
+      ${p.gaps.map((g) => `<li class="gapline"><span class="sdot" style="border-style:dashed;border-color:var(--warn)"></span><span class="nm">${esc(g.name)}</span><span class="ct" style="color:var(--warn)">not on your map</span></li>`).join("")}</ul></div>
+  </aside></div>`;
+}
+function questions(p) {
+  const order = { exploring: 0, open: 1, decided: 2, parked: 3 };
+  const rows = [...p.questions].sort((a, b) => order[a.state] - order[b.state]).map((q) => {
+    const n = p.refs.filter((r) => r.q === q.id).length, o = (p.options[q.id] || []).length;
+    return `<button class="qrow" data-act="open-q" data-id="${q.id}"><span class="state ${q.state}">${q.state}</span><span><h3>${esc(q.text)}</h3><span class="meta">${q.uses.map((t) => `<span style="display:inline-flex;gap:5px;align-items:center">${sdot(t)}${esc(TP[t].name)}</span>`).join("")}${q.gap ? `<span style="color:var(--warn)">Gap: ${esc(p.gaps.find((g) => g.id === q.gap).name)}</span>` : ""}</span></span><span class="counts">${n} references${o ? ` · ${o} options` : ""}${q.state === "decided" ? `<br>decided ${esc(q.decided)}` : ""}</span></button>`;
+  }).join("");
+  return `<div class="section-h"><h3>Questions</h3><span class="muted">The unit of work: something you can gather for, learn for, try options for, and decide.</span></div><div class="qlist">${rows}</div>
+  <form class="addq" data-form="addq"><label class="vh" for="newq">Ask a new question</label><input id="newq" name="q" placeholder="Ask a new question about this project…" autocomplete="off"><button class="btn line" type="submit">Add</button></form>`;
+}
+function knownLines(p, q) {
+  const places = new Set(q.uses.flatMap((t) => [t, TP[t].parent].filter(Boolean)));
+  if (q.id === "q1") places.add("islamic");
+  const mem = S.memory.filter((m) => places.has(m.place));
+  const extra = (p.known[q.id] || []);
+  const lines = [...extra, ...mem];
+  if (!lines.length) return `<p class="muted" style="font-size:13px;margin:0">Nothing on your map about this yet.</p>`;
+  return `<ul class="knows">${lines.map((m, i) => {
+    const slotCls = m.slot === "revisit" ? "rv" : m.slot === "lumen" ? "lm" : "";
+    const key = m.check ? m.check : null;
+    const ans = key ? S.checkAns[key] : null;
+    return `<li class="${m.fresh ? "fresh" : ""}"><span class="slot ${slotCls}">${SLOTNAME[m.slot] || m.slot}</span><span class="tx">${esc(m.text)}<span class="src">${esc(TP[m.place] ? TP[m.place].name : "")} · ${esc(m.how)}, ${esc(m.when)}</span></span>${key && ans == null ? `<button class="btn line tiny" data-act="checkme" data-id="${key}">Check me</button>` : "<span></span>"}
+      ${key && S.checkOpen === key ? checkHtml(key) : ""}</li>`;
+  }).join("")}</ul>`;
+}
+function checkHtml(key) {
+  const c = CHECKS[key], a = S.checkAns[key];
+  return `<div class="check" role="group" aria-label="Quick check"><p>${esc(c.q)}</p><div class="ans">${c.a.map((t, i) => `<button data-act="answer" data-id="${key}" data-i="${i}" class="${a == null ? "" : i === c.right ? "right" : i === a ? "wrong" : ""}" ${a != null ? "disabled" : ""}>${esc(t)}</button>`).join("")}</div>${a != null ? `<div class="fb">${esc(a === c.right ? c.yes : c.no)}</div>` : ""}</div>`;
+}
+function evCard(it, reason, sugg) {
+  const p = it.img ? pic(it.img) : null;
+  return `<div class="evc ${sugg ? "sugg" : ""}"><button class="open" data-act="item" data-id="${it.id}" aria-label="Open ${esc(it.title)}">${p ? `<div class="pic">${imgTag(it.img, it.title)}</div>` : textCard(it)}</button>${it.madeIn ? '<span class="madebadge">Made here</span>' : ""}
+    ${p ? `<div class="t">${esc(it.title)}</div>` : ""}<div class="why">${esc(reason)}</div>
+    ${sugg ? `<div class="sugg-acts"><span class="faint" style="font-size:11px">Suggested</span><button class="btn line tiny" data-act="use-sugg" data-id="${it.id}">Use</button><button class="btn tiny quiet" data-act="skip-sugg" data-id="${it.id}">Not for this</button></div>` : ""}</div>`;
+}
+function questionView(p, q) {
+  const items = IT();
+  const refs = p.refs.filter((r) => r.q === q.id).map((r) => evCard(items[r.item], r.reason, false));
+  const made = p.made.filter((m) => m.q === q.id && !(p.options[q.id] || []).some((o) => o.img === m.img)).map((m) => evCard(items[m.id], m.caption, false));
+  const sugg = ((p.suggested || {})[q.id] || []).map((s) => evCard(items[s.item], s.reason, true));
+  const opts = p.options[q.id] || [];
+  const dec = p.decisions.find((d) => d.q === q.id);
+  const gap = q.gap ? p.gaps.find((g) => g.id === q.gap) : null;
+  let gapsHtml = "";
+  if (q.id === "q1") gapsHtml = S.lumenMade
+    ? `<div class="gapcard closed"><div class="g"><b>Daylight & glare</b> · still Not started on your map<p>You watched <i>Glare on a qibla wall at 25° N</i> for this question; its main idea is in What you know. Your topic's status is yours to change.</p></div><div class="acts"><button class="btn line small" data-act="lumen-play">Watch again</button></div></div>`
+    : `<div class="gapcard"><div class="g"><b>Daylight & glare</b> · Not started on your map<p>To choose between A, B and C you need to know how glare works when the sun is low. A 4-minute Lumen, written for this question, from your own references.</p></div><div class="acts"><button class="btn primary small" data-act="lumen-brief">Make a Lumen for this question</button></div></div>`;
+  else if (q.id === "q2") gapsHtml = `<div class="gapcard"><div class="g"><b>Comfort in humid heat</b> · not on your map<p>Night humidity reaches 90 % in August. Everything on your map about cooling comes from dry places like Yazd.</p></div><div class="acts"><button class="btn line small" data-act="toast" data-msg="Added Comfort in humid heat under Climate-responsive design on your map, Not started. Undo in the app.">Add to Loci</button><button class="btn primary small" data-act="toast" data-msg="In the app this opens Make a Lumen with the project and this question in its brief.">Learn this for the project</button></div></div>`;
+  else if (gap) gapsHtml = `<div class="gapcard"><div class="g"><b>${esc(gap.name)}</b> · not on your map<p>${esc(gap.why)}.</p></div><div class="acts"><button class="btn line small" data-act="toast" data-msg="Added ${esc(gap.name)} to your map, Not started.">Add to Loci</button><button class="btn primary small" data-act="toast" data-msg="In the app this plans a short course for the project.">Plan a course for this</button></div></div>`;
+  else gapsHtml = `<p class="muted" style="font-size:13px;margin:0">No gaps found. Everything this question uses is on your map.</p>`;
+  const optHtml = opts.length ? `<div class="opts">${opts.map((o) => {
+      const chosen = S.lastDecision && S.lastDecision.q === q.id && S.lastDecision.opt === o.id;
+      const cr = S.critOpen[q.id + ":" + o.id];
+      return `<div class="opt ${chosen ? "chosen" : ""}"><div class="pic">${imgTag(o.img, o.title)}<span class="lt">${o.id}</span></div><div class="bd"><h4>${esc(o.title)}</h4><ul class="pc">${o.pros.map(([t, ref]) => `<li><span class="m p">+</span><span>${esc(t)}${ref ? ` ${citeItem(ref)}` : ""}</span></li>`).join("")}${o.cons.map(([t]) => `<li><span class="m c">−</span><span>${esc(t)}</span></li>`).join("")}</ul>
+        <div class="ft"><button class="btn line small" data-act="crit" data-id="${o.id}" aria-expanded="${!!cr}">${ic("spark")}Crit this</button>${chosen ? '<span class="state decided">chosen</span>' : ""}</div></div></div>${cr ? critHtml(p, q, o, cr) : ""}`;
+    }).join("")}</div>` : `<p class="muted" style="font-size:13px;margin:0">No options yet.</p>`;
+  return `<div class="qv-head"><button class="btn small quiet" data-act="back-q">${ic("back")}Questions</button><div style="margin-top:8px"><span class="state ${q.state}">${q.state}</span></div><h2>${esc(q.text)}</h2><div class="tchips">${q.uses.map(tchip).join("")}</div></div>
+  <div class="qv"><div class="qv-main">
+    ${dec ? decisionHtml(dec) : ""}
+    <section class="block"><h3>What you already know <span class="edge-tag">Loci → Work</span></h3><p class="lede">From your memory cards and topic statuses at the places this question uses. The same lines Loci reads.</p>${knownLines(p, q)}</section>
+    <section class="block"><h3>Evidence from your Commonplace <span class="edge-tag w">Save → Work</span></h3><p class="lede">Each with the reason you brought it. Suggestions are dashed: items tagged on the topics this question uses, Picks first.</p><div class="ev">${refs.join("")}${made.join("")}${sugg.join("")}</div>
+      <div style="margin-top:12px"><button class="btn line small" data-act="drawer">${ic("plus")}Add from Commonplace</button></div></section>
+    ${q.state !== "decided" ? `<section class="block"><h3>Options <span class="edge-tag w">Work → Save</span></h3><p class="lede">Each option's picture is saved to Commonplace as made in this project.</p>${optHtml}
+      <div style="margin-top:12px"><button class="btn line small" data-act="toast" data-msg="In the app: upload or photograph a sketch. It's saved to Commonplace › Drawings with Made in: Prayer hall.">${ic("image")}Add an option</button></div></section>
+    <section class="block"><h3>Gaps <span class="edge-tag w">Work → Learn</span></h3><p class="lede">What this question needs that your map doesn't have yet.</p>${gapsHtml}</section>` : ""}
+  </div>
+  <aside class="qv-side">
+    ${q.state !== "decided" && opts.length ? `<div class="offer"><p class="kicker">Ready to decide?</p><p>Write what you chose and why. It becomes a Decision note in Commonplace that cites its evidence, and each topic it used remembers you applied it.</p><div class="acts"><button class="btn primary" data-act="decide">Decide</button><button class="btn quiet small" data-act="toast" data-msg="Parked. It stays on the list, greyed.">Park it</button></div></div>` : ""}
+    ${S.offers.filter((o) => o.q === q.id).map(offerHtml).join("")}
+    <div class="offer"><p class="kicker">Ask Loci about this question</p><p class="muted" style="font-size:12.5px">Loci reads the brief, the facts, this question, its evidence and your memory here.</p><div class="acts" style="flex-direction:column;align-items:stretch">
+      <button class="btn line small" data-act="toast" data-msg="Scripted in this prototype. Try Crit this on an option.">What am I missing?</button><button class="btn line small" data-act="toast" data-msg="Scripted in this prototype.">Which reference argues against this?</button></div></div>
+  </aside></div>`;
+}
+function critHtml(p, q, o, state) {
+  if (state === "typing") return `<div class="crit"><div class="av">S</div><div><div class="who">Loci · crit of option ${o.id}</div><span class="typing"><i></i><i></i><i></i></span></div></div>`;
+  const c = p.crit[q.id + ":" + o.id]; if (!c) return "";
+  return `<div class="crit" aria-live="polite"><div class="av" aria-hidden="true">S</div><div><div class="who">Loci · crit of option ${o.id} · from your references, memory and the facts</div>${c.text.map((t) => `<p>${t}</p>`).join("")}<div class="cites">${c.cites.map(([k, v]) => k === "item" ? citeItem(v) : `<span class="src">${k === "mem" ? "Memory: " : "Fact: "}<b>${esc(v)}</b></span>`).join("")}</div></div></div>`;
+}
+function decisionHtml(d) {
+  return `<div class="decision"><p class="kicker">Decision · ${esc(d.date)}</p><h4>${esc(d.text)}</h4><ul>${d.because.map(([t, ref]) => `<li>${esc(t)}${ref ? " " + citeItem(ref) : ""}</li>`).join("")}</ul><div class="foot"><span>A Decision note in Commonplace</span><span>·</span><span>Applied: ${d.uses.map((t) => esc(TP[t].name)).join(", ")}</span></div></div>`;
+}
+function offerHtml(o) {
+  if (o.kind === "mem") return `<div class="offer mem"><p class="kicker">Remembered on ${esc(TP[o.topic].name)}</p><p>${esc(o.text)} <span class="src">· You did</span></p><div class="acts"><button class="btn small quiet" data-act="toast" data-msg="Removed from memory.">Undo</button></div></div>`;
+  if (o.kind === "status") return `<div class="offer"><p class="kicker">${esc(TP[o.topic].name)} · Learning</p><p>You've now used it in two decisions on this project. Mark it Learned?</p><div class="acts"><button class="btn line small" data-act="mark-learned" data-id="${o.topic}">Mark Learned</button><button class="btn small quiet" data-act="dismiss-offer" data-id="${o.topic}">Not now</button></div></div>`;
+  return "";
+}
+function board(p) {
+  const items = IT();
+  const all = [...p.refs.map((r) => ({ it: items[r.item], why: r.reason, q: r.q })), ...p.made.map((m) => ({ it: items[m.id], why: m.caption, q: m.q })), ...p.decisions.map((d) => ({ it: items[d.id], why: "Decided " + d.date, q: d.q }))].filter((x) => x.it);
+  const card = ({ it, why }) => { const pp = it.img ? pic(it.img) : null; return `<div class="bcard"><button class="open" data-act="item" data-id="${it.id}" aria-label="Open ${esc(it.title)}">${pp ? `<div class="pic"><img src="${pp.src}" alt="${esc(it.title)}" style="aspect-ratio:${pp.r}" loading="lazy"></div>` : textCard(it)}</button>${it.madeIn && it.type !== "decision" ? '<span class="madebadge">Made here</span>' : ""}${pp ? `<div class="t">${esc(it.title)}</div>` : ""}<div class="why">${esc(why)}</div><div class="from">${it.madeIn ? "Made in this project" : esc(it.kind || ({ quote: "Quote", note: "Note", link: "Link", decision: "Decision note" })[it.type] || "")} · ${esc(it.date)}</div></div>`; };
+  const cols = (list, n) => { const c = Array.from({ length: n }, () => []); const h = Array(n).fill(0); for (const x of list) { const i = h.indexOf(Math.min(...h)); c[i].push(card(x)); const pp = x.it.img ? pic(x.it.img) : null; h[i] += pp ? 1 / pp.r + .35 : .9; } return `<div class="mason">${c.map((cc) => `<div class="col">${cc.join("")}</div>`).join("")}</div>`; };
+  const n = window.innerWidth < 720 ? 1 : window.innerWidth < 1100 ? 3 : 4;
+  let body = "";
+  if (S.group === "question") {
+    const groups = [...p.questions.map((q) => ({ h: q.text, s: q.state, list: all.filter((x) => x.q === q.id) })), { h: "For the whole project", list: all.filter((x) => !x.q) }].filter((g) => g.list.length);
+    body = groups.map((g) => `<section class="bgroup"><h3>${esc(g.h)}</h3><p class="muted">${g.list.length} on the board${g.s ? " · " + g.s : ""}</p>${cols(g.list, n)}</section>`).join("");
+  } else if (S.group === "made") {
+    body = `<section class="bgroup"><h3>Made in this project</h3><p class="muted">Saved to Commonplace with Made in: ${esc(p.title)}</p>${cols(all.filter((x) => x.it.madeIn), n)}</section><section class="bgroup"><h3>Brought from Commonplace</h3><p class="muted">The project points at them; they stay where they are.</p>${cols(all.filter((x) => !x.it.madeIn), n)}</section>`;
+  } else body = cols(all, n);
+  return `<div class="boardbar"><div class="seg" role="group" aria-label="Group by">${[["question", "By question"], ["made", "Made · brought"], ["none", "No groups"]].map(([k, l]) => `<button aria-pressed="${S.group === k}" data-act="group" data-id="${k}">${l}</button>`).join("")}</div><span class="grow"></span><span class="muted" style="font-size:12.5px">${all.length} on the board</span><button class="btn primary small" data-act="drawer">${ic("plus")}Add from Commonplace</button></div>${body}`;
+}
+function uses(p) {
+  const byArea = {};
+  for (const u of p.uses) { const a = areaOf(u.topic); (byArea[a.id] ||= { a, list: [] }).list.push(u); }
+  const items = S.items;
+  return `<div class="uses"><div>
+    <div class="section-h"><h3>Topics this project uses</h3><span class="muted">From your map. Press Apply to see a topic in work mode, for this project.</span></div>
+    ${Object.values(byArea).map(({ a, list }) => `<div class="areagrp"><h4>${esc(a.name)}</h4>${list.map((u) => { const t = TP[u.topic]; const n = p.refs.filter((r) => (IT()[r.item] || { topics: [] }).topics.includes(u.topic)).length; const mem = S.memory.filter((m) => m.place === u.topic).length;
+      return `<div class="urow">${sdot(u.topic)}<div><div class="nm">${esc(t.name)}</div><div class="rs">${esc(u.reason)}</div><div class="mt">${ST[t.st || 0]}${t.level ? " · " + t.level : ""} · ${n} used here · ${mem} memory line${mem === 1 ? "" : "s"}</div></div><button class="btn ${t.st === 0 ? "line" : "line"} small" data-act="open-apply" data-id="${u.topic}">Apply</button></div>`; }).join("")}</div>`).join("")}
+    <div class="areagrp"><h4 style="color:var(--warn)">Not on your map</h4>${p.gaps.map((g) => `<div class="urow gapr"><span class="sdot" style="border-style:dashed;border-color:var(--warn)"></span><div><div class="nm">${esc(g.name)}</div><div class="rs">${esc(g.why)}</div></div><button class="btn line small" data-act="toast" data-msg="Added ${esc(g.name)} to your map, Not started, and linked to this project.">Add to Loci</button></div>`).join("")}</div>
+  </div><div class="constel">${constellation(p, 340, 300)}<p class="cap">The project's topics across your map. Filled dots are learned. <button class="btn link small" data-act="nav" data-to="loci">Open in Loci</button></p></div></div>`;
+}
+function constellation(p, W, H) {
+  const areas = TOPICS.filter((t) => !t.parent), used = new Set(p.uses.map((u) => u.topic));
+  const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 34;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${p.uses.length} topics in ${new Set(p.uses.map((u) => areaOf(u.topic).id)).size} areas">`;
+  const pos = {};
+  areas.forEach((a, i) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / areas.length; pos[a.id] = [cx + R * Math.cos(ang), cy + R * Math.sin(ang), ang];
+    const kids = TOPICS.filter((t) => t.parent && areaOf(t.id).id === a.id);
+    kids.forEach((k, j) => { const spread = (j - (kids.length - 1) / 2) * .22; const r2 = R * (.62 + (TP[k.parent].parent ? .0 : .08)) - (TP[k.parent] && TP[k.parent].parent ? 14 : 0); pos[k.id] = [cx + r2 * Math.cos(ang + spread), cy + r2 * Math.sin(ang + spread)]; }); });
+  for (const u of used) { const [x, y] = pos[u]; s += `<path d="M${cx} ${cy}L${x} ${y}" stroke="var(--work)" stroke-width="1" opacity=".55"/>`; }
+  for (const t of TOPICS) { const [x, y] = pos[t.id]; const isA = !t.parent; const u = used.has(t.id);
+    s += `<circle cx="${x}" cy="${y}" r="${isA ? 6 : 4.5}" fill="${isA ? "var(--status-3)" : t.st === 2 ? "var(--status-3)" : t.st === 1 ? "var(--status-1)" : "var(--panel)"}" stroke="${u ? "var(--work)" : "var(--ink-3)"}" stroke-width="${u ? 2 : 1}" opacity="${u || isA ? 1 : .35}"/>`;
+    if (isA) { const ang = pos[t.id][2]; const lx = x + Math.cos(ang) * 12, ly = y + Math.sin(ang) * 12 + 4; s += `<text x="${lx}" y="${ly}" font-size="9.5" fill="var(--ink-2)" text-anchor="${Math.cos(ang) > .3 ? "start" : Math.cos(ang) < -.3 ? "end" : "middle"}" font-family="var(--ui)">${esc(t.name.split(" ")[0])}</text>`; } }
+  s += `<circle cx="${cx}" cy="${cy}" r="18" fill="var(--work-soft)" stroke="var(--work)" stroke-width="1.5"/><text x="${cx}" y="${cy + 4}" font-size="10" text-anchor="middle" fill="var(--work)" font-weight="600" font-family="var(--ui)">Work</text></svg>`;
+  return s;
+}
+function applyView(p, tid) {
+  const t = TP[tid], A = applyFor(tid), items = IT();
+  const known = S.memory.filter((m) => m.place === tid || TP[m.place] && TP[m.place].parent === tid);
+  const usedHere = p.refs.filter((r) => (items[r.item] || { topics: [] }).topics.includes(tid));
+  const sugg = S.items.filter((i) => i.topics.includes(tid) && !p.refs.some((r) => r.item === i.id) && !i.madeIn).slice(0, 3);
+  const checks = p.checks[tid] || [];
+  return `<div class="apply"><button class="btn small quiet" data-act="back-apply">${ic("back")}Uses</button>
+  <div class="apply-head"><div><p class="kicker">Applied to ${esc(p.title)} <span class="edge-tag w" style="margin-left:6px">Learn → Work</span></p><h2>${esc(t.name)}</h2><div class="sub">${sdot(tid)}<span>${ST[t.st || 0]}${t.level ? " · pitched at " + t.level : ""}</span><span class="faint">·</span><span>${esc(pathOf(tid))}</span></div></div>
+    <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn line" data-act="toast" data-msg="In the app this opens Make a Lumen with ${esc(t.name)}, the project and its facts in the brief.">${ic("play")}Learn more for this project</button><button class="btn line" data-act="loci-topic" data-id="${tid}">Open on Loci</button></div></div>
+  <p class="muted" style="margin:-8px 0 24px;max-width:72ch">In Learn this topic is explained. Here it's applied: what you'd pin above your desk for this one project. Every line cites one of your own items or memory lines; Loci compiled it once and refreshes it when they change.</p>
+  <div class="apply-grid">
+    <section class="block"><h3>Rules of thumb, from your saves</h3><p class="lede">Your quotes, captions and notes on this topic.</p>${A.rules.length ? `<ul class="rules">${A.rules.map(([r, id, how]) => `<li><q>${esc(r)}</q><span class="src">${esc(how)} · ${citeItem(id)}</span></li>`).join("")}</ul>` : `<p class="muted" style="font-size:13px">Nothing saved on this topic yet.</p>`}</section>
+    <section class="block"><h3>Checks for ${esc(p.title.split(",")[0])}</h3><p class="lede">From the rules and the project's facts. Tick them as the drawings meet them.</p><ul class="checks">${A.checks.map(([c, why], i) => `<li><label><input type="checkbox" data-act="tick" data-id="${tid}" data-i="${i}" ${checks.includes(i) ? "checked" : ""}><span>${esc(c)}<span class="why">${esc(why)}</span></span></label></li>`).join("")}</ul></section>
+    <section class="block"><h3>What you know here</h3><p class="lede">Your memory card for this topic and the ones under it.</p>${known.length ? `<ul class="knows">${known.map((m) => `<li><span class="slot ${m.slot === "revisit" ? "rv" : ""}">${SLOTNAME[m.slot]}</span><span class="tx">${esc(m.text)}<span class="src">${esc(m.how)}, ${esc(m.when)}</span></span>${m.check && S.checkAns[m.check] == null ? `<button class="btn line tiny" data-act="checkme" data-id="${m.check}">Check me</button>` : "<span></span>"}${m.check && S.checkOpen === m.check ? checkHtml(m.check) : ""}</li>`).join("")}</ul>` : `<p class="muted" style="font-size:13px;margin:0">Nothing remembered here yet.</p>`}</section>
+    <section class="block"><h3>References</h3><p class="lede">${usedHere.length} used on this project${sugg.length ? `, ${sugg.length} more on this topic` : ""}.</p><div class="ev">${usedHere.map((r) => evCard(items[r.item], r.reason, false)).join("")}${sugg.map((i) => `<div class="evc sugg"><button class="open" data-act="item" data-id="${i.id}">${i.img ? `<div class="pic">${imgTag(i.img, i.title)}</div>` : textCard(i)}</button>${i.img ? `<div class="t">${esc(i.title)}</div>` : ""}<div class="sugg-acts"><button class="btn line tiny" data-act="use-direct" data-id="${i.id}">Use</button></div></div>`).join("")}</div></section>
+    ${A.q.length ? `<section class="block full"><h3>Questions it helps with</h3><div class="qlist">${A.q.map((qid) => { const q = p.questions.find((x) => x.id === qid); return `<button class="qrow" data-act="open-q" data-id="${q.id}"><span class="state ${q.state}">${q.state}</span><span><h3>${esc(q.text)}</h3></span><span class="counts">Open</span></button>`; }).join("")}</div></section>` : ""}
+  </div></div>`;
+}
+function logView(p) {
+  const icn = { learn: "learn", save: "bookmark", made: "pencil", decided: "check", stage: "flag" };
+  const rows = [...(S.extraLog || []).filter((l) => l.p === p.id), ...p.log];
+  return `${p.status === "active" ? `<div class="stagebox"><p><b>Close Concept design?</b> When the review is done, a short debrief files what this stage taught you on your map, as notes and as memory you did.</p><button class="btn line" data-act="toast" data-msg="Available after the review on 29 October. Try Debrief on the Riyadh competition.">Close the stage</button></div>` : ""}
+  <div class="section-h"><h3>Log</h3><span class="muted">Every turn of the loop on this project.</span></div>
+  <div class="log">${rows.map((l) => `<div class="lrow"><span class="d">${esc(l.d)}</span><span class="ic ${l.k}">${ic(icn[l.k])}</span><span class="b">${l.t}<span class="muted">${esc(l.s)}</span></span></div>`).join("") || `<p class="muted">Nothing yet.</p>`}</div>`;
+}
+
+/* ---------- touchpoints */
+function tpNote(what) { return `<div class="tp-note"><b>Simplified.</b><span>${what}</span></div>`; }
+function today() {
+  return `${tpNote("Today shown with only what Work adds: a Work on next card beside Continue, and stage dates in the week.")}
+  <div class="today"><h1>Today <span>Saturday 24 October</span></h1>
+    <div class="cont-card"><p class="kicker">Continue · Lumen · Plan types & ritual</p><h3>How the four-iwan plan organises a courtyard</h3><p>2:41 of 4:38 · you paused at “Why the iwans face each other”.</p><button class="btn primary" data-act="toast" data-msg="Opens the Lumen.">Continue watching</button></div>
+    <div class="cont-card work"><p class="kicker">Work on next · Prayer hall <span class="new">new</span></p><h3>How do we bring daylight onto the qibla wall without glare?</h3><p>Concept review on Thursday · 3 options · 1 gap: Daylight & glare.</p><button class="btn primary" data-act="open-q" data-id="q1" data-pid="p1">Open the question</button> <button class="btn line" data-act="lumen-brief" data-pid="p1" data-qid="q1">Make the Lumen it needs</button></div>
+    <div class="agenda"><div><span class="d">Mon 26</span><span>Lumen · Glare on a qibla wall <span class="forproj" style="margin-left:6px">${ic("work")}for Prayer hall</span></span></div><div><span class="d">Wed 28</span><span>Review: 3 lines due on Climate-responsive design</span></div><div><span class="d">Thu 29</span><span><b>Concept review</b> · Prayer hall <span class="new">new</span></span></div></div>
+  </div>`;
+}
+function learn() {
+  return `${tpNote("Learn's Home with only what Work adds: making a Lumen for a project, and projects beside goals.")}
+  <div class="dest-head"><b>Learn</b><span class="sep">/</span><span>Ask, pick up, and what's next</span></div>
+  <h2 style="font:400 26px var(--read);margin:0 0 12px">What do you want to understand?</h2>
+  <div class="learnbar"><div class="seg fmtseg"><button aria-pressed="true">Watch</button><button aria-pressed="false">Listen</button><button aria-pressed="false">Read</button></div><label class="vh" for="lq">What should it explain?</label><input id="lq" value="Glare on a qibla wall at 25° N" autocomplete="off"><button class="forsel" data-act="toast" data-msg="Choose a project or None. The project's facts and the question go into the brief.">${ic("work")}For Prayer hall${ic("chev")}</button><button class="btn primary" data-act="lumen-brief" data-pid="p1" data-qid="q1">Make a Lumen</button></div>
+  <p class="muted" style="font-size:12.5px;margin:0 0 32px">With a project chosen, the brief adds its facts, the question and what it already decided. <span class="new">new</span></p>
+  <div class="section-h" style="max-width:1100px"><h3>Next for your goals and projects <span class="new">new</span></h3></div>
+  <div class="goalcols">
+    <div class="goalcol proj"><h3>Prayer hall, Al Barsha <span>Review Thu 29 Oct</span></h3>
+      <div class="it"><div><div class="f">Watch · 4 min · for a question</div><div class="tt">Glare on a qibla wall at 25° N</div></div><button class="btn line small" data-act="lumen-brief" data-pid="p1" data-qid="q1">Make</button></div>
+      <div class="it"><div><div class="f">Read · 10 min · a gap</div><div class="tt">Comfort in humid heat</div></div><button class="btn line small" data-act="toast" data-msg="Made for Prayer hall.">Make</button></div>
+      <div class="it"><div><div class="f">Check · 1 min · to revisit</div><div class="tt">Thermal bridging at panel fixings</div></div><button class="btn line small" data-act="open-apply" data-id="precast" data-pid="p1">Check me</button></div></div>
+    <div class="goalcol"><h3>Thesis · Dubai courtyard house <span>Due March</span></h3><div class="it"><div><div class="f">Read · 14 min</div><div class="tt">Courtyards in hot, humid places</div></div><button class="btn line small" data-act="toast" data-msg="Opens the Read.">Open</button></div><div class="it"><div><div class="f">Listen</div><div class="tt">Night flushing when the nights stay warm</div></div><button class="btn line small" data-act="toast" data-msg="Made.">Make</button></div></div>
+  </div>
+  <div class="section-h" style="max-width:1100px;margin-top:32px"><h3>A Lumen's end card</h3></div>
+  <div class="player" style="max-width:640px">${lumenEnd(true)}</div>`;
+}
+function commonplace() {
+  const items = S.items.filter((i) => S.cfilter === "all" ? i.type !== "decision" : S.cfilter === "made" ? i.madeIn : S.cfilter === "decision" ? i.type === "decision" : S.cfilter === "used" ? S.projects.some((p) => p.refs.some((r) => r.item === i.id)) : true);
+  const usedCount = S.items.filter((i) => S.projects.some((p) => p.refs.some((r) => r.item === i.id))).length;
+  const n = window.innerWidth < 720 ? 2 : 5;
+  const c = Array.from({ length: n }, () => []);
+  items.forEach((it, i) => c[i % n].push(it));
+  const card = (it) => { const pp = it.img ? pic(it.img) : null; const used = S.projects.filter((p) => p.refs.some((r) => r.item === it.id)); return `<div class="bcard"><button class="open" data-act="item" data-id="${it.id}" aria-label="Open ${esc(it.title)}">${pp ? `<div class="pic"><img src="${pp.src}" alt="${esc(it.title)}" style="aspect-ratio:${pp.r}" loading="lazy"></div>` : textCard(it)}</button>${it.madeIn && it.type !== "decision" ? '<span class="madebadge">Made in a project</span>' : ""}${pp ? `<div class="t">${esc(it.title)}</div>` : ""}<div class="from">${esc(it.kind || it.type)}${used.length ? ` · <span style="color:var(--work)">used in ${used.length} project${used.length > 1 ? "s" : ""}</span>` : ""}</div></div>`; };
+  return `${tpNote("Commonplace with only what Work adds: Use in a project on every item, Used in on its page, and filters for what projects made and decided.")}
+  <div class="dest-head"><b>Commonplace</b><span class="sep">/</span><span>${S.items.length} entries</span></div>
+  <div class="chips" role="group" aria-label="Filter">${[["all", "All", S.items.filter((i) => i.type !== "decision").length], ["used", "Used in a project", usedCount], ["made", "Made in a project", S.items.filter((i) => i.madeIn).length], ["decision", "Decisions", S.items.filter((i) => i.type === "decision").length]].map(([k, l, nn], i) => `<button class="chip" aria-pressed="${S.cfilter === k}" data-act="cfilter" data-id="${k}">${l} <span class="n">${nn}</span>${i ? '<span class="new">new</span>' : ""}</button>`).join("")}</div>
+  <div class="mason">${c.map((cc) => `<div class="col">${cc.map(card).join("")}</div>`).join("")}</div>`;
+}
+function loci() {
+  const p = S.projects.find((x) => x.id === "p1"), used = new Set(p.uses.map((u) => u.topic));
+  const W = 900, H = 560, cx = W / 2, cy = H / 2, pos = {};
+  const kidsAll = TOPICS.filter((t) => t.parent), step = 2 * Math.PI / kidsAll.length;
+  kidsAll.forEach((k, i) => { const ang = -Math.PI / 2 + step * (i + 1); const deep = TP[k.parent].parent ? 1 : .9; pos[k.id] = [cx + 300 * deep * Math.cos(ang), cy + 222 * deep * Math.sin(ang), ang, i]; });
+  for (const a of TOPICS.filter((t) => !t.parent)) { const ks = kidsAll.filter((k) => areaOf(k.id).id === a.id); const sx = ks.reduce((m, k) => m + Math.cos(pos[k.id][2]), 0), sy = ks.reduce((m, k) => m + Math.sin(pos[k.id][2]), 0); const ang = Math.atan2(sy, sx); pos[a.id] = [cx + 158 * Math.cos(ang), cy + 112 * Math.sin(ang), ang, -1]; }
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Loci map${S.lociShow ? ", Prayer hall's topics lit" : ""}">`;
+  for (const t of TOPICS) if (t.parent) { const [x1, y1] = pos[t.parent], [x2, y2] = pos[t.id]; s += `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="var(--line)" stroke-width="1" opacity="${S.lociShow && !used.has(t.id) ? .4 : 1}"/>`; }
+  if (S.lociShow) { for (const u of used) { const [x, y] = pos[u]; s += `<path d="M${cx} ${cy}Q${(cx + x) / 2 + 20} ${(cy + y) / 2 - 20} ${x} ${y}" fill="none" stroke="var(--work)" stroke-width="1.3" stroke-dasharray="3 4" opacity=".8"/>`; } s += `<g><circle cx="${cx}" cy="${cy}" r="30" fill="var(--work-soft)" stroke="var(--work)" stroke-width="1.6"/><text x="${cx}" y="${cy - 2}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--work)" font-family="var(--ui)">Prayer</text><text x="${cx}" y="${cy + 11}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--work)" font-family="var(--ui)">hall</text></g>`; }
+  for (const t of TOPICS) { const [x, y, ang] = pos[t.id]; const isA = !t.parent; const dim = S.lociShow && !isA && !used.has(t.id); const sel = S.lociSel === t.id;
+    const fill = isA ? "var(--status-3)" : t.st === 2 ? "var(--status-3)" : t.st === 1 ? "var(--status-1)" : "var(--panel)";
+    let anchor = Math.cos(ang) > .3 ? "start" : Math.cos(ang) < -.3 ? "end" : "middle", dx = anchor === "start" ? 11 : anchor === "end" ? -11 : 0, dy = anchor === "middle" ? (Math.sin(ang) > 0 ? 22 : -13) : 4;
+    if (isA) { anchor = Math.cos(ang) > .35 ? "start" : Math.cos(ang) < -.35 ? "end" : "middle"; dx = anchor === "start" ? 13 : anchor === "end" ? -13 : 0; dy = anchor !== "middle" ? 4 : Math.sin(ang) > 0 ? -14 : 24; }
+    s += `<g class="map-node ${isA ? "area" : ""} ${dim ? "dim" : ""}" data-act="loci-sel" data-id="${t.id}" tabindex="0" role="button" aria-label="${esc(t.name)}${isA ? "" : ", " + ST[t.st || 0]}"><circle cx="${x}" cy="${y}" r="${isA ? 8 : 6}" fill="${fill}" stroke="${sel ? "var(--accent)" : S.lociShow && used.has(t.id) ? "var(--work)" : "var(--ink-3)"}" stroke-width="${sel || (S.lociShow && used.has(t.id)) ? 2.4 : 1}"/><text x="${x + dx}" y="${y + dy}" text-anchor="${anchor}">${esc(t.name)}</text></g>`; }
+  s += `</svg>`;
+  const t = TP[S.lociSel], u = p.uses.find((x) => x.topic === t.id);
+  const panel = `<div class="tpanel"><div class="path">${esc(pathOf(t.id))}</div><h2>${esc(t.name)}</h2>${t.parent ? `<div class="st">${sdot(t.id)}${ST[t.st || 0]}${t.level ? `<span class="faint">·</span><span class="muted">Loci: ${t.level}</span>` : ""}</div>` : ""}
+    ${u ? `<div class="usedbox"><span class="kicker" style="color:var(--work)">Used in Prayer hall <span class="new">new</span></span><span class="why">${esc(u.reason)}</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary small" data-act="open-apply" data-id="${t.id}" data-pid="p1">Apply ›</button><button class="btn line small" data-act="open-project" data-id="p1">Open project</button></div></div>` : ""}
+    ${t.projectish ? `<div class="usedbox"><span>This looks like a project: it has a deadline-like name and nothing to learn under it.</span><button class="btn line small" data-act="toast" data-msg="In the app: Housing study becomes a project; its item comes over as a reference.">Turn into a project</button></div>` : ""}
+    ${t.parent && !u && !t.projectish ? `<button class="btn line small" data-act="toast" data-msg="Added to Prayer hall's Uses with a reason Loci suggests: you can edit it.">Use in a project…</button>` : ""}
+    <p class="muted" style="font-size:12.5px;margin:0">The topic panel keeps everything it has today: status, My Focus, Explain, Plan a course, Ask Loci.</p></div>`;
+  return `${tpNote("Loci's Map with only what Work adds: Show on Loci from a project, and Used in on a topic.")}
+  <div class="dest-head"><b>Loci</b><span class="sep">/</span><span>Map</span></div>
+  <div class="mapbar"><button class="btn ${S.lociShow ? "primary" : "line"} small" data-act="loci-toggle" aria-pressed="${S.lociShow}">${ic("work")}Show Prayer hall</button><span class="muted" style="font-size:12.5px">${S.lociShow ? `${used.size} topics in ${new Set([...used].map((x) => areaOf(x).id)).size} areas. The rest dimmed.` : "Your whole map."}</span></div>
+  <div class="loci"><div class="mapbox">${s}</div>${panel}</div>`;
+}
+
+/* ---------- drawer, sheets, toast */
+function drawer() {
+  const p = P(), q = S.qid ? Q() : null;
+  const usedTopics = new Set(q ? q.uses : p.uses.map((u) => u.topic));
+  const on = new Set(p.refs.map((r) => r.item));
+  const term = (S.dq || "").toLowerCase();
+  const pool = S.items.filter((i) => !i.madeIn && !on.has(i.id) && i.type !== "decision" && (!term || (i.title + " " + i.caption).toLowerCase().includes(term)));
+  const sugg = pool.filter((i) => i.topics.some((t) => usedTopics.has(t))).sort((a, b) => (b.picked ? 1 : 0) - (a.picked ? 1 : 0));
+  const rest = pool.filter((i) => !sugg.includes(i));
+  const row = (i) => { const pp = i.img ? pic(i.img) : null; return `<div class="drow"><div class="th">${pp ? `<img src="${pp.src}" alt="">` : "“"}</div><div><div class="t">${esc(i.title)}</div><div class="s">${esc(i.kind || ({ quote: "Quote", note: "Note", link: "Link" })[i.type])}${i.topics.length ? " · " + i.topics.map((t) => esc(TP[t].name)).join(", ") : " · no topic yet"}${i.picked ? " · ★ Pick" : ""}</div></div>${S.dpick === i.id ? "" : `<button class="btn line tiny" data-act="dpick" data-id="${i.id}">Use</button>`}
+    ${S.dpick === i.id ? `<form class="reason" data-form="dref" data-id="${i.id}"><label class="vh" for="dr-${i.id}">Why is it here?</label><input id="dr-${i.id}" name="reason" value="${esc(suggestReason(i, q))}" autocomplete="off"><button class="btn primary tiny" type="submit">Add</button></form>` : ""}</div>`; };
+  return `<aside class="drawer" role="dialog" aria-label="Add from Commonplace"><div class="dh"><h3>Add from Commonplace</h3><button class="btn small quiet" data-act="close-drawer" aria-label="Close">${ic("x")}</button></div>
+    <p class="muted" style="font-size:12.5px;margin:0 0 10px">${q ? `To: <b style="color:var(--ink);font-weight:500">${esc(q.text)}</b>` : `To ${esc(p.title)}`}. The item stays where it is; the project points at it with a reason.</p>
+    <label class="vh" for="dsearch">Search your Commonplace</label><input class="dsearch" id="dsearch" placeholder="Search your Commonplace…" value="${esc(S.dq || "")}" autocomplete="off">
+    <div class="dlist">${sugg.length ? `<div class="dlab">Suggested · on the topics ${q ? "this question" : "the project"} uses</div>${sugg.map(row).join("")}` : ""}${rest.length ? `<div class="dlab">Everything else</div>${rest.map(row).join("")}` : ""}${!pool.length ? `<p class="muted">Nothing matches.</p>` : ""}</div></aside>`;
+}
+function suggestReason(i, q, ptitle) {
+  const r = { "mat-jali": "A screen for the women's gallery", "screen-shadow": "Low sun through a screen", vaults: "Thick roofs against the heat", stepwell: "Deep and shaded: could the ablutions go down?", "colonnade-dusk": "The rhythm of the hall at dusk", "q-field": "What the hypostyle should feel like", "ln-hassan": "Court as a room, not a field", "q-fathy": "For the client presentation", "stair-light": "One slot of light at the top", "courtyard-morning": "A pool on the axis: does it cool, or only look cool?", "mat-travertine": "Floor of the hall: cool underfoot" };
+  return r[i.id] || (q ? `For: ${q.text.replace(/\?$/, "").toLowerCase()}` : `For ${ptitle || P().title.split(",")[0]}`);
+}
+function sheetHtml() {
+  const s = S.sheet;
+  const wrap = (inner, cls = "") => `<div class="scrim" data-act="scrim"><div class="sheet ${cls}" role="dialog" aria-modal="true" aria-labelledby="sheet-h">${inner}</div></div>`;
+  const head = (kick, h) => `<div class="sh"><div>${kick ? `<p class="kicker">${kick}</p>` : ""}<h2 id="sheet-h">${h}</h2></div><button class="x" data-act="close-sheet" aria-label="Close">${ic("x")}</button></div>`;
+  if (s.kind === "start") {
+    if (s.step < 4) return wrap(head("Start a project", esc(s.text)) + `<ul class="steps">${["Reading your map · 24 topics, their status and memory", "Looking through Commonplace · 43 entries, Picks first", "Writing the brief, the first questions and the gaps"].map((t, i) => `<li class="${i < s.step ? "done" : i === s.step ? "on" : ""}"><span class="tk">${i < s.step ? "✓" : i === s.step ? '<span class="typing"><i></i></span>' : "·"}</span>${t}</li>`).join("")}</ul><p class="muted" style="font-size:12px;margin:14px 0 0">One Sonnet call. It reads titles, topics and memory lines, never whole items.</p>`);
+    const D = DRAFT, items = IT();
+    return wrap(head("Loci's draft · keep what you want", esc(D.title)) + `<div class="draft">
+      <div class="full"><h4>Brief</h4><p class="bp">${esc(D.brief)}</p></div>
+      <div><h4>Facts</h4><dl class="facts" style="grid-template-columns:1fr">${D.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl></div>
+      <div><h4>First questions</h4><ul>${D.questions.map((q, i) => `<li><label><input type="checkbox" checked id="dq${i}">${esc(q)}</label></li>`).join("")}</ul>
+        <h4 style="margin-top:18px">Uses, from your map</h4><div class="tchips">${D.uses.map((t) => `<span class="tchip">${sdot(t)}${esc(TP[t].name)}</span>`).join("")}</div>
+        <h4 style="margin-top:18px;color:var(--warn)">Gaps</h4><ul>${D.gaps.map((g) => `<li style="color:var(--warn)">${esc(g)}</li>`).join("")}</ul></div>
+      <div class="full"><h4>References from your Commonplace</h4><ul style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">${D.refs.map(([id, why], i) => { const it = items[id]; return `<li><label class="dref"><span class="th">${it.img ? imgTag(it.img) : ""}</span><span><input type="checkbox" checked id="dr${i}" style="margin-right:6px">${esc(it.title)}<span class="why" style="display:block">${esc(why)}</span></span></label></li>`; }).join("")}</ul></div>
+    </div><div class="foot"><span class="grow">A change card: nothing is created until you press Keep.</span><button class="btn quiet" data-act="close-sheet">Discard</button><button class="btn primary" data-act="keep-draft">Keep</button></div>`, "wide");
+  }
+  if (s.kind === "lumen-brief") {
+    const p = S.projects.find((x) => x.id === "p1"), items = IT();
+    return wrap(head("Make a Lumen · for a question", "Glare on a qibla wall at 25° N") + `<p class="muted" style="margin:0 0 14px;font-size:13px">The brief every Lumen gets, with one new part: the project. Highlighted lines are new.</p>
+      <dl class="briefparts"><dt>Learner</dt><dd>Architect, 8 years, mostly religious and civic buildings in the Gulf</dd>
+      <dt>Project</dt><dd class="newp"><b style="font-weight:500">Prayer hall, Al Barsha</b> · Concept · qibla 258° · 25.1° N · hot, humid coast</dd>
+      <dt>Question</dt><dd class="newp">How do we bring daylight onto the qibla wall without glare? Options A roof slot, B north clerestory, C side court and screen</dd>
+      <dt>Filed under</dt><dd>Design & Composition › Light & threshold › Daylight & glare</dd>
+      <dt>Sources</dt><dd>${["brick-hall", "hypostyle", "l-rouf", "reading-room", "screen-shadow"].map(citeItem).join(" ")} · grounding: mostly</dd>
+      <dt>Already known</dt><dd>Light & threshold learned. Hypostyle and four-iwan plans. Decided: hypostyle, 7 × 9 bays <span class="new">from work</span></dd>
+      <dt>Rules</dt><dd>No invented numbers; say when unsure</dd></dl>
+      <div class="fmt"><div class="seg"><button aria-pressed="true">Watch · 4 min</button><button aria-pressed="false">Listen</button><button aria-pressed="false">Read</button></div></div>
+      <div class="foot"><span class="grow">Filed on Daylight & glare and tagged for Prayer hall. The topic's status doesn't change.</span><button class="btn quiet" data-act="close-sheet">Cancel</button><button class="btn primary" data-act="lumen-make">Make the Lumen</button></div>`);
+  }
+  if (s.kind === "lumen") return wrap(head(forproj(), "Glare on a qibla wall at 25° N") + `<div class="player">${s.i < SLIDES.length ? `<div class="slide">${SLIDES[s.i]}</div>` : lumenEnd(false)}<div class="pctl"><button class="btn small line" data-act="slide-prev" ${s.i === 0 ? "disabled" : ""}>Back</button><div class="bar"><i style="width:${Math.min(100, (s.i + 1) / (SLIDES.length + 1) * 100)}%"></i></div><span class="cap">${s.i < SLIDES.length ? `Slide ${s.i + 1} of ${SLIDES.length}` : "The end"}</span><button class="btn small primary" data-act="slide-next" ${s.i >= SLIDES.length ? "disabled" : ""}>Next</button></div></div>`, "wide");
+  if (s.kind === "decide") {
+    const p = P(), q = Q();
+    const D = DECIDE[q.id] || { text: "", because: [] };
+    return wrap(head("Decide · " + esc(p.title), esc(q.text)) + `<div class="decide"><label class="kicker" for="dtext">What you chose</label><textarea id="dtext" style="margin-top:6px">${esc(D.text)}</textarea>
+      <p class="kicker" style="margin-top:16px">Because <span class="faint" style="text-transform:none;letter-spacing:0;font-weight:400">· Loci drew these from your options, crits and memory. Untick any.</span></p>
+      <ul class="because">${D.because.map(([t, ref], i) => `<li><label><input type="checkbox" checked id="db${i}"><span>${esc(t)}${ref ? `<span class="src">${ref.startsWith("fact") ? "Fact: " + ref.slice(5) : ""}</span>` : ""}</span></label></li>`).join("")}</ul>
+      <p class="kicker" style="margin-top:16px">Applies</p><div class="tchips" style="margin-top:6px">${q.uses.map((t) => `<span class="tchip">${sdot(t)}${esc(TP[t].name)}</span>`).join("")}</div>
+      </div><div class="foot"><span class="grow">Saved as a Decision note in Commonplace, tagged on these topics. Each one remembers you applied it.</span><button class="btn quiet" data-act="close-sheet">Cancel</button><button class="btn primary" data-act="save-decision">Save the decision</button></div>`);
+  }
+  if (s.kind === "item") {
+    const it = IT()[s.id]; const pp = it.img ? pic(it.img) : null; const used = S.projects.flatMap((p) => p.refs.filter((r) => r.item === it.id).map((r) => ({ p, r })));
+    return wrap(`<div class="sh"><div><p class="kicker">${esc(it.kind || it.type)}${it.madeIn ? " · made in " + esc(S.projects.find((p) => p.id === it.madeIn).title) : ""}</p></div><button class="x" data-act="close-sheet" aria-label="Close">${ic("x")}</button></div>
+      <div class="qview">${pp ? `<div class="pic"><img src="${pp.src}" alt="${esc(it.title)}"></div>` : `<div>${textCard(it)}</div>`}<div><h2 id="sheet-h">${esc(it.title)}</h2>${it.caption && it.type === "photo" ? `<p class="cap">${esc(it.caption)}</p>` : ""}
+        <div class="row"><b>Topics</b><div class="tchips">${it.topics.length ? it.topics.map(tchip).join("") : '<span class="faint">No topic yet</span>'}</div></div>
+        <div class="row"><b>Used in <span class="new">new</span></b>${used.length ? `<ul class="usedin">${used.map(({ p, r }) => `<li><button class="btn link" data-act="open-project" data-id="${p.id}">${esc(p.title)}</button>${r.q ? ` · <span class="muted">${esc(p.questions.find((q) => q.id === r.q).text)}</span>` : ""}<span class="why">${esc(r.reason)}</span></li>`).join("")}</ul>` : '<span class="faint">Not used in a project yet.</span>'}</div>
+        ${it.madeIn ? "" : s.use ? `<form class="usein" data-form="usein" data-id="${it.id}"><label>Project<select id="uproj" name="p">${[...S.projects].sort((a, b) => (a.id === "p1" ? -1 : b.id === "p1" ? 1 : 0)).filter((p) => p.status !== "done").map((p) => `<option value="${p.id}">${esc(p.title)}</option>`).join("")}</select></label><label>Question (optional)<select id="uq" name="q"><option value="">The whole project</option>${S.projects.find((x) => x.id === "p1").questions.filter((q) => q.state !== "decided").map((q) => `<option value="${q.id}">${esc(q.text)}</option>`).join("")}</select></label><label>Why is it here?<input id="ureason" name="reason" value="${esc(suggestReason(it, null, "Prayer hall"))}" autocomplete="off"></label><div style="display:flex;gap:8px"><button class="btn primary small" type="submit">Use</button><button class="btn quiet small" type="button" data-act="item-use-cancel">Cancel</button></div></form>` : `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary small" data-act="item-use">${ic("work")}Use in a project</button><button class="btn line small" data-act="toast" data-msg="Opens Make a Lumen about this item. Exists today.">Explain this</button></div>`}
+      </div></div>`, "wide");
+  }
+  if (s.kind === "debrief") {
+    if (s.done) return wrap(head("Debrief · Riyadh library competition", "Filed on your map") + `<ul class="knows">${DEBRIEF.map((l, i) => `<li><span class="slot">You did</span><span class="tx">${esc(S.debriefTexts[i])}<span class="src">${esc(TP[l.topic].name)} · a Note and a memory line, basis did</span></span><span></span></li>`).join("")}</ul>
+      <div class="offer" style="margin-top:18px"><p class="kicker">Keep the project as an Object</p><p>Add <b>Riyadh library competition</b> to Commonplace › Objects › My projects, with its cover, its facts as fields (Year, Role, Stage reached, Result) and links to its decisions. Your own work becomes a reference for the next one.</p><div class="acts"><button class="btn primary small" data-act="keep-object">Keep as an Object</button><button class="btn small quiet" data-act="close-sheet">Not now</button></div></div>`);
+    return wrap(head("Debrief · Riyadh library competition", "What did this project teach you?") + `<p class="muted" style="margin:0 0 6px;font-size:13px">Three questions. Loci suggests an answer from the log; write your own over it. Each answer is filed on a topic as a Note and remembered there as something you did. Status changes are offered, never made.</p>
+      ${DEBRIEF.map((l, i) => `<div class="lesson"><span class="pr">${esc(l.prompt)}</span><label class="vh" for="les${i}">${esc(l.prompt)}</label><textarea id="les${i}">${esc(S.debriefTexts[i])}</textarea><div class="to"><span>File on</span>${tchip(l.topic)}<span class="faint">· from the log: ${esc(l.from)}</span></div></div>`).join("")}
+      <div class="foot"><button class="btn quiet" data-act="close-sheet">Later</button><button class="btn primary" data-act="debrief-file">File 3 lessons on Loci</button></div>`);
+  }
+  return "";
+}
+function toastHtml() { return `<div class="toast" role="status">${esc(S.toast.msg)}${S.toast.act ? `<button data-act="${S.toast.act}" ${S.toast.id ? `data-id="${S.toast.id}"` : ""}>${esc(S.toast.label)}</button>` : ""}</div>`; }
+
+/* ---------- scripted content */
+const DRAFT = {
+  title: "A library in Sharjah, with a reading garden",
+  brief: "A small public library on two floors in Sharjah: an open reading hall, a children's room, quiet study rooms and a walled reading garden. Calm, cool and lit for reading. Concept due in three weeks.",
+  facts: [["Site", "Sharjah · 25.3° N"], ["Floors", "Two"], ["Climate", "Hot desert on a humid coast"], ["Due", "Concept in 3 weeks · Fri 13 Nov"]],
+  questions: ["How does north light reach the reading tables on both floors?", "Can the reading garden be used in May and October?", "Where does the children's room go so its noise doesn't carry?", "One long roof, or open both sides? (you asked this in Riyadh)"],
+  uses: ["light", "court", "climate", "shading", "earth", "glare"],
+  gaps: ["Room acoustics: quiet rooms next to a children's room", "Comfort in humid heat"],
+  refs: [["reading-room", "You saved it for north light on tables: the reading hall"], ["pavilion-a", "Your Riyadh option A: closed to the north, one roof"], ["pavilion-b", "Your Riyadh option B, and why it lost: afternoon glare"], ["vault-study", "Vaults over the stacks, tested in clay"], ["courtyard-noon", "A walled garden at noon is a heat trap: your note"], ["mat-jali", "A screen wall for the reading garden"]],
+};
+const DECIDE = {
+  q1: { text: "Light the qibla wall from a roof slot along its full length (option A), with a deep baffle against the midday sun. No openings in the qibla wall itself.", because: [["Light grazes the wall from above, as in Brick prayer hall and Bait Ur Rouf Mosque", null], ["No sun in worshippers' eyes at Asr and Maghrib", "fact:Qibla 258°"], ["B lights the room evenly and leaves the qibla wall darker than the hall", null], ["C lets the low western sun in across the rows", null], ["Check the slot-to-panel junction with the precaster: thermal bridging is still to revisit", null]] },
+  q2: { text: "Shade the middle of the court with a tensile canopy lifted clear of deep arcades on the south and west. Keep the pool for its look; don't count on it for cooling.", because: [["At noon in August the sun is 79° up: only shade from above works", "fact:Sun 79°"], ["Shade first, then mass, then air: your rule", null], ["Arcades give the Friday overflow somewhere to stand", null], ["A pool cools little in humid air", null]] },
+  q3: { text: "Keep the panel joints off the mihrab's axis: one wide panel for the mihrab, joints at the edges of the niche.", because: [["Tolerances of ±3 mm on the faces, ±6 mm on joints: your note", null]] },
+};
+const SLIDES = [
+  `<h3>Glare is light you didn't ask to look at</h3><p>On a qibla wall the question isn't how much light, but where your eyes are. Six hundred people face one wall, at 258°, five times a day.</p>`,
+  `<h3>The sun at 25° N</h3><svg viewBox="0 0 600 224" aria-label="Sun heights at noon in Dubai: 88° in June, 41° in December, and near the horizon in the west at Maghrib"><path d="M30 190h540" stroke="currentColor" stroke-width="1.2"/><g fill="none" stroke="var(--accent)" stroke-width="1.4"><path d="M300 190 L306 30"/><path d="M300 190 L150 58"/><path d="M300 190 L40 176" stroke-dasharray="4 4"/></g><g font-size="13" fill="var(--ink-2)" font-family="var(--ui)"><text x="312" y="34">June noon · 88°</text><text x="72" y="54">December noon · 41°</text><text x="40" y="212">Asr and Maghrib: low, from the west-southwest</text></g><circle cx="300" cy="190" r="4" fill="var(--ink)"/></svg><p>At noon the sun is nearly overhead; in the afternoon it sinks toward the qibla. Any opening in the qibla wall faces it.</p>`,
+  `<h3>Three ways in, one wall</h3><p><b>From above</b> (a roof slot): light grazes the wall and shows its texture; the sun is never in view. <b>From the north</b> (a clerestory): even light, but on the room, not the wall. <b>From the side</b> (a screen): beautiful patterns, low sun at eye height in the afternoon.</p><p>General knowledge, matched to your references: Brick prayer hall, Bait Ur Rouf, Reading room with clerestory.</p>`,
+];
+function lumenEnd(demo) {
+  return `<div class="endcard"><span class="kicker">The main idea</span><div class="tk">Light from above lights a wall. Light from in front lights faces, and blinds them.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="${demo ? "open-q" : "lumen-apply"}" data-id="q1" data-pid="p1">${ic("work")}Use in Prayer hall</button><button class="btn line" data-act="toast" data-msg="Saved to Commonplace as a quote from the Lumen. Exists today.">Mark it</button><button class="btn quiet" data-act="toast" data-msg="Asks 3 quick questions. Exists today.">Test me</button></div>
+    <p class="muted" style="font-size:12.5px;margin:0">Use in Prayer hall adds this line to the question's What you know, from a Lumen. ${demo ? "" : "Daylight & glare stays Not started until you change it."}</p></div>`;
+}
+const DEBRIEF = [
+  { prompt: "What worked?", text: "A north clerestory gave the reading room even light with no sun on the tables.", topic: "light", from: "decided 15 Oct" },
+  { prompt: "What would you do differently?", text: "Test a colonnade's afternoon glare in a model before choosing: option B was dropped late for glare.", topic: "glare", from: "Massing option B, caption" },
+  { prompt: "What do you know now that you didn't?", text: "A clay model settled the stack vaults in two days: model first, draw second.", topic: "earth", from: "Vault study, clay model" },
+];
+
+/* ------------------------------------------------------------------ actions */
+let toastTimer;
+function toast(msg, act, label, id) { S.toast = { msg, act, label, id }; clearTimeout(toastTimer); const old = $(".toast"); if (old) old.remove(); document.body.querySelector("#app").insertAdjacentHTML("beforeend", toastHtml()); toastTimer = setTimeout(() => { S.toast = null; const t = $(".toast"); if (t) t.remove(); }, 4800); }
+function go(screen, extra = {}) { Object.assign(S, { screen, drawer: null, sheet: null }, extra); render(); }
+const ACT = {
+  nav: (d) => go(d.to, d.to === "work" ? { qid: null, apply: null } : {}),
+  reset: () => { reset(); render(); },
+  guide: () => { S.guide = !S.guide; render.keep = true; render(); },
+  edge: (d) => { S.edge = d.id; render.keep = true; render(); },
+  "open-project": (d) => go("project", { pid: d.id, tab: "overview", qid: null, apply: null }),
+  "open-q": (d) => go("project", { pid: d.pid || "p1", tab: "questions", qid: d.id, apply: null, guide: false }),
+  "open-apply": (d) => go("project", { pid: d.pid || (S.screen === "project" ? S.pid : "p1"), tab: "uses", apply: d.id, qid: null, guide: false }),
+  tab: (d) => go("project", { tab: d.tab, qid: null, apply: null, pid: S.screen === "project" ? S.pid : "p1", guide: false }),
+  "back-q": () => go("project", { qid: null }),
+  "back-apply": () => go("project", { apply: null }),
+  group: (d) => { S.group = d.id; render.keep = true; render(); },
+  drawer: () => { S.drawer = true; S.dq = ""; S.dpick = null; render.keep = true; render(); setTimeout(() => { const i = $("#dsearch"); if (i) i.focus(); }, 30); },
+  "close-drawer": () => { S.drawer = null; render.keep = true; render(); },
+  dpick: (d) => { S.dpick = d.id; render.keep = true; render(); const i = $(`#dr-${d.id}`); if (i) { i.focus(); i.select(); } },
+  crit: (d) => { const k = S.qid + ":" + d.id; if (S.critOpen[k]) { delete S.critOpen[k]; render.keep = true; render(); return; } S.critOpen[k] = "typing"; render.keep = true; render(); setTimeout(() => { if (S.critOpen[k] === "typing") { S.critOpen[k] = "done"; render.keep = true; render(); } }, 900); },
+  checkme: (d) => { S.checkOpen = S.checkOpen === d.id ? null : d.id; render.keep = true; render(); },
+  answer: (d) => { const c = CHECKS[d.id], i = +d.i; S.checkAns[d.id] = i; if (i === c.right) { const m = S.memory.find((x) => x.check === d.id); if (m) { m.slot = "known"; m.how = "from a check in Work, right this time"; m.when = "today"; m.text = d.id === "evap" ? "Evaporative cooling helps little in humid air" : "Steel fixings are the main heat path through precast walls"; } } render.keep = true; render(); },
+  "use-sugg": (d) => { const p = P(); const s = p.suggested[S.qid].find((x) => x.item === d.id); p.refs.push({ item: d.id, q: S.qid, reason: s.reason }); p.suggested[S.qid] = p.suggested[S.qid].filter((x) => x.item !== d.id); toast("Used in " + p.title + ". The item stays where it is in Commonplace."); render.keep = true; render(); },
+  "skip-sugg": (d) => { const p = P(); p.suggested[S.qid] = p.suggested[S.qid].filter((x) => x.item !== d.id); toast("Loci won't suggest it for this question again."); render.keep = true; render(); },
+  "use-direct": (d) => { const p = P(); p.refs.push({ item: d.id, q: null, reason: suggestReason(IT()[d.id], null) }); toast("Used in " + p.title + "."); render.keep = true; render(); },
+  tick: (d, el) => { const p = P(); const arr = p.checks[d.id] ||= []; const i = +d.i; if (el.checked) arr.push(i); else p.checks[d.id] = arr.filter((x) => x !== i); },
+  "loci-topic": (d) => go("loci", { lociSel: d.id }),
+  "loci-sel": (d) => { S.lociSel = d.id; render.keep = true; render(); },
+  "loci-toggle": () => { S.lociShow = !S.lociShow; render.keep = true; render(); },
+  cfilter: (d) => { S.cfilter = d.id; render.keep = true; render(); },
+  item: (d) => { S.sheet = { kind: "item", id: d.id }; render.keep = true; render(); },
+  "item-use": () => { S.sheet.use = true; render.keep = true; render(); },
+  "item-use-cancel": () => { S.sheet.use = false; render.keep = true; render(); },
+  "close-sheet": () => { S.sheet = null; render.keep = true; render(); },
+  scrim: (d, el, ev) => { if (ev.target === el) ACT["close-sheet"](); },
+  toast: (d) => { toast(d.msg); render.keep = true; render(); },
+  start: (d) => { openStart($("#ask") && $("#ask").value.trim() || "A small library in Sharjah, two floors, with a reading garden. Concept due in three weeks."); },
+  "keep-draft": () => {
+    const D = DRAFT, id = "p" + (S.projects.length + 1);
+    S.projects.unshift({ id, title: D.title, cover: "reading-room", status: "active", stage: 0, due: "Concept due Fri 13 Nov", brief: D.brief, facts: D.facts, uses: D.uses.map((t) => ({ topic: t, reason: "Suggested by Loci from the brief" })), gaps: D.gaps.map((g, i) => ({ id: "dg" + i, name: g.split(":")[0], why: g.split(":")[1] ? g.split(":")[1].trim() : "Not on your map" })),
+      questions: D.questions.map((q, i) => ({ id: id + "q" + i, text: q, state: "open", uses: D.uses.slice(i, i + 2), added: "today" })), refs: D.refs.map(([item, reason]) => ({ item, q: null, reason })), suggested: {}, made: [], options: {}, crit: {}, decisions: [], known: {}, log: [{ d: "today", k: "stage", t: "<b>Started</b> from a sentence", s: "Loci's draft: 4 questions, 6 topics, 6 references" }], checks: {} });
+    go("project", { pid: id, tab: "overview", qid: null, apply: null, sheet: null }); toast("Project started. Everything it points at stays where it is.");
+  },
+  "lumen-brief": (d) => { if (d.pid) { S.pid = d.pid; } S.sheet = { kind: "lumen-brief" }; render.keep = true; render(); },
+  "lumen-make": () => { S.sheet = { kind: "lumen", i: 0 }; render.keep = true; render(); },
+  "lumen-play": () => { S.sheet = { kind: "lumen", i: 0 }; render.keep = true; render(); },
+  "slide-next": () => { S.sheet.i++; render.keep = true; render(); },
+  "slide-prev": () => { S.sheet.i = Math.max(0, S.sheet.i - 1); render.keep = true; render(); },
+  "lumen-apply": () => {
+    const p = S.projects.find((x) => x.id === "p1");
+    p.known.q1 = [{ place: "glare", slot: "lumen", text: "Light from above lights a wall. Light from in front lights faces, and blinds them.", how: "from the Lumen Glare on a qibla wall", when: "today", fresh: true }];
+    S.lumenMade = true; (S.extraLog ||= []).unshift({ p: "p1", d: "today", k: "learn", t: "Watched <b>Glare on a qibla wall at 25° N</b> for this project", s: "Lumen · 4 min · filed on Daylight & glare" });
+    go("project", { pid: "p1", tab: "questions", qid: "q1", apply: null, sheet: null }); toast("Added to What you know on this question.");
+  },
+  decide: () => { S.sheet = { kind: "decide" }; render.keep = true; render(); },
+  "save-decision": () => {
+    const p = P(), q = Q(), text = ($("#dtext") || {}).value || "";
+    const D = DECIDE[q.id] || { because: [] };
+    const because = D.because.filter((_, i) => { const el = $("#db" + i); return !el || el.checked; }).map(([t]) => [t, null]);
+    const did = "d-" + q.id;
+    p.decisions.push({ id: did, q: q.id, text, because, date: "today", uses: q.uses });
+    S.items.push({ id: did, type: "decision", title: text, caption: "", topics: q.uses, date: "today", madeIn: p.id, q: q.id });
+    q.state = "decided"; q.decided = "today";
+    S.lastDecision = { q: q.id, opt: "A" };
+    (S.extraLog ||= []).unshift({ p: p.id, d: "today", k: "decided", t: `Decided <b>${esc(q.text)}</b>`, s: text });
+    const main = q.uses[0];
+    S.offers.push({ q: q.id, kind: "mem", topic: main, text: `Applied on ${p.title}: ${q.id === "q1" ? "the qibla wall lit from a roof slot" : q.id === "q2" ? "the court shaded from above" : "panel joints off the mihrab's axis"}` });
+    const learning = q.uses.find((t) => TP[t].st === 1 && p.decisions.filter((d) => d.uses.includes(t)).length >= 2);
+    if (learning) S.offers.push({ q: q.id, kind: "status", topic: learning });
+    S.sheet = null; render.keep = true; render(); toast("Saved as a Decision note in Commonplace.", "nav-decisions", "Show");
+  },
+  "nav-decisions": () => go("commonplace", { cfilter: "decision" }),
+  "mark-learned": (d) => { TP[d.id].st = 2; S.offers = S.offers.filter((o) => !(o.kind === "status" && o.topic === d.id)); toast(TP[d.id].name + " is now Learned. You chose it."); render.keep = true; render(); },
+  "dismiss-offer": (d) => { S.offers = S.offers.filter((o) => !(o.kind === "status" && o.topic === d.id)); render.keep = true; render(); },
+  debrief: () => { S.pid = "p2"; S.sheet = { kind: "debrief" }; if (S.screen !== "project") { S.screen = "project"; S.tab = "overview"; S.qid = null; S.apply = null; } S.guide = false; render(); },
+  "debrief-file": () => { DEBRIEF.forEach((l, i) => { const el = $("#les" + i); if (el) S.debriefTexts[i] = el.value; S.memory.push({ place: l.topic, slot: "did", text: S.debriefTexts[i], basis: "did", when: "today", how: "from the Riyadh debrief" }); }); S.sheet.done = true; render.keep = true; render(); },
+  "keep-object": () => { S.sheet = null; toast("Added to Commonplace › Objects › My projects."); render.keep = true; render(); },
+};
+function openStart(text) {
+  S.sheet = { kind: "start", text, step: 0 }; S.guide = false; render.keep = true; render();
+  const tick = () => { if (!S.sheet || S.sheet.kind !== "start") return; S.sheet.step++; render.keep = true; render(); if (S.sheet.step < 4) setTimeout(tick, S.sheet.step === 3 ? 500 : 700); };
+  setTimeout(tick, 700);
+}
+document.addEventListener("click", (ev) => {
+  const el = ev.target.closest("[data-act]"); if (!el) return;
+  const fn = ACT[el.dataset.act]; if (!fn) return;
+  if (el.dataset.act === "tick") { fn(el.dataset, el); return; }
+  if (el.tagName === "A") ev.preventDefault();
+  fn(el.dataset, el, ev);
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") { if (S.sheet) ACT["close-sheet"](); else if (S.drawer) ACT["close-drawer"](); else if (S.guide) ACT.guide(); return; }
+  const el = ev.target.closest && ev.target.closest('[role="button"][data-act]');
+  if (el && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); ACT[el.dataset.act](el.dataset, el, ev); }
+});
+document.addEventListener("submit", (ev) => {
+  const f = ev.target; ev.preventDefault();
+  if (f.dataset.form === "start") openStart((f.ask.value || "").trim() || "A small library in Sharjah, two floors, with a reading garden. Concept due in three weeks.");
+  if (f.dataset.form === "addq") { const t = f.q.value.trim(); if (!t) return; P().questions.push({ id: "nq" + Date.now(), text: t.endsWith("?") ? t : t + "?", state: "open", uses: [], added: "today" }); toast("Question added. Loci will suggest topics and evidence for it."); render.keep = true; render(); }
+  if (f.dataset.form === "dref") { const p = P(); p.refs.push({ item: f.dataset.id, q: S.qid || null, reason: f.reason.value.trim() || "For this project" }); S.dpick = null; (S.extraLog ||= []).unshift({ p: p.id, d: "today", k: "save", t: `Used <b>${esc(IT()[f.dataset.id].title)}</b>`, s: f.reason.value.trim() }); toast("Added to the board. It stays where it is in Commonplace."); render.keep = true; render(); }
+  if (f.dataset.form === "usein") { const p = S.projects.find((x) => x.id === f.p.value); p.refs.push({ item: f.dataset.id, q: f.q.value || null, reason: f.reason.value.trim() || "For this project" }); S.sheet.use = false; toast("Used in " + p.title + ".", "open-project", "Open", p.id); render.keep = true; render(); }
+});
+document.addEventListener("input", (ev) => {
+  if (ev.target.id === "dsearch") { S.dq = ev.target.value; const pos = ev.target.selectionStart; render.keep = true; render(); const i = $("#dsearch"); if (i) { i.focus(); i.setSelectionRange(pos, pos); } }
+});
+function afterRender() {
+  if (S.sheet) { const h = $("#sheet-h"); const sh = $(".sheet"); if (sh && !sh.contains(document.activeElement)) { const first = sh.querySelector("textarea, input, button.btn.primary") || sh.querySelector("button"); if (first && S.sheet.kind !== "start") first.focus({ preventScroll: true }); } }
+}
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (S.screen === "commonplace" || S.tab === "board") { render.keep = true; render(); } }, 200); });
+reset();
+render();
+})();
+</script>
