@@ -6,6 +6,7 @@ HIGH (a new destination and new records; each phase states its own tier)
 **Status:** Idea, explored. Claude, 24 October 2026. Nothing here is agreed until the owner says so in the conversation.
 **Checked against:** `studiolo` main @ `64a5cee` (24 Oct 2026), read only, and this repo's proposals from 21–24 October (Lumens, learner memory, Commonplace photos, Loci Palace). Paths exist on that commit unless marked *new*.
 **Prototype:** [`prototypes/work/`](../../../prototypes/work/README.md).
+**Superseded in part (24 Oct):** the model in §2–§6 is shaped around an architect. [Work, in any field](2026-10-24-work-any-field-design.md) replaces it with one shape for every field; the loop, touchpoints and limits here still stand.
 
 ## 0. In short
 
