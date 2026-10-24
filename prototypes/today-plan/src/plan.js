@@ -123,8 +123,13 @@
   ];
   const LIBRARY = ["Architecture for the Poor, Hassan Fathy (PDF, read to p. 41)", "Bait Ur Rouf Mosque, Marina Tabassum (video, 12:34 of 48:10)", "Mihrab tolerances on site (your note)"];
 
+  /* Phases (design doc docs/superpowers/specs/2026-10-24-today-planner-phases.md): 1 the calendar and side column as
+     Today behaves now (activity only); 2 adding and moving sessions by hand; 3 learning time, weekly targets and
+     routines; 4 Loci plans. Chosen in the prototype bar, or with #phase1 … #phase4 on the link. */
+  const PHASES = { 1: "Calendar and side column", 2: "Add and move by hand", 3: "Learning time and habits", 4: "Loci plans" };
+  const PHASE = (() => { const m = /^#phase([1-4])$/.exec(location.hash); if (m) return +m[1]; try { const v = +localStorage.getItem("pl-phase"); if (v >= 1 && v <= 4) return v; } catch { /* private */ } return 4; })();
   const S = {
-    now: { d: 2, m: 935 }, view: "day", sel: 2, wk: 0, panel: false, readId: null,
+    now: { d: 2, m: 935 }, view: "day", sel: 2, wk: 0, panel: false, readId: null, phase: PHASE,
     blocks: clone(START_BLOCKS), busy: clone(START_BUSY), tracks: clone(TRACKS), routines: [], extraRt: [], maxDay: 90, calOn: true, autoMove: true,
     notes: [{ d: 2, text: "<b>Glare</b> moved from Tuesday to Thursday 07:00, because you missed it on Tuesday." }],
     msgs: [], cards: [], card: null, seq: 0, ai: null, busyAI: false, meeting: false, skipped: false,
@@ -203,8 +208,8 @@
   const main = () => $("main", root);
   const wide = () => matchMedia("(min-width: 1100px)").matches; // the live app docks Loci from 1100px; below, a sheet
   const head = () => `<header class="td-head"><h1>Today <span>${esc(dayLong(S.now.d))}</span></h1><div class="pl-tools">
-      <button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>
-      <button class="cp-reopen pl-ask" type="button" data-copilot aria-expanded="${S.panel}" aria-controls="pl-in"><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>
+      ${S.phase >= 3 ? `<button class="button button-quiet" type="button" data-lt>${I.clock}Learning time</button>` : ""}
+      ${S.phase >= 4 ? `<button class="cp-reopen pl-ask" type="button" data-copilot aria-expanded="${S.panel}" aria-controls="pl-in"><span><span aria-hidden="true">✦</span> Ask Loci</span> <kbd>/</kbd></button>` : ""}
       <time>${h12(S.now.m)}</time></div></header>`;
   const shownWeek = () => (S.view === "week" ? S.wk : Math.floor(S.sel / 7));
 
@@ -218,7 +223,7 @@
     const docked = S.panel && wide();
     const w = shownWeek(), days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i);
     fitHours(days);
-    main().innerHTML = `<div class="plan-pg pl-frame">${head()}<div class="pl-body">
+    main().innerHTML = `<div class="plan-pg pl-frame pl-phase-${S.phase}">${head()}<div class="pl-body">
       <aside class="pl-side" aria-label="${docked ? "Ask Loci" : "My Focus, Up next and the Big Picture"}">${docked ? "" : `${focusSec()}${upNext()}${bigPicture()}`}</aside>
       <section class="pl-cal" aria-label="Calendar">${calNav(w)}<div class="pl-calscroll">${S.view === "week" ? weekGrid(days) : dayGrid(S.sel, days)}</div></section></div></div>`;
     placePanel();
@@ -257,7 +262,7 @@
     const canPrev = wk ? w > 0 : S.sel > 0, canNext = wk ? w < 1 : S.sel < 13;
     return `<div class="pl-calnav"><div class="pl-seg" role="group" aria-label="Calendar view"><button type="button" data-view="day" aria-pressed="${!wk}">Day</button><button type="button" data-view="week" aria-pressed="${wk}">Week</button></div>
       <button class="icb" type="button" data-step="-1" aria-label="${wk ? "Previous week" : "Previous day"}"${canPrev ? "" : " disabled"}>${I.prev}</button><button class="icb" type="button" data-step="1" aria-label="${wk ? "Next week" : "Next day"}"${canNext ? "" : " disabled"}>${I.next}</button>
-      <h2>${title}</h2>${CONNECT("pl-conn")}<span class="pl-key2"><i class="av"></i>Learning time${S.routines.length ? '<i class="rt"></i>Routine' : ""}${S.calOn ? '<i class="bz"></i>Busy' : ""}</span></div>`;
+      <h2>${title}</h2>${S.phase >= 2 ? `<button class="button button-quiet pl-addbtn" type="button" data-add>+ Add</button>` : ""}${CONNECT("pl-conn")}${S.phase >= 3 ? `<span class="pl-key2"><i class="av"></i>Learning time${S.routines.length ? '<i class="rt"></i>Routine' : ""}${S.phase >= 4 && S.calOn ? '<i class="bz"></i>Busy' : ""}</span>` : ""}</div>`;
   }
   function hoursCol() {
     let h = ""; for (let k = 6; k <= 22; k++) if (!FOLDED[k - 6]) h += `<span style="top:${Y(k * 60)}px">${k}:00</span>`;
@@ -267,16 +272,16 @@
   const ghostDays = () => { const g = ghostOps(), s = new Set(g.add.map((b) => b.d)); g.to.forEach((o) => s.add(o.d)); g.from.forEach((id) => s.add(blockById(id)?.d)); g.gone.forEach((id) => s.add(blockById(id)?.d)); g.link.forEach((_, id) => s.add(blockById(id)?.d)); g.conv.forEach((_, id) => s.add(blockById(id)?.d)); return s; };
   function weekGrid(days) {
     const gd = ghostDays();
-    const dh = days.map((d) => { const ld = dayLoad(d, S.blocks); return `<button type="button" class="pl-wd${d === S.now.d ? " is-today" : ""}${gd.has(d) ? " has-ghost" : ""}" data-sel="${d}" aria-label="Open ${dayLong(d)}${gd.has(d) ? ", has proposed changes" : ""}">${DN[wd(d)].slice(0, 3)}<b>${dateOf(d).getDate()}</b><span class="sm${ld > S.maxDay ? " over" : ""}">${ld ? len(ld) : "–"}</span></button>`; }).join("");
-    const cols = days.map((d) => `<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}</div>`).join("");
+    const dh = days.map((d) => { const ld = dayLoad(d, S.blocks); return `<button type="button" class="pl-wd${d === S.now.d ? " is-today" : ""}${gd.has(d) ? " has-ghost" : ""}" data-sel="${d}" aria-label="Open ${dayLong(d)}${gd.has(d) ? ", has proposed changes" : ""}">${DN[wd(d)].slice(0, 3)}<b>${dateOf(d).getDate()}</b><span class="sm${S.phase >= 3 && ld > S.maxDay ? " over" : ""}">${S.phase === 1 ? (activity(d).length ? `${activity(d).length} done` : "–") : ld ? len(ld) : "–"}</span></button>`; }).join("");
+    const cols = days.map((d) => `<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}${S.phase === 1 ? activityEls(d, true) : ""}</div>`).join("");
     return `<div class="pl-grid" style="--cols:7"><div class="pl-gh"></div>${dh}${hoursCol()}${cols}</div>`;
   }
   function dayGrid(d, days) {
     const gd = ghostDays();
     const dayB = S.blocks.filter((b) => b.d === d && live(b));
-    const sum = dayB.length ? `${dayB.filter((b) => b.st === "done").length} done · ${dayB.filter((b) => b.st !== "done").length} to go · ${len(dayB.reduce((a, b) => a + b.m, 0))}` : "Nothing planned";
-    const strip = days.map((dd) => `<button type="button" data-sel="${dd}" class="${dd === d ? "is-on" : ""}${dd === S.now.d ? " is-today" : ""}" aria-pressed="${dd === d}" aria-label="${dayLong(dd)}${dd === S.now.d ? ", today" : ""}">${DN[wd(dd)][0]}<b>${dateOf(dd).getDate()}</b>${gd.has(dd) ? '<i class="gh"></i>' : S.blocks.some((b) => b.d === dd && live(b)) ? "<i></i>" : ""}</button>`).join("");
-    const logs = LOG.filter((l) => l.d === d && (d < S.now.d || l.at < S.now.m)).map((l) => `<div class="pl-log" style="top:${Y(l.at)}px"><b>${esc(l.title)}</b>${esc(l.sub)}</div>`).join("");
+    const sum = S.phase === 1 ? (activity(d).length ? `${activity(d).length} thing${activity(d).length === 1 ? "" : "s"} done` : d > S.now.d ? "" : "Nothing yet") : dayB.length ? `${dayB.filter((b) => b.st === "done").length} done · ${dayB.filter((b) => b.st !== "done").length} to go · ${len(dayB.reduce((a, b) => a + b.m, 0))}` : "Nothing planned";
+    const strip = days.map((dd) => `<button type="button" data-sel="${dd}" class="${dd === d ? "is-on" : ""}${dd === S.now.d ? " is-today" : ""}" aria-pressed="${dd === d}" aria-label="${dayLong(dd)}${dd === S.now.d ? ", today" : ""}">${DN[wd(dd)][0]}<b>${dateOf(dd).getDate()}</b>${gd.has(dd) ? '<i class="gh"></i>' : (S.phase === 1 ? activity(dd).length : S.blocks.some((b) => b.d === dd && live(b))) ? "<i></i>" : ""}</button>`).join("");
+    const logs = S.phase === 1 ? activityEls(d, false) : LOG.filter((l) => l.d === d && (d < S.now.d || l.at < S.now.m)).map((l) => `<div class="pl-log" style="top:${Y(l.at)}px"><b>${esc(l.title)}</b>${esc(l.sub)}</div>`).join("");
     return `<div class="pl-grid is-day" style="--cols:1"><div class="pl-gh"></div><div class="pl-gh pl-strip" role="group" aria-label="Days">${strip}<span class="sum" aria-live="polite">${sum}</span></div>${hoursCol()}<div class="pl-col" data-d="${d}" aria-label="${dayLong(d)}" style="height:${TOT()}px">${dayLayer(d)}${logs}</div></div>`;
   }
 
@@ -294,12 +299,21 @@
     }
     return g;
   }
+  /** Phase 1: the calendar shows only what happened, as Today does now: things watched or read, saved, and asked. */
+  function activity(d) {
+    const lg = LOG.filter((l) => l.d === d && (d < S.now.d || l.at < S.now.m)).map((l) => ({ at: l.at, title: l.title, sub: l.sub }));
+    const bl = S.blocks.filter((b) => b.d === d && (b.st === "done" || b.st === "started") && isPast(b.d, b.s)).map((b) => ({ at: b.s, title: b.title, sub: `${KIND[b.kind].noun}${b.res ? ` · ${b.res.toLowerCase()}` : ""}` }));
+    return lg.concat(bl).sort((a, b) => a.at - b.at);
+  }
+  const activityEls = (d, compact) => activity(d).map((l) => `<div class="pl-log is-wide${compact ? " is-compact" : ""}" style="top:${Y(l.at)}px" title="${esc(l.title)} · ${esc(l.sub)}"><b>${esc(l.title)}</b>${compact ? "" : esc(l.sub)}</div>`).join("");
   function layout(days) {
     ROW = []; FOLDED = [];
     for (let h = 6; h < 23; h++) {
       const a = h * 60, e = a + 60, hit = (d, s, m) => days.includes(d) && overlaps(s, s + m, a, e);
-      const used = AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e))) || routines().some((r) => overlaps(r.s, r.e, a, e))
-        || S.blocks.some((b) => b.st !== "dropped" && hit(b.d, b.s, b.m)) || (days.includes(S.now.d) && S.now.m >= a && S.now.m < e);
+      const used = (S.phase === 1
+        ? days.some((d) => activity(d).some((l) => l.at >= a - 30 && l.at < e))
+        : AVAIL.some((ws) => ws.some(([x, y]) => overlaps(x, y, a, e))) || routines().some((r) => overlaps(r.s, r.e, a, e)) || S.blocks.some((b) => b.st !== "dropped" && hit(b.d, b.s, b.m)))
+        || (days.includes(S.now.d) && S.now.m >= a && S.now.m < e);
       ROW.push(H); FOLDED.push(!used);
     }
     for (const [a, b] of runs()) for (let i = a; i < b; i++) ROW[i] = FOLD / (b - a);
@@ -320,11 +334,12 @@
     let h = "";
     for (let k = 7; k < 23; k++) if (!FOLDED[k - 6] || !FOLDED[k - 7]) h += `<span class="pl-hl" style="top:${Y(k * 60)}px"></span>`;
     for (const [a, e] of folds()) h += `<div class="pl-fold" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`;
-    for (const [a, e] of AVAIL[wd(d)]) h += `<div class="pl-av" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`;
-    if (S.calOn) for (const z of S.busy.filter((z) => z.d === d)) h += `<div class="pl-busy${z.isNew ? " is-new" : ""}" style="top:${Y(z.s)}px;height:${Y(z.e) - Y(z.s)}px">${Y(z.e) - Y(z.s) > 16 ? `Busy · ${hm(z.s)}–${hm(z.e)}` : ""}</div>`;
+    if (S.phase >= 3) for (const [a, e] of AVAIL[wd(d)]) h += `<div class="pl-av" style="top:${Y(a)}px;height:${Y(e) - Y(a)}px"></div>`;
+    if (S.phase >= 4 && S.calOn) for (const z of S.busy.filter((z) => z.d === d)) h += `<div class="pl-busy${z.isNew ? " is-new" : ""}" style="top:${Y(z.s)}px;height:${Y(z.e) - Y(z.s)}px">${Y(z.e) - Y(z.s) > 16 ? `Busy · ${hm(z.s)}–${hm(z.e)}` : ""}</div>`;
     const pastTo = d < S.now.d ? H1 : d === S.now.d ? S.now.m : H0;
     if (pastTo > H0) h += `<div class="pl-past" style="height:${Y(pastTo)}px"></div>`;
     const g = ghostOps();
+    if (S.phase === 1) { if (d === S.now.d) h += `<div class="pl-now" style="top:${Y(S.now.m)}px" aria-hidden="true"></div>`; return h; }
     for (const r of routines().filter((x) => x.days.includes(wd(d)) && d >= S.now.d)) h += `<div class="pl-rt${S.routines.some((x) => x.id === r.id) ? "" : " is-ghost"}" style="top:${Y(r.s)}px;height:${Y(r.e) - Y(r.s)}px" title="${esc(r.name)} · ${hm(r.s)}–${hm(r.e)} · ${esc(MODES[r.mode].note)}"><span class="ic" aria-hidden="true">${I[r.mode]}</span></div>`;
     for (const b of S.blocks.filter((x) => x.d === d && x.st !== "dropped")) { const cv = g.conv.get(b.id); h += cv ? blockEl({ ...b, kind: cv.kind, title: cv.title, m: cv.m, why: cv.why, convOf: b.id }, { ghost: true }) : blockEl(b, { from: g.from.has(b.id), gone: g.gone.has(b.id), linked: g.link.get(b.id) || null }); }
     for (const [id, o] of g.to) { const b = blockById(id); if (b && o.d === d) h += blockEl({ ...b, d: o.d, s: o.s, id: b.id, ghostOf: b.id }, { ghost: true }); }
@@ -344,8 +359,14 @@
   /* The side column: My Focus, Up next (with Continue folded in) and the Big Picture, in that order. Each section has
      the same small head; the first head sits on the calendar's toolbar line, and the copilot's head takes its place. */
   const secHead = (id, title, meta, top) => `<div class="pl-sh${top ? " is-top" : ""}"><h2 id="${id}">${title}</h2>${meta ? `<span>${meta}</span>` : ""}</div>`;
+  const WAIT = { day: "1 new Lumen", plan: "in progress", ver: "2 suggestions waiting" };
   function focusSec() {
     const w = Math.floor(S.now.d / 7);
+    if (S.phase <= 2) { // before weekly targets (phase 3): status, as Today shows now, and in phase 2 the week's sessions
+      const rows = S.tracks.filter((t) => !t.goal).map((t) => { const n = S.blocks.filter((b) => Math.floor(b.d / 7) === w && live(b) && b.tr === t.id).length;
+        return `<li class="pl-fr is-status" data-tr="${t.tr}"><span class="dot" aria-hidden="true"></span><span class="nm">${esc(t.name)}</span><span class="hr">${esc(t.state)}</span><span class="sub">${S.phase === 2 ? `${n} session${n === 1 ? "" : "s"} this week` : esc(WAIT[t.id] || "")}</span></li>`; }).join("");
+      return `<section class="pl-sec" aria-labelledby="pl-fh">${secHead("pl-fh", "My Focus", "Topics you're prioritising", true)}<ul class="pl-focus2">${rows}</ul></section>`;
+    }
     const rows = S.tracks.map((t) => {
       const plan = weekMins(w, t.id), done = weekDone(w, t.id), max = Math.max(plan, t.target, 1);
       const short = !t.goal && plan < t.target;
@@ -357,9 +378,15 @@
     return `<section class="pl-sec" aria-labelledby="pl-fh">${secHead("pl-fh", "My Focus", "This week", true)}<ul class="pl-focus2">${rows}</ul></section>`;
   }
   function upNext() {
+    if (S.phase === 1) { // Today's Continue card, as it is now
+      const c = S.blocks.find((x) => x.st === "started") || null;
+      return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Continue")}${c ? `<div class="pl-up" data-tr="${trOf(c.tr)}"><p class="k"><span class="pl-kind">${esc(KIND[c.kind].noun)}</span><span>${esc(track(c.tr)?.name || "")}</span></p><h3>${esc(c.title)}</h3><p class="m">${esc((c.res || "").replace(/^Paused at /, ""))} · you paused at “Why the iwans face each other”.</p>
+        <div class="row"><button class="button" type="button" data-start="${c.id}">Continue watching</button><button class="button button-link" type="button" data-locilink>Ask Loci ↗</button></div></div>` : '<p class="pl-empty">Nothing half-done. Pick a topic in focus to go further.</p>'}
+        <p class="pl-cont">Also in progress: Bait Ur Rouf Mosque, Marina Tabassum (video, 12:34 of 48:10) · Architecture for the Poor (PDF, p. 41)</p></section>`;
+    }
     const { b, started } = nextUp();
     const cont = started && started.id !== b?.id ? `<p class="pl-cont">Continue <button class="pl-linkbtn" type="button" data-start="${started.id}">${esc(started.title)}</button><span>${esc(started.res || "")}</span></p>` : "";
-    if (!b) return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next")}<p class="pl-empty">Nothing planned yet. Ask Loci to plan your week.</p>${cont}</section>`;
+    if (!b) return `<section class="pl-sec" aria-labelledby="pl-uh">${secHead("pl-uh", "Up next")}<p class="pl-empty">Nothing planned yet. ${S.phase >= 4 ? "Ask Loci to plan your week." : "Press + Add, or click an hour on the calendar."}</p>${cont}</section>`;
     const t = track(b.tr), K = KIND[b.kind];
     const when = b.d === S.now.d ? "Today" : b.d === S.now.d + 1 ? "Tomorrow" : DN[wd(b.d)];
     const r = AUDIO.has(b.kind) && routineOver(b.d, b.s, b.m);
@@ -370,8 +397,15 @@
         <div class="row"><button class="button" type="button" data-start="${b.id}">${esc(K.go)}</button><button class="button button-link" type="button" data-movenext="${b.id}">Later</button><button class="button button-link" type="button" data-skip="${b.id}">Skip</button></div>
       </div>${cont}</section>`;
   }
+  const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  const nw = (n) => WORDS[n] || String(n);
   function bigPicture() {
     const w = Math.floor(S.now.d / 7);
+    if (S.phase === 1) { // T1's template sentences, from records
+      const days = [0, 1, 2, 3, 4, 5, 6].map((i) => w * 7 + i).filter((d) => d <= S.now.d), all = days.flatMap(activity);
+      const lumens = all.filter((l) => /Lumen|Course|Reading/.test(l.sub)).length, saved = all.filter((l) => /saved|PDF|Video/.test(l.sub)).length;
+      return `<section class="pl-sec pl-bp" aria-labelledby="pl-bh">${secHead("pl-bh", "The Big Picture")}<p>This week you watched or read <em>${nw(lumens)} Lumen${lumens === 1 ? "" : "s"}</em> and saved <em>${nw(saved)} thing${saved === 1 ? "" : "s"}</em> to your Commonplace. <em>Daylight &amp; shading</em> is in focus and has a new Lumen you haven't seen.</p><p class="sub">5 of 24 topics on your map are learned.</p></section>`;
+    }
     const wk = S.blocks.filter((b) => Math.floor(b.d / 7) === w && b.kind !== "plan");
     const done = wk.filter((b) => b.st === "done"), planned = wk.filter((b) => live(b));
     const moved = wk.filter((b) => b.st === "moved" || b.st === "skipped").length;
@@ -380,9 +414,9 @@
     const nxt = S.blocks.filter((b) => Math.floor(b.d / 7) === w + 1 && live(b) && b.kind !== "plan").length;
     return `<section class="pl-sec pl-bp" aria-labelledby="pl-bh">${secHead("pl-bh", "The Big Picture")}
       <p>You've done <em>${done.length} of ${planned.length}</em> sessions this week.${moved ? ` ${moved === 1 ? "One was" : `${moved} were`} moved rather than dropped.` : ""}
-      ${short.length ? ` <em>${esc(short[0].name)}</em> is ${len(short[0].target - weekMins(w, short[0].id))} short.` : " Every topic has its time."}
+      ${S.phase < 3 ? "" : short.length ? ` <em>${esc(short[0].name)}</em> is ${len(short[0].target - weekMins(w, short[0].id))} short.` : " Every topic has its time."}
       ${goal ? ` <em>${esc(goal.name)}</em> is in ${goal.until - S.now.d} days.` : ""}</p>
-      <p class="sub">Next week: ${nxt ? `${nxt} planned so far` : "nothing yet"} · weekly plan on Sunday</p></section>`;
+      <p class="sub">Next week: ${nxt ? `${nxt} planned so far` : "nothing yet"}${S.phase >= 4 ? " · weekly plan on Sunday" : ""}</p></section>`;
   }
   /* ================================================================ popover */
   let popEl = null;
@@ -456,7 +490,7 @@
   let drag = null;
   function dragStart(e, el) {
     const b = blockById(el.dataset.b);
-    if (!b || el.dataset.ghost || S.view !== "week" || !(b.st === "planned" || b.st === "started") || e.button > 0) return;
+    if (!b || el.dataset.ghost || S.phase < 2 || !(b.st === "planned" || b.st === "started") || e.button > 0) return;
     const r = el.getBoundingClientRect();
     drag = { el, b, x0: e.clientX, y0: e.clientY, dy: e.clientY - r.top, on: false };
     el.setPointerCapture?.(e.pointerId);
@@ -506,6 +540,7 @@
   function prompts() { $(".prompts", cpw).innerHTML = PROMPTS.filter((p) => !used.has(p)).map((p) => `<button type="button" data-say="${esc(p)}">${esc(p)}</button>`).join(""); }
   // The copilot takes the side column's place; the calendar and the view stay exactly as they are.
   function openPanel(focus = true) {
+    if (S.phase < 4) return;
     S.panel = true; render();
     if (focus) setTimeout(() => input.focus({ preventScroll: true }), 60);
   }
@@ -557,7 +592,9 @@
     if (S.view === "week") S.wk = c.wk; // the view never switches by itself; the card has "Show on the week"
     render();
   }
-  function applyCard(id) {
+  /** Phase 3: a routine added in Learning time is planned by the same rules and applied at once, with Undo. */
+  function applyNow(c, title) { c.state = "pending"; S.cards.push(c); const keep = S.card; S.card = null; applyCard(c.id, title); S.card = keep && keep.state === "pending" ? keep : null; }
+  function applyCard(id, title) {
     const c = S.cards.find((x) => x.id === id); if (!c || c.state !== "pending") return;
     c.snap = snapshot();
     if (c.goal && !S.tracks.some((t) => t.id === c.goal.id)) S.tracks.push(clone(c.goal));
@@ -572,7 +609,7 @@
       if (o.type === "convert" && b) { Object.assign(b, { kind: o.kind, title: o.title, m: o.m, why: o.why || b.why, made: "evening" }); ids.push(b.id); }
     }
     c.state = "applied"; S.card = null; refreshCard(c); flash(ids); render();
-    toast("Plan applied", `${c.ops.filter((x) => x.on).length} changes on your calendar.`, () => undoCard(id));
+    toast(title || "Plan applied", `${c.ops.filter((x) => x.on).length} changes on your calendar.`, () => undoCard(id));
   }
   function undoCard(id) { const c = S.cards.find((x) => x.id === id); if (!c || c.state !== "applied") return; restore(c.snap); c.state = "undone"; refreshCard(c); render(); }
 
@@ -699,8 +736,9 @@
   }
   /** Fills a routine with what suits it: screen sessions in its way move or turn into dialogues, a spoken review
       recalls yesterday's desk session (the loop: desk, then ears), and dialogues come from the topics most short. */
-  function scriptRoutine(text) {
-    const r = parseRoutine(text), M = MODES[r.mode], w0 = Math.floor(S.now.d / 7);
+  function scriptRoutine(text) { return planRoutine(parseRoutine(text)); }
+  function planRoutine(r) {
+    const M = MODES[r.mode], w0 = Math.floor(S.now.d / 7);
     if (S.routines.some((x) => x.id === r.id)) return { say: `${r.name} is already on your calendar.` };
     const span = r.e - r.s, wishes = [], used = new Set(), extra = {};
     const daysAhead = []; for (let d = S.now.d; d <= w0 * 7 + 13; d++) if (r.days.includes(wd(d)) && !isPast(d, r.s)) daysAhead.push(d);
@@ -1035,22 +1073,90 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     q.insertAdjacentHTML("beforeend", `<p class="why">${good ? "Right." : "Not quite."} ${esc(why)}</p>`);
   }
 
+  /* ================================================================ adding by hand (phase 2) */
+  const CATALOG = [
+    { tab: "lumen", kind: "watch", title: "Glare: where it comes from", tr: "day", topic: "Glare", m: 15, meta: "Lumen · 5 min · new", made: "ready" },
+    { tab: "lumen", kind: "watch", title: "Hypostyle halls: a forest of columns", tr: "plan", topic: "Hypostyle hall", m: 15, meta: "Lumen · 4 min", made: "ready" },
+    { tab: "lumen", kind: "watch", title: "How the four-iwan plan organises a courtyard", tr: "plan", topic: "Four-iwan plan", m: 10, meta: "Lumen · 2:41 of 4:38", made: "ready" },
+    { tab: "lumen", kind: "read", title: "Thermal mass in hot-arid courtyard houses", tr: "ver", topic: "Thermal mass", m: 30, meta: "Reading Lumen · 12 min read", made: "ready" },
+    { tab: "lumen", kind: "read", title: "Courtyard houses: how the court works", tr: "ver", topic: "Courtyard houses", m: 30, meta: "Reading Lumen · read on Monday", made: "ready" },
+    { tab: "lumen", kind: "course", title: "Daylighting · Part 3: Shading devices", tr: "day", topic: "Sun angles", m: 15, meta: "Course part · made when you reach it", made: "course" },
+    { tab: "lumen", kind: "review", title: "Courtyard houses · 4 questions", tr: "ver", topic: "Courtyard houses", m: 10, meta: "Review quiz", made: "none" },
+    { tab: "place", kind: "library", title: "Architecture for the Poor · from p. 41", tr: "ver", topic: "Courtyard houses", m: 40, meta: "PDF · you're at p. 41", made: "exists" },
+    { tab: "place", kind: "library", title: "Bait Ur Rouf Mosque · from 12:34", tr: "ver", topic: "Courtyard houses", m: 35, meta: "Video · 12:34 of 48:10", made: "exists" },
+    { tab: "place", kind: "library", title: "Mihrab tolerances on site", tr: "plan", topic: "Qibla orientation", m: 10, meta: "Your note", made: "exists" },
+  ];
+  /** The picker: a Lumen, a Commonplace item, or a topic to explain, at a day, time and length. It lands on the
+      nearest free time (never in the past, never on another session or, from phase 3, in a routine it doesn't suit). */
+  function openAdd({ d, s = null }) {
+    const tracksSubs = S.tracks.filter((t) => !t.goal).flatMap((t) => t.subs.map((sub) => ({ tab: "new", kind: "watch", title: `${sub}, explained`, tr: t.id, topic: sub, m: 15, meta: `${t.name} · a new Lumen, made the evening before · uses one Lumen`, made: "evening" })));
+    const items = CATALOG.concat(tracksSubs);
+    const w0 = Math.floor(S.now.d / 7), dayOpts = []; for (let x = S.now.d; x <= w0 * 7 + 13; x++) dayOpts.push(x);
+    if (s == null) s = d === S.now.d ? Math.min(H1 - 15, Math.ceil((S.now.m + 15) / 15) * 15) : 1140;
+    let tab = "lumen", pick = null;
+    const times = (dd) => { const out = []; for (let t = H0; t <= H1 - 15; t += 15) if (!isPast(dd, t)) out.push(t); return out; };
+    const planned = (title) => S.blocks.find((b) => b.title === title && b.st === "planned" && !isPast(b.d, b.s));
+    const list = () => items.filter((x) => x.tab === tab).filter((x) => { const q = ((dlg && $("#pl-ad-q", dlg)?.value) || "").toLowerCase(); return !q || `${x.title} ${x.meta}`.toLowerCase().includes(q); })
+      .map((x) => { const i = items.indexOf(x), pl = planned(x.title); return `<li><button type="button" class="pl-pick${pick === i ? " is-on" : ""}" data-pick="${i}" aria-pressed="${pick === i}" data-tr="${trOf(x.tr)}"><span class="dot" aria-hidden="true"></span><span class="tt"><b>${esc(x.title)}</b><small>${esc(x.meta)}${pl ? ` · already planned ${dayShort(pl.d)} ${hm(pl.s)}` : ""}</small></span><span class="pl-kind">${esc(KIND[x.kind].k)}</span></button></li>`; }).join("") || '<li class="pl-empty">Nothing matches.</li>';
+    openDlg(`<h3>Add to your calendar</h3><p class="sub">A Lumen, something from your Commonplace, or a topic to explain. It goes at the nearest free time.</p>
+      <div class="pl-add"><div class="pl-seg" role="group" aria-label="What to add"><button type="button" data-tab="lumen" aria-pressed="true">Lumens</button><button type="button" data-tab="place" aria-pressed="false">Commonplace</button><button type="button" data-tab="new" aria-pressed="false">Explain a topic</button></div>
+        <label class="visually-hidden" for="pl-ad-q">Search</label><input id="pl-ad-q" type="search" placeholder="Search…" autocomplete="off">
+        <ul class="pl-picks" role="list">${list()}</ul>
+        <div class="pl-when"><label>Day <select id="pl-ad-d">${dayOpts.map((x) => `<option value="${x}"${x === d ? " selected" : ""}>${x === S.now.d ? "Today" : dayShort(x)}</option>`).join("")}</select></label>
+          <label>Time <select id="pl-ad-s">${times(d).map((t) => `<option value="${t}"${t === s ? " selected" : ""}>${hm(t)}</option>`).join("")}</select></label>
+          <label>Length <select id="pl-ad-m">${[5, 10, 15, 20, 25, 30, 40, 45, 60].map((m) => `<option value="${m}">${len(m)}</option>`).join("")}</select></label></div></div>
+      <div class="acts"><button class="button button-quiet" type="button" data-dx>Cancel</button><button class="button" type="button" data-addgo disabled>Add</button></div>`, (e) => {
+      const tb = e.target.closest("[data-tab]"); if (tb) { tab = tb.dataset.tab; $$("[data-tab]", dlg).forEach((x) => x.setAttribute("aria-pressed", String(x === tb))); $(".pl-picks", dlg).innerHTML = list(); return; }
+      const pk = e.target.closest("[data-pick]"); if (pk) { pick = +pk.dataset.pick; $("#pl-ad-m", dlg).value = String(items[pick].m); $(".pl-picks", dlg).innerHTML = list(); label(); return; }
+      if (e.target.closest("[data-addgo]") && pick != null) addPicked(items[pick], +$("#pl-ad-d", dlg).value, +$("#pl-ad-s", dlg).value, +$("#pl-ad-m", dlg).value);
+    });
+    const label = () => { const go = $("[data-addgo]", dlg); go.disabled = pick == null; const dd = +$("#pl-ad-d", dlg).value; go.textContent = pick == null ? "Add" : `Add to ${dd === S.now.d ? "today" : dayShort(dd)} ${hm(+$("#pl-ad-s", dlg).value)}`; };
+    $("#pl-ad-q", dlg).addEventListener("input", () => { $(".pl-picks", dlg).innerHTML = list(); });
+    $("#pl-ad-d", dlg).addEventListener("change", () => { const dd = +$("#pl-ad-d", dlg).value, cur = +$("#pl-ad-s", dlg).value, ts = times(dd); $("#pl-ad-s", dlg).innerHTML = ts.map((t) => `<option value="${t}"${t === cur ? " selected" : ""}>${hm(t)}</option>`).join(""); label(); });
+    $("#pl-ad-s", dlg).addEventListener("change", label);
+    $("#pl-ad-q", dlg).focus();
+  }
+  function addPicked(x, d, s, m) {
+    const ns = nearest(d, s, m, [], x.kind);
+    if (ns == null) return toast("No room that day", `${dayLong(d)} has no free time for ${len(m)}.`);
+    const snap = snapshot(), nb = { id: newId(), d, s: ns, m, kind: x.kind, title: x.title, tr: x.tr, topic: x.topic, st: "planned", made: x.made, why: "Added by you", also: null };
+    S.blocks.push(nb); closeDlg(); flash([nb.id]);
+    if (S.view === "week") S.wk = Math.floor(d / 7); else S.sel = d;
+    render();
+    toast(`Added to ${d === S.now.d ? "today" : dayShort(d)} ${hm(ns)}`, `${x.title}${ns !== s ? ". That was the nearest free time" : ""}.`, () => { restore(snap); render(); });
+  }
+
   /* ================================================================ learning time, and the simulations */
   function openLT() {
     const rows = [["Weekdays", AVAIL[0]], ["Saturday", AVAIL[5]], ["Sunday", AVAIL[6]]];
-    openDlg(`<h3>Learning time</h3><p class="sub">When Loci may plan sessions. You can still move any session anywhere by hand.</p>
+    openDlg(`<h3>Learning time</h3><p class="sub">When sessions are planned, how much time each topic gets, and your routines. You can still move any session anywhere by hand.</p>
       <div class="pl-lt">${rows.map(([n, ws]) => `<div class="pl-lt-row"><span>${n}</span><span class="slots">${ws.map(([a, e]) => `<i>${hm(a)}–${hm(e)}</i>`).join("")}</span></div>`).join("")}
-        <div class="pl-lt-row"><span>Routines</span><span class="slots">${S.routines.length ? S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)}</i>`).join("") : '<small>None yet. Tell Loci, for example “I drive to work 7:00 to 7:30”. Routines hold audio only and don’t count towards the daily maximum.</small>'}</span></div>
+        <div class="pl-lt-row"><span>Each week</span><span class="pl-targets">${S.tracks.filter((t) => !t.goal).map((t) => `<label data-tr="${t.tr}"><span class="dot" aria-hidden="true"></span>${esc(t.name)} <select data-target="${t.id}">${[30, 60, 90, 120, 150, 180, 240].map((m) => `<option value="${m}"${m === t.target ? " selected" : ""}>${len(m)}</option>`).join("")}</select></label>`).join("")}</span></div>
+        <div class="pl-lt-row"><span>Routines</span><span><span class="slots">${S.routines.map((r) => `<i class="rt">${esc(r.name)} · ${esc(daysLabel(r.days))} ${hm(r.s)}–${hm(r.e)} <button class="pl-linkbtn" type="button" data-rmrt="${r.id}" aria-label="Remove ${esc(r.name)}">Remove</button></i>`).join("")}</span>
+          <span class="pl-rtform"><select id="pl-rt-mode" aria-label="What you're doing"><option value="driving">Driving</option><option value="cycling">Cycling</option><option value="walking">Walking</option></select><select id="pl-rt-days" aria-label="Days"><option value="01234">Weekdays</option><option value="56">Weekends</option><option value="0123456">Every day</option><option value="5">Saturday</option><option value="6">Sunday</option></select><select id="pl-rt-s" aria-label="From">${[360, 390, 420, 450, 480, 510, 1020, 1050, 1080, 1110].map((t) => `<option value="${t}"${t === 420 ? " selected" : ""}>${hm(t)}</option>`).join("")}</select><select id="pl-rt-e" aria-label="To">${[390, 420, 450, 480, 510, 540, 1050, 1080, 1110, 1140].map((t) => `<option value="${t}"${t === 450 ? " selected" : ""}>${hm(t)}</option>`).join("")}</select><button class="button button-quiet" type="button" data-addrt>Add routine</button></span>
+          <small>A routine is time you spend anyway, like a drive. It holds audio only and doesn't count towards the daily maximum.${S.phase >= 4 ? " You can also tell Loci." : ""}</small></span></div>
         <div class="pl-lt-row"><span>Each day</span><span><label for="pl-max">At most <select id="pl-max">${[60, 90, 120].map((m) => `<option value="${m}"${m === S.maxDay ? " selected" : ""}>${len(m)}</option>`).join("")}</select></label></span></div>
         <div class="pl-lt-row"><span>Calendars</span><span>${CONNECT("pl-conn is-lt")}<small class="pl-soon-note">Coming soon. Studiolo will read only busy and free, never event titles. The busy times on this calendar are sample data.</small></span></div>
-        <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times<small>Loci keeps sessions out of busy time and moves them when something new lands.</small></span></label>
+        <label><input type="checkbox" id="pl-cal"${S.calOn ? " checked" : ""}><span>Plan around busy times<small>Sessions stay out of busy time and move when something new lands.</small></span></label>
         <label><input type="checkbox" id="pl-auto"${S.autoMove ? " checked" : ""}><span>When something new lands on a session, move the session to the next free time<small>Otherwise the session stays and is marked as clashing.</small></span></label></div>
       <div class="acts"><button class="button" type="button" data-dx>Done</button></div>`);
     dlg.addEventListener("change", (e) => {
       if (e.target.id === "pl-max") S.maxDay = +e.target.value;
       if (e.target.id === "pl-cal") S.calOn = e.target.checked;
       if (e.target.id === "pl-auto") S.autoMove = e.target.checked;
+      if (e.target.dataset.target) { const t = track(e.target.dataset.target); if (t) t.target = +e.target.value; }
       render();
+    });
+    dlg.addEventListener("click", (e) => {
+      const rm = e.target.closest("[data-rmrt]"); if (rm) { S.routines = S.routines.filter((r) => r.id !== rm.dataset.rmrt); closeDlg(); render(); toast("Routine removed", "Sessions already planned in it stay where they are."); return; }
+      if (!e.target.closest("[data-addrt]")) return;
+      const mode = $("#pl-rt-mode", dlg).value, days = $("#pl-rt-days", dlg).value.split("").map(Number), s = +$("#pl-rt-s", dlg).value, en = +$("#pl-rt-e", dlg).value;
+      if (en <= s) return toast("Check the times", "The routine has to end after it starts.");
+      const name = mode === "driving" ? (s < 720 ? "Morning drive" : "Drive home") : mode === "cycling" ? (days.length === 1 ? `${DN[days[0]]} ride` : "Ride") : "Walk";
+      const r = { id: `r${mode}${s}${days.join("")}`, name, mode, days, s, e: en };
+      if (S.routines.some((x) => x.id === r.id)) return toast("Already there", `${name} is already a routine.`);
+      const res = planRoutine(r); closeDlg();
+      if (res.card) applyNow(res.card, `${name} added`); else toast(`${name}`, res.say);
     });
   }
   function simMeeting() {
@@ -1127,6 +1233,10 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
     const stp = t.closest("[data-step]"); if (stp) { const k = +stp.dataset.step; if (S.view === "week") S.wk = Math.min(1, Math.max(0, S.wk + k)); else S.sel = Math.min(13, Math.max(0, S.sel + k)); return render(); }
     if (t.closest("[data-copilot]")) return S.panel ? input.focus() : openPanel();
     if (t.closest("[data-lt]")) return openLT();
+    if (t.closest("[data-locilink]")) return toast("Opens Loci", "In the app this opens Loci on the map, as Today's Ask Loci link does now.");
+    if (t.closest("[data-add]")) return openAdd({ d: S.view === "day" ? Math.max(S.sel, S.now.d) : Math.max(S.now.d, S.wk * 7) });
+    const ecol = t.closest(".pl-col");
+    if (ecol && S.phase >= 2 && !t.closest(".pl-b, .pl-log")) { const d = +ecol.dataset.d, m = Math.floor(M(e.clientY - ecol.getBoundingClientRect().top) / 15) * 15; if (isPast(d, m + 15)) return toast("That time has passed", "Pick a time from now on."); return openAdd({ d, s: Math.max(m, d === S.now.d ? Math.ceil(S.now.m / 15) * 15 : H0) }); }
     const sel = t.closest("[data-sel]"); if (sel) { S.sel = +sel.dataset.sel; S.view = "day"; return render(); }
     const st = t.closest("[data-start]"); if (st) { e.preventDefault(); return start(st.dataset.start); }
     const op = t.closest("[data-open]"); if (op) { e.preventDefault(); const el = $(`.pl-b[data-b="${op.dataset.open}"]`, root); return el ? showPop(op.dataset.open, el) : start(op.dataset.open); }
@@ -1199,7 +1309,7 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   let rz = 0;
   window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { wasWide = wide(); if (S.view !== "read") render(); else placePanel(); }, 120); });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") && !dlg) { e.preventDefault(); if (S.panel) input.focus(); else openPanel(); }
+    if (S.phase >= 4 && e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") && !dlg) { e.preventDefault(); if (S.panel) input.focus(); else openPanel(); }
   });
   input.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); input.blur(); } });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (dlg) closeDlg(); else if (popEl) hidePop(); } });
@@ -1207,11 +1317,18 @@ Rules: change only sessions that are planned and still ahead; keep to learning t
   /* ================================================================ prototype bar */
   const bar = document.createElement("nav");
   bar.className = "td-proto pl-proto"; bar.setAttribute("aria-label", "Prototype");
-  bar.innerHTML = '<div class="row"><b>Prototype · planning</b><button type="button" id="pl-how" aria-expanded="false">How to try it</button><button type="button" id="pl-meet">A meeting lands on Thursday</button><button type="button" id="pl-sun">Skip to Sunday</button><button type="button" id="pl-restart">Start again</button><span class="ai" id="pl-ai">Checking for Claude…</span></div><p class="hint" hidden>Open <b>✦ Ask Loci</b> (or press /) and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a lighter Saturday, then next week. Tell it about a <b>routine</b> (“I drive to work every weekday, 7:00 to 7:30”) and it fills the drive with dialogues and spoken reviews, moving anything that needs a screen. Changes show as dashed ghosts until you apply them. Drag sessions on the week; click one to start it. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time. <b>Skip to Sunday</b> plays the week out so you can plan next week from what happened. The 19:00 reading Lumen today is a full lesson.</p>';
+  const HOW = {
+    1: "<b>Phase 1</b> is Today as it behaves now, in the new layout: the Day and Week calendar shows only what happened (watched, read, saved, asked Loci), the side column has My Focus, Continue and the Big Picture, and <b>Ask Loci ↗</b> links to the map. No planning, no migration, no AI.",
+    2: "<b>Phase 2</b> adds sessions by hand: press <b>+ Add</b> or click an empty hour, pick a Lumen, a Commonplace item or a topic to explain, and it lands on the nearest free time. Drag sessions to move them; click one to start, skip or remove it. <b>Skip to Sunday</b> plays the week out.",
+    3: "<b>Phase 3</b> adds <b>Learning time</b>: tinted windows, a weekly time per topic (My Focus shows hours), a daily maximum, and routines. Add a routine (try Driving, Weekdays, 07:00–07:30) and it fills with dialogues and spoken reviews by rule, moving anything that needs a screen. The 19:00 reading Lumen today is a full lesson.",
+    4: "<b>Phase 4</b> adds Loci. Open <b>✦ Ask Loci</b> (or press /) and try the suggestions: plan the rest of the week, a client presentation on 6 November (a goal across two topics), a routine, a lighter Saturday, then next week. Changes show as dashed ghosts until you apply them. <b>A meeting lands on Thursday</b> shows sessions moving around a new busy time.",
+  };
+  bar.innerHTML = `<div class="row"><b>Prototype</b><label class="pl-phase">Phase <select id="pl-phase" aria-label="Phase">${[1, 2, 3, 4].map((n) => `<option value="${n}"${n === S.phase ? " selected" : ""}>${n} · ${PHASES[n]}</option>`).join("")}</select></label><button type="button" id="pl-how" aria-expanded="false">How to try it</button>${S.phase >= 4 ? '<button type="button" id="pl-meet">A meeting lands on Thursday</button>' : ""}${S.phase >= 2 ? '<button type="button" id="pl-sun">Skip to Sunday</button>' : ""}<button type="button" id="pl-restart">Start again</button>${S.phase >= 4 ? '<span class="ai" id="pl-ai">Checking for Claude…</span>' : ""}</div><p class="hint" hidden>${HOW[S.phase]}</p>`;
   document.body.appendChild(bar);
   $("#pl-restart", bar).addEventListener("click", () => location.reload());
-  $("#pl-meet", bar).addEventListener("click", simMeeting);
-  $("#pl-sun", bar).addEventListener("click", skipToSunday);
+  $("#pl-meet", bar)?.addEventListener("click", simMeeting);
+  $("#pl-sun", bar)?.addEventListener("click", skipToSunday);
+  $("#pl-phase", bar).addEventListener("change", (e) => { try { localStorage.setItem("pl-phase", e.target.value); } catch { /* private */ } location.hash = `phase${e.target.value}`; location.reload(); });
   $("#pl-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
 
   shell(); prompts(); greet(); aiBadge(); render();

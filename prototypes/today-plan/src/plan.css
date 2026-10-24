@@ -398,10 +398,55 @@ body { background: var(--surface-page); }
 .pl-proto .hint { position: absolute; left: 0; bottom: calc(100% + 6px); width: min(560px, calc(100vw - 16px)); box-sizing: border-box; margin: 0; padding: 12px 14px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 4px; color: var(--ink); line-height: 1.5; white-space: normal; }
 .pl-proto .hint b { text-transform: none; letter-spacing: 0; font-size: inherit; color: var(--ink); font-weight: 600; }
 
+
+/* ------------------------------------------------------------------ phases: activity, status, adding by hand */
+.pl-log.is-wide { left: 8px; right: 8px; z-index: 2; }
+.pl-col .pl-log.is-compact { left: 4px; right: 4px; padding: 1px 0 1px 6px; font-size: 10.5px; }
+.pl-col .pl-log.is-compact b { font-weight: 500; }
+.pl-fr.is-status .hr { color: var(--ink-2); font-size: 12px; }
+.pl-fr .sub { grid-column: 2 / 4; margin-top: -4px; font-size: 12px; color: var(--ink-2); }
+.pl-up .m { margin: -6px 0 12px; font-size: 12.5px; color: var(--ink-2); }
+.pl-calnav .pl-addbtn { min-height: 28px; padding: 3px 10px; font-size: 12.5px; margin-left: 6px; }
+.pl-col { cursor: default; }
+.pl-phase-2 .pl-col, .pl-phase-3 .pl-col, .pl-phase-4 .pl-col { cursor: copy; }
+.pl-add { display: grid; gap: 10px; }
+.pl-add .pl-seg { justify-self: start; }
+.pl-add input[type="search"] { font: inherit; font-size: 13.5px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); color: var(--ink); }
+.pl-add input[type="search"]:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+.pl-picks { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow-y: auto; display: grid; gap: 2px; border-block: 1px solid var(--rule); padding-block: 4px; }
+.pl-pick { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 4px; }
+.pl-pick:hover { background: var(--hover-fill); }
+.pl-pick:focus-visible { outline: var(--focus-ring); outline-offset: -2px; }
+.pl-pick.is-on { background: var(--tr-soft); box-shadow: inset 3px 0 0 var(--tr); }
+.pl-pick .dot { width: 8px; height: 8px; border-radius: 2px; background: var(--tr); }
+.pl-pick .tt b { font-weight: 500; font-size: 13.5px; display: block; }
+.pl-pick .tt small { color: var(--ink-2); font-size: 12px; }
+.pl-when { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+.pl-when label, .pl-targets label { display: inline-flex; align-items: center; gap: 6px; }
+.pl-when select, .pl-targets select, .pl-rtform select { font: inherit; font-size: 13px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); color: var(--ink); }
+.pl-targets { display: grid; gap: 6px; }
+.pl-targets label { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; }
+.pl-targets .dot { width: 8px; height: 8px; border-radius: 2px; background: var(--tr); margin-right: 2px; }
+.pl-rtform { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.pl-rtform .button { min-height: 0; padding: 4px 10px; font-size: 12.5px; }
+.pl-lt-row .slots i.rt .pl-linkbtn { margin-left: 6px; font-size: 12px; }
+.pl-proto .pl-phase { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.pl-proto .pl-phase select { max-width: 230px; }
+
 /* ------------------------------------------------------------------ narrower screens */
 @media (max-width: 1180px) {
   .pl-read { grid-template-columns: minmax(0, 1fr); }
   .pl-toc { display: none; }
+}
+/* One toolbar line from 700px, so the hours never shift: the title gives way first, and with the phase 3–4 legend
+   the connection chips show only where they fit (they're always under Learning time). */
+@media (min-width: 700px) {
+  .pl-calnav { flex-wrap: nowrap; }
+  .pl-calnav h2 { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+}
+@media (max-width: 1599.98px) {
+  .pl-phase-3 .pl-cal .pl-conn, .pl-phase-4 .pl-cal .pl-conn { display: none; }
+  .pl-phase-3 .pl-cal .pl-conn + .pl-key2, .pl-phase-4 .pl-cal .pl-conn + .pl-key2 { margin-left: auto; padding-left: 0; border-left: 0; }
 }
 @media (max-width: 1360px) {
   .pl-cal .pl-conn { display: none; }

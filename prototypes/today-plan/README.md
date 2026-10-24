@@ -6,6 +6,18 @@ This is the owner's T4 direction (Craft *Today*; `studiolo` `docs/superpowers/sp
 
 Open `dist/today-plan-prototype.html`. It's also published as a claude.ai artifact that may use Claude.
 
+
+## Phases
+
+The **Phase** select in the prototype bar (or `#phase1` … `#phase4` on the link) shows each build phase on its own. The design and build plan for an AI agent is [`docs/superpowers/specs/2026-10-24-today-planner-phases.md`](../../docs/superpowers/specs/2026-10-24-today-planner-phases.md).
+
+| Phase | What it shows |
+|---|---|
+| **1 · Calendar and side column** | Today as it behaves now, in the new layout. Day/Week shows only what happened; Continue, My Focus (status) and the Big Picture; **Ask Loci ↗** links to the map. No planning, no migration, no AI. |
+| **2 · Add and move by hand** | **+ Add** or click an empty hour: Lumens, Commonplace items or a topic to explain. Drag, Later, Skip, Remove, Undo. Up next replaces Continue. |
+| **3 · Learning time and habits** | Learning time (windows, weekly time per topic, daily maximum), routines added in the dialog and filled by rule, hours in My Focus. |
+| **4 · Loci plans** (default) | Everything below: Loci in the side column, plan cards with ghosts, goals, next week, routines by conversation, busy times. |
+
 ## Loci, as in the live app
 
 The copilot here is **Loci**, as it is in the live app (`studiolo` @ `5fbb7f2`). It uses the app's own pieces:
