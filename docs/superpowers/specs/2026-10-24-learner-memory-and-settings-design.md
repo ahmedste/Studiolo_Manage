@@ -13,6 +13,7 @@ HIGH (a design system across Settings, Loci, Learn and every AI surface; it need
 - Craft, Studilo space: *Learner context & Memory*, *AI BRain*, *Settings & Onboarding*, *Copilot*, *Features & Ideas* ("Agent layers: learning flows up topic to area to map, skill profiles per area", Ahmed), *Library - polishment Phase* (the owner's notes of 10 Oct), *Vision & Principles* (read 24 Oct 2026).
 
 **Prototype:** [`prototypes/settings-memory/`](../../../prototypes/settings-memory/README.md), the Settings tabs and the memory map on Studiolo's real shell and styles.
+**System reference (diagrams):** [`2026-10-24-learner-memory-system-reference.md`](2026-10-24-learner-memory-system-reference.md): every Save, Call and Edit step, its tables, its cost and its tests.
 
 ## 0. In short
 
@@ -32,7 +33,9 @@ Studiolo should feel like it knows you: what you're new to, what you already do 
 
 **The one rule for what's hidden: any sentence about you that Loci reads, you can read.** The app may keep raw records, numbers worked out from them by fixed rules, and shortened copies, out of sight. It may never keep a judgement about you that you can't see, correct or delete. That is already the agreed scope ("They must not become a separate hidden learner profile"); this design makes it testable (§4.3).
 
-**Cheap to read.** A card is compiled into a short digest when it changes, not when it's read, so assembling Loci's context is a few indexed reads and no model call. The whole slice is about **350–700 tokens** (today's learner line is about 30), sits after the cached prompt prefix, and costs about US$0.001 per copilot turn on Sonnet 5.5 (§6.5).
+**Cheap to read and write.** A card is compiled into a short digest when it changes, not when it's read, so assembling Loci's context is one query and no model call. The slice is about **350–700 tokens** (today's learner line is about 30), and a conversation sends it once, not every turn. Fixed rules handle facts, checks, taps and ratings; a small model reads only the learner's own free text. All of it comes to about **US$0.05 per active learner a month** ([system reference §7](2026-10-24-learner-memory-system-reference.md#7-what-it-costs)).
+
+**Shows little.** The learner sees exactly what Loci reads, and the token budget is the filter: a few short lines per place, written as sentences. While learning, they see almost nothing about memory, just Lumens that are pitched right. Settings opens on one paragraph about you and one line per area; the detail is one tap away; the records behind it are kept, not shown (§4.4).
 
 **Smart about when.** Loci writes facts on its own, writes what you *tell* it with a visible "Loci will remember…" chip you can undo, and only **suggests** anything it infers. It asks **at most one question a session**, and only when the answer would change what it makes next (§8).
 
@@ -79,7 +82,7 @@ The old prototype's Settings (`studiolo-design-concept.html`, `#s-settings`) had
 - **C. Fixed card slots** instead of free-form entries, so the model can read them cheaply and the learner can scan them.
 - **D. Three visible bases on every entry:** *You said*, *You did*, *You showed*, plus *Suggested* for anything inferred and waiting for your yes.
 - **E. The one-question rule** and a fixed catalogue of the questions Loci may ask (§8.2).
-- **F. A "What Loci knows here" preview**: the exact text Loci would receive at any place on the map.
+- **F. "Show the text Loci reads"** on any place: the exact text Loci receives there, as plain text.
 - **G. Five Settings tabs** (§9).
 
 ## 3. How others do it
@@ -166,8 +169,41 @@ If you *write* something personal into your own Instructions, that's yours, and 
 | A Live tap | "Simpler" three times in Structures | Evidence | Never directly; only via a memory it supports | Behind **Why?** | No, but deleting the memory drops it | n/a |
 | An inferred pattern | "You often ask for simpler in Structures" | **Suggested** memory, waiting | No, not until you say yes | Yes, in **Waiting for you** | Keep, edit or dismiss | Settings → Memory, and a chip in context |
 | Concept levels (Stage 4) | `retrieved` for "load path" | Evidence-derived numbers | As the card's **Known** list | Yes, as **Known** with **You showed** | Delete the entry; the numbers stay as history and stop being used | On the topic |
-| Card digests, caches, snapshots | "Precast · basics (showed) · …" | Working copies | Yes | No, but **What Loci knows here** prints the same text | No | n/a |
+| Card digests, caches, snapshots | "Precast · basics (showed) · …" | Working copies | Yes | No, but **Show the text Loci reads** prints the same text | No | n/a |
 | Usage | 42% of this month's allowance | Usage ledger | No | Yes | No | Settings → Usage |
+
+### 4.4 Show less: what the learner sees, and what's kept
+
+The risk with an honest memory is a wall of information. The answer is one rule, plus four depths.
+
+> **The read set is the show set, and the budget is the filter.** A learner can see every line Loci reads, and nothing else. Loci reads only a few short lines per place (§6.1's budgets), so there are only a few short lines to show. Everything else is a record, kept out of sight.
+
+| Depth | Where | What the learner sees | How much |
+|---|---|---|---|
+| **1. Felt** | While learning: Lumens, chats, Live | Nothing *about* memory. Lumens and replies are simply pitched right. At most three small signs: a **For you** tag on a Lumen (tap: one sentence and **Too basic · Too advanced**), a one-line **Remembered: …** with **Undo** when you told Loci something about yourself, and one question per session | A few words, rarely |
+| **2. Glance** | Settings → Memory as it opens; one line on a topic's panel in Loci | **About you**: one paragraph of up to three sentences. **By area**: one line per area that has something ("Envelope & Facade · regular, for work"). **Waiting for you**: at most three | Seconds to read |
+| **3. Open** | Tap an area or topic | That place's notes as short sentences, each with a faint source ("you said", "from a check") and a **⋯** menu (Why?, Edit, Delete); the **level dial**; your note for Loci; **Show the text Loci reads** | On purpose only |
+| **4. Kept** | Nowhere as such | Evidence rows, the scribe's runs, digests, tombstones, hashes, snapshots, token sizes, counts and the course engine's concept numbers | Never shown; reachable only as a plain sentence behind **Why?** |
+
+**The display rules** (for every memory screen):
+1. **Sentences, not fields.** Slots are for the machine. The learner reads "You know the basics here, for work on the prayer hall", not `level: basics · why: work`.
+2. **No empty rows and no zeros.** A slot with nothing in it isn't drawn. A place with nothing isn't listed.
+3. **Don't repeat what's on screen elsewhere.** Seen-here, topic status and My Focus are already in Learn and on the map. A card says once, "Loci also reads your status here and what you've seen", and doesn't list them.
+4. **Sources in one word, details on request.** "you said", "from a check", "you agreed". The evidence is behind **Why?**, in one or two plain sentences.
+5. **Three waiting, at most.** In Settings, the three newest suggestions; in context, one per session.
+6. **No technical words.** Never *token, slice, digest, evidence, basis, scribe, confidence, snapshot* on a learner's screen.
+7. **Caps match the budget.** A slot shows at most what the slice reads (§5.2's maximums); "and 2 more" opens the rest.
+8. **Builder detail stays with builders.** Token sizes and the raw slice live in a **Builder** view (dev specimens, owner accounts), not in Settings. Learners get **Show the text Loci reads** as plain text, no numbers.
+
+**What the learner can steer** is short on purpose, highest leverage first:
+1. **The level dial** on any place: New · Basics · Regular · Deep. It's the single biggest lever on every Lumen and reply there.
+2. **Too basic · Too advanced** on a Lumen. It's the same lever, pulled in the moment.
+3. **Instructions**: two boxes in Settings → Learning, and a note on any topic.
+4. **Keep · Dismiss** on what's waiting.
+5. **Edit · Delete** any line; **Forget this place**.
+6. **Memory on/off** and **Off the record**.
+
+Everything else is Loci's job, and the learner never has to manage it.
 
 ## 5. The memory map: cards that follow the graph
 
@@ -296,7 +332,7 @@ related: Concrete & precast · basics
 
 At the map (no place selected), the copilot gets `you` plus one line per area with a card (≤ 18 areas, about 15 tokens each). At *Law*, nothing of the above except `you`.
 
-Format: plain labelled lines, not JSON. They take fewer tokens than the same data as JSON (no quotes, braces or repeated keys), read easily for the model, and the same text the learner sees in **What Loci knows here** (§9.2). Inside the copilot's JSON block it's one string field; learner text is escaped exactly as the learner line is today (`tagSafeJson`).
+Format: plain labelled lines, not JSON. They take fewer tokens than the same data as JSON (no quotes, braces or repeated keys), read easily for the model, and the same text the learner sees with **Show the text Loci reads** (§9.2). Inside the copilot's JSON block it's one string field; learner text is escaped exactly as the learner line is today (`tagSafeJson`).
 
 ### 6.3 Which surface reads what
 
@@ -315,14 +351,17 @@ Format: plain labelled lines, not JSON. They take fewer tokens than the same dat
 - **Compiled on write, not on read.** When an entry changes, its card's digest and headline are recompiled (a template, no model). Reading is: resolve the ancestor chain (already done for the copilot's `path`), fetch the digests for those ids, concatenate. One query.
 - **No model call to read memory.** Ever. The scribe (§7) is the only model that touches memory, and it writes.
 - **Depth on demand.** The map chat doesn't load every card. The copilot gets a `read_memory(topicId)` tool beside `read_topic`, for "what do I know about Structures?".
+- **Sent once per conversation.** The copilot replays its history verbatim, so a slice sent in one turn is still in front of the model in later turns. A turn sends the full slice only when its hash changed or the earlier copy fell out of the replayed history; otherwise `learner: unchanged`. A 20-turn chat carries one or two slices, not twenty ([reference §4.2](2026-10-24-learner-memory-system-reference.md#42-in-a-conversation-send-it-once)).
+- **Names and paths are read live.** A digest never holds its place's name, path or neighbours, so a rename or a move recompiles nothing, and an edit recompiles one row ([reference §3.4](2026-10-24-learner-memory-system-reference.md#34-compile-the-one-step-every-save-and-edit-ends-with)).
 - **Prompt caching unchanged.** The slice is per-turn data in the user message, where the learner line already is; the six system blocks and tools stay byte-identical. The one fixed `rules` line joins the system prefix once, with a prompt version bump.
-- **Snapshot per generation.** Each Lumen or course run records which instructions and entries (ids and versions) it used: the agreed "Learner context snapshot". That's what lets a Lumen say **Made for you because…** later, and lets a deleted entry stay out of future runs.
+- **Snapshot per generation.** Each Lumen or course run records which instructions and entries (ids and versions) it used: the agreed "Learner context snapshot". That's what lets a Lumen's **For you** tag say what it used, later, and lets a deleted entry stay out of future runs.
 
 ### 6.5 What it costs
 
 From the app's own [rate card](https://github.com/ahmedste/studiolo/blob/main/src/features/usage/rate-card.ts) (2026-10-16):
-- **Reading:** a 600-token slice adds about **US$0.0012 per copilot turn** (Sonnet 5.5 at $2 per million input tokens) and about **US$0.0024 per Lumen** (Opus 5.5 at $4). The learner line already costs a tenth of that.
-- **Writing:** a scribe run on Haiku 5.5 reads about 3,000 tokens and writes about 400: about **US$0.0005**. At 60 runs a month for an active learner, about **US$0.03 a month**.
+- **Reading:** a 500-token slice costs about **US$0.001 per conversation** (Sonnet 5.5 at $2 per million input tokens, sent once) and about **US$0.0016 per Lumen** (Opus 5.5 at $4).
+- **Writing:** rules cost nothing. A scribe run on Haiku 5.5 reads about 2,500 tokens and writes about 300: under **US$0.0005**, about ten times a month.
+- **In all:** about **US$0.05 per active learner a month**. The [reference's cost table](2026-10-24-learner-memory-system-reference.md#7-what-it-costs) has the assumptions.
 
 ## 7. Writing memory: how Loci fills the cards
 
@@ -342,40 +381,37 @@ From the app's own [rate card](https://github.com/ahmedste/studiolo/blob/main/sr
 | Library items saved and tagged | ✓ `content_topic_tags` | **Nothing in the MVP** (agreed: no inference from incidental Library activity) | n/a |
 | Time of day, session length, typing | n/a | **Never** | n/a |
 
-### 7.2 The pipeline
+### 7.2 The pipeline: rules first, a model only for free text
 
 ```mermaid
 flowchart LR
-  E[Something happens<br/>a chat line, a Live tap,<br/>a check, a finish] --> V[(Evidence<br/>append-only, no model)]
-  V --> R[Fixed rules<br/>counts, concept levels,<br/>review dates]
-  V --> S[The scribe<br/>small model, batched<br/>per place]
-  R --> S
-  S --> C{Validator}
-  C -->|a fact or You said| M[(Memory entry)]
-  C -->|an inference| Q[Waiting for you<br/>suggested entry]
-  C -->|breaks a rule| X[Dropped, logged]
-  M --> D[Digest recompiled<br/>no model]
-  Q -->|Keep| M
+  E["Something happens<br/>a finish, a check, a tap,<br/>a rating, a chat line"] --> V[("Evidence<br/>append-only, no model")]
+  V --> R["Fixed rules<br/>no model"]
+  R -->|"a fact"| F["Nothing more<br/>read at display time"]
+  R -->|"a check"| M[("Memory entry<br/>you showed")]
+  R -->|"a pattern crosses a threshold"| Q["Waiting for you<br/>suggested, template text"]
+  R -->|"free text"| S["The scribe<br/>Haiku 5.5, per place,<br/>batched"]
+  CP["The copilot's own turn<br/>remember tool"] --> C{"Validator"}
+  S --> C
+  C -->|"you said"| M
+  C -->|"inferred"| Q
+  C -->|"breaks a rule"| X["Dropped, logged"]
+  Q -->|"Keep"| M
+  M --> D["Digest recompiled<br/>template, one row"]
 ```
 
-1. **Evidence first, always cheap.** Every signal writes an evidence row (account, place, kind, typed reference, time). No model call.
-2. **Rules.** Counts, `seen`, and (Stage 4) concept levels update deterministically (course engine §6.3).
-3. **The scribe.** A small model (Haiku 5.5, thinking off, a strict tool) runs **per place, in batches**. It reads that card, the new evidence since its last run (as short summaries: "Live: 'simpler' on slide 3 of *Load paths*"; never whole transcripts), and the **corrections log** for that place. It returns a list of changes: `add | update | remove`, each with slot, text, basis, and evidence ids.
-4. **The validator** (server, deterministic) enforces §7.4. It can only shorten or drop what the scribe proposes, never add.
-5. **Recompile** the digest. Next read sees it.
-
-**Exception, no scribe needed:** a statement the learner makes about themselves in a chat is caught by the copilot itself, through a new tool `remember(slot, text)`, and written at once as *You said*, with the chip in the reply (§8.1). The copilot can't write *You showed* or *Suggested*.
+1. **Evidence first, always cheap.** Every signal writes an evidence row (account, place, kind, typed reference, a template summary, time). No model call.
+2. **Rules decide most things.** Facts (finished, opened) stop there: seen-here is read from evidence when it's shown. Checks write *You showed* entries by the course engine's rules (§6.3 there). Taps and ratings write a **suggestion with template text** when they cross a threshold ("3 Simpler taps at one place in 14 days"). The thresholds are in the [reference §3.1](2026-10-24-learner-memory-system-reference.md#31-something-happened-every-signal-no-model).
+3. **The copilot catches what it hears.** A statement the learner makes about themselves in a chat is written during the turn, through the tool `remember(slot, text)`, as *You said*, with the one-line **Remembered** sign (§8.1). No extra call.
+4. **The scribe reads only free text the copilot didn't catch.** A small model (Haiku 5.5, thinking off, a strict tool) runs per place, in batches, on the learner's own chat and Live lines since its last run (as summaries, never whole transcripts), the place's card and its corrections. It returns `add | update | remove | noop`. With nothing new, it isn't called.
+5. **The validator** (server, no model) enforces §7.4 for both the copilot and the scribe. It can only drop what they propose, never add.
+6. **Recompile** the one digest that changed. The next call reads it.
 
 ### 7.3 When the scribe runs
 
-Never on page load, never on a timer per learner. It's a worker job ([Trigger](https://github.com/ahmedste/studiolo/blob/main/trigger.config.ts), like the explainer jobs), queued when one of these happens, with one job per place collapsing repeats:
-- a copilot conversation goes quiet for 30 minutes after at least two learner messages;
-- a Live session ends;
-- a Lumen, Listen or Read is finished, or rated;
-- three new evidence rows have arrived at one place since its last run;
-- a weekly sweep, only for places with unprocessed evidence, the roll-up suggestions of §5.5, and **time-bound entries**: a `working_on` older than 60 days becomes a suggestion ("Still working on the mihrab panel?"), and dated facts are rewritten in the past tense ("exam on 12 Nov" → "had an exam on 12 Nov").
+Never on page load, and never for facts, checks, taps or ratings. Free text queues its place in `scribe_queue`, one row per place, due 30 minutes after the last line, so a burst of messages makes one run. A weekly sweep handles roll-ups (§5.5) and **time-bound entries**: a `working_on` older than 60 days becomes a suggestion ("Still working on the mihrab panel?"), and dated facts move to the past tense ("exam on 12 Nov" → "had an exam on 12 Nov"). Both are rules, not model calls.
 
-Memory off: no jobs are queued (evidence still records facts, as progress does today).
+Memory off: nothing is queued and no rule writes (evidence still records facts, as progress does today).
 
 ### 7.4 What Loci may write on its own
 
@@ -410,14 +446,14 @@ When off, Loci uses **Profile, Learning preferences and Instructions**, plus pla
 
 ## 8. Using memory: the right thing, at the right time, with the right question
 
-### 8.1 Personalisation you can see
+### 8.1 Personalisation you can feel, and see when you want to
 
-People feel personalisation when they can see it happen. Four quiet places:
+People feel personalisation when a Lumen lands at the right level, not when they read about it. So the signs are small, and most of the time there's nothing to see (§4.4, depth 1):
 
-1. **"Made for you" on every Lumen.** Under the title, beside the topic tag: *Pitched at basics · skips joints and tolerances · uses your prayer-hall project*. Tap it to see the slice the Lumen used (from its snapshot), with two buttons: **Too basic** and **Too advanced** (each one evidence, and an immediate suggested `level` change).
-2. **"Loci will remember: …" in the chat.** When the copilot writes a *You said* entry, the reply shows one line with **Undo** and **Edit**. Like ChatGPT's "Memory updated", but with the words.
-3. **"What Loci knows here"** on every topic's panel in Loci, under status and My Focus: the headline and a link: *Basics · for work · 2 seen · 1 to revisit · Edit*. It opens the card in place.
-4. **Openings that remember.** A topic chat or Live session can open with one line drawn from `revisit` or `working_on`: "Last time thermal bridging at the fixings was tricky. Two-minute check first, or straight on?" At most once per place per week.
+1. **For you** on a Lumen: a small tag beside the topic. Tap it for one sentence ("Pitched at basics. Skips joints and tolerances. Uses your prayer hall.") and **Too basic · Too advanced**, each moving the level dial for that place at once, with Undo.
+2. **Remembered: …** in a reply: one line, only when you told Loci something about yourself, with **Undo**. Like ChatGPT's "Memory updated", but with the words.
+3. **One line on a topic's panel** in Loci, under status and My Focus: *Loci: basics · for work ›*. It opens that place's card (depth 3) in place.
+4. **Openings that remember.** A topic chat or Live session may open with one line drawn from `revisit` or `working_on`: "Last time thermal bridging at the fixings was tricky. Two-minute check first, or straight on?" At most once per place per week, and it counts as the session's one question.
 
 ### 8.2 The one-question rule
 
@@ -445,7 +481,7 @@ Q4–Q6 are the in-context form of **Waiting for you** in Settings: the same sug
 - **Use, don't announce.** Loci doesn't say "I remember that you…" unless you ask or it's §8.1's single opening line. It just pitches right.
 - **Never surprise with the personal.** No slot can hold the sensitive kinds in §4.2, so they can't come back.
 - **Cite on request.** "Why did you assume that?" always gets an answer: the entry, its basis, and **Edit**.
-- **Shared Lumens carry no memory.** A viewer of a shared Lumen sees no "Made for you" line, and the share page never shows the snapshot.
+- **Shared Lumens carry no memory.** A viewer of a shared Lumen sees no **For you** tag, and the share page never shows the snapshot.
 
 ## 9. Settings: five tabs
 
@@ -469,16 +505,15 @@ Q4–Q6 are the in-context form of **Waiting for you** in Settings: the same sug
 **Profile.** Display name · Time zone (the full list with search, not five) · What you do (the field: chips plus your words) · Years in practice (optional) · Language of lessons (English; more later) · Spelling and units (British · American; Metric · Imperial) · Appearance (System · Light · Dark).
 
 **Learning** (what you tell Loci).
-- *Learning preferences*: **Start with** Watch · Listen · Read (the Home bar's default) · **Length** Short · Standard · Long · **Depth** Gentle · Balanced · Rigorous · **Examples from my field** on/off · **Quick checks** Often · Sometimes · Never · **Narrator** voice and speed (from Listen and Live).
-- *Instructions for Loci*: **About me**, **How I like to be taught**, **Right now I'm working on…** (each ≤ 1,000 characters, with the character count and a "Loci reads this everywhere" note).
-- *Notes on topics*: every scoped note, by area, with its path; **Edit**, **Delete**, **Open in Loci**.
+- *Four preferences*: **Start with** Watch · Listen · Read (the Home bar's default) · **Length** Short · Standard · Long · **Quick checks** Often · Sometimes · Never · **Examples from my field** on/off. Depth isn't here: the level dial in Memory does that job per place. Narrator voice and speed live in the player.
+- *Instructions for Loci*: two boxes, **About me and my work** and **How I like to be taught** (each ≤ 1,000 characters). Hints in the boxes suggest what helps: experience, goals, pace, what to skip.
+- *Notes on topics*: one collapsed line, "Notes on 2 topics ›", opening the list (path, text, **Edit**, **Delete**, **Open in Loci**).
 
-**Memory** (what Loci noticed).
-- The toggle (§7.6).
-- **Waiting for you**: suggested entries (≤ 5), each with its reason and **Keep · Edit · Dismiss**.
-- **The memory map**: a tree that mirrors your map, showing only places with a card, with counts. Choosing a place shows its card: slots with their entries, each with basis and date, **Why?** (the evidence, in plain words: "You answered a check correctly on 14 Oct, in *Precast joints*"), **Edit**, **Delete**. **Forget this place**.
-- **What Loci knows here**: pick any place; see the exact slice text and its size in tokens.
-- **Search memory**, and **Delete all memory** (typed confirmation, as deleting many items in the Library already does).
+**Memory** (what Loci noticed), in the depths of §4.4.
+- *Glance, as it opens*: the toggle (§7.6) as one line; **About you**, one paragraph of up to three sentences with **Change**; **Waiting for you**, at most three, each with one reason and **Keep · Dismiss**; **By area**, one line per area that has something, with its level and why.
+- *Open, on a tap*: a place's page (area, then its topics with notes): the **level dial**, the place's lines as sentences, each with a faint source and **⋯** (Why?, Edit, Delete); your note for Loci; **Show the text Loci reads**; **Forget this place**.
+- *At the foot, small*: **Off the record** (what it is) and **Delete all memory…** (typed confirmation, as deleting many items in the Library already does).
+- Not here: token sizes, the raw slice for every surface, evidence lists, counts. They're in the Builder view (§4.4, rule 8).
 
 **Usage.** This month as a percentage of the allowance (Phase 3D), and what used it (Lumens, chats, Live minutes); until 3D, the tester cap. No per-call log.
 
@@ -488,10 +523,10 @@ Q4–Q6 are the in-context form of **Waiting for you** in Settings: the same sug
 
 | Where | What |
 |---|---|
-| Loci, a topic's panel | **What Loci knows here** row (§8.1); opens the card in place, with the same controls as Settings |
+| Loci, a topic's panel | One line, *Loci: basics · for work ›* (§8.1); opens the place's card in place, with the same controls as Settings |
 | Loci, the topic menu | **Tell Loci about this topic…** writes a scoped instruction |
-| The copilot reply | "Loci will remember: …" with **Undo · Edit**; a waiting Q4–Q6 question as chips |
-| A Lumen's head | **Made for you** line; **Too basic · Too advanced** |
+| The copilot reply | **Remembered: …** with **Undo**; at most one waiting question per session, as chips |
+| A Lumen's head | A **For you** tag; tap for one sentence and **Too basic · Too advanced** |
 | Learn Home and Today | No new UI: "Next for your goals" ranks with `level`, `revisit` and `seen` |
 | Onboarding | The note line keeps its words until Memory ships; then its **Edit** opens the You card and the step adds "Loci remembers this. Change it any time in Settings → Memory." |
 
@@ -530,8 +565,8 @@ Each step is useful alone. Tiers as in the Learn roadmap.
 | **M0** | Settings tabs: Profile (with what you do, full time zones, appearance), Privacy & data; Learning, Memory and Usage as "coming" placeholders hidden behind the switch | LOW | no | `SETTINGS_TABS` |
 | **M1** | **Learning**: preferences and Instructions for Loci (global), read into the copilot and every brief beside the learner line | MEDIUM | yes | `LEARNER_INSTRUCTIONS` |
 | **M2** | **Memory on You**: the toggle, You card, onboarding answers turned into entries, the copilot's `remember` tool and chip, **Delete all** | HIGH | yes | `LEARNER_MEMORY` |
-| **M3** | **Memory on the map**: cards per place, `learnerSlice`, digests, **What Loci knows here** (Settings and the topic panel), **Tell Loci about this topic…**, **Made for you** on Lumens, snapshots | HIGH | yes | `LEARNER_MEMORY` |
-| **M4** | **The scribe**: evidence from views, ratings and Live taps; suggestions, **Waiting for you**, the one-question rule (Q1, Q2, Q4–Q7), roll-ups | HIGH | yes | `MEMORY_SCRIBE` |
+| **M3** | **Memory on the map**: cards per place, `learnerSlice`, digests, the Glance and Open views, the topic panel line, **Tell Loci about this topic…**, **For you** on Lumens, snapshots, send-once in conversations | HIGH | yes | `LEARNER_MEMORY` |
+| **M4** | **Rules and the scribe**: evidence from views, ratings and Live taps; rule-made suggestions, **Waiting for you**, the one-question rule (Q1, Q2, Q4–Q7), roll-ups; then the scribe for free text | HIGH | yes | `MEMORY_SCRIBE` |
 | **M5** | **Stage 4**: checks, quizzes and notes write *You showed*; `known`, `revisit`, `words` from the Learner Model; Q3 in the planner | HIGH | yes (with Stage 4) | with Stage 4 |
 
 **Evaluation before M4 ships** (a fixture set, as the copilot and explainers have): 20 scripted learner histories; for each, the expected entries and suggestions. Pass when no sensitive entry is ever written, no deleted entry returns, every slice line maps to a visible source (§4.2's test), and a blind owner review rates the personalised Lumen better than the unpersonalised one in at least 14 of 20.
@@ -548,10 +583,14 @@ Each step is useful alone. Tiers as in the Learn roadmap.
 | M-D6 | Deleting a topic deletes its cards | **Yes**, named in the delete confirmation |
 | M-D7 | Retention: tombstones, evidence, snapshots | As in §10 |
 | M-D8 | Onboarding answers: edit in Settings as well as on the note card | **Both**, one record |
-| M-D9 | "Made for you" line on every Lumen | **Yes**, hidden on shared Lumens |
+| M-D9 | A **For you** tag on every Lumen | **Yes**, hidden on shared Lumens |
 | M-D10 | Live taps and Lumen ratings count as evidence | **Yes**, as *You did*, suggestions only |
 | M-D11 | Library saves and tags as a memory signal | **Not in the MVP** (as agreed); revisit post-MVP |
 | M-D12 | The scribe on Haiku 5.5 | **Yes**, behind the evaluation in §12 |
+| M-D13 | Show less: the four depths and eight display rules (§4.4) | **Yes.** Settings opens on one paragraph and one line per area |
+| M-D14 | Rules before the scribe: taps, ratings, checks and expiry by fixed rules; the scribe only for free text | **Yes.** Cheaper, and more predictable |
+| M-D15 | Send the slice once per conversation | **Yes** |
+| M-D16 | Learning keeps four preferences and two instruction boxes; depth moves to the level dial | **Yes** |
 
 ## 14. Sources
 
