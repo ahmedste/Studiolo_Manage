@@ -1,0 +1,679 @@
+<title>Learner Memory System Reference</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Every Save, Call and Edit step of Studiolo's learner memory, with diagrams, tables, costs and invariants.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Studiolo's own palette and faces (warm paper, fine rules, restrained ultramarine). Layout: a contents rail beside one reading column; diagrams and tables may run wider. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #8e99a1; --accent: #1e3e9e; --accent-soft: #e6ebf8;
+  --save: #2f6b4a; --call: #1e3e9e; --edit: #9a3b2e;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; } }
+:root[data-theme="dark"] { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding-block: 40px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 960px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 24px 64px; } }
+nav.toc { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; font-size: 13px; }
+nav.toc h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: flex; gap: 10px; padding: 4px 8px; margin-left: -8px; border-radius: 3px; color: var(--ink-2); text-decoration: none; }
+nav.toc a:hover { background: var(--panel); color: var(--ink); }
+nav.toc a span { color: var(--ink-3); font-variant-numeric: tabular-nums; min-width: 1ch; }
+@media (max-width: 960px) { nav.toc { position: static; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); } nav.toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { nav.toc ol { grid-template-columns: minmax(0, 1fr); } }
+main { min-width: 0; }
+.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+h1 { font-family: var(--read); font-weight: 400; font-size: clamp(30px, 5vw, 42px); line-height: 1.1; margin: 0 0 18px; text-wrap: balance; letter-spacing: -0.01em; }
+.intro { display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); font-size: 13.5px; color: var(--ink-2); max-width: 760px; }
+.intro p { margin: 0; }
+.intro strong { color: var(--ink); }
+.paths { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 0 0; font-size: 13px; color: var(--ink-2); }
+.paths b { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.paths i { width: 22px; height: 0; border-top: 2px solid var(--save); display: inline-block; }
+.paths .c i { border-top: 2px dashed var(--call); } .paths .e i { border-top: 4px solid var(--edit); }
+main h2 { font-family: var(--read); font-weight: 500; font-size: 27px; line-height: 1.2; margin: 56px 0 14px; padding-top: 22px; border-top: 1px solid var(--line); text-wrap: balance; scroll-margin-top: 16px; }
+main h3 { font-size: 15px; font-weight: 600; margin: 32px 0 8px; text-wrap: balance; scroll-margin-top: 16px; }
+main p, main li { max-width: 68ch; }
+main p { margin: 0 0 12px; }
+main ol, main ul { padding-left: 22px; margin: 0 0 14px; display: grid; gap: 6px; }
+main li::marker { color: var(--ink-3); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+strong { font-weight: 600; }
+.tbl { overflow-x: auto; margin: 6px 0 18px; border: 1px solid var(--line); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); background: var(--paper); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td { font-variant-numeric: tabular-nums; min-width: 120px; }
+.dia { margin: 10px 0 22px; padding: 18px; border: 1px solid var(--line); background: var(--panel); overflow-x: auto; }
+.dia pre.mermaid { margin: 0; background: none; text-align: center; font-family: var(--ui); }
+.dia pre.mermaid svg { max-width: 100%; height: auto; }
+blockquote { margin: 0 0 14px; padding: 4px 16px; border-left: 2px solid var(--accent); font-family: var(--read); font-size: 17px; }
+.foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#0-the-system-in-six-rules"><span>0</span>The system in six rules</a></li><li><a href="#1-the-whole-system"><span>1</span>The whole system</a></li><li><a href="#2-the-records"><span>2</span>The records</a></li><li><a href="#3-save"><span>3</span>Save</a></li><li><a href="#4-call"><span>4</span>Call</a></li><li><a href="#5-edit"><span>5</span>Edit</a></li><li><a href="#6-an-entrys-life"><span>6</span>An entry's life</a></li><li><a href="#7-what-it-costs"><span>7</span>What it costs</a></li><li><a href="#8-invariants-one-test-each"><span>8</span>Invariants (one test each)</a></li><li><a href="#9-function-contracts-proposed"><span>9</span>Function contracts (proposed)</a></li></ol></nav>
+  <main>
+    <p class="kicker">Studiolo · learner memory · proposed</p>
+    <h1>Learner memory: the system reference</h1>
+    <div class="intro"><p><strong>For:</strong> whoever builds learner memory in <code>studiolo</code>. This is the reference to keep open while building: what runs, in what order, what it reads and writes, and what it costs.</p><p><strong>Status:</strong> Proposed with the <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">design</a> (Claude, 24 October 2026); not approved. Function and table names marked <em>new</em> don&#39;t exist yet; the rest exist on <code>studiolo</code> main @ <code>3c2f744</code>.</p><p><strong>Prototype:</strong> <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener"><code>prototypes/settings-memory/</code></a>. Its <strong>Builder</strong> view shows the slice and its token size for any place.</p></div>
+    <div class="paths" aria-label="How the main diagram draws the three paths"><b><i></i>Save</b><b class="c"><i></i>Call</b><b class="e"><i></i>Edit</b><span>Boxes marked MODEL are the only model calls.</span></div>
+    <h2 id="0-the-system-in-six-rules">0. The system in six rules</h2>
+<ol>
+<li><strong>Three paths only.</strong> <strong>Save</strong> (something happened, maybe remember it), <strong>Call</strong> (an AI surface needs to know the learner), <strong>Edit</strong> (the learner changes what&#39;s remembered). Every diagram below is one of them.</li>
+<li><strong>Rules before models.</strong> Facts, checks, taps, ratings and expiry are handled by fixed rules: no model call. A model is used in exactly two places: the copilot&#39;s own turn (<code>remember</code>, which is a tool call inside a turn that was happening anyway), and the <strong>scribe</strong>, which reads only the learner&#39;s own free text that the copilot didn&#39;t already catch.</li>
+<li><strong>Compile on write, concatenate on read.</strong> Every save or edit recompiles one place&#39;s <strong>digest</strong> (ready-made text, by template, no model). A call reads the digests it needs in <strong>one query</strong> and joins them. Calling never runs a model to read memory.</li>
+<li><strong>Invalidation is local.</strong> A digest holds only its own place&#39;s entries. It holds no names, no paths and no other places, so an edit recompiles one row; a rename or move recompiles nothing.</li>
+<li><strong>Send only what changed.</strong> In a conversation, the slice is sent in full once. After that a turn sends a two-token marker until the slice&#39;s hash changes (§4.2).</li>
+<li><strong>What&#39;s shown is what&#39;s read.</strong> The learner&#39;s screens render the same digests the model reads. Nothing is read that can&#39;t be shown, and nothing is shown that isn&#39;t read (design §4.4).</li>
+</ol>
+<h2 id="1-the-whole-system">1. The whole system</h2>
+<p>Solid lines are the <strong>Save</strong> path, dashed lines the <strong>Call</strong> path, thick lines the <strong>Edit</strong> path. Boxes marked <code>MODEL</code> are the only model calls.</p>
+<figure class="dia"><pre class="mermaid">flowchart LR
+  subgraph UI["Surfaces"]
+    CHAT["Loci chat&lt;br/&gt;map, area, topic"]
+    LUMEN["Make a Lumen&lt;br/&gt;Watch, Listen, Read"]
+    LIVE["Live session"]
+    PLAYER["Player and checks&lt;br/&gt;finish, rate, tap, answer"]
+    SET["Settings: Learning, Memory&lt;br/&gt;topic panel card"]
+  end
+
+  subgraph API["Server (Next.js routes and operations)"]
+    REC["recordEvidence&lt;br/&gt;new"]
+    RULES["applyRules&lt;br/&gt;new, no model"]
+    REM["remember tool&lt;br/&gt;new, inside the copilot turn"]
+    EDIT["editMemory&lt;br/&gt;new, version-checked"]
+    COMP["compileDigest&lt;br/&gt;new, template"]
+    SLICE["learnerSlice&lt;br/&gt;new, one query"]
+    SNAP["writeSnapshot&lt;br/&gt;new"]
+  end
+
+  subgraph DB["Postgres (account-owned rows)"]
+    EV[("learning_evidence&lt;br/&gt;append-only")]
+    ME[("memory_entries")]
+    TB[("memory_tombstones")]
+    DG[("memory_digests")]
+    IN[("learner_instructions&lt;br/&gt;account_preferences")]
+    CS[("context_snapshots")]
+    CQ[("scribe_queue")]
+  end
+
+  subgraph WK["Trigger worker"]
+    SCRIBE["scribePlace&lt;br/&gt;new"]
+    VAL["validateOps&lt;br/&gt;new, no model"]
+  end
+
+  subgraph M["Models"]
+    HAIKU["MODEL: Haiku 5.5&lt;br/&gt;scribe, free text only"]
+    SONNET["MODEL: Sonnet 5.5&lt;br/&gt;copilot turn"]
+    OPUS["MODEL: Opus 5.5&lt;br/&gt;Lumen author"]
+  end
+
+  PLAYER --&gt; REC
+  CHAT --&gt; REC
+  LIVE --&gt; REC
+  REC --&gt; EV
+  REC --&gt; RULES
+  RULES --&gt; ME
+  RULES --&gt;|"free text only"| CQ
+  CQ --&gt; SCRIBE
+  SCRIBE --&gt; HAIKU
+  HAIKU --&gt; VAL
+  VAL --&gt; ME
+  VAL -. "checks" .-&gt; TB
+  SONNET --&gt; REM
+  REM --&gt; ME
+  ME --&gt; COMP
+  IN --&gt; COMP
+  COMP --&gt; DG
+
+  CHAT -.-&gt; SLICE
+  LUMEN -.-&gt; SLICE
+  LIVE -.-&gt; SLICE
+  DG -.-&gt; SLICE
+  SLICE -.-&gt; SNAP
+  SNAP -.-&gt; CS
+  SLICE -.-&gt; SONNET
+  SLICE -.-&gt; OPUS
+
+  SET ==&gt; EDIT
+  EDIT ==&gt; ME
+  EDIT ==&gt; TB
+  EDIT ==&gt; IN
+  EDIT ==&gt; COMP</pre></figure>
+<h2 id="2-the-records">2. The records</h2>
+<p>Logical tables; the design&#39;s §10 has the fields&#39; meaning. Every table has <code>account_id</code>, and every foreign key is a same-account composite key, as in every private table today.</p>
+<figure class="dia"><pre class="mermaid">erDiagram
+  ACCOUNT ||--o{ LEARNING_EVIDENCE : records
+  ACCOUNT ||--o{ MEMORY_ENTRY : remembers
+  ACCOUNT ||--o{ MEMORY_TOMBSTONE : forgets
+  ACCOUNT ||--o{ MEMORY_DIGEST : compiles
+  ACCOUNT ||--o{ LEARNER_INSTRUCTION : writes
+  ACCOUNT ||--o{ CONTEXT_SNAPSHOT : uses
+  ACCOUNT ||--o{ SCRIBE_QUEUE : waits
+  TOPIC ||--o{ MEMORY_ENTRY : "place (null = You)"
+  TOPIC ||--o| MEMORY_DIGEST : "one per place"
+  TOPIC ||--o{ LEARNER_INSTRUCTION : "topic note"
+  MEMORY_ENTRY }o--o{ LEARNING_EVIDENCE : "why (entry_evidence)"
+
+  LEARNING_EVIDENCE {
+    uuid id
+    uuid place_id "topic or null"
+    text kind "finished, rated, tap, check, said_text, ..."
+    text ref "typed reference"
+    text summary "max 200 chars, written by template"
+    timestamptz at
+    bool scribed "free text read by the scribe"
+  }
+  MEMORY_ENTRY {
+    uuid id
+    uuid place_id
+    text slot "level, why, working_on, known, revisit, prefer, words"
+    text text "max 160 chars"
+    text basis "said, did, showed, agreed"
+    text status "suggested, active, dismissed, superseded"
+    text origin "app or learner"
+    timestamptz learner_edited_at
+    int version
+  }
+  MEMORY_TOMBSTONE {
+    uuid place_id
+    text slot
+    text text_hash "normalised text"
+    timestamptz deleted_at
+    int dismissals
+  }
+  MEMORY_DIGEST {
+    uuid place_id "null = You"
+    text line "max 25 tokens, as a parent or neighbour"
+    text card "max 250 tokens, as here"
+    text glance "the sentence the learner sees"
+    int source_version
+    text hash
+  }
+  LEARNER_INSTRUCTION {
+    uuid place_id "null = everywhere"
+    text kind "about, teaching, topic_note"
+    text text "max 1000 chars"
+    int version
+  }
+  CONTEXT_SNAPSHOT {
+    text run "message id or Lumen id"
+    text slice_hash
+    jsonb entry_versions "ids and versions only"
+    bool memory_on
+  }
+  SCRIBE_QUEUE {
+    uuid place_id
+    timestamptz due_at "coalesced: one row per place"
+  }</pre></figure>
+<p><strong>Indexes that make the paths cheap:</strong> <code>memory_digests (account_id, place_id)</code> unique, for the one-query read; <code>memory_entries (account_id, place_id, status)</code>; <code>memory_tombstones (account_id, place_id, slot, text_hash)</code>; <code>learning_evidence (account_id, place_id, at)</code>; <code>scribe_queue (due_at)</code>.</p>
+<h2 id="3-save">3. Save</h2>
+<h3 id="31-something-happened-every-signal-no-model">3.1 Something happened (every signal, no model)</h3>
+<p>Every signal enters through one function. Most stop at the rules.</p>
+<figure class="dia"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant S as Surface
+  participant R as recordEvidence
+  participant DB as Postgres
+  participant RU as applyRules
+  participant C as compileDigest
+  S-&gt;&gt;R: event (kind, place, ref)
+  R-&gt;&gt;R: memory on? off-the-record session? If either says no, stop here
+  R-&gt;&gt;DB: insert learning_evidence with a template summary
+  R-&gt;&gt;RU: run the rules for this kind
+  alt finished, opened, watched (a fact)
+    RU-&gt;&gt;DB: nothing more. Seen-here is read from evidence at display time
+  else a check answered (Stage 4 levels)
+    RU-&gt;&gt;DB: known or revisit entry, basis showed (course engine rules)
+    RU-&gt;&gt;C: recompile this place
+  else a tap or rating pattern crosses its threshold
+    RU-&gt;&gt;DB: suggested entry, text from a template
+    Note over RU,DB: e.g. 3 Simpler taps at one place in 14 days gives "Start simpler here?"
+  else learner free text (a chat line, a Live line)
+    RU-&gt;&gt;DB: upsert scribe_queue for this place, due in 30 min
+  end</pre></figure>
+<p><strong>The thresholds</strong> (rules, tunable, no model):</p>
+<div class="tbl"><table><thead><tr>
+<th>Signal</th>
+<th>Rule</th>
+<th>Writes</th>
+</tr>
+</thead><tbody><tr>
+<td>Live <strong>Simpler</strong> / <strong>Deeper</strong></td>
+<td>3 at one place in 14 days</td>
+<td>suggested <code>level</code> one step down / up</td>
+</tr>
+<tr>
+<td>Lumen rating <strong>Too basic</strong> / <strong>Too advanced</strong></td>
+<td>1 (it&#39;s explicit)</td>
+<td>suggested <code>level</code>, shown at once</td>
+</tr>
+<tr>
+<td><strong>From my field</strong> taps</td>
+<td>4 anywhere in 30 days</td>
+<td>suggested <code>prefer</code> at You</td>
+</tr>
+<tr>
+<td>Same <code>prefer</code> text kept in 2 areas</td>
+<td>on the second Keep</td>
+<td>suggested <code>prefer</code> at You (roll-up)</td>
+</tr>
+<tr>
+<td>Check right first time, then right again ≥ 3 days later</td>
+<td>course engine §6.3</td>
+<td><code>known</code>, basis showed</td>
+</tr>
+<tr>
+<td>Check wrong</td>
+<td>course engine §6.3</td>
+<td><code>revisit</code>, basis showed</td>
+</tr>
+<tr>
+<td><code>working_on</code> older than 60 days</td>
+<td>weekly sweep</td>
+<td>suggested &quot;Still working on…?&quot;</td>
+</tr>
+</tbody></table></div>
+<h3 id="32-the-learner-tells-loci-something-in-a-chat-inside-the-turn">3.2 The learner tells Loci something in a chat (inside the turn)</h3>
+<p>No extra model call: the copilot&#39;s turn already reads the message.</p>
+<figure class="dia"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant L as Learner
+  participant CP as Copilot turn (Sonnet)
+  participant T as remember tool
+  participant V as validateOps
+  participant DB as Postgres
+  participant C as compileDigest
+  L-&gt;&gt;CP: I already know the stack effect. I'm designing a courtyard in Dubai.
+  CP-&gt;&gt;T: remember(slot working_on, text, place = this chat's topic)
+  T-&gt;&gt;V: same checks as the scribe's output
+  V-&gt;&gt;DB: tombstone match? slot cap? sensitive words? learner-locked slot?
+  alt passes
+    V-&gt;&gt;DB: insert entry, basis said, status active
+    V-&gt;&gt;C: recompile this place
+    T--&gt;&gt;CP: ok, entry id
+    CP--&gt;&gt;L: reply plus one line, "Remembered: ..." with Undo
+  else refused
+    T--&gt;&gt;CP: refused (reason)
+    CP--&gt;&gt;L: reply only, nothing remembered
+  end
+  L-&gt;&gt;CP: Undo
+  CP-&gt;&gt;DB: delete entry (Edit path, section 5)</pre></figure>
+<h3 id="33-the-scribe-free-text-the-copilot-didnt-catch">3.3 The scribe: free text the copilot didn&#39;t catch</h3>
+<p>Runs in the worker, per place, coalesced, rarely.</p>
+<figure class="dia"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant Q as scribe_queue
+  participant W as scribePlace (worker)
+  participant DB as Postgres
+  participant H as Haiku 5.5
+  participant V as validateOps
+  participant C as compileDigest
+  Q-&gt;&gt;W: place is due (30 min after the last free-text line)
+  W-&gt;&gt;DB: read digest.card, unscribed said_text summaries (max 20), corrections (max 10)
+  alt nothing new since the last run
+    W-&gt;&gt;Q: drop, no model call
+  else
+    W-&gt;&gt;H: one call, strict tool, thinking off. About 2,500 tokens in, 300 out
+    H--&gt;&gt;W: ops: add, update, remove, noop. Each with slot, text, basis, evidence ids
+    W-&gt;&gt;V: validate
+    V-&gt;&gt;DB: drop ops that hit a tombstone, a locked slot, a cap or a sensitive word
+    V-&gt;&gt;DB: said statements become active, anything inferred becomes suggested
+    V-&gt;&gt;DB: mark the evidence scribed
+    V-&gt;&gt;C: recompile this place if anything changed
+  end</pre></figure>
+<p>The scribe&#39;s system prompt (about 1,200 tokens) is the same for every place, so a worker that handles several places for one account in a row reads it from the five-minute cache.</p>
+<h3 id="34-compile-the-one-step-every-save-and-edit-ends-with">3.4 Compile: the one step every save and edit ends with</h3>
+<figure class="dia"><pre class="mermaid">flowchart TD
+  A["An entry at place P changed&lt;br/&gt;or an instruction at P changed"] --&gt; B["Read P's active entries&lt;br/&gt;and P's topic note"]
+  B --&gt; C["Template: line, max 25 tokens&lt;br/&gt;level, why, counts"]
+  B --&gt; D["Template: card, max 250 tokens&lt;br/&gt;every slot, trimmed to caps"]
+  B --&gt; E["Template: glance&lt;br/&gt;the learner's sentence"]
+  C --&gt; F["Upsert memory_digests row for P&lt;br/&gt;new hash, source_version"]
+  D --&gt; F
+  E --&gt; F
+  F --&gt; G{"P is You?"}
+  G --&gt;|yes| H["Also rebuild the you block&lt;br/&gt;profile, preferences, instructions"]
+  G --&gt;|no| I["Done. No other place changes"]
+  H --&gt; I</pre></figure>
+<p><strong>What&#39;s not in a digest, on purpose:</strong> the place&#39;s name, its path, its children, its related topics and seen-here. Those are read live at call time from data the caller already has (the copilot&#39;s context already resolves the path, children and related topics). So <strong>rename and move cost nothing</strong>, and an edit never cascades.</p>
+<h2 id="4-call">4. Call</h2>
+<h3 id="41-building-the-slice">4.1 Building the slice</h3>
+<figure class="dia"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant S as Surface (chat, Lumen, Live)
+  participant LS as learnerSlice
+  participant DB as Postgres
+  participant SN as writeSnapshot
+  participant M as Model
+  S-&gt;&gt;LS: account, place, surface, plus the chain, children and related it already resolved
+  LS-&gt;&gt;DB: one query: digests for You, the chain, the place, children with cards, related (max 3)
+  LS-&gt;&gt;DB: same query: memory_enabled, the you block, topic notes on the chain
+  LS-&gt;&gt;LS: memory off? Keep the you block and notes only
+  LS-&gt;&gt;LS: assemble labelled lines in a fixed order, names from the caller
+  LS-&gt;&gt;LS: over budget? Trim related, then below, then seen, then far path
+  LS-&gt;&gt;LS: hash the text
+  LS-&gt;&gt;SN: run id, slice hash, entry ids and versions
+  LS--&gt;&gt;S: slice text and hash
+  S-&gt;&gt;M: request with the slice in the per-turn context block</pre></figure>
+<p><strong>Which parts each surface asks for</strong> (the design&#39;s §6.3): chat gets you, path, here, below; a Lumen or Live session gets you, path, here, seen, related. Budgets: you ≤ 120 tokens, each path line ≤ 25, here ≤ 250, seen ≤ 60, below ≤ 80, related ≤ 60. The trimming order is fixed, so the same data always gives the same bytes.</p>
+<h3 id="42-in-a-conversation-send-it-once">4.2 In a conversation: send it once</h3>
+<p>The copilot replays its history verbatim, so a slice sent in turn 3 is still in front of the model in turn 9.</p>
+<figure class="dia"><pre class="mermaid">flowchart TD
+  A["Copilot turn admitted"] --&gt; B["learnerSlice(place, chat)"]
+  B --&gt; C{"Same hash as the last full slice&lt;br/&gt;in this conversation?"}
+  C --&gt;|no| D["Send the full slice&lt;br/&gt;store its hash and message id on the conversation"]
+  C --&gt;|yes| E{"Is that message still inside&lt;br/&gt;the replayed history window?"}
+  E --&gt;|yes| F["Send learner: unchanged&lt;br/&gt;about 2 tokens"]
+  E --&gt;|no, trimmed or Start fresh| D</pre></figure>
+<p>A 20-turn conversation then carries one or two slices instead of twenty: about 500 tokens instead of about 10,000, and the earlier copy is read from the prompt cache at a tenth of the input price.</p>
+<h3 id="43-where-the-slice-sits-in-each-request">4.3 Where the slice sits in each request</h3>
+<div class="tbl"><table><thead><tr>
+<th>Request</th>
+<th>Cached prefix (unchanged)</th>
+<th>Per-request part</th>
+<th>The slice</th>
+</tr>
+</thead><tbody><tr>
+<td>Copilot turn</td>
+<td>Tools and six system blocks, plus one fixed line on how to read <code>&lt;learner&gt;</code></td>
+<td>History, then this turn&#39;s <code>&lt;studiolo_context&gt;</code></td>
+<td>One string field in the context block, replacing today&#39;s <code>learner</code> line</td>
+</tr>
+<tr>
+<td>Lumen author</td>
+<td>The author contract and brand kit (the brief&#39;s cache block)</td>
+<td>The brief</td>
+<td>Replaces the brief&#39;s <code>Learner:</code> line</td>
+</tr>
+<tr>
+<td>Live session</td>
+<td>The agent&#39;s prompt</td>
+<td><code>dynamicVariables</code> at connect</td>
+<td>One variable</td>
+</tr>
+<tr>
+<td>Scribe</td>
+<td>Its system prompt</td>
+<td>The place&#39;s card and new summaries</td>
+<td>Not used (it reads the card directly)</td>
+</tr>
+</tbody></table></div>
+<h2 id="5-edit">5. Edit</h2>
+<p>Every edit is a normal versioned write under the account&#39;s memory lock, then one recompile.</p>
+<figure class="dia"><pre class="mermaid">sequenceDiagram
+  autonumber
+  participant L as Learner (Settings or the topic panel)
+  participant E as editMemory
+  participant DB as Postgres
+  participant C as compileDigest
+  L-&gt;&gt;E: edit entry (id, text, expectedVersion)
+  E-&gt;&gt;DB: lock the account's memory, check the version
+  alt version changed
+    E--&gt;&gt;L: conflict, show both, keep the draft
+  else
+    E-&gt;&gt;DB: update text, origin learner, basis said, learner_edited_at now, version + 1
+    E-&gt;&gt;C: recompile this place
+    E--&gt;&gt;L: saved. Used from the next call. A Lumen already being made keeps its snapshot
+  end
+  L-&gt;&gt;E: delete entry (id)
+  E-&gt;&gt;DB: delete it and write a tombstone (place, slot, text hash, now)
+  E-&gt;&gt;C: recompile this place
+  E--&gt;&gt;L: deleted, with Undo for this session</pre></figure>
+<div class="tbl"><table><thead><tr>
+<th>Edit</th>
+<th>Writes</th>
+<th>Recompiles</th>
+<th>Also</th>
+</tr>
+</thead><tbody><tr>
+<td>Change a line</td>
+<td>entry: learner text, basis said, <code>learner_edited_at</code></td>
+<td>that place</td>
+<td>Rules and the scribe may only <em>suggest</em> changes to it, from evidence newer than the edit</td>
+</tr>
+<tr>
+<td>Set the level dial</td>
+<td>the place&#39;s <code>level</code> entry (one-value slot)</td>
+<td>that place</td>
+<td>Same lock as above</td>
+</tr>
+<tr>
+<td>Delete a line</td>
+<td>delete + tombstone</td>
+<td>that place</td>
+<td>Older evidence can never re-add it; newer evidence can only suggest it; a second dismissal blocks it at that place</td>
+</tr>
+<tr>
+<td>Forget a place</td>
+<td>delete all + tombstones</td>
+<td>that place</td>
+<td></td>
+</tr>
+<tr>
+<td>Keep / Dismiss a suggestion</td>
+<td>status active / dismissed (+ tombstone on dismiss)</td>
+<td>that place on Keep</td>
+<td></td>
+</tr>
+<tr>
+<td>Edit an instruction or topic note</td>
+<td><code>learner_instructions</code> new version</td>
+<td>You, or that place</td>
+<td></td>
+</tr>
+<tr>
+<td>Memory off</td>
+<td><code>memory_enabled = false</code>, <code>memory_paused_at</code></td>
+<td>nothing</td>
+<td>Calls skip memory digests; <code>recordEvidence</code> stops queueing; entries stay editable</td>
+</tr>
+<tr>
+<td>Memory on</td>
+<td><code>memory_enabled = true</code>, <code>memory_resumed_at</code></td>
+<td>nothing</td>
+<td>Rules and the scribe ignore evidence older than <code>memory_resumed_at</code></td>
+</tr>
+<tr>
+<td>Delete all memory</td>
+<td>delete all + tombstones</td>
+<td>all places</td>
+<td>One transaction</td>
+</tr>
+<tr>
+<td>Topic renamed or moved</td>
+<td>nothing</td>
+<td>nothing</td>
+<td>Names and paths are read at call time</td>
+</tr>
+<tr>
+<td>Topic deleted</td>
+<td>cascade: entries, digest, tombstones, notes</td>
+<td>nothing</td>
+<td>The delete confirmation says &quot;and what Loci noted here&quot;</td>
+</tr>
+</tbody></table></div>
+<h2 id="6-an-entrys-life">6. An entry&#39;s life</h2>
+<figure class="dia"><pre class="mermaid">stateDiagram-v2
+  [*] --&gt; Suggested: a rule or the scribe infers it
+  [*] --&gt; Active: remember, Settings, a check, or a said line from the scribe
+  Suggested --&gt; Active: Keep, or a yes to the question
+  Suggested --&gt; Dismissed: Dismiss
+  Suggested --&gt; Expired: 30 days, or a sixth suggestion pushes it out
+  Active --&gt; Locked: the learner edits it
+  Locked --&gt; Locked: the learner edits it again
+  Active --&gt; Superseded: a newer value in a one-value slot
+  Locked --&gt; Superseded: the learner sets a new value
+  Active --&gt; Deleted: Delete or Forget
+  Locked --&gt; Deleted: Delete or Forget
+  Deleted --&gt; Active: Undo in the same session
+  Dismissed --&gt; [*]
+  Expired --&gt; [*]
+  Superseded --&gt; [*]
+  Deleted --&gt; [*]
+  note right of Deleted
+    A tombstone stays. Older evidence can never bring it back.
+  end note
+  note right of Locked
+    Only suggestions may change it, from evidence newer than the edit.
+  end note</pre></figure>
+<h2 id="7-what-it-costs">7. What it costs</h2>
+<p>Prices from the app&#39;s <a href="https://github.com/ahmedste/studiolo/blob/main/src/features/usage/rate-card.ts" target="_blank" rel="noopener">rate card</a> (2026-10-16). &quot;Active learner&quot; is an assumption: 60 copilot turns, 20 Lumens, 4 Live sessions and 10 free-text scribe runs a month.</p>
+<div class="tbl"><table><thead><tr>
+<th>Step</th>
+<th>Model</th>
+<th>Tokens</th>
+<th>How often</th>
+<th>Per active learner a month</th>
+</tr>
+</thead><tbody><tr>
+<td><code>recordEvidence</code>, rules, compile, <code>learnerSlice</code></td>
+<td>none</td>
+<td>0</td>
+<td>every event and call</td>
+<td>US$0 (database rows only)</td>
+</tr>
+<tr>
+<td><code>remember</code> inside a copilot turn</td>
+<td>Sonnet 5.5 (already running)</td>
+<td>about 60 out</td>
+<td>when the learner says something about themselves</td>
+<td>under US$0.001</td>
+</tr>
+<tr>
+<td>Slice in copilot turns, sent once per conversation (§4.2)</td>
+<td>Sonnet 5.5, $2 per million in</td>
+<td>about 500 per conversation</td>
+<td>about 15 conversations</td>
+<td>about US$0.015</td>
+</tr>
+<tr>
+<td>Slice in a Lumen brief</td>
+<td>Opus 5.5, $4 per million in</td>
+<td>about 400</td>
+<td>20 Lumens</td>
+<td>about US$0.03</td>
+</tr>
+<tr>
+<td>Scribe run</td>
+<td>Haiku 5.5, $0.10 in and $0.50 out per million</td>
+<td>about 2,500 in, 300 out</td>
+<td>about 10</td>
+<td>under US$0.005</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>about US$0.05</strong></td>
+</tr>
+</tbody></table></div>
+<p>Without the two savings (send-once, and rules before the scribe), the same month comes to roughly US$0.15: about US$0.065 for a slice in every copilot turn, and about US$0.06 for a scribe run on every one of some 150 events. That&#39;s three times as much, and the scribe would be making judgements that rules make more reliably.</p>
+<h2 id="8-invariants-one-test-each">8. Invariants (one test each)</h2>
+<ol>
+<li><strong>Every line in a snapshot&#39;s slice maps to a visible source</strong>: a digest the learner can open, an instruction, a profile field, or a fact shown on screen.</li>
+<li><strong>No model call reads memory.</strong> <code>learnerSlice</code> makes no provider request (spy in the unit test).</li>
+<li><strong>One query per call.</strong> <code>learnerSlice</code> issues one database round trip for digests and instructions.</li>
+<li><strong>An edit recompiles exactly one digest</strong> (two for You: its digest and the you block).</li>
+<li><strong>Rename and move recompile nothing.</strong></li>
+<li><strong>A tombstoned text never returns</strong> from evidence older than its tombstone, from either the rules or the scribe.</li>
+<li><strong>A learner-locked entry is never rewritten</strong> by the app; only a suggestion can appear beside it.</li>
+<li><strong>Memory off:</strong> no queue rows, no scribe runs, no memory digests in any slice; instructions still present.</li>
+<li><strong>Off the record:</strong> <code>recordEvidence</code> writes nothing for that session, and its slices carry no memory.</li>
+<li><strong>Same data, same bytes:</strong> two <code>learnerSlice</code> calls with no change in between return the same hash.</li>
+<li><strong>Sensitive words</strong> (the design&#39;s §4.2 list, a maintained word list plus the scribe&#39;s own refusal) never reach <code>memory_entries</code>.</li>
+<li><strong>Account isolation:</strong> every query is scoped by <code>account_id</code>, and composite keys prevent cross-account references.</li>
+</ol>
+<h2 id="9-function-contracts-proposed">9. Function contracts (proposed)</h2>
+<div class="tbl"><table><thead><tr>
+<th>Function</th>
+<th>Called by</th>
+<th>Input</th>
+<th>Output</th>
+<th>Model?</th>
+</tr>
+</thead><tbody><tr>
+<td><code>recordEvidence</code></td>
+<td>player, checks, copilot admission, Live end</td>
+<td>account, place, kind, ref</td>
+<td>evidence id</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>applyRules</code></td>
+<td><code>recordEvidence</code>, weekly sweep</td>
+<td>evidence</td>
+<td>entries or suggestions written, queue row</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>remember</code> (copilot tool)</td>
+<td>copilot turn</td>
+<td>slot, text, place</td>
+<td>ok + entry id, or refused + reason</td>
+<td>inside the turn</td>
+</tr>
+<tr>
+<td><code>scribePlace</code></td>
+<td>worker, from <code>scribe_queue</code></td>
+<td>account, place</td>
+<td>ops applied</td>
+<td>Haiku 5.5</td>
+</tr>
+<tr>
+<td><code>validateOps</code></td>
+<td><code>remember</code>, <code>scribePlace</code></td>
+<td>ops</td>
+<td>ops kept, ops dropped with reasons</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>compileDigest</code></td>
+<td>every save and edit</td>
+<td>account, place</td>
+<td>digest row</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>learnerSlice</code></td>
+<td>copilot admission, Lumen brief, Live connect, planner</td>
+<td>account, place, surface, resolved chain, children, related</td>
+<td>text, hash</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>writeSnapshot</code></td>
+<td><code>learnerSlice</code> callers</td>
+<td>run, hash, entry versions</td>
+<td>snapshot id</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>editMemory</code></td>
+<td>Settings, topic panel, chat Undo</td>
+<td>op, ids, expectedVersion</td>
+<td>saved, conflict or refused</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>setMemoryEnabled</code></td>
+<td>Settings toggle</td>
+<td>on or off</td>
+<td>the new state</td>
+<td>no</td>
+</tr>
+</tbody></table></div>
+
+    <p class="foot">Source: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-system-reference.md" target="_blank" rel="noopener">docs/superpowers/specs/2026-10-24-learner-memory-system-reference.md</a> in Studiolo_Manage. Design: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">learner memory and Settings</a>. Prototype: <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Studiolo Learner Memory</a>.</p>
+  </main>
+</div>
