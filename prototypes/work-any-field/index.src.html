@@ -1,0 +1,768 @@
+<meta charset="utf-8">
+<title>Work in Any Field</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the app shell (58 px rail + main stage) with Work drawn by one engine for any field. Tokens are Studiolo's own (src/styles/tokens.css). */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --float: #fbfbf9; --hover: #ecece6; --mat: #e4e4de; --scrim: rgba(243, 243, 239, .74);
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5;
+  --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a; --ok-soft: #e2efe7;
+  --pick: #b7791f; --pick-soft: #fbf3df;
+  --work: #7a5a2e; --work-soft: #f3ecdf;
+  --decision-paper: #f6f3ea; --decision-rule: #c9b48a;
+  --on-media: #ffffff; --media-badge: rgba(0, 0, 0, .64);
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, .07), 0 8px 22px rgba(34, 48, 58, .09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, .08), 0 16px 36px rgba(34, 48, 58, .15);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, .06), 0 18px 48px rgba(34, 48, 58, .16);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-q: 130ms; --dur-s: 220ms; --dur-m: 380ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --accent-soft: #263156; --accent-strong: #c3cff8;
+    --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+    --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a;
+    --work: #d9b57c; --work-soft: #352b1c; --decision-paper: #27251e; --decision-rule: #7d6a45;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --accent-soft: #263156; --accent-strong: #c3cff8;
+  --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a;
+  --work: #d9b57c; --work-soft: #352b1c; --decision-paper: #27251e; --decision-rule: #7d6a45;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-q: 1ms; --dur-s: 1ms; --dur-m: 1ms; } }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { text-wrap: balance; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- shell ---------- */
+.rail { position: fixed; inset: 0 auto 0 0; width: 58px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: calc(16px + env(safe-area-inset-top, 0px)) 0 calc(16px + env(safe-area-inset-bottom, 0px)); padding-left: env(safe-area-inset-left, 0px); border-right: 1px solid var(--line); background: var(--paper); z-index: 20; }
+.rail .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 17px var(--read); margin-bottom: 20px; }
+.rail button { all: unset; width: 40px; height: 36px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); cursor: pointer; position: relative; }
+.rail button:hover { background: var(--hover); color: var(--ink); }
+.rail button[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.rail button:focus-visible { outline: 2px solid var(--accent); }
+.rail button .tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: var(--ink); color: var(--paper); font-size: 12px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--dur-q); }
+.rail button:hover .tip, .rail button:focus-visible .tip { opacity: 1; }
+.rail .newdot { position: absolute; right: 4px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--work); }
+.rail .grow { flex: 1; }
+.rail .me { width: 26px; height: 26px; border-radius: 50%; background: var(--board); font-size: 11px; font-weight: 500; display: grid; place-items: center; }
+.rail svg { width: 18px; height: 18px; }
+.stage { margin-left: 58px; min-width: 0; padding-block: 32px 140px; padding-left: max(44px, env(safe-area-inset-left, 0px)); padding-right: max(44px, env(safe-area-inset-right, 0px)); max-width: 1440px; }
+.dest-head { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; color: var(--ink-2); margin: 0 0 14px; flex-wrap: wrap; }
+.dest-head b { color: var(--ink); font-weight: 500; }
+.dest-head button { all: unset; cursor: pointer; color: var(--ink); font-weight: 500; }
+.dest-head button:hover { text-decoration: underline; }
+.dest-head .sep { color: var(--ink-3); }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 26px; overflow-x: auto; scrollbar-width: none; }
+.tabs button { all: unset; cursor: pointer; padding: 7px 12px 9px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); font-weight: 500; border-color: var(--accent); }
+.tabs button:hover { color: var(--ink); }
+.tabs .n { color: var(--ink-3); font-size: 12px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+/* ---------- atoms ---------- */
+.btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 4px; font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.btn:hover { background: var(--hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); }
+.btn.line { box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.btn.line:hover { background: var(--hover); }
+.btn.primary { background: var(--accent); color: var(--paper); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.small { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn.tiny { height: 24px; padding: 0 8px; font-size: 12px; }
+.btn.quiet { color: var(--ink-2); font-weight: 400; }
+.btn.link { height: auto; padding: 0; color: var(--accent); font-weight: 500; }
+.btn.link:hover { background: none; text-decoration: underline; }
+.btn svg { width: 15px; height: 15px; flex: none; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.seg { display: inline-flex; background: var(--board); padding: 3px; border-radius: 8px; gap: 2px; }
+.seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 6px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(34, 48, 58, .08); }
+.seg button:focus-visible { outline: 2px solid var(--accent); }
+.new { display: inline-block; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--work); background: var(--work-soft); padding: 1px 5px; border-radius: 3px; vertical-align: 2px; margin-left: 6px; }
+.kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0; font-weight: 500; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+.sdot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-3); display: inline-block; flex: none; }
+.sdot.s1 { background: var(--status-1); border-color: var(--status-1); }
+.sdot.s2 { background: var(--status-3); border-color: var(--status-3); }
+.tchip { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px 0 8px; border-radius: 12px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; color: var(--ink); white-space: nowrap; }
+.tchip:hover { background: var(--hover); }
+.tchip.gap { box-shadow: inset 0 0 0 1px var(--warn); color: var(--warn); background: transparent; border-style: dashed; }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.state { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 3px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.state.open { background: var(--board); color: var(--ink-2); }
+.state.exploring { background: var(--accent-soft); color: var(--accent-strong); }
+.state.decided { background: var(--ok-soft); color: var(--ok); }
+.state.parked { background: transparent; color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
+.src { font-size: 11.5px; color: var(--ink-2); }
+.src b { font-weight: 500; color: var(--ink); }
+.cite { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--accent); white-space: nowrap; }
+.cite:hover { text-decoration: underline; }
+.cite img, .cite .sw { width: 18px; height: 18px; border-radius: 3px; object-fit: cover; flex: none; background: var(--mat); }
+hr.rule { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
+.section-h h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.section-h .muted { font-size: 12.5px; }
+
+
+/* ---------- field switch, chain ---------- */
+.topbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.topbar .grow { flex: 1; }
+.fieldseg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--board); flex-wrap: wrap; }
+.fieldseg button { all: unset; cursor: pointer; display: inline-flex; flex-direction: column; padding: 6px 14px 7px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); line-height: 1.2; }
+.fieldseg button small { font-size: 11px; font-weight: 400; color: var(--ink-3); }
+.fieldseg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(34, 48, 58, .1), 0 0 0 1px var(--line); }
+.fieldseg button:focus-visible { outline: 2px solid var(--accent); }
+.adtoggle { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 17px; font-size: 13px; font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.adtoggle .sw { width: 28px; height: 16px; border-radius: 8px; background: var(--line); position: relative; transition: background var(--dur-s); }
+.adtoggle .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--panel); transition: transform var(--dur-s) var(--ease); }
+.adtoggle[aria-pressed="true"] .sw { background: var(--work); }
+.adtoggle[aria-pressed="true"] .sw::after { transform: translateX(12px); }
+.adtoggle:focus-visible { outline: 2px solid var(--accent); }
+.adapt .ad { background: var(--work-soft); color: var(--work); box-shadow: 0 1.5px 0 var(--work); border-radius: 2px; padding: 0 2px; }
+.adapt .adbox { outline: 1.5px dashed var(--work); outline-offset: 3px; border-radius: 4px; }
+.adlegend { display: none; font-size: 12.5px; color: var(--work); margin: -8px 0 16px; }
+.adapt .adlegend { display: block; }
+.persona { font: 400 15px/1.4 var(--read); color: var(--ink-2); margin: 0 0 16px; }
+.chain { display: grid; grid-template-columns: 92px repeat(10, minmax(84px, 1fr)); border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 26px; overflow-x: auto; }
+.chain > div { padding: 8px 8px; font-size: 12px; border-left: 1px solid var(--line); min-width: 0; }
+.chain > div:nth-child(11n + 1) { border-left: 0; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; display: flex; align-items: center; }
+.chain .u { color: var(--ink-2); }
+.chain .f { font-weight: 500; border-top: 1px solid var(--line); }
+.chain .f.lab { border-top: 1px solid var(--line); }
+.chain .on { background: var(--accent-soft); }
+.chainwrap { overflow-x: auto; margin-bottom: 26px; }
+.chainwrap .chain { margin-bottom: 0; min-width: 960px; }
+
+/* ---------- work header ---------- */
+.wk-head { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 14px; }
+.wk-head .cv { width: 96px; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; background: var(--mat); flex: none; display: grid; place-items: center; box-shadow: var(--shadow-pic); }
+.wk-head .cv img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wk-head .cv.txt { background: var(--cover-paper); color: var(--cover-ink); font: 400 28px var(--read); }
+.wk-head .tt { flex: 1; min-width: 240px; }
+.wk-head h1 { font: 400 28px/1.15 var(--read); margin: 2px 0 8px; }
+.wk-head .sub { font-size: 13px; color: var(--ink-2); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.stagerow { display: flex; gap: 3px; max-width: 420px; margin-top: 10px; }
+.stagerow span { flex: 1; min-width: 0; font-size: 10.5px; color: var(--ink-3); border-top: 3px solid var(--line); padding-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stagerow span.done { border-color: var(--status-2); }
+.stagerow span.now { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.factsrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); border-top: 1px solid var(--line); margin-bottom: 18px; }
+.factsrow div { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.factsrow dt { font-size: 11px; color: var(--ink-2); }
+.factsrow dd { margin: 0; font-size: 13px; }
+.sens { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 6px; margin-bottom: 18px; font-size: 12.5px; background: var(--warn-soft); color: var(--ink); }
+.sens b { color: var(--warn); font-weight: 600; white-space: nowrap; }
+.sens.conf { background: var(--accent-soft); }
+.sens.conf b { color: var(--accent-strong); }
+
+/* ---------- question ---------- */
+.qhead { margin-bottom: 20px; }
+.qhead h2 { font: 400 26px/1.25 var(--read); margin: 6px 0 10px; max-width: 34ch; }
+.slot { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.qgrid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 36px; align-items: start; }
+.qmain { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
+.sec h3 { margin: 2px 0 4px; font: 400 20px/1.25 var(--read); }
+.sec .lede { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-2); max-width: 70ch; }
+.topicline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; margin-bottom: 10px; }
+.topicline .path { color: var(--ink-2); font-size: 12px; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.rules li { padding-left: 14px; border-left: 2px solid var(--line); }
+.rules q { font: 400 15.5px/1.45 var(--read); quotes: none; display: block; }
+.rules .src { margin-top: 3px; display: block; }
+.knows { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.knows li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 7px 10px; border-radius: 5px; font-size: 13.5px; }
+.knows li:nth-child(odd) { background: var(--panel); }
+.knows .k { font-size: 11.5px; color: var(--ink-2); }
+.knows .k.rv { color: var(--warn); }
+.knows .src { display: block; margin-top: 2px; }
+.test { border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); overflow: hidden; }
+.tline { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 54px 108px; gap: 14px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 13.5px; }
+.tline:first-child { border-top: 0; }
+.tline.hd { font-size: 11px; color: var(--ink-3); letter-spacing: .05em; text-transform: uppercase; font-weight: 600; padding-block: 8px; background: var(--paper); }
+.tline .rule { font-weight: 500; }
+.tline .rule .src { display: block; font-weight: 400; margin-top: 2px; }
+.tline .fact { color: var(--ink-2); font-size: 13px; }
+.tline .pts { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2); }
+.tline.nopts { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 108px; }
+.verdict { all: unset; cursor: pointer; justify-self: end; display: inline-flex; align-items: center; justify-content: center; gap: 5px; width: 98px; height: 26px; border-radius: 13px; font-size: 12px; font-weight: 600; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); color: var(--ink-2); }
+.verdict.met { background: var(--ok-soft); color: var(--ok); box-shadow: none; }
+.verdict.not { background: var(--board); color: var(--ink-2); box-shadow: none; }
+.verdict.unclear { background: var(--pick-soft); color: var(--pick); box-shadow: none; }
+.verdict:focus-visible { outline: 2px solid var(--accent); }
+.tsum { display: flex; gap: 14px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line); background: var(--accent-soft); color: var(--accent-strong); font-size: 13.5px; flex-wrap: wrap; }
+.tsum b { font: 400 22px/1 var(--read); font-variant-numeric: tabular-nums; }
+.ev { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.evc { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 12px 13px; border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); min-width: 0; }
+.evc:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.evc:focus-visible { outline: 2px solid var(--accent); }
+.evc .th { margin: -12px -13px 4px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 6px 6px 0 0; background: var(--mat); position: relative; }
+.evc .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.evc .th .box { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .35); border-radius: 2px; }
+.evc .top { display: flex; gap: 6px; align-items: center; justify-content: space-between; }
+.stance { display: inline-flex; align-items: center; height: 19px; padding: 0 7px; border-radius: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.stance.for { background: var(--ok-soft); color: var(--ok); }
+.stance.against { background: var(--warn-soft); color: var(--warn); }
+.stance.context { background: var(--board); color: var(--ink-2); }
+.evc .kind { font-size: 11px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.evc .t { font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+.evc .loc { font-size: 11.5px; color: var(--accent); }
+.evc .why { font: italic 400 13.5px/1.35 var(--read); color: var(--ink-2); }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.opt { display: flex; flex-direction: column; border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; min-width: 0; }
+.opt.lead { box-shadow: inset 0 0 0 2px var(--accent); }
+.opt .pic { aspect-ratio: 16 / 9; background: var(--mat); overflow: hidden; }
+.opt .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.opt .bd { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+.opt h4 { margin: 0; font: 400 16.5px/1.3 var(--read); display: flex; gap: 8px; align-items: baseline; }
+.opt h4 .lt { font: 600 11px var(--ui); color: var(--ink-3); }
+.opt .leadtag { font-size: 11px; color: var(--accent); font-weight: 600; }
+.pc { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.pc li { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 6px; }
+.pc .m { font-weight: 700; }
+.pc .m.p { color: var(--ok); }
+.pc .m.c { color: var(--warn); }
+.challenge { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding: 14px 16px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.challenge .av { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 14px var(--read); }
+.challenge .who { font-size: 12px; color: var(--ink-2); margin-bottom: 4px; }
+.challenge p { margin: 0 0 8px; font: 400 15.5px/1.55 var(--read); max-width: 70ch; }
+.typing { display: inline-flex; gap: 4px; }
+.typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); animation: bl 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes bl { 50% { opacity: .25; } }
+.gapcard { display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border-radius: 6px; border: 1px dashed var(--warn); background: var(--warn-soft); flex-wrap: wrap; margin-top: 12px; font-size: 13px; }
+.gapcard .g { flex: 1; min-width: 220px; }
+.gapcard b { font-weight: 600; }
+.decision { background: var(--decision-paper); border-left: 3px solid var(--decision-rule); padding: 16px 18px; border-radius: 0 6px 6px 0; }
+.decision h4 { font: 400 18px/1.45 var(--read); margin: 4px 0 10px; }
+.decision ul { margin: 0 0 10px; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 4px; }
+.decision .meta { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 12px; font-size: 13px; margin-top: 8px; }
+.decision .meta dt { color: var(--ink-2); }
+.decision .meta dd { margin: 0; }
+.conf { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: 6px; }
+.conf i { width: 14px; height: 6px; border-radius: 2px; background: var(--line); }
+.conf i.on { background: var(--work); }
+.side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(20px + env(safe-area-inset-top, 0px)); }
+.sidebox { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 14px 16px; font-size: 13px; }
+.sidebox p { margin: 0 0 10px; }
+.sidebox .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.slotmap { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.slotmap li { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; padding: 3px 0; border-bottom: 1px solid var(--line); }
+.slotmap li span:first-child { color: var(--ink-3); }
+
+/* ---------- board ---------- */
+.boardgrid { border-radius: 8px; padding: 22px; background-color: var(--board); background-image: radial-gradient(circle, var(--line) 1.1px, transparent 1.3px); background-size: 22px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; align-items: start; }
+.frame { border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: rgba(255, 255, 255, .02); padding: 30px 12px 12px; position: relative; display: flex; flex-direction: column; gap: 10px; }
+.frame > .fl { position: absolute; left: 12px; top: 8px; font: 500 14px var(--read); color: var(--ink-2); }
+.bcard { background: var(--panel); border-radius: 4px; box-shadow: var(--shadow-pic); padding: 10px 12px; font-size: 12.5px; display: flex; flex-direction: column; gap: 4px; }
+.bcard img { width: calc(100% + 24px); margin: -10px -12px 4px; border-radius: 4px 4px 0 0; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+.bcard b { font: 400 15px/1.3 var(--read); }
+.bcard .src { font-size: 11px; }
+.bcard.q { background: var(--pick-soft); }
+.bcard.d { background: var(--decision-paper); border-left: 3px solid var(--decision-rule); }
+
+/* ---------- outcome ---------- */
+.outc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; max-width: 1100px; }
+.outc textarea { width: 100%; min-height: 84px; border: 0; border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); padding: 12px 14px; font: 400 16px/1.45 var(--read); resize: vertical; }
+.outc textarea:focus { outline: 2px solid var(--accent); }
+.memcard { border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.memcard .yes { padding: 10px 12px; border-radius: 5px; background: var(--ok-soft); font: 400 15px/1.45 var(--read); }
+.memcard ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-2); display: flex; flex-direction: column; gap: 3px; }
+.memcard .no li { text-decoration: line-through; text-decoration-color: var(--ink-3); }
+
+/* ---------- kind (template) ---------- */
+.kind { width: 100%; border-collapse: collapse; font-size: 13.5px; max-width: 980px; }
+.kind th, .kind td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.kind th { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.kind td:first-child { color: var(--ink-2); width: 170px; }
+.kind td:nth-child(2) { color: var(--ink-3); width: 260px; }
+.tablewrap { overflow-x: auto; }
+.yourfield { max-width: 980px; }
+.yourfield .askbox { margin-bottom: 10px; }
+.chiprow { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.chiprow button { all: unset; cursor: pointer; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; display: inline-flex; align-items: center; }
+.chiprow button:hover { background: var(--hover); }
+.chiprow button:focus-visible { outline: 2px solid var(--accent); }
+.askbox { display: flex; align-items: center; gap: 8px; height: 54px; padding: 0 7px 0 16px; border-radius: 12px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.askbox:focus-within { box-shadow: inset 0 0 0 1.5px var(--accent), 0 0 0 4px var(--accent-soft); }
+.askbox input { flex: 1; min-width: 0; border: 0; background: transparent; font: 18px/1.2 var(--read); height: 42px; }
+.askbox input:focus { outline: none; }
+
+/* ---------- home list ---------- */
+.wlist { display: flex; flex-direction: column; border-top: 1px solid var(--line); max-width: 980px; }
+.wrow { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 64px minmax(0, 1fr) 220px; gap: 16px; align-items: center; padding: 12px 6px; border-bottom: 1px solid var(--line); }
+.wrow:hover { background: var(--hover); }
+.wrow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.wrow .cv { width: 64px; height: 48px; border-radius: 4px; overflow: hidden; background: var(--cover-paper); color: var(--cover-ink); display: grid; place-items: center; font: 400 18px var(--read); }
+.wrow .cv img { width: 100%; height: 100%; object-fit: cover; }
+.wrow h3 { margin: 0 0 3px; font: 400 17px/1.3 var(--read); }
+.wrow .meta { font-size: 12px; color: var(--ink-2); }
+
+/* ---------- viewer sheet ---------- */
+.scrim { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 50; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); animation: fade var(--dur-s) var(--ease); }
+@keyframes fade { from { opacity: 0; } }
+.sheet { width: min(900px, 100%); max-height: calc(100% - 20px); overflow-y: auto; background: var(--float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 22px 24px; animation: rise var(--dur-m) var(--ease); }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } }
+.sheet .sh { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+.sheet .sh h2 { margin: 4px 0 0; font: 400 22px/1.25 var(--read); }
+.sheet .x { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); flex: none; }
+.sheet .x:hover { background: var(--hover); }
+.sheet .x:focus-visible { outline: 2px solid var(--accent); }
+.vgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; }
+.vstage { border-radius: 6px; overflow: hidden; background: var(--mat); position: relative; }
+.vstage img { width: 100%; display: block; }
+.vstage .box { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .4), 0 0 0 9999px rgba(0, 0, 0, .28); border-radius: 2px; }
+.vstage .boxn { position: absolute; transform: translate(-50%, -130%); background: #fff; color: #22303a; font-size: 11.5px; font-weight: 600; padding: 2px 7px; border-radius: 3px; white-space: nowrap; }
+.page { background: #fbfaf6; color: #22303a; padding: 26px 30px; font: 400 15px/1.6 var(--read); box-shadow: inset 0 0 0 1px #e6e3da; border-radius: 4px; }
+.page .ph { font: 600 11px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: #7a8790; margin-bottom: 12px; display: flex; justify-content: space-between; }
+.page p { margin: 0 0 10px; }
+.page .hl { background: #fbe9a8; box-shadow: -4px 0 0 #fbe9a8, 4px 0 0 #fbe9a8; border-left: 3px solid #b7791f; padding-left: 6px; }
+.rtable { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fbfaf6; color: #22303a; border-radius: 4px; overflow: hidden; }
+.rtable th, .rtable td { padding: 9px 12px; border-bottom: 1px solid #e6e3da; text-align: left; }
+.rtable th { font-size: 11px; color: #7a8790; text-transform: uppercase; letter-spacing: .05em; }
+.rtable tr.hl td { background: #fbe9a8; font-weight: 600; }
+.vside { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+.vside .why { font: italic 15px/1.45 var(--read); color: var(--ink-2); }
+.vside .row { padding-top: 8px; border-top: 1px solid var(--line); }
+.vside .row b { display: block; font-size: 11.5px; color: var(--ink-2); font-weight: 500; margin-bottom: 3px; }
+.toast { position: fixed; left: 50%; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); border-radius: 8px; padding: 10px 16px; font-size: 13px; z-index: 70; box-shadow: var(--shadow-lift); max-width: calc(100% - 32px); animation: rise var(--dur-m) var(--ease); }
+.proto { position: fixed; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); z-index: 30; display: flex; gap: 4px; align-items: center; background: var(--float); box-shadow: var(--shadow-float); border-radius: 8px; padding: 5px 6px 5px 12px; font-size: 12.5px; }
+.proto .lbl { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; color: var(--accent); margin-right: 6px; }
+
+@media (max-width: 1100px) { .qgrid, .outc, .vgrid { grid-template-columns: minmax(0, 1fr); } .side { position: static; } }
+@media (max-width: 720px) {
+  .proto { bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }
+  .rail { inset: auto 0 0 0; width: auto; height: calc(56px + env(safe-area-inset-bottom, 0px)); flex-direction: row; justify-content: space-around; padding: 0 max(8px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(8px, env(safe-area-inset-left, 0px)); border-right: 0; border-top: 1px solid var(--line); }
+  .rail .logo, .rail .grow, .rail .me, .rail .tip { display: none; }
+  .stage { margin-left: 0; padding-block: 64px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .tline, .tline.nopts { grid-template-columns: minmax(0, 1fr) auto; }
+  .tline .fact { grid-column: 1 / -1; grid-row: 2; }
+  .tline .pts { display: none; }
+  .tline.hd { display: none; }
+  .wrow { grid-template-columns: 48px minmax(0, 1fr); }
+  .wrow .stagerow { grid-column: 1 / -1; }
+  .knows li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .decision .meta { grid-template-columns: minmax(0, 1fr); }
+  .wk-head h1, .qhead h2 { font-size: 23px; }
+  .askbox { height: auto; flex-wrap: wrap; padding: 6px 8px 8px 14px; }
+  .askbox input { flex-basis: 100%; }
+}
+</style>
+
+<div id="app"></div>
+<script>
+const IMG = /*IMG*/{};
+</script>
+<script>
+/* Work in any field (prototype). One engine, three fields. Every screen is drawn by the same code from a field's
+   work kind (words, slot order, facts, stages, test style, stances, sensitivity) and one sample piece of work.
+   "Show what adapts" highlights every word that comes from the work kind. Spec:
+   docs/superpowers/specs/2026-10-24-work-any-field-design.md. All content is example data; Loci's words are scripted. */
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const ad = (t) => `<span class="ad">${esc(t)}</span>`;
+const ICON = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  learn: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  library: '<path d="m16 6 4 14M12 6v14M8 8v12M4 4v16"/>',
+  work: '<path d="M3 21V3l18 18z"/><path d="M7.5 16.5v-4.6l4.6 4.6z"/><path d="M3 8h2M3 12h2"/>',
+  graph: '<rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+};
+const ic = (k) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+function sketchSlot() {
+  const ink = "#2c3640", L = (d, w = 1.4) => `<path d="${d}" fill="none" stroke="${ink}" stroke-width="${w}" stroke-linecap="round"/>`;
+  let b = L("M40 380h560", 1.2) + L("M110 380V120h20V380", 2) + L("M130 140h420", 2.2) + L("M150 140V110h40v30", 1.6) + L("M150 110h-40", 1.4);
+  for (let i = 0; i < 6; i++) b += L(`M${160 + i * 7} ${108 - i * 2}l${-28 + i * 2} ${230 - i * 18}`, .7);
+  b += `<rect x="130" y="150" width="14" height="230" fill="#c9a86a" opacity=".35"/>`;
+  for (let i = 0; i < 5; i++) { const x = 280 + i * 60; b += L(`M${x} 380v-34M${x - 7} 360h14`, 1) + `<circle cx="${x}" cy="338" r="6" fill="none" stroke="${ink}"/>`; }
+  b += `<text x="40" y="60" font-family="Courier New, monospace" font-size="13" fill="${ink}">SECTION · ROOF SLOT OVER THE QIBLA WALL</text>`;
+  return "data:image/svg+xml," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="#f6f5ef"/>${b}</svg>`);
+}
+IMG.slot = { src: sketchSlot(), r: 1.6 };
+
+/* ------------------------------------------------------------------ the one shape (fixed) */
+const SLOTS = [
+  ["situation", "Situation"], ["question", "Question"], ["knowledge", "Knowledge"], ["test", "Test"], ["evidence", "Evidence"],
+  ["options", "Options"], ["challenge", "Challenge"], ["decision", "Decision"], ["outcome", "Outcome"], ["lesson", "Lesson"],
+];
+const VERDICT = { met: "Met", not: "Not met", unclear: "Unclear" };
+const NEXTV = { met: "not", not: "unclear", unclear: "met" };
+
+/* ------------------------------------------------------------------ fields: a work kind + one sample piece of work */
+const FIELDS = {
+  architect: {
+    label: "Architect", who: "An architect designing a prayer hall for about 600 people in Dubai.",
+    kind: {
+      name: "Project", plural: "Projects",
+      words: { situation: "Brief and site", question: "Design question", knowledge: "What you know", test: "Checks", evidence: "References", options: "Options", challenge: "Crit", decision: "Decision", outcome: "Post-occupancy", lesson: "Lesson" },
+      order: ["knowledge", "test", "evidence", "options", "challenge", "decision"],
+      stages: ["Brief", "Concept", "Developed", "Technical", "Site", "Done"],
+      facts: ["Site", "Size", "Climate", "Structure", "Client", "Next"],
+      test: "checks", stances: { for: "Precedent", against: "Warns against", context: "Context" },
+      sensitivity: "normal", challengeAsk: "Ask for a crit",
+    },
+    work: {
+      title: "Prayer hall, Al Barsha", cover: "hypostyle", stage: 1, due: "Concept review · Thu 29 Oct",
+      facts: [["Site", "Corner plot, Al Barsha 2 · qibla 258°"], ["Size", "About 600 worshippers"], ["Climate", "Hot, humid coast · 46 °C in August"], ["Structure", "Precast concrete"], ["Client", "A community trust"], ["Next", "Concept review, 29 Oct"]],
+      others: [["Riyadh library competition", "Done · reflection waiting", 5, "reading-room"], ["Thesis: a Dubai courtyard house", "Brief · paused", 0, "plan-courtyard"]],
+    },
+    q: {
+      text: "How do we bring daylight onto the qibla wall without glare?",
+      topic: { name: "Light & threshold", path: "Design & Composition › Light & threshold", st: "Learned", level: "Regular" },
+      rules: [["Light comes down the brick, not across it.", "your caption · Brick prayer hall"], ["Openings in the roof slab, not windows: light arrives in pools between the columns.", "your caption · Hypostyle hall, Kairouan"], ["One slot of light at the top.", "your caption · Stair under a roof light"]],
+      known: [["You know", "Hypostyle and four-iwan plans", "two checks right, 23 Oct"], ["Working on", "The mihrab and the light on the qibla wall", "you said, 20 Oct"]],
+      tests: [
+        ["No openings in the qibla wall below 3 m", "Asr and Maghrib are prayed facing 258°, into the low sun", "Option A: none", "met"],
+        ["Light the wall from above or from behind the rows", "your rule: light down the brick", "Option A: roof slot", "met"],
+        ["Baffle the slot against the June noon sun (88°)", "sun angle at 25° N", "Section shows a baffle", "met"],
+        ["The mihrab is the brightest point on the wall", "the brief", "Not modelled yet", "unclear"],
+      ],
+      gap: ["Daylight & glare", "Not started on your map. A daylight model would settle the last check."],
+      evidence: [
+        { stance: "for", kind: "Photo · References", t: "Brick prayer hall, light from above", loc: "Box on the wall: 1 note", why: "The effect we want on the qibla wall", view: { type: "photo", img: "brick-hall", box: [0.22, 0.18, 0.56, 0.5], note: "This glow: light grazing the brick from above" } },
+        { stance: "for", kind: "Photo · Site visits", t: "Hypostyle hall, light through the roof", loc: "Box: roof openings", why: "Light in pools between the columns", view: { type: "photo", img: "hypostyle", box: [0.3, 0.02, 0.4, 0.3], note: "Openings in the slab, not windows" } },
+        { stance: "for", kind: "Photo · References", t: "Stair under a roof light", loc: "Whole photo", why: "Option A in one picture", view: { type: "photo", img: "stair-light" } },
+        { stance: "against", kind: "Photo · Site visits", t: "Mashrabiya shadow on the floor", loc: "Box: the light at eye height", why: "Side light at Asr: beautiful, and in people's eyes", view: { type: "photo", img: "screen-shadow", box: [0.05, 0.05, 0.4, 0.6], note: "Low sun comes in at eye height" } },
+      ],
+      options: [
+        { n: "A", t: "A roof slot along the qibla wall", img: "slot", lead: true, p: ["Lights the wall, never shows the sun"], c: ["A hard stripe at noon in June without a baffle"] },
+        { n: "B", t: "A north clerestory over the hall", img: "reading-room", p: ["Even light, no sun on the floor"], c: ["Lights the room, not the wall"] },
+        { n: "C", t: "A side court behind a screen", img: "screen-shadow", p: ["Patterned light and air"], c: ["Low western sun across the rows at Asr"] },
+      ],
+      challenge: ["A is the strongest of the three, and your own references back it: Brick prayer hall and Bait Ur Rouf both light the wall from above.", "What you haven't shown is the last check: that the mihrab ends up the brightest point. Your Precast card also has thermal bridging at fixings to revisit, and a slot along the wall is a long roof-to-panel junction. Ask the precaster before Thursday."],
+      decision: { text: "Light the qibla wall from a roof slot along its full length (option A), with a deep baffle against the midday sun. No openings in the qibla wall itself.", because: ["Three of four checks met; the fourth needs a daylight model", "Light from above, as in Brick prayer hall and Bait Ur Rouf", "B lights the room but leaves the wall darker", "C brings the low western sun across the rows"], conf: 2, change: "A daylight model showing the mihrab darker than the side walls" },
+      outcome: "Post-occupancy, March 2028: worshippers describe the wall as glowing; the women's gallery gets afternoon glare through its side windows.",
+      lesson: "The roof slot worked; the gallery's side windows didn't. Apply the same rule to every space that faces the qibla, not only the hall.",
+    },
+  },
+  lawyer: {
+    label: "Lawyer", who: "A construction lawyer advising a fit-out contractor on a delay claim.",
+    kind: {
+      name: "Matter", plural: "Matters",
+      words: { situation: "Instructions", question: "Issue", knowledge: "Rule", test: "Elements", evidence: "Documents and authorities", options: "Arguments", challenge: "Opposing counsel", decision: "Advice", outcome: "Result", lesson: "Lesson" },
+      order: ["knowledge", "test", "evidence", "options", "challenge", "decision"],
+      stages: ["Instructions", "Investigation", "Claim", "Negotiation", "Hearing", "Closed"],
+      facts: ["Client", "Other side", "Contract", "Governing law", "Key dates", "Next"],
+      test: "elements", stances: { for: "Supports", against: "Undermines", context: "Background" },
+      sensitivity: "confidential", challengeAsk: "Argue it as opposing counsel",
+    },
+    work: {
+      title: "Fit-out delay claim, office tower", cover: null, coverText: "§", stage: 1, due: "Detailed claim due 26 May",
+      facts: [["Client", "The fit-out contractor"], ["Other side", "The employer (developer)"], ["Contract", "FIDIC Red Book, 2017 edition"], ["Governing law", "English law"], ["Key dates", "Drawings due 3 Mar · issued 14 Apr · notice 27 Mar"], ["Next", "Fully detailed claim by 26 May"]],
+      others: [["Defects dispute, school extension", "Negotiation", 3, null], ["Adjudication: unpaid valuation 9", "Closed · lesson waiting", 5, null]],
+    },
+    q: {
+      text: "Is the contractor entitled to an extension of time for the late fit-out drawings?",
+      topic: { name: "Extensions of time", path: "Construction Law › Time › Extensions of time", st: "Learning", level: "Regular" },
+      rules: [["Late drawings or instructions from the employer's side can entitle the contractor to more time (Sub-Clause 1.9, read with 8.5).", "your note · FIDIC 2017, lecture 3 (paraphrased)"], ["The contractor must give notice of a claim within 28 days of becoming aware of the event, or loses the entitlement (Sub-Clause 20.2.1).", "your quote · FIDIC 2017 (paraphrased)"], ["A time bar can survive the prevention principle where the contract gives a route to more time.", "your note · Multiplex v Honeywell [2007] EWHC 447 (TCC)"]],
+      known: [["You know", "Notice clauses as conditions precedent", "from a check, 12 Oct"], ["To revisit", "Concurrent delay: time without money under English law", "from a check you missed, 15 Oct"]],
+      tests: [
+        ["A cause the contract lists", "Sub-Clause 1.9, 8.5", "Drawings 42 days late (3 Mar to 14 Apr)", "met"],
+        ["Notice of claim within 28 days", "Sub-Clause 20.2.1", "Aware 3 Mar, notice 27 Mar: 24 days", "met"],
+        ["The delay reached completion, not just an activity", "Sub-Clause 8.5", "Programme rev. 4 shows 12 days of float", "unclear"],
+        ["Fully detailed claim within 84 days", "Sub-Clause 20.2.4", "Due 26 May; not sent yet", "unclear"],
+      ],
+      gap: ["Delay analysis (time impact, windows)", "Not started on your map. The third element turns on it."],
+      evidence: [
+        { stance: "for", kind: "PDF · Correspondence", t: "Contractor's letter C-114, 27 March", loc: "p. 1, para 2", why: "The notice: 24 days after the drawings were due", view: { type: "doc", head: ["Letter C-114", "27 March · p. 1"], lines: ["Dear Sirs,", "Notice of Claim: delayed fit-out drawings, levels 4 to 6.", "The drawings listed in the Engineer's register for 3 March have not been issued. We hereby give notice under Sub-Clause 20.2.1 that we consider ourselves entitled to an extension of time.", "We will submit a fully detailed claim within the period the contract allows."], hl: [2] } },
+        { stance: "for", kind: "Spreadsheet · Registers", t: "Engineer's drawing register", loc: "rows 37 to 41", why: "Due 3 March, issued 14 April", view: { type: "table", cols: ["Row", "Drawing", "Due", "Issued"], rows: [["36", "FO-301 Ceilings L3", "24 Feb", "24 Feb"], ["37", "FO-401 Ceilings L4", "3 Mar", "14 Apr"], ["38", "FO-402 Partitions L4", "3 Mar", "14 Apr"], ["39", "FO-501 Ceilings L5", "3 Mar", "14 Apr"], ["40", "FO-601 Ceilings L6", "3 Mar", "14 Apr"], ["41", "FO-602 Partitions L6", "3 Mar", "14 Apr"]], hl: [1, 2, 3, 4, 5] } },
+        { stance: "against", kind: "PDF · Programme", t: "Programme, revision 4", loc: "activity FO-4.2", why: "Levels 4 to 6 had 12 days of float", view: { type: "gantt" } },
+        { stance: "against", kind: "PDF · Minutes", t: "Site meeting minutes, 10 March", loc: "item 6", why: "The contractor chose to resequence to level 7", view: { type: "doc", head: ["Site meeting 14", "10 March · item 6"], lines: ["5. Health and safety: no incidents.", "6. Fit-out drawings: Contractor confirms it will resequence to level 7 while drawings for levels 4 to 6 are outstanding.", "7. Next meeting 24 March."], hl: [1] } },
+        { stance: "context", kind: "Note · Commonplace", t: "Multiplex v Honeywell [2007]", loc: "your note", why: "If notice were late, prevention wouldn't save it", view: { type: "doc", head: ["Your note", "Construction Law"], lines: ["Multiplex Constructions v Honeywell Control Systems [2007] EWHC 447 (TCC).", "Notice provisions can be conditions precedent. Where the contract gives a way to extend time for the employer's delay, the prevention principle doesn't defeat a time bar."], hl: [1] } },
+      ],
+      options: [
+        { n: "A", t: "Full extension: 42 days", p: ["Late drawings are the employer's risk", "Notice in time"], c: ["12 days of float on levels 4 to 6", "Resequencing to level 7"] },
+        { n: "B", t: "Net extension: about 30 days", lead: true, p: ["42 days less 12 days of float", "Hard to attack once analysed"], c: ["Depends on whose float it is"] },
+        { n: "C", t: "Time-barred, no extension (their case)", p: [], c: ["Notice served in 24 days, within the 28"] },
+      ],
+      challenge: ["I'd say the delay never reached completion. Your client's own programme, revision 4, gives levels 4 to 6 twelve days of float, and the 10 March minutes record that it chose to resequence to level 7.", "So at most it's 30 days, and only if your delay analysis survives cross-examination. You don't have one yet, and the fully detailed claim is due on 26 May."],
+      decision: { text: "Advise the client to claim 42 days with 30 days as the realistic floor, and commission a time-impact analysis before the fully detailed claim, due 26 May.", because: ["Two of four elements met: a listed cause, and notice in 24 days", "Float and resequencing bring the critical delay to about 30 days", "The third element needs a delay analysis; the fourth is a deadline"], conf: 2, change: "An analysis showing the fit-out wasn't on the critical path at all" },
+      outcome: "Settled on 18 August: 36 days granted, costs shared.",
+      lesson: "The float in the as-planned programme decided the number. Ask for the programme with its float on the first day of every delay matter.",
+    },
+  },
+  doctor: {
+    label: "Doctor", who: "An emergency medicine registrar reflecting on a case, for learning and revalidation.",
+    kind: {
+      name: "Case", plural: "Cases",
+      words: { situation: "Presentation", question: "Clinical question", knowledge: "Guideline and evidence", test: "Score", evidence: "Findings", options: "Differential", challenge: "Second opinion", decision: "Plan", outcome: "Follow-up", lesson: "Reflection" },
+      order: ["evidence", "knowledge", "test", "options", "challenge", "decision"],
+      stages: ["Presentation", "Assessment", "Investigation", "Management", "Follow-up", "Reflected"],
+      facts: ["Age band", "Sex", "Setting", "Presenting complaint", "Relevant history", "Stage"],
+      test: "score", stances: { for: "For", against: "Against", context: "Neutral" },
+      sensitivity: "clinical", challengeAsk: "Ask: what else could it be?",
+    },
+    work: {
+      title: "Breathless three days after a long flight", cover: null, coverText: "+", stage: 3, due: "Teaching case · de-identified",
+      facts: [["Age band", "60s"], ["Sex", "Female"], ["Setting", "Emergency department"], ["Presenting complaint", "Breathless on exertion, 2 days"], ["Relevant history", "12-hour flight 3 days ago"], ["Stage", "Management"]],
+      others: [["Chest pain, acute coronary syndrome ruled out", "Reflected", 5, null], ["Audit: VTE prophylaxis on the ward", "Audit · data collection", 2, null]],
+    },
+    q: {
+      text: "Could this be a pulmonary embolism, and which test comes first?",
+      topic: { name: "Pulmonary embolism", path: "Medicine › Respiratory › Pulmonary embolism", st: "Learning", level: "Regular" },
+      rules: [["Two-level Wells score: more than 4 points means PE likely; 4 or fewer, unlikely.", "your note · Wells et al. 2000"], ["PE likely: offer a CT pulmonary angiogram. PE unlikely: offer a D-dimer first.", "your quote · NICE NG158 (paraphrased)"], ["A long-haul flight is a risk factor, but not a Wells criterion.", "your note · VTE lecture"]],
+      known: [["You know", "The two-level Wells threshold is 4", "from a check, 15 Oct"], ["To revisit", "When the PERC rule applies", "from a check you missed, 18 Oct"]],
+      tests: [
+        ["Clinical signs of DVT", "3 points", "Left calf swollen and tender, 3 cm larger", "met", 3],
+        ["PE is the most likely diagnosis", "3 points · your judgement", "Not decided yet", "unclear", 3],
+        ["Heart rate over 100", "1.5 points", "108", "met", 1.5],
+        ["Immobilised 3 days or more, or surgery in 4 weeks", "1.5 points", "A 12-hour flight doesn't count", "not", 1.5],
+        ["Previous DVT or PE", "1.5 points", "None recorded", "not", 1.5],
+        ["Haemoptysis", "1 point", "None", "not", 1],
+        ["Active cancer", "1 point", "None", "not", 1],
+      ],
+      gap: null,
+      evidence: [
+        { stance: "for", kind: "Observations · 09:40", t: "Observations", loc: "HR and SpO₂ rows", why: "Tachycardic and a little hypoxic", view: { type: "table", cols: ["Observation", "Value", "Normal"], rows: [["Heart rate", "108 /min", "60–100"], ["SpO₂", "93 % on air", "94–98 %"], ["Respiratory rate", "22 /min", "12–20"], ["Blood pressure", "128/78", ""], ["Temperature", "36.9 °C", "36.1–37.8"]], hl: [0, 1] } },
+        { stance: "for", kind: "Note · Examination", t: "Examination", loc: "Legs, chest", why: "Calf signs; chest clear", view: { type: "doc", head: ["Examination", "09:55"], lines: ["Alert, talking in full sentences.", "Left calf swollen and tender, 3 cm larger than the right.", "Chest clear on auscultation. No ankle oedema on the right."], hl: [1] } },
+        { stance: "against", kind: "Result · ECG", t: "ECG", loc: "rhythm strip", why: "No ST changes: acute coronary syndrome less likely", view: { type: "doc", head: ["ECG report", "10:05"], lines: ["Sinus tachycardia, 108.", "No ST elevation or depression. Normal axis."], hl: [1] } },
+        { stance: "context", kind: "Quote · Commonplace", t: "NICE NG158, PE diagnosis", loc: "your quote", why: "Which test the score points to", view: { type: "doc", head: ["Your quote (paraphrased)", "Pulmonary embolism"], lines: ["If PE is likely on the two-level Wells score, offer a CT pulmonary angiogram.", "If PE is unlikely, offer a D-dimer test first."], hl: [0] } },
+      ],
+      options: [
+        { n: "1", t: "Pulmonary embolism", lead: true, p: ["Calf signs, tachycardia, low SpO₂"], c: [] },
+        { n: "2", t: "Pneumonia", p: ["Low SpO₂"], c: ["No fever", "Chest clear"] },
+        { n: "3", t: "Acute coronary syndrome", p: ["Breathless on exertion"], c: ["No chest pain", "No ST changes"] },
+        { n: "4", t: "Heart failure", p: [], c: ["Chest clear", "One-sided leg swelling"] },
+      ],
+      challenge: ["Check you haven't anchored. The flight made PE the first thought, and here the findings agree, but notice the flight itself scored nothing: the calf and the heart rate did.", "Two checks keep it honest: a chest X-ray for anything else in the chest, and a fresh look if the scan is clear, because then the swollen calf still needs explaining."],
+      decision: null,
+      outcome: "CT pulmonary angiogram: segmental PE, left lower lobe. Anticoagulated; home after 2 days.",
+      lesson: "The calf signs and heart rate alone put her over 4. I would have sent a D-dimer first; the score said scan. Score before choosing the test.",
+    },
+  },
+};
+function doctorDecision(total) {
+  const likely = total > 4;
+  return { text: likely ? `PE likely (Wells ${total}). CT pulmonary angiogram today; interim anticoagulation if the scan is delayed and nothing contraindicates it. Chest X-ray.` : `PE unlikely (Wells ${total}). D-dimer first; scan if it is raised.`, because: [`Wells ${total}: ${likely ? "more than 4, PE likely" : "4 or fewer, PE unlikely"}`, "Calf signs and tachycardia; chest clear, no fever", "No ST changes on the ECG"], conf: likely ? 3 : 2, change: likely ? "A clear scan: then the calf needs a leg ultrasound" : "A raised D-dimer" };
+}
+const EXTRA = {
+  Journalist: { name: "Story", words: { situation: "Tip and brief", question: "What we need to stand up", knowledge: "Standards and law", test: "Checks", evidence: "Sources", options: "Angles", challenge: "Lawyer's read", decision: "Publish or hold", outcome: "After publication", lesson: "Lesson" }, stages: ["Tip", "Reporting", "Writing", "Legal", "Published", "Follow-up"], facts: ["Desk", "Deadline", "Sources", "Legal risk", "Editor"], test: "checks", stances: "Corroborates · Contradicts · Background", sensitivity: "Confidential: sources never go to memory" },
+  Teacher: { name: "Unit", words: { situation: "Class and curriculum", question: "Learning question", knowledge: "Pedagogy", test: "Checks", evidence: "Student work", options: "Approaches", challenge: "Colleague's view", decision: "Plan", outcome: "Results", lesson: "Reflection" }, stages: ["Plan", "Teach", "Assess", "Review", "Done"], facts: ["Year group", "Subject", "Weeks", "Assessment", "Needs"], test: "checks", stances: "Shows progress · Shows a gap · Context", sensitivity: "Confidential: no student names" },
+  "Software engineer": { name: "Change", words: { situation: "Context", question: "Design question", knowledge: "Patterns and docs", test: "Checks", evidence: "Code, metrics, incidents", options: "Approaches", challenge: "Reviewer", decision: "Decision record", outcome: "In production", lesson: "Lesson" }, stages: ["Proposal", "Design", "Build", "Review", "Shipped", "Reviewed"], facts: ["System", "Owner", "Constraints", "Deadline", "Risk"], test: "checks", stances: "Supports · Against · Context", sensitivity: "Normal" },
+};
+
+/* ------------------------------------------------------------------ state */
+let S;
+function reset() {
+  S = { field: "architect", tab: "question", adapt: false, sheet: null, toast: null, verdicts: {}, challenge: {}, decided: {}, outcome: {}, filed: {}, custom: null };
+  for (const [k, f] of Object.entries(FIELDS)) S.verdicts[k] = f.q.tests.map((t) => t[3]);
+}
+const F = () => FIELDS[S.field];
+const W = (slot) => F().kind.words[slot];
+
+/* ------------------------------------------------------------------ test maths */
+function testSummary() {
+  const f = F(), v = S.verdicts[S.field], t = f.q.tests;
+  const met = v.filter((x) => x === "met").length, unclear = v.filter((x) => x === "unclear").length;
+  if (f.kind.test === "score") { const total = t.reduce((m, l, i) => m + (v[i] === "met" ? l[4] : 0), 0); return { total, html: `<b>${total}</b><span>${total > 4 ? "More than 4: PE likely. The guideline points to a scan, not a D-dimer." : "4 or fewer: PE unlikely. The guideline points to a D-dimer first."}${unclear ? ` ${unclear} criterion still unclear.` : ""}</span>` }; }
+  if (f.kind.test === "elements") return { html: `<b>${met} of ${t.length}</b><span>elements met${unclear ? `, ${unclear} unclear. The entitlement stands only if every element is met.` : "."}</span>` };
+  return { html: `<b>${met} of ${t.length}</b><span>checks met${unclear ? `, ${unclear} unclear` : ""}.</span>` };
+}
+function decisionFor() { const f = F(); return f.q.decision || doctorDecision(testSummary().total); }
+
+/* ------------------------------------------------------------------ render */
+function render() {
+  const keep = render.keep; render.keep = false; const y = window.scrollY;
+  document.body.classList.toggle("adapt", S.adapt);
+  $("#app").innerHTML = rail() + `<main class="stage">${top()}${S.field === "custom" ? yourField() : body()}</main>` + `<div class="proto"><span class="lbl">PROTOTYPE · WORK IN ANY FIELD</span><button class="btn small quiet" data-act="reset">Start again</button></div>` + (S.sheet ? viewer() : "") + (S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : "");
+  window.scrollTo(0, keep ? y : 0);
+}
+function rail() {
+  const b = (k, l, cur) => `<button aria-label="${l}" ${cur ? 'aria-current="page"' : ""} data-act="toast" data-msg="This prototype only shows Work.">${ic(k)}<span class="tip">${l}</span></button>`;
+  return `<nav class="rail" aria-label="Primary"><div class="logo" aria-hidden="true">S</div>${b("sun", "Today")}${b("learn", "Learn")}${b("library", "Commonplace")}${b("work", "Work", true)}${b("graph", "Loci")}<div class="grow"></div><div class="me" aria-hidden="true">S</div></nav>`;
+}
+function top() {
+  const seg = Object.entries(FIELDS).map(([k, f]) => `<button aria-pressed="${S.field === k}" data-act="field" data-id="${k}">${f.label}<small>${f.kind.plural}</small></button>`).join("") + `<button aria-pressed="${S.field === "custom"}" data-act="field" data-id="custom">+ Your field<small>Loci drafts it</small></button>`;
+  const f = S.field === "custom" ? null : F();
+  const chain = f ? `<div class="chainwrap"><div class="chain" role="table" aria-label="The same ten steps in every field">
+      <div role="rowheader">Everyone</div>${SLOTS.map(([, l]) => `<div class="u" role="cell">${l}</div>`).join("")}
+      <div role="rowheader" class="f lab">${f.label}</div>${SLOTS.map(([k]) => `<div class="f" role="cell">${ad(f.kind.words[k])}</div>`).join("")}</div></div>` : "";
+  return `<div class="dest-head"><b>Work</b><span class="sep">/</span><span>One way of working, in every field</span></div>
+    <div class="topbar"><div class="fieldseg" role="group" aria-label="Field">${seg}</div><span class="grow"></span><button class="adtoggle" data-act="adapt" aria-pressed="${S.adapt}"><span class="sw" aria-hidden="true"></span>Show what adapts</button></div>
+    <p class="adlegend">Highlighted words and boxes come from the field's work kind. Everything else is the same code for everyone.</p>
+    ${f ? `<p class="persona">${esc(f.who)}</p>` : ""}${chain}`;
+}
+function body() {
+  const f = F(), k = f.kind, w = f.work;
+  const cover = w.cover ? `<img src="${IMG[w.cover].src}" alt="">` : esc(w.coverText);
+  const sens = k.sensitivity === "clinical" ? `<div class="sens adbox"><b>Clinical</b><span>Teaching case. No names, dates of birth or record numbers: facts take bands. For your learning and reflection, not a clinical record or clinical advice. Loci remembers your reflection, never the case.</span></div>`
+    : k.sensitivity === "confidential" ? `<div class="sens conf adbox"><b>Confidential</b><span>Off the record for memory. Loci reads the facts while you work on this matter and remembers only the lessons you file, never parties, names or numbers.</span></div>` : "";
+  const tabs = [["list", k.plural], ["question", W("question")], ["board", "Board"], ["outcome", `${W("outcome")} and ${W("lesson").toLowerCase()}`], ["kind", `How ${k.plural.toLowerCase()} are set up`]];
+  const head = `<div class="wk-head"><div class="cv ${w.cover ? "" : "txt"}">${cover}</div><div class="tt"><p class="kicker">${ad(k.name)}</p><h1>${esc(w.title)}</h1><div class="sub"><span>${ad(k.stages[w.stage])}</span><span class="faint">·</span><span>${esc(w.due)}</span></div>
+    <div class="stagerow adbox">${k.stages.map((s, i) => `<span class="${i < w.stage ? "done" : i === w.stage ? "now" : ""}">${esc(s)}</span>`).join("")}</div></div></div>
+    <dl class="factsrow adbox">${w.facts.map(([a, b]) => `<div><dt>${ad(a)}</dt><dd>${esc(b)}</dd></div>`).join("")}</dl>${sens}
+    <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" aria-selected="${S.tab === id}" data-act="tab" data-id="${id}">${id === "board" ? l : ad(l)}</button>`).join("")}</div>`;
+  const view = { list: listView, question: questionView, board: boardView, outcome: outcomeView, kind: kindView }[S.tab]();
+  return head + view;
+}
+function listView() {
+  const f = F(), k = f.kind, w = f.work;
+  const row = (title, meta, stage, img, open) => `<button class="wrow" ${open ? 'data-act="tab" data-id="question"' : 'data-act="toast" data-msg="Only the first one is filled in for this prototype."'}><span class="cv">${img ? `<img src="${IMG[img].src}" alt="">` : esc(w.coverText)}</span><span><h3>${esc(title)}</h3><span class="meta">${esc(meta)}</span></span><span class="stagerow">${k.stages.map((s, i) => `<span class="${i < stage ? "done" : i === stage ? "now" : ""}"></span>`).join("")}</span></button>`;
+  return `<div class="section-h"><h3>Your ${ad(k.plural.toLowerCase())}</h3><span class="muted">The same list for every field; the word and the stages come from the work kind.</span></div>
+    <div class="wlist">${row(w.title, `${k.stages[w.stage]} · ${w.due}`, w.stage, w.cover, true)}${w.others.map(([t, m, s, img]) => row(t, m, s, img, false)).join("")}</div>`;
+}
+function sectionHead(slot, lede) { return `<span class="slot">${SLOTS.find((s) => s[0] === slot)[1]}</span><h3>${ad(W(slot))}</h3>${lede ? `<p class="lede">${lede}</p>` : ""}`; }
+function questionView() {
+  const f = F(), q = f.q, k = f.kind, v = S.verdicts[S.field];
+  const st = k.stances;
+  const secs = {
+    knowledge: `<section class="sec">${sectionHead("knowledge", "From your map and your Commonplace: the topic this question uses, its rules in your own saves, and what Loci remembers you know there.")}
+      <div class="topicline"><span class="tchip"><span class="sdot ${q.topic.st === "Learned" ? "s2" : "s1"}"></span>${esc(q.topic.name)}</span><span class="path">${esc(q.topic.path)} · ${esc(q.topic.st)} · pitched at ${esc(q.topic.level)}</span></div>
+      <ul class="rules">${q.rules.map(([r, s]) => `<li><q>${esc(r)}</q><span class="src">${esc(s)}</span></li>`).join("")}</ul>
+      <ul class="knows">${q.known.map(([a, b, c]) => `<li><span class="k ${a === "To revisit" ? "rv" : ""}">${esc(a)}</span><span>${esc(b)}<span class="src">${esc(q.topic.name)} · ${esc(c)}</span></span></li>`).join("")}</ul>
+      ${q.gap ? `<div class="gapcard"><div class="g"><b>${esc(q.gap[0])}</b> · ${esc(q.gap[1])}</div><button class="btn primary small" data-act="toast" data-msg="Opens Make a Lumen with this ${esc(k.name.toLowerCase())}, its facts and this question in the brief.">Learn this for the ${esc(k.name.toLowerCase())}</button></div>` : ""}</section>`,
+    test: `<section class="sec">${sectionHead("test", "The same component in every field: each rule tried against the facts, with a verdict you set. Tap a verdict to change it.")}
+      <div class="test adbox">${(() => { const pts = k.test === "score"; return `<div class="tline hd ${pts ? "" : "nopts"}"><span>Rule</span><span>The facts</span>${pts ? "<span>Points</span>" : ""}<span style="text-align:right">Verdict</span></div>` + q.tests.map((t, i) => `<div class="tline ${pts ? "" : "nopts"}"><span class="rule">${esc(t[0])}<span class="src">${esc(t[1])}</span></span><span class="fact">${esc(t[2])}</span>${pts ? `<span class="pts">${v[i] === "met" ? t[4] : "0"}</span>` : ""}<button class="verdict ${v[i]}" data-act="verdict" data-i="${i}" aria-label="Verdict: ${VERDICT[v[i]]}. Change">${VERDICT[v[i]]}</button></div>`).join(""); })()}
+      <div class="tsum">${testSummary().html}</div></div></section>`,
+    evidence: `<section class="sec">${sectionHead("evidence", `Commonplace items placed here with a stance, a locator (the exact page, row or part of a photo) and a reason. Open one to see the part it points at.`)}
+      <div class="ev">${q.evidence.map((e, i) => `<button class="evc" data-act="view" data-i="${i}">${e.view.type === "photo" ? `<span class="th"><img src="${IMG[e.view.img].src}" alt="">${e.view.box ? `<span class="box" style="left:${e.view.box[0] * 100}%;top:${e.view.box[1] * 100}%;width:${e.view.box[2] * 100}%;height:${e.view.box[3] * 100}%"></span>` : ""}</span>` : ""}<span class="top"><span class="stance ${e.stance}">${ad(st[e.stance])}</span><span class="kind">${esc(e.kind)}</span></span><span class="t">${esc(e.t)}</span><span class="loc">${esc(e.loc)}</span><span class="why">${esc(e.why)}</span></button>`).join("")}</div></section>`,
+    options: `<section class="sec">${sectionHead("options", "Each with what's for and against it.")}<div class="opts">${q.options.map((o) => `<div class="opt ${o.lead ? "lead" : ""}">${o.img ? `<div class="pic"><img src="${IMG[o.img].src}" alt=""></div>` : ""}<div class="bd"><h4><span class="lt">${esc(o.n)}</span>${esc(o.t)}</h4>${o.lead ? `<span class="leadtag">Leading</span>` : ""}<ul class="pc">${o.p.map((t) => `<li><span class="m p">+</span><span>${esc(t)}</span></li>`).join("")}${o.c.map((t) => `<li><span class="m c">−</span><span>${esc(t)}</span></li>`).join("")}</ul></div></div>`).join("")}</div></section>`,
+    challenge: `<section class="sec">${sectionHead("challenge", "Loci argues against your leaning, from your own evidence and memory. It never writes the decision.")}
+      ${S.challenge[S.field] === "done" ? `<div class="challenge" aria-live="polite"><div class="av" aria-hidden="true">S</div><div><div class="who">Loci, as ${ad(W("challenge").toLowerCase())}</div>${q.challenge.map((p) => `<p>${esc(p)}</p>`).join("")}</div></div>`
+        : S.challenge[S.field] === "typing" ? `<div class="challenge"><div class="av">S</div><div><div class="who">Loci, as ${ad(W("challenge").toLowerCase())}</div><span class="typing"><i></i><i></i><i></i></span></div></div>`
+        : `<button class="btn line" data-act="challenge">${ic("spark")}${ad(k.challengeAsk)}</button>`}</section>`,
+    decision: `<section class="sec">${sectionHead("decision", "What you chose and why, with how sure you are and what would change your mind. Saved as a Decision note in Commonplace.")}
+      ${S.decided[S.field] ? decisionHtml() : `<button class="btn primary" data-act="decide"><span>Write the ${ad(W("decision").toLowerCase())}</span></button>`}</section>`,
+  };
+  const order = k.order;
+  return `<div class="qhead"><span class="slot">Question</span><h2>${esc(q.text)}</h2></div>
+    <div class="qgrid"><div class="qmain">${order.map((s) => secs[s]).join("")}</div>
+    <aside class="side"><div class="sidebox adbox"><p class="kicker" style="margin-bottom:8px">This field's order</p><ul class="slotmap">${["question", ...order].map((s) => `<li><span>${SLOTS.find((x) => x[0] === s)[1]}</span><span>${ad(W(s))}</span></li>`).join("")}</ul>
+      <p class="muted" style="font-size:12px;margin:10px 0 0">${S.field === "lawyer" ? "IRAC: issue, rule, application, conclusion." : S.field === "doctor" ? "Findings first, then the guideline, the score and the differential." : "Brief, rules of thumb, references, options, crit."} Same slots, a different order.</p></div>
+      <div class="sidebox"><p class="kicker" style="margin-bottom:8px">After the ${ad(W("decision").toLowerCase())}</p><p>Record the ${ad(W("outcome").toLowerCase())} when you know it, and file the ${ad(W("lesson").toLowerCase())} on ${esc(q.topic.name)}.</p><div class="acts"><button class="btn line small" data-act="tab" data-id="outcome">Open</button></div></div></aside></div>`;
+}
+function decisionHtml() {
+  const d = decisionFor();
+  return `<div class="decision"><p class="kicker">${ad(W("decision"))} · today</p><h4>${esc(d.text)}</h4><ul>${d.because.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+    <dl class="meta"><dt>Confidence</dt><dd><span class="conf">${[1, 2, 3].map((i) => `<i class="${i <= d.conf ? "on" : ""}"></i>`).join("")}</span>${["", "Low", "Medium", "High"][d.conf]}</dd><dt>What would change it</dt><dd>${esc(d.change)}</dd></dl></div>`;
+}
+function boardView() {
+  const f = F(), q = f.q, k = f.kind, v = S.verdicts[S.field];
+  const fr = (slot, inner) => `<div class="frame"><span class="fl">${ad(W(slot))}</span>${inner}</div>`;
+  const ev = (stance) => q.evidence.filter((e) => e.stance === stance).map((e) => `<div class="bcard">${e.view.type === "photo" ? `<img src="${IMG[e.view.img].src}" alt="">` : ""}<b>${esc(e.t)}</b><span class="src">${esc(e.loc)} · ${esc(e.why)}</span></div>`).join("");
+  return `<p class="muted" style="margin:0 0 14px;font-size:13px;max-width:80ch">The board is the free canvas from the Boards design, the same in every field. Here it's laid out by the field's slots as frames; you can move anything, draw arrows and add your own notes.</p>
+    <div class="boardgrid">
+      ${fr("question", `<div class="bcard q"><b>${esc(q.text)}</b></div><div class="bcard"><b>${esc(f.work.title)}</b><span class="src">${f.work.facts.slice(0, 3).map(([a, b]) => `${esc(a)}: ${esc(b)}`).join(" · ")}</span></div>`)}
+      ${fr("knowledge", q.rules.map(([r, s]) => `<div class="bcard"><b>${esc(r)}</b><span class="src">${esc(s)}</span></div>`).join(""))}
+      ${fr("test", `<div class="bcard">${q.tests.map((t, i) => `<span>${v[i] === "met" ? "✓" : v[i] === "not" ? "✗" : "?"} ${esc(t[0])}</span>`).join("")}</div>`)}
+      ${fr("evidence", `<span class="stance for" style="align-self:flex-start">${ad(k.stances.for)}</span>${ev("for")}<span class="stance against" style="align-self:flex-start">${ad(k.stances.against)}</span>${ev("against") || '<span class="faint" style="font-size:12px">Nothing yet</span>'}`)}
+      ${fr("options", q.options.map((o) => `<div class="bcard">${o.img ? `<img src="${IMG[o.img].src}" alt="">` : ""}<b>${esc(o.n)} · ${esc(o.t)}</b>${o.lead ? '<span class="src" style="color:var(--accent)">Leading</span>' : ""}</div>`).join(""))}
+      ${fr("decision", S.decided[S.field] ? `<div class="bcard d"><b>${esc(decisionFor().text)}</b></div>` : `<span class="faint" style="font-size:12px">Not decided yet</span>`)}
+    </div>`;
+}
+function outcomeView() {
+  const f = F(), q = f.q, k = f.kind, filed = S.filed[S.field];
+  const facts = f.work.facts.map(([a, b]) => `${a}: ${b}`);
+  const sensitive = k.sensitivity !== "normal";
+  return `<div class="outc">
+    <section class="sec"><span class="slot">Outcome</span><h3>${ad(W("outcome"))}</h3><p class="lede">What actually happened, recorded when you know it. Example text.</p><label class="vh" for="oc">${esc(W("outcome"))}</label><textarea id="oc">${esc(q.outcome)}</textarea>
+      <div style="height:18px"></div><span class="slot">Lesson</span><h3>${ad(W("lesson"))}</h3><p class="lede">What it taught you, in your words. It's filed on ${esc(q.topic.name)} on your map.</p><label class="vh" for="ls">${esc(W("lesson"))}</label><textarea id="ls">${esc(q.lesson)}</textarea>
+      <div style="margin-top:12px"><button class="btn primary" data-act="file"><span>File the ${ad(W("lesson").toLowerCase())} on ${esc(q.topic.name)}</span></button></div></section>
+    <section class="sec"><span class="slot">Memory</span><h3>What Loci keeps</h3><p class="lede">${sensitive ? "Lessons travel, facts stay. The lesson goes onto your map; the facts stay in this " + esc(k.name.toLowerCase()) + ", which you can delete in one step." : "The lesson goes onto your map. The facts stay in the project, where Loci reads them only while you work on it."}</p>
+      <div class="memcard">${filed ? `<span class="kicker" style="color:var(--ok)">Remembered on ${esc(q.topic.name)} · you did</span><div class="yes">${esc(filed)}</div>` : `<span class="muted" style="font-size:13px">Nothing filed yet.</span>`}
+        <span class="kicker">${sensitive ? "Never remembered" : "Stays in the project"}</span><ul class="${sensitive ? "no" : ""}">${facts.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+        ${filed && q.topic.st === "Learning" ? `<div class="sidebox" style="background:var(--paper)"><p>You've applied ${esc(q.topic.name)} and filed a lesson. Mark it Learned?</p><div class="acts"><button class="btn line small" data-act="toast" data-msg="Marked Learned. You chose it; work never changes status by itself.">Mark Learned</button><button class="btn small quiet" data-act="toast" data-msg="Left as Learning.">Not now</button></div></div>` : ""}</div></section></div>`;
+}
+function kindView() {
+  const f = F(), k = f.kind;
+  const sens = { normal: "Normal", confidential: "Confidential: off the record for memory; lessons only", clinical: "Clinical: bands not identifiers, a warning on names and record numbers, lessons only" }[k.sensitivity];
+  const testStyle = { checks: "Checks (met or not, no score)", elements: "Elements (every one must be met)", score: "Score (points, with a threshold)" }[k.test];
+  const rows = [
+    ["The work is called", "A piece of work", `${k.name} · ${k.plural}`],
+    ...SLOTS.map(([s, l]) => [l, `Slot: ${s}`, k.words[s]]),
+    ["Order on a question", "Question, then six slots", ["question", ...k.order].map((s) => k.words[s]).join(" → ")],
+    ["Facts", "Up to 8 fields", k.facts.join(" · ")],
+    ["Stages", "A short list", k.stages.join(" · ")],
+    ["Test style", "Checks, elements or score", testStyle],
+    ["Evidence stances", "For, against, context", `${k.stances.for} · ${k.stances.against} · ${k.stances.context}`],
+    ["Sensitivity", "Normal, confidential, clinical", sens],
+  ];
+  return `<div class="section-h"><h3>How ${ad(k.plural.toLowerCase())} are set up</h3><span class="muted">A work kind is data, like a collection's fields. Seeded from what you do; edit it in a minute.</span></div>
+    <div class="tablewrap"><table class="kind"><thead><tr><th>Part</th><th>Same for everyone</th><th>${esc(f.label)}</th></tr></thead><tbody>${rows.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td>${ad(c)}</td></tr>`).join("")}</tbody></table></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn line" data-act="toast" data-msg="In the app each row edits in place.">Edit this work kind</button><button class="btn quiet" data-act="field" data-id="custom">Add your own field</button></div>`;
+}
+function yourField() {
+  const c = S.custom;
+  const k = c && (EXTRA[c] || { name: "Project", words: { situation: "Situation", question: "Question", knowledge: "What you know", test: "Checks", evidence: "Evidence", options: "Options", challenge: "Second opinion", decision: "Decision", outcome: "Outcome", lesson: "Lesson" }, stages: ["Start", "Work", "Review", "Done"], facts: ["Client", "Deadline", "Constraints"], test: "checks", stances: "Supports · Against · Context", sensitivity: "Normal (Loci asks if it should be confidential)" });
+  return `<div class="yourfield"><p class="persona">Anyone else: say what you do, and Loci drafts a work kind. It's the same ten slots with your field's words. You keep or edit it.</p>
+    <form class="askbox" data-form="field"><label class="vh" for="fd">What do you do?</label><input id="fd" name="fd" placeholder="I'm a journalist on a news desk…" autocomplete="off" value="${esc(c && !EXTRA[c] ? c : "")}"><button class="btn primary" type="submit">Draft my work kind</button></form>
+    <div class="chiprow">${Object.keys(EXTRA).map((x) => `<button data-act="custom" data-id="${x}">${x}</button>`).join("")}</div>
+    ${k ? `<div class="chainwrap"><div class="chain"><div>Everyone</div>${SLOTS.map(([, l]) => `<div class="u">${l}</div>`).join("")}<div class="f lab">${esc(c)}</div>${SLOTS.map(([s]) => `<div class="f">${ad(k.words[s])}</div>`).join("")}</div></div>
+      <div class="tablewrap"><table class="kind"><thead><tr><th>Part</th><th>Same for everyone</th><th>${esc(c)} · Loci's draft</th></tr></thead><tbody>
+      <tr><td>The work is called</td><td>A piece of work</td><td>${ad(k.name)}</td></tr><tr><td>Facts</td><td>Up to 8 fields</td><td>${ad(k.facts.join(" · "))}</td></tr><tr><td>Stages</td><td>A short list</td><td>${ad(k.stages.join(" · "))}</td></tr><tr><td>Test style</td><td>Checks, elements or score</td><td>${ad(k.test === "checks" ? "Checks" : k.test)}</td></tr><tr><td>Evidence stances</td><td>For, against, context</td><td>${ad(k.stances)}</td></tr><tr><td>Sensitivity</td><td>Normal, confidential, clinical</td><td>${ad(k.sensitivity)}</td></tr></tbody></table></div>
+      <div style="margin-top:14px;display:flex;gap:8px"><button class="btn primary" data-act="toast" data-msg="Kept. Your ${esc(k.name.toLowerCase())}s now use these words.">Keep</button><button class="btn line" data-act="toast" data-msg="In the app each row edits in place.">Edit</button></div>${EXTRA[c] ? "" : `<p class="muted" style="font-size:12px;margin-top:10px">Scripted in this prototype: any field you type gets a neutral draft. Try the chips for worked examples.</p>`}` : ""}</div>`;
+}
+function viewer() {
+  const e = F().q.evidence[S.sheet], v = e.view;
+  let stage = "";
+  if (v.type === "photo") stage = `<div class="vstage"><img src="${IMG[v.img].src}" alt="${esc(e.t)}">${v.box ? `<span class="box" style="left:${v.box[0] * 100}%;top:${v.box[1] * 100}%;width:${v.box[2] * 100}%;height:${v.box[3] * 100}%"></span><span class="boxn" style="left:${(v.box[0] + v.box[2] / 2) * 100}%;top:${v.box[1] * 100}%">1</span>` : ""}</div>`;
+  if (v.type === "doc") stage = `<div class="page"><div class="ph"><span>${esc(v.head[0])}</span><span>${esc(v.head[1])}</span></div>${v.lines.map((l, i) => `<p class="${v.hl.includes(i) ? "hl" : ""}">${esc(l)}</p>`).join("")}</div>`;
+  if (v.type === "table") stage = `<table class="rtable"><thead><tr>${v.cols.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${v.rows.map((r, i) => `<tr class="${v.hl.includes(i) ? "hl" : ""}">${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  if (v.type === "gantt") { const bars = [["FO-3 Fit-out L3", 0, 20, 0], ["FO-4.2 Fit-out L4–6", 14, 30, 12, true], ["FO-7 Fit-out L7", 30, 24, 4], ["Completion", 66, 1, 0]]; stage = `<div class="page"><div class="ph"><span>Programme rev. 4</span><span>activity FO-4.2</span></div><svg viewBox="0 0 600 170" style="width:100%" role="img" aria-label="Activity FO-4.2 with 12 days of float">${bars.map(([n, s, d, fl, hl], i) => `<text x="0" y="${30 + i * 36}" font-size="12" fill="#22303a" font-family="system-ui">${n}</text><rect x="${150 + s * 6}" y="${18 + i * 36}" width="${Math.max(4, d * 6)}" height="16" rx="2" fill="${hl ? "#b7791f" : "#6e86d0"}"/>${fl ? `<rect x="${150 + (s + d) * 6}" y="${22 + i * 36}" width="${fl * 6}" height="8" fill="none" stroke="#5d6c77" stroke-dasharray="3 3"/><text x="${150 + (s + d + fl) * 6 + 6}" y="${30 + i * 36}" font-size="11" fill="#5d6c77" font-family="system-ui">${fl} days float</text>` : ""}`).join("")}</svg></div>`; }
+  return `<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="vh"><div class="sh"><div><p class="kicker">${esc(e.kind)}</p><h2 id="vh">${esc(e.t)}</h2></div><button class="x" data-act="close" aria-label="Close">${ic("x")}</button></div>
+    <div class="vgrid">${stage}<div class="vside"><span class="stance ${e.stance}" style="align-self:flex-start">${ad(F().kind.stances[e.stance])}</span><div class="why">${esc(e.why)}</div>
+      <div class="row"><b>Points at</b>${esc(e.loc)}${v.note ? `<br><span class="muted">Note 1: ${esc(v.note)}</span>` : ""}</div>
+      <div class="row"><b>One viewer for every kind of evidence</b>A box on a photo, a highlight on a page, a row in a table, a bar in a programme: each is a locator on the same Commonplace item, which is never copied.</div></div></div></div></div>`;
+}
+
+/* ------------------------------------------------------------------ actions */
+let tt;
+function toast(m) { S.toast = m; clearTimeout(tt); tt = setTimeout(() => { S.toast = null; const t = $(".toast"); if (t) t.remove(); }, 4200); }
+const ACT = {
+  reset: () => { reset(); render(); },
+  field: (d) => { S.field = d.id; if (d.id !== "custom") S.tab = S.tab === "kind" ? "kind" : "question"; render.keep = true; render(); },
+  adapt: () => { S.adapt = !S.adapt; render.keep = true; render(); },
+  tab: (d) => { S.tab = d.id; render.keep = true; render(); },
+  verdict: (d) => { const v = S.verdicts[S.field]; v[+d.i] = NEXTV[v[+d.i]]; render.keep = true; render(); },
+  challenge: () => { const f = S.field; S.challenge[f] = "typing"; render.keep = true; render(); setTimeout(() => { S.challenge[f] = "done"; if (S.field === f) { render.keep = true; render(); } }, 900); },
+  decide: () => { S.decided[S.field] = true; toast("Saved as a Decision note in Commonplace."); render.keep = true; render(); },
+  file: () => { const el = $("#ls"); S.filed[S.field] = el ? el.value : F().q.lesson; toast("Filed on " + F().q.topic.name + "."); render.keep = true; render(); },
+  view: (d) => { S.sheet = +d.i; render.keep = true; render(); },
+  close: () => { S.sheet = null; render.keep = true; render(); },
+  scrim: (d, el, ev) => { if (ev.target === el) ACT.close(); },
+  custom: (d) => { S.custom = d.id; render.keep = true; render(); },
+  toast: (d) => { toast(d.msg); render.keep = true; render(); },
+};
+document.addEventListener("click", (ev) => { const el = ev.target.closest("[data-act]"); if (!el) return; const fn = ACT[el.dataset.act]; if (fn) fn(el.dataset, el, ev); });
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && S.sheet != null) ACT.close(); });
+document.addEventListener("submit", (ev) => { ev.preventDefault(); const f = ev.target; if (f.dataset.form === "field") { const t = f.fd.value.trim(); if (!t) return; const m = Object.keys(EXTRA).find((x) => t.toLowerCase().includes(x.toLowerCase().split(" ")[0])); S.custom = m || t.replace(/^i'?m an? /i, "").replace(/^\w/, (c) => c.toUpperCase()); render.keep = true; render(); } });
+reset();
+render();
+})();
+</script>
