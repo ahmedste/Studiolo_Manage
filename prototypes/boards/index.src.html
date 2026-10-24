@@ -808,7 +808,7 @@ kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); borde
 .btile b { font: 400 14px/1.25 var(--read); padding: 0 2px; } .btile small { font-size: 11px; color: var(--ink-2); padding: 0 2px; }
 .bsug { padding: 10px 12px; border-radius: 8px; border: 1px dashed var(--pick); background: var(--pick-soft); display: grid; gap: 8px; font-size: 13px; line-height: 1.45; }
 .bsug em { font: italic 400 14px var(--read); }
-.bsug.done { border-style: solid; border-color: var(--line); background: var(--panel); color: var(--ink-2); }
+.bsug.done { display: block; border-style: solid; border-color: var(--line); background: var(--panel); color: var(--ink-2); }
 .breads { padding: 10px 12px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
 .breads b { font: 400 15px/1.4 var(--read); color: var(--ink); }
 @media (max-width: 980px) { .bmini { display: none; } }
@@ -824,6 +824,31 @@ kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); borde
   .bdrawer.open, .binsp.open { transform: none; }
   .bslide .s-img { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } .bslide .tx { padding: 10px 14px; gap: 4px; } .bslide .tx p { display: none; }
 }
+
+/* ---------- Loci: the app's own Palace and Map (loci/), with the Phase 7 inspector beside them ---------- */
+.lx { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.lx-stage { position: relative; height: max(560px, calc(100vh - 200px)); border-radius: 10px; overflow: hidden; overflow: clip; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.lx .lx-palace { position: absolute; inset: 0; margin: 0; height: auto; }
+.lx-stage .loci-appmap-fill { position: absolute; inset: 0; }
+.lx-stage .palace-trail { top: 14px; }
+.lx-stage .palace-row { left: 12px; right: 12px; }
+.lx-slot { position: absolute; top: 12px; right: 12px; bottom: 58px; width: 340px; z-index: 4; display: flex; flex-direction: column; pointer-events: none; }
+.lx-slot > * { pointer-events: auto; }
+.lx-slot .dsheet { max-height: 100%; }
+.lx-side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+.lx-side .inspector { box-shadow: var(--shadow-pic), inset 0 0 0 1px var(--line); }
+.lx-bcover .bpv { display: block; border-radius: 0; }
+.lx-goal { margin: 0; font: 400 15px/1.45 var(--read); color: var(--ink); }
+.lx-counts { margin: 0; font-size: 13px; color: var(--ink-2); }
+.lx-sent { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font: 400 14px/1.4 var(--read); }
+.lx-sent .v { font: 500 11px var(--ui); color: var(--accent-strong); background: var(--accent-soft); padding: 1px 6px; border-radius: 8px; }
+.lx-sent em { color: var(--ink-2); }
+@media (max-width: 980px) {
+  .lx { grid-template-columns: minmax(0, 1fr); }
+  .lx-side { position: static; max-height: none; }
+  .lx-slot { top: auto; left: 8px; right: 8px; width: auto; bottom: 52px; max-height: 58%; }
+}
+@media (max-width: 700px) { .lx-stage { height: 62vh; margin: 0 -16px; border-radius: 0; box-shadow: none; } }
 </style>
 
 <div class="app">
@@ -869,6 +894,19 @@ const TOPICS = [
   { id: "t5", name: "Riyadh library competition", parent: "a2", status: 1 },
   { id: "t5a", name: "Massing options", parent: "t5", status: 1 },
   { id: "t6", name: "Housing study", parent: "a2", status: 0 },
+  // BOARDS: the rest of the sample learner's map (as in ../settings-memory), so the Palace shows a whole palace
+  { id: "a3", name: "Structures", parent: null, status: 1 },
+  { id: "s1", name: "Concrete & precast", parent: "a3", status: 1 },
+  { id: "s2", name: "Precast panels", parent: "s1", status: 1 },
+  { id: "s3", name: "Timber frames", parent: "a3", status: 0 },
+  { id: "s4", name: "Long spans", parent: "a3", status: 0 },
+  { id: "a4", name: "Envelope & Facade", parent: null, status: 1 },
+  { id: "e1", name: "Facade systems", parent: "a4", status: 1 },
+  { id: "e2", name: "Rainscreens", parent: "e1", status: 2 },
+  { id: "e3", name: "Glazing & glare", parent: "a4", status: 0 },
+  { id: "a5", name: "Construction Law", parent: null, status: 0 },
+  { id: "l1x", name: "Contracts", parent: "a5", status: 0 },
+  { id: "l2x", name: "Building codes", parent: "a5", status: 1 },
 ];
 const KINDS = [
   { id: "site", name: "Site visits" }, { id: "refs", name: "References" }, { id: "renders", name: "Renders" },
@@ -1891,7 +1929,7 @@ const TRIES = [
   ["b-viewer", "A photo on a board", "Double-click a photo: the same viewer, with the board's arrows and Place this detail."],
   ["b-wall", "Boards in Commonplace", "Boards is a type, beside Notes, Sources and Photos. Same slim bar, wall and shelves."],
   ["b-make", "Make a Lumen from a board", "The picture shelf, your arrows as the order, questions as the check."],
-  ["b-loci", "Boards in Loci", "The board on its topic, the goal, and links your arrows suggest."],
+  ["b-loci", "A board in the Palace and on the Map", "The app's own Palace and Map. The board is a Commonplace item: opened, its cards sit by their own topics with its arrows between them. Make a Lumen first to see it on the Map too."],
   ["header", "Search, areas and types", "One search row with an area scope. Types on top; the chosen type shows its collections."],
   ["zoom", "Zoom into a photo", "Scroll or pinch to zoom, drag to pan, Z for 1:1, F for full screen."],
   ["detail", "Write a note on a detail", "In the viewer, press N and drag a box."],
@@ -2740,7 +2778,7 @@ window.bootCP = function boot() { const hash = location.hash.slice(1); if (hash 
     if (k === "b-viewer") { openBoard("b-court"); setTimeout(() => openQV("courtyard-morning", photoOrder()), 150); }
     if (k === "b-wall") { S.dest = "commonplace"; S.view = "wall"; S.type = "board"; S.pf = { ...FDEF }; S.area = "all"; render(); window.scrollTo(0, 0); }
     if (k === "b-make") { openBoard("b-court"); setTimeout(() => openMake(), 150); }
-    if (k === "b-loci") { S.dest = "loci"; S.loci.focus = "t2"; S.loci.hl = null; render(); window.scrollTo(0, 0); }
+    if (k === "b-loci") window.lociOpenBoard("b-court");
   };
 
   document.addEventListener("click", e => {
@@ -2752,7 +2790,7 @@ window.bootCP = function boot() { const hash = location.hash.slice(1); if (hash 
       case "b-open": openBoard(t.dataset.id); break;
       case "b-back": S.dest = "commonplace"; render(); window.scrollTo(0, 0); break;
       case "b-wallboards": S.dest = "commonplace"; S.view = "wall"; S.type = "board"; S.pf = { ...FDEF }; render(); window.scrollTo(0, 0); break;
-      case "b-loci": S.dest = "loci"; S.loci.hl = null; S.loci.focus = t.dataset.t || placeOf(b) || "a1"; render(); window.scrollTo(0, 0); break;
+      case "b-loci": if (t.dataset.t) { S.dest = "loci"; S.loci.hl = null; S.loci.focus = t.dataset.t; S.loci.extra = null; S.loci.trail = [t.dataset.t]; render(); window.scrollTo(0, 0); } else window.lociOpenBoard(b.id); break;
       case "b-new": newBoard(t.dataset.t || S.pf.topic || (S.area !== "all" && S.area !== "none" ? S.area : "t2")); break;
       case "bqpop": openPop(t, listPopHTML("Questions", "bq", [["open", "With open questions"]]), v => { S.pf.bq = v.split(":")[1] || null; S.pf.view = null; closePop(); render(); }); break;
       case "b-tool": setTool(t.dataset.t); break;
@@ -2789,11 +2827,268 @@ window.bootCP = function boot() { const hash = location.hash.slice(1); if (hash 
         const B2 = cur(), qc = B2?.cards.find(c => c.ref === q.id); if (!qc) { toast("Making a Lumen to answer it…"); break; }
         U.sel = new Set([qc.id]); const order = B2.arrows.filter(x => x.b === qc.id).map(x => cardOf(x.a)).filter(isContent); toast(`Making a short Lumen to answer “${short(q.text, 44)}”.`);
         setTimeout(() => doMake({ shape: "lumen", len: "std", scope: "sel", title: q.text, out: new Set() }, { order, qs: [qc], secs: [{ name: "", cards: order }], into: () => null, arrows: [], connected: new Set() }), 300); break; }
-      case "b-link": U.links.push(t.dataset.k); renderLoci(); toast("Linked on your map."); break;
-      case "b-unlink": U.dismissed.push(t.dataset.k); renderLoci(); break;
+      case "b-link": U.links.push(t.dataset.k); window.lociRelink ? lociRelink() : renderLoci(); toast("Linked on your map: a related link, in the Palace and on the Map."); break;
+      case "b-unlink": U.dismissed.push(t.dataset.k); window.lociRelink ? lociRelink() : renderLoci(); break;
     }
   });
   addEventListener("resize", () => { if (S.dest === "board") applyV(); });
+  // What Loci (the next script) needs from Boards: Lumens and courses, the player, covers and links from arrows.
+  window.BX = { LUMENS, COURSES, U, item, nameOf, isContent, boardsWith, previewInner, play, openBoard, newBoard, placeOf, sentence: (b, a) => { const A = item(b.cards.find(c => c.id === a.a)?.ref), B = item(b.cards.find(c => c.id === a.b)?.ref); return { a: nameOf(A), b: nameOf(B), verb: a.verb, why: a.why }; } };
+})();
+</script>
+<!--LOCI-BUNDLES-->
+<script>
+"use strict";
+/* ================= LOCI: the app's own Palace and Map, with Boards =================
+   The Palace is Studiolo's PalaceEngine and the Map is Studiolo's GraphMap, both bundled from studiolo main @ 6f8d396
+   (see loci/README.md). This script only feeds them the prototype's data and draws the chrome around them with the app's
+   own class names (palace.css, graph.css). A board is a Commonplace item: a square in its area's Commonplace stack,
+   tagged on its place. Opened, its cards orbit it, each tied to the topics it is about, and its arrows run between them;
+   Lumens made from it hang off it. On the Map it sits in the "In your Commonplace" lane, and a Lumen made from it is
+   "From board" in the Lumens lane, with ▶ on the board's card. Everything else (key picture, mood, colours) is the photo
+   roadmap's Phase 7 inspector, unchanged. */
+(() => {
+  const LP = window.LociPalace, BX = window.BX, $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const STATUS = ["not_started", "learning", "learned"];
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const RELS = [
+    { id: "r1", topicAId: "t1b", topicBId: "t3", explanation: "Light through a roof of columns" },
+    { id: "r2", topicAId: "t4a", topicBId: "t2b", explanation: "Brick screens shade a wall" },
+    { id: "r3", topicAId: "s2", topicBId: "e2", explanation: "Precast panels are both structure and skin" },
+  ];
+  const L = S.loci; L.tab ||= "palace"; L.extra ??= null; L.trail ||= []; L.focus = L.focus || "t2";
+  if (L.focus === "a1" && !L.trail.length) L.focus = "t2";
+  let engine = null, mapMounted = false;
+
+  /* ---------- data: the map, the rooms, the lanes ---------- */
+  const relations = () => [...RELS, ...BX.U.links.map((k, i) => { const [a, b] = k.split("|"); return { id: "u" + i, topicAId: a, topicBId: b, explanation: "From an arrow on your board", version: 1 }; })];
+  const graph = () => ({ topics: TOPICS.map((t, i) => ({ id: t.id, parentId: t.parent, name: t.name, description: "", status: STATUS[t.status ?? 0], wantToLearn: t.id === "t2", sortOrder: i, version: 1 })), relations: relations() });
+  let scene = LP.buildScene(graph());
+  const kindLabel = x => x.type === "photo" ? "Photo" : x.type === "board" ? "Board" : x.type === "quote" ? "Quote" : x.type === "question" ? "Question" : ["note", "longnote"].includes(x.type) ? "Note" : x.type === "video" ? "Lecture" : x.type === "book" ? "Book" : "Link";
+  const stamp = x => new Date((x.added || Date.parse(x.date)) || 0).toISOString();
+  function roomOf(areaId) {
+    const inArea = x => (x.topics || []).some(t => areaOf(t) === areaId);
+    const items = ALL_ITEMS().filter(inArea).sort((a, b) => (b.added || 0) - (a.added || 0))
+      .map(x => ({ id: x.id, title: titleOf(x), kindLabel: kindLabel(x), createdAt: stamp(x), topicIds: x.topics.filter(t => T[t]), opens: "quick" }));
+    const lumens = Object.values(BX.LUMENS).filter(l => !l.course && l.state !== "making").map(l => ({ id: l.id, kind: "lumen", title: l.title, createdAt: l.fromBoard ? new Date().toISOString() : "2026-10-19T00:00:00Z", anchor: l.fromBoard ? { kind: "item", itemId: l.fromBoard } : { kind: "topic", topicId: l.topics[0] }, partTopicIds: [], partCount: 0, parts: [] }))
+      .concat(Object.values(BX.COURSES).map(c => ({ id: c.id, kind: "course", title: c.title, createdAt: "2026-10-12T00:00:00Z", anchor: { kind: "topic", topicId: c.topics[0] }, partTopicIds: c.parts.map(p => (BX.LUMENS[p].topics || [])[0]).filter(Boolean), partCount: c.parts.length, parts: c.parts.map(p => ({ title: BX.LUMENS[p].title, topicId: (BX.LUMENS[p].topics || [])[0] || null, explainerId: p, finished: true })) })))
+      .filter(l => { const tid = l.anchor.kind === "topic" ? l.anchor.topicId : BY[l.anchor.itemId]?.topics?.[0]; return tid && areaOf(tid) === areaId; })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return { areaId, items, itemTotal: items.length, lumens, lumenTotal: lumens.length };
+  }
+  const nodeArea = id => scene.byId.get(id)?.areaId || null;
+
+  /* ---------- an open board in the Palace: its cards orbit it, its arrows run between them ---------- */
+  function boardExtras(openId, room) {
+    const ref = openId && LP.parseExtraId(openId); if (!ref || ref.kind !== "item" || BY[ref.id]?.type !== "board") return LP.NO_EXTRAS;
+    const b = BY[ref.id], areaId = room.areaId, nodes = [], links = [], idOf = {}, have = new Set([openId]);
+    const base = (id, name, kind, radius) => ({ id, kind, name, level: 3, status: "not_started", focus: false, parentId: null, areaId, weight: 0, radius, slot: { kind: "near", anchorId: openId } });
+    for (const c of b.cards.filter(BX.isContent)) {
+      const x = BX.item(c.ref); if (!x) continue;
+      if (x.type === "topic") { links.push({ a: openId, b: x.topic.id, kind: "serves", why: null }); continue; }
+      let id;
+      if (x.type === "lumen") id = `lumen:${x.id}`; else if (x.type === "course") id = `course:${x.id}`;
+      else if (BY[c.ref]) id = `item:${c.ref}`; else if (x.type === "detail") id = `item:${x.photo.id}`; else continue;
+      idOf[c.id] = id; if (have.has(id)) continue; have.add(id);
+      const tps = (x.topics || []).filter(t => scene.byId.has(t));
+      // Each card sits beside the topic it is about, tied back to the board: the board is seen reaching across the map.
+      nodes.push({ ...base(id, BX.nameOf(x), id.split(":")[0], id.startsWith("item") ? 4 + .55 * Math.min(4, tps.length) : id.startsWith("course") ? 6.6 : 5.6), slot: { kind: "near", anchorId: tps[0] || openId } });
+      links.push({ a: id, b: openId, kind: "holds", why: null });
+      tps.forEach(t => links.push({ a: id, b: t, kind: "serves", why: null }));
+    }
+    for (const a of b.arrows) { const A = idOf[a.a], B = idOf[a.b]; if (A && B && A !== B) links.push({ a: A, b: B, kind: "related", why: [a.verb, a.why].filter(Boolean).join(": ") || null }); }
+    Object.values(BX.LUMENS).filter(l => l.fromBoard === b.id && l.state !== "making").forEach(l => { const id = `lumen:${l.id}`; if (have.has(id)) return; have.add(id); nodes.push(base(id, l.title, "lumen", 5.6)); links.push({ a: id, b: openId, kind: "serves", why: null }); });
+    return { nodes, links };
+  }
+  function current() {
+    const ref = L.extra ? LP.parseExtraId(L.extra) : null;
+    const areaId = ref?.kind === "stack" ? ref.areaId : L.extra ? L.extraArea : (L.focus ? nodeArea(L.focus) : null);
+    const room = areaId ? roomOf(areaId) : null, openId = L.extra || L.focus || null;
+    const extras = room ? LP.combineExtras(LP.roomExtras(scene, room, { openId, roomAreaId: areaId }), boardExtras(openId, room)) : LP.NO_EXTRAS;
+    return { ref, areaId, room, openId, extras };
+  }
+  function memberOf(room, id) {
+    const r = LP.parseExtraId(id); if (!r || !room) return null;
+    if (r.kind === "item") return room.items.find(i => i.id === r.id) || null;
+    if (r.kind === "lumen" || r.kind === "course") return room.lumens.find(l => l.id === r.id && l.kind === r.kind) || null;
+    return null;
+  }
+
+  /* ---------- opening and going back (the app's openThing and goBack, without the copilot) ---------- */
+  function openThing(id) {
+    const ref = LP.parseExtraId(id);
+    if (ref && ref.kind !== "ghost") {
+      const cur = current();
+      const area = ref.kind === "stack" ? ref.areaId : (cur.areaId || nodeArea((BY[ref.id]?.topics || [])[0]));
+      L.extra = id; L.extraArea = area; L.trail = LP.pushTrail(L.trail, id); if (area) L.focus = L.focus && nodeArea(L.focus) === area ? L.focus : area;
+      if (ref.kind === "lumen" && BX.LUMENS[ref.id]) BX.play(ref.id);
+    } else if (scene.byId.has(id)) { L.extra = null; L.trail = LP.pushTrail(L.trail, id); L.focus = id; }
+    refresh();
+  }
+  function goBack() {
+    const { trail, openId } = LP.backTrail(L.trail); L.trail = trail;
+    const ref = openId ? LP.parseExtraId(openId) : null;
+    if (openId && ref) L.extra = openId; else { L.extra = null; if (openId) L.focus = openId; }
+    refresh();
+  }
+  function goHome() { L.trail = []; L.extra = null; L.focus = null; refresh(); }
+
+  /* ---------- the page ---------- */
+  window.renderLoci = function renderLoci() {
+    if (engine) { engine.destroy(); engine = null; } mapMounted = false;
+    scene = LP.buildScene(graph());
+    const hl = L.hl;
+    main.innerHTML = `<div class="dest-head"><b>Loci</b><span>/</span><span>${L.tab === "map" ? "Map" : "Palace"}</span></div>
+      <div class="tabs" role="tablist">${[["palace", "Palace"], ["map", "Map"], ["list", "List"], ["overview", "Overview"]].map(([k, t]) => `<button role="tab" aria-selected="${L.tab === k}" data-act="lx-tab" data-t="${k}">${t}</button>`).join("")}</div>
+      ${hl ? `<div class="hl-bar"><span>Glowing on the map: topics that hold <b>${hl.n}</b> ${TYPES.find(t => t.id === hl.type).many} matching <b>${esc(hl.label)}</b></span><span style="flex:1"></span><button class="btn small" data-act="backtophotos">Back to Commonplace</button><button class="btn small" data-act="clearhl">Clear</button></div>` : ""}
+      <div class="lx">
+        <div class="lx-stage loci-appmap" id="lx-stage">${L.tab === "map" ? `<div class="loci-appmap-fill" id="mapView"></div>` : `<div class="palace lx-palace" data-view="palace"><canvas class="palace-canvas" id="palace-canvas" tabindex="0" aria-label="Your whole map in 3D"></canvas></div>`}
+          <div id="lx-chrome"></div><div class="lx-slot" id="lx-slot"></div></div>
+        <aside class="lx-side" id="lx-side"></aside>
+      </div>`;
+    if (L.tab === "map") mountMap(); else mountPalace();
+    paintChrome(); paintSide();
+  };
+  function slotOpen() { return !!(L.tab === "palace" && L.extra); }
+  function viewOf() { const narrow = innerWidth < 980; return { panel: narrow ? "none" : "side", sheetHeight: 0, slowTurn: false, reduced: matchMedia("(prefers-reduced-motion: reduce)").matches, cover: !narrow && slotOpen() ? 352 : 0 }; }
+  function mountPalace() {
+    const cv = $("#palace-canvas"), c = current();
+    engine = new LP.PalaceEngine(cv, { scene, extras: c.extras, placesKey: "boards-proto", storage: null, view: viewOf(), openId: c.openId, trail: L.trail, onOpen: openThing, onBack: goBack, onInteract: () => $(".palace-hint")?.classList.add("is-gone"), probe: true });
+  }
+  function laneFor(topicId) {
+    const card = x => { const pic = x.type === "photo" ? x : x.type === "board" ? null : null, cover = x.type === "board" ? (x.cards.map(c => BY[c.ref]).find(y => y?.type === "photo")) : pic;
+      return { id: x.id, shape: x.type === "board" ? "board" : x.type === "photo" ? "image" : x.type === "quote" ? "quote" : ["note", "longnote", "question"].includes(x.type) ? "note" : "source", kind: x.type === "board" ? "board" : x.type === "photo" ? "image" : x.type === "quote" ? "quote" : ["note", "longnote", "question"].includes(x.type) ? "note" : "source", title: titleOf(x), excerpt: "", createdAt: stamp(x), onWall: true, marginNoteCount: 0, foundInNote: null, source: null, quote: null, object: null, topic: null, topicCount: (x.topics || []).length, media: x.type === "board" && ["b-court", "b-qibla"].includes(x.id) ? { kind: "link", thumb: { url: `bimg/${x.id}-t.png` }, width: 640, height: 480 } : cover ? { kind: "link", thumb: { url: `img/${cover.id}-t.jpg` }, width: 640, height: 480 } : null, group: null, notePage: null, noteSeconds: null }; };
+    const items = ALL_ITEMS().filter(x => (x.topics || []).includes(topicId)).sort((a, b) => (b.type === "board") - (a.type === "board") || (b.added || 0) - (a.added || 0));
+    return items.length ? { topicId, items: items.map(card), total: items.length } : null;
+  }
+  function explainersFor(topicId) {
+    const ls = Object.values(BX.LUMENS).filter(l => !l.course && l.state !== "making" && (l.topics || []).includes(topicId));
+    if (!ls.length) return null;
+    const itemCounts = {}; ls.forEach(l => { if (l.fromBoard) itemCounts[l.fromBoard] = (itemCounts[l.fromBoard] || 0) + 1; });
+    return { topicId, total: ls.length, itemCounts, childCounts: {}, latest: ls.map(l => ({ id: l.id, title: l.title, status: "finished", failure: null, lengthMs: l.min * 60000, itemId: l.fromBoard || null, intro: { title: l.title, subtitle: null } })) };
+  }
+  // The app's TopicExplainers (topic-gateway.ts): what the Map's "Made from this item" peek lists.
+  function topicExplainersFor(topicId) {
+    const ls = Object.values(BX.LUMENS).filter(l => !l.course && l.state !== "making" && (l.topics || []).includes(topicId));
+    if (!ls.length) return null;
+    const row = l => ({ id: l.id, title: l.title, request: "", status: "finished", failure: null, createdAt: new Date().toISOString(), anchor: l.fromBoard ? { kind: "item", itemId: l.fromBoard } : { kind: "topic", topicId }, intro: { title: l.title, subtitle: null }, board: null, lengthMs: l.min * 60000, view: l.watched ? { positionMs: 0, watched: true, lastViewedAt: new Date().toISOString() } : null, shareUrl: null, itemId: l.fromBoard || null, childId: null });
+    const from = [...new Set(ls.filter(l => l.fromBoard).map(l => l.fromBoard))].map(id => ({ itemId: id, itemTitle: BX.nameOf(id), explainers: ls.filter(l => l.fromBoard === id).map(row) }));
+    const x = explainersFor(topicId);
+    return { topicId, forTopic: ls.filter(l => !l.fromBoard).map(row), fromItems: from, fromSubtopics: [], total: ls.length, subtopicTotal: 0, latest: ls.slice(0, 3).map(row), itemCounts: x.itemCounts, childCounts: {} };
+  }
+  // The peek's Play is a plain link (#lumen-<id>) where the app has no Graph player: play it here.
+  document.addEventListener("click", e => { const a = e.target.closest?.('a[href^="#lumen-"]'); if (!a) return; e.preventDefault(); a.closest(".graph-xpeek")?.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); BX.play(a.getAttribute("href").slice(7)); }, true);
+  function mapState() {
+    const f = L.focus && T[L.focus] ? L.focus : null, glow = new Set(L.hl ? [...L.hl.ids] : []);
+    return { topics: graph().topics, relations: relations(), focusId: f, selectedId: f, lane: f ? laneFor(f) : null, explainers: f ? explainersFor(f) : null, ghosts: [], pending: {}, reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches, coveredBottom: 0, topicExplainers: f ? topicExplainersFor(f) : null, popIds: new Set(), glowIds: glow, litItemId: null, topicName: id => T[id]?.name };
+  }
+  function mountMap() {
+    const el = $("#mapView"); if (!el || !window.LociAppMap) return;
+    LociAppMap.mount(el, { ...mapState(), on: {
+      activate: it => { if (T[it.id]) { L.focus = it.id; L.trail = LP.pushTrail(L.trail, it.id); L.extra = null; refresh(); } else if (it.id === "centre" || it.kind === "centre") { L.focus = T[L.focus]?.parent || null; refresh(); } },
+      add: () => toast("Adding topics works as it does in the app."), more: () => enterPhotos({ topic: L.focus }),
+      openItem: it => openEntry(it.itemId), relation: () => toast("A related link: its explanation shows in the app's panel."),
+      ghost: () => { }, openExplainer: it => BX.play(it.explainerId),
+    } });
+    mapMounted = true;
+  }
+  function openEntry(id) { const x = BY[id]; if (!x) return; if (x.type === "board") return BX.openBoard(id); if (x.type === "photo") return openQV(id, [id]); toast(`${kindLabel(x)}: “${titleOf(x).slice(0, 60)}” opens in the reader, as in the app.`); }
+  function refresh() {
+    const c = current();
+    if (engine) { engine.setView(viewOf()); engine.setExtras(c.extras); engine.setTrail(L.trail); engine.setOpen(c.openId); }
+    if (mapMounted) LociAppMap.update(mapState());
+    paintChrome(); paintSide();
+  }
+  window.lociRelink = () => { scene = LP.buildScene(graph()); if (engine) engine.setScene(scene); refresh(); };
+
+  /* ---------- the chrome: the app's trail, bottom row and slot card ---------- */
+  function nameOfId(id) { const n = scene.byId.get(id); if (n) return n.name; const r = LP.parseExtraId(id); if (!r) return ""; if (r.kind === "stack") return r.which === "commonplace" ? "Commonplace" : "Learn"; if (r.kind === "item") return titleOf(BY[r.id] || {}); return (BX.LUMENS[r.id] || BX.COURSES[r.id] || {}).title || ""; }
+  function paintChrome() {
+    const host = $("#lx-chrome"); if (!host) return;
+    const crumbs = L.trail.slice(-3), more = L.trail.length > 3;
+    host.innerHTML = L.tab === "palace" ? `
+      ${L.trail.length ? `<nav aria-label="Where you are" class="palace-float palace-trail"><button aria-label="Back" class="back" data-act="lx-back">←</button><button data-act="lx-home">All areas</button>${more ? `<span class="sep">›</span><span class="more">…</span>` : ""}${crumbs.map((id, i) => `<span class="sep">›</span>${i === crumbs.length - 1 ? `<b aria-current="location">${esc(nameOfId(id))}</b>` : `<button data-act="lx-open" data-id="${esc(id)}">${esc(nameOfId(id))}</button>`}`).join("")}</nav>` : ""}
+      <p aria-hidden="true" class="palace-float palace-hint${L.trail.length ? " is-gone" : ""}">Drag to turn · Scroll in to open an area, out to go back · Click to open</p>
+      <div class="palace-row"><div class="gtop"><div aria-label="Status legend" class="legend" role="group"><span class="state s0">Not started</span><span class="state s1">Learning</span><span class="state s2">Learned</span><span class="state palace-mark-item">Commonplace</span><span class="state palace-mark-lumen">Lumen</span></div><span class="graph-controls-spacer"></span><div class="gzoom-controls"><button aria-label="Zoom out" class="gzoom-button" data-act="lx-zout">−</button><button aria-label="Zoom in" class="gzoom-button" data-act="lx-zin">＋</button><button class="gzoom-button gzoom-reset" data-act="lx-reset">Whole palace</button></div></div></div>`
+      : `<div class="palace-row"><div class="gtop"><div aria-label="Status legend" class="legend" role="group"><span class="state s0">Not started</span><span class="state s1">Learning</span><span class="state s2">Learned</span></div><span class="graph-controls-spacer"></span><div class="gzoom-controls"><button aria-label="Zoom out" class="gzoom-button" data-act="lx-mzout">−</button><button aria-label="Zoom in" class="gzoom-button" data-act="lx-mzin">＋</button><button class="gzoom-button gzoom-reset" data-act="lx-mfit">Fit</button></div></div></div>`;
+    paintSlot();
+  }
+  const row = (cls, title, why, act, id) => `<li><button data-act="${act}" data-id="${esc(id)}"><i aria-hidden="true" class="palace-kind ${cls}"></i><span>${esc(title)}${why ? `<span class="why">${esc(why)}</span>` : ""}</span></button></li>`;
+  const memberLine = m => "anchor" in m ? (m.kind === "course" ? `Course · ${plural(m.partCount, "part")}` : "Lumen") : `${m.kindLabel} · on ${plural(m.topicIds.length, "topic")}`;
+  function slotCard(kicker, title, meta, body, foot) {
+    return `<section class="dsheet palace-slot-card" aria-label="${esc(kicker)} details"><div class="dsheet-head"><div><span class="cp-kicker">${esc(kicker)}</span><h2>${esc(title)}</h2><p class="meta">${esc(meta)}</p></div><button aria-label="Close" class="icb" data-act="lx-back">×</button></div><div class="dsheet-body gin">${body}</div><div class="palace-slot-foot">${foot}</div></section>`;
+  }
+  function paintSlot() {
+    const host = $("#lx-slot"); if (!host) return;
+    if (!slotOpen()) { host.innerHTML = ""; return; }
+    const c = current(), ref = c.ref, room = c.room; let html = "";
+    if (ref?.kind === "stack" && room) {
+      const ms = LP.latestMembers(room, ref.which), total = ref.which === "commonplace" ? room.itemTotal : room.lumenTotal;
+      html = slotCard(T[ref.areaId].name, ref.which === "commonplace" ? "Commonplace" : "Lumens and courses", `The newest ${ms.length} of ${total}`, `<ul class="palace-rows">${ms.map(m => row("anchor" in m ? m.kind : "item", m.title, memberLine(m), "lx-open", "anchor" in m ? `${m.kind}:${m.id}` : `item:${m.id}`)).join("")}</ul>`,
+        ref.which === "commonplace" ? `<a class="more" href="#" data-act="lx-seeall" data-id="${ref.areaId}">See all ${total} in your Commonplace →</a>` : `<a class="more" href="#" data-act="toast" data-msg="Learn isn't part of this prototype.">See all ${total} in Learn →</a>`);
+    } else if (ref) {
+      const m = memberOf(room, L.extra);
+      if (m && !("anchor" in m)) html = itemCard(m); else if (m) html = lumenCard(m, room);
+    }
+    host.innerHTML = html;
+  }
+  const topicRows = ids => { const shown = ids.filter(id => scene.byId.has(id)); return shown.length ? `<ul class="palace-rows">${shown.map(id => row("topic", scene.byId.get(id).name, "", "lx-open", id)).join("")}</ul>` : `<p class="empty">Not on your map.</p>`; };
+  function itemCard(m) {
+    const x = BY[m.id], onB = BX.boardsWith(m.id);
+    if (x.type === "board") {
+      const cs = x.cards.filter(BX.isContent).map(c => BX.item(c.ref)).filter(Boolean), reach = [...new Set(cs.flatMap(y => y.topics || []))].filter(t => scene.byId.has(t) && !x.topics.includes(t));
+      const madeL = Object.values(BX.LUMENS).filter(l => l.fromBoard === x.id && l.state !== "making");
+      const arrows = x.arrows.map(a => BX.sentence(x, a)).filter(s => s.a && s.b);
+      const counts = {}; cs.forEach(y => { const k = kindLabel(y.type === "detail" ? { type: "photo" } : y.type === "lumen" ? { type: "x" } : y); counts[y.type === "lumen" ? "Lumen" : y.type === "course" ? "Course" : y.type === "topic" ? "Topic" : k] = (counts[y.type === "lumen" ? "Lumen" : y.type === "course" ? "Course" : y.type === "topic" ? "Topic" : k] || 0) + 1; });
+      return slotCard("Commonplace · Board", x.title, `${cs.length} ${cs.length === 1 ? "entry" : "entries"} · ${plural(x.arrows.length, "arrow")} · reaches ${plural(reach.length + x.topics.length, "topic")}`,
+        `<button class="palace-cover lx-bcover" data-act="b-open" data-id="${x.id}" aria-label="Open the board"><span class="pic bpv" style="aspect-ratio:4/3">${BX.previewInner(x)}</span></button>
+         ${x.goal ? `<section><h3>Goal</h3><p class="lx-goal">${esc(x.goal)}</p></section>` : ""}
+         <section><h3>Lives at</h3>${topicRows(x.topics)}</section>
+         ${reach.length ? `<section><h3>Reaches, through what's on it</h3>${topicRows(reach)}</section>` : ""}
+         <section><h3>On it</h3><p class="lx-counts">${Object.entries(counts).map(([k, n]) => `${n} ${k.toLowerCase()}${n > 1 && !k.endsWith("s") ? "s" : ""}`).join(" · ")}</p></section>
+         ${arrows.length ? `<section><h3>Its arrows (${arrows.length})</h3><ul class="lx-sent">${arrows.slice(0, 5).map(s => `<li>${esc(s.a.length > 34 ? s.a.slice(0, 33) + "…" : s.a)} <span class="v">${esc(s.verb || "→")}</span> ${esc(s.b.length > 34 ? s.b.slice(0, 33) + "…" : s.b)}${s.why ? `<em> · ${esc(s.why)}</em>` : ""}</li>`).join("")}</ul></section>` : ""}
+         <section><h3>Lumens made from it</h3>${madeL.length ? `<ul class="palace-rows">${madeL.map(l => row("lumen", l.title, `Lumen · ${l.slides.length} slides`, "lx-open", `lumen:${l.id}`)).join("")}</ul>` : `<p class="empty">None yet. Make a Lumen on the board.</p>`}</section>`,
+        `<button class="palace-btn is-primary" data-act="b-open" data-id="${x.id}">Open board</button><a class="more" href="#" data-act="lx-cp" data-id="${x.id}">Open in your Commonplace →</a>`);
+    }
+    const pic = x.type === "photo" ? `<button class="palace-cover" data-act="lx-entry" data-id="${x.id}" aria-label="Open ${esc(x.title)}"><img src="${thumb(x)}" alt=""></button>` : "";
+    return slotCard(`Commonplace · ${m.kindLabel}`, m.title, memberLine(m), `<section>${pic}<h3>Tagged on</h3>${topicRows(m.topicIds)}</section>
+      ${onB.length ? `<section><h3>On ${plural(onB.length, "board")}</h3><ul class="palace-rows">${onB.map(b => row("item", b.title, "Board", "lx-open", `item:${b.id}`)).join("")}</ul></section>` : ""}`,
+      `<button class="palace-btn is-primary" data-act="lx-entry" data-id="${x.id}">Open</button><a class="more" href="#" data-act="lx-cp" data-id="${x.id}">Open in your Commonplace →</a>`);
+  }
+  function lumenCard(m, room) {
+    const made = m.anchor.kind === "item" ? room.items.find(i => i.id === m.anchor.itemId) : null;
+    const body = `<section><h3>Made from</h3>${m.anchor.kind === "topic" ? topicRows([m.anchor.topicId]) : made ? `<ul class="palace-rows">${row("item", made.title, memberLine(made), "lx-open", `item:${made.id}`)}</ul>` : `<p class="empty">Something in your Commonplace.</p>`}</section>
+      ${m.kind === "course" ? `<section><h3>Parts (${m.partCount})</h3><ol class="palace-parts">${m.parts.map((p, i) => `<li><span class="n">${i + 1}</span><span class="t">${esc(p.title)}${p.topicId && scene.byId.has(p.topicId) ? `<span class="why">${esc(scene.byId.get(p.topicId).name)}</span>` : ""}</span><button class="palace-link" data-act="b-play" data-id="${p.explainerId}">▶ Play</button></li>`).join("")}</ol></section>` : ""}`;
+    return slotCard(m.kind === "course" ? "Course" : "Lumen", m.title, memberLine(m), body, m.kind === "course" ? `<a class="more" href="#" data-act="toast" data-msg="Learn isn't part of this prototype.">Open course in Learn →</a>` : `<button class="palace-btn is-primary" data-act="b-play" data-id="${m.id}">▶ Play</button><a class="more" href="#" data-act="toast" data-msg="Learn isn't part of this prototype.">Open in Learn →</a>`);
+  }
+
+  /* ---------- the side panel: the photo roadmap's Phase 7 inspector, with Boards ---------- */
+  function paintSide() {
+    const el = $("#lx-side"); if (!el) return;
+    const tid = L.focus && T[L.focus] ? L.focus : null;
+    el.innerHTML = tid ? inspectorHTML(tid) : `<div class="inspector"><span class="k">Overview</span><h2>Your whole map</h2><p style="margin:0;color:var(--ink-2);font-size:13px">${scene.areaIds.length} areas · ${scene.nodes.length - scene.areaIds.length} topics. Open an area to see its room: its topics, its Commonplace stack and its Lumens. A board sits in the Commonplace stack of the area it lives in.</p></div>`;
+  }
+
+  /* ---------- clicks ---------- */
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-act]"); if (!t) return; const a = t.dataset.act; if (!a.startsWith("lx-")) return; e.preventDefault();
+    switch (a) {
+      case "lx-tab": if (t.dataset.t === "list" || t.dataset.t === "overview") { toast(`${t.textContent} works as it does in the app.`); break; } L.tab = t.dataset.t; renderLoci(); break;
+      case "lx-back": goBack(); break;
+      case "lx-home": goHome(); break;
+      case "lx-open": openThing(t.dataset.id); break;
+      case "lx-zin": engine?.zoom(.8); break; case "lx-zout": engine?.zoom(1.25); break; case "lx-reset": goHome(); engine?.home(); break;
+      case "lx-mzin": LociAppMap.zoom(1); break; case "lx-mzout": LociAppMap.zoom(-1); break; case "lx-mfit": LociAppMap.fit(); break;
+      case "lx-seeall": enterPhotos({}); S.type = "all"; S.area = t.dataset.id; render(); break;
+      case "lx-cp": { const x = BY[t.dataset.id]; S.dest = "commonplace"; S.view = "wall"; S.type = x.type === "board" ? "board" : typeOf(x); S.pf = { ...FDEF }; S.q = titleOf(x).slice(0, 24); render(); window.scrollTo(0, 0); break; }
+      case "lx-entry": openEntry(t.dataset.id); break;
+    }
+  });
+  // The side panel's own links (Phase 7 inspector and Boards): topics open in the Palace or focus the Map.
+  document.addEventListener("click", e => { const t = e.target.closest('[data-act="lfocus"]'); if (!t || S.dest !== "loci") return; e.stopImmediatePropagation(); const id = t.dataset.t; if (id === "root") goHome(); else openThing(id); }, true);
+  // Opening a board in Loci from the board page: the Palace, with the board open in its area.
+  window.lociOpenBoard = id => { const b = BY[id], pl = b.topics[0]; S.dest = "loci"; L.tab = "palace"; L.hl = null; L.focus = pl; L.extra = `item:${id}`; L.extraArea = areaOf(pl); L.trail = [areaOf(pl), pl, `item:${id}`]; render(); window.scrollTo(0, 0); };
+  addEventListener("resize", () => { if (engine) engine.setView(viewOf()); });
   bootCP();
 })();
 </script>

@@ -1,0 +1,28 @@
+// Infographic slides never draw on the map's posters; every icon is an empty component.
+const Empty = () => null;
+export const BookOpen = Empty;
+export const Building = Empty;
+export const Clock = Empty;
+export const Coins = Empty;
+export const Compass = Empty;
+export const Droplets = Empty;
+export const FileText = Empty;
+export const GitBranch = Empty;
+export const Hammer = Empty;
+export const Landmark = Empty;
+export const Layers = Empty;
+export const Leaf = Empty;
+export const Lightbulb = Empty;
+export const Map = Empty;
+export const Ruler = Empty;
+export const Scale = Empty;
+export const Search = Empty;
+export const Shield = Empty;
+export const Sun = Empty;
+export const Target = Empty;
+export const Thermometer = Empty;
+export const Users = Empty;
+export const Wind = Empty;
+export const Zap = Empty;
+export type LucideIcon = typeof Empty;
+export type LucideProps = Record<string, unknown>;

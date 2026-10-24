@@ -12,13 +12,25 @@ HIGH (a programme of four phases; each phase states its own tier)
 - [Learner memory](2026-10-24-learner-memory-and-settings-design.md): what Loci reads for a place on the map.
 - [Learn roadmap](2026-10-23-learn-roadmap-design.md): Lumens, courses, and "the model writes typed content, Studiolo renders it".
 
-**Checked against:** not re-read for this document. Facts about `studiolo` come from the photos design's §1 (main @ `3c2f744`). Each phase spec re-checks paths before it is written.
+**Checked against:** Commonplace facts come from the photos design's §1 (main @ `3c2f744`). The Palace and Map facts in §2.2 and B4 were read from `studiolo` main @ `6f8d396` (24 Oct): `src/features/palace/extras.ts`, `room.ts`, `room-types.ts`, `scene.ts`, `src/components/graph/palace/palace-engine.ts`, `src/components/graph/graph-map.tsx`, `src/features/topics/layout.ts` and `src/features/explainers/topic-gateway.ts`. Each phase spec re-checks paths before it is written.
 
 ## 0. In short
 
 The owner's idea (24 Oct): an infinite board where people place a photo, a link, a video, a note, a course or a Lumen, draw arrows between them, write their learning goal, and think freely. The board lives in the graph, at an area, topic or sub-topic. It is a Commonplace item, it holds other Commonplace items, and it can be turned into a Lumen.
 
 **The proposal in one line:** a **board** is a Commonplace entry of its own type. It sits beside Notes, Sources and Photos, and its page is a canvas. Every card on it is a **placement** of an existing entry, drawn with the wall's own card, and it opens in the same viewer. Arrows carry a word and a *why*. The board feeds Learn (Make a Lumen) and Loci (the goal, suggested links, open questions).
+
+**What a board is for.** Its job is **understanding**: working a question through until you can state what you now know, toward a goal you wrote first (*"Understand how to keep the prayer hall's courtyard cool without machines, well enough to brief the engineer"*).
+- **Thinking is the activity, learning is the purpose, and work is often where it points.** The sample board is all three: you think by arranging and connecting, you learn because the goal and the questions ask you to, and the brief to the engineer is the work it serves.
+- **So the design leans to learning.** The goal card comes first. An arrow asks for a word and a *why*. Questions are their own cards. Recall and Make a Lumen test and teach what is on it. Loci reads the goal.
+- **It is not a moodboard or a task board.** No columns, statuses, owners or due dates. A board in a Practice area (a project, a competition entry) is the same board with a work goal, not a separate mode.
+
+**An entry type, not a collection.** A board sits on the wall and on the shelves like a photo, and it shows other entries, but it does not *own* them the way a folder or collection would:
+- every card is a pointer to an entry that stays where it is, with its own topics;
+- one photo can be on three boards;
+- deleting a board deletes only its placements, arrows, frames and goal.
+
+That is why a board can live at **one** place on Loci while its cards keep theirs, and why it is just another Commonplace item in the Palace and on the Map (§2.2).
 
 Five rules:
 1. **Placed, never copied.** A photo on a board is the photo. Its picks, topics and notes on details are the same everywhere, and a change on the board is a change in Commonplace.
@@ -86,6 +98,43 @@ flowchart LR
 - **Unpacking** places a course's parts, a Lumen's slides or a lecture's moments. Each one remembers its parent (a dotted line). *Fold* takes them back, except the ones you moved or connected.
 - **An arrow** has a word from a fixed list (*leads to, explains, example of, contrasts with, causes, raises, part of*) and an optional *why* of one line. The word lets Learn and Loci read it; the why is the learner's own sentence.
 - **Writing on a board** creates the Commonplace entry first, then places it.
+
+### 2.1 What an arrow means
+
+An arrow is **a claim the learner makes about two things, on this board**: *A* [word] *B*, because [why]. For example: *"Courtyard house, aerial"* **example of** *"Courtyard toward the prayer hall"*, because "same court, but here the tall wing holds the tower".
+
+- **It belongs to the board, not to the entries.** The same two photos can be joined differently on another board, or not at all. The viewer's *On this board* shows only this board's arrows.
+- **It is not a hyperlink, and not a link on the map.** It never changes Loci by itself (below).
+- **The word is for the app; the why is for the learner.** The word comes from the fixed list so Learn and Loci can read it. The why is kept in the learner's own words, quoted back by the Lumen, and covered by Recall.
+
+Who reads arrows:
+
+| Reader | What it takes from them |
+|---|---|
+| **The viewer** (B2) | The order: ← → walks the board's photos along the arrows |
+| **Make a Lumen** (B3) | The order (*Follow my arrows*); which cards matter (*Connected cards* leaves out the unconnected); the whys, quoted; two connected cards with a picture become a `photo_pair` slide with the word between them; *raises* joins a question to what it asks about, so the check sits after it |
+| **Recall** (B3) | Each arrow's word and why are covered, like a note |
+| **Loci** (B4) | When the two cards' topics are not linked on the map, the arrow becomes a **suggested** link, with the why as its reason. *Link them* adds a `related` link; *Not now* never asks again |
+| **The Palace** (B4) | An opened board draws its arrows between the cards' topics as `related` links, with the why as the link's text |
+
+The words, in the prototype's order: *leads to* (sequence), *explains* (B is the explanation of A), *example of* (A shows B), *contrasts with* (compare), *causes* (cause and effect), *raises* (A raises the question B), *part of* (a detail and its whole). The B3 spec decides how each word changes a Lumen beyond order and pairs; the prototype reads only the order, the pairs, *raises* and the whys.
+
+### 2.2 How a board lives in Loci
+
+A board is **a Commonplace item**, so the Palace and the Map treat it as they treat a photo or a note. Nothing about the Palace or the Map changes shape. A board only brings its own card and, when opened, its own satellites.
+
+- **Its place.** A board's one place is its topic (`content_items` topics, as for any item). In the Palace, its area's room counts it in the **Commonplace stack** (`stack:commonplace:<area>`, `room.ts`), newest first, beside the photos and notes.
+- **Opened in the Palace** (`item:<id>`, the slot card on the right):
+  - the board's square sits near its topic and serves it, as any item serves its topics;
+  - its cards appear as small marks near **their own** topics, held by the board (`holds`, not drawn) and serving those topics, so you see where the board reaches across the map. A Loci topic placed on the board is tied to the board directly;
+  - its arrows are drawn between them as `related` links carrying the why;
+  - Lumens made from it are tied to it (`serves`), exactly as the app already ties a Lumen anchored to an item (`extras.ts`: `anchor.kind === "item"`).
+- **Its slot card** reads *Commonplace · Board*: the cover, the goal, *Lives at*, *Reaches, through what's on it*, *On it*, *Its arrows* (as sentences), *Lumens made from it*, then **Open board** and *Open in your Commonplace →*.
+- **On the Map,** the topic's Commonplace lane lists the board first with its cover and the kind line *BOARD*.
+  - A Lumen made from the board appears in the Lumens lane as *From board*, because its anchor is the board (an item).
+  - The board's lane card gets the ▶ badge: *1 Lumen made from Cooling the prayer-hall courtyard*, with the app's own peek and Play. This is the lane's existing `itemCounts`, keyed by the board's id (`topic-gateway.ts`).
+- **The explainer link is the existing one.** A Lumen made from a board is anchored to the board as an item. Learn, the Map lane, the badge and the Palace already read that anchor, so the board joins all of them without new plumbing.
+- **What is new for Loci** is the item kind `board` (its label and lane card, in `item-kinds.ts`), the satellites for an opened board, and the inspector's Boards section (B4).
 
 **Data, for the B1 spec to settle** (*new*, names indicative):
 - a new `content_items.shape` value `board`, with its place as its one topic;
@@ -167,7 +216,7 @@ All four are hand-written SQL, applied only on the owner's word.
 
 **Goal:** a board changes what the map knows.
 
-- **On the map.** A small square under a topic counts the boards there and below it.
+- **In the Palace and on the Map**, as §2.2: the board is a Commonplace item in its area's stack and its topic's lane. Opened, it shows its cards near their own topics, its arrows as `related` links with their whys, and the Lumens made from it. The Map's lane card carries the ▶ badge for those Lumens.
 - **In the inspector** (Phase 7), a **Boards** section:
   - the boards' covers as tiles, and *+ New board here*;
   - **Loci reads**: the goal of the board placed at this topic, shown as *why you're learning it*;
@@ -175,6 +224,9 @@ All four are hand-written SQL, applied only on the owner's word.
   - **Open questions on boards**, each with *Explain…*.
 - **Which arrows count.** An arrow into the board's own topic, or between a topic and one of its own parents, never suggests anything.
 - **Done when:**
+  - a new board shows in its area's Commonplace stack and its topic's lane, with no change to how other items show;
+  - opening it in the Palace places its cards near their own topics and never moves a topic (the Palace's rule C-17);
+  - a Lumen made from it shows *From board* in the Lumens lane and the ▶ badge on the board's card;
   - linking from a suggestion adds the link to the map, and *Not now* never asks again for that pair;
   - the goal appears in the place's memory card under *Why you're learning it* (learner memory §4);
   - *Explain…* starts a short Lumen whose check is that question.
@@ -190,6 +242,9 @@ All four are hand-written SQL, applied only on the owner's word.
 | BD-5 | Does Recall's *Not yet* write to memory without asking? | Yes, as *To revisit*, the same as a missed check; the learner can remove it |
 | BD-6 | Size limit | At most 300 placements per board in v1; the canvas stays fast and the cover readable |
 | BD-7 | Sharing a board | Not in this programme. It follows Learn's sharing design (Learn roadmap phase 3) |
+| BD-8 | Board as a Commonplace item in the Palace and Map, or a mark of its own | An item. It sits in the Commonplace stack and lane, and opening it shows what it reaches (§2.2). No new kind of node |
+| BD-9 | Does an arrow change the map? | Never by itself. It is a suggestion until the learner taps *Link them* |
+| BD-10 | What a board is for | Understanding toward a written goal. Not a moodboard or a task board; work boards are the same board in a Practice area |
 
 ## 5. Not in this programme
 
@@ -208,6 +263,8 @@ All four are hand-written SQL, applied only on the owner's word.
 - select three cards, then **Ask Loci**;
 - **Make a Lumen**, then **Play**;
 - **Recall**;
-- Loci › Climate-responsive design.
+- **The place pill** under the board's title (*Architecture › Climate-responsive design*): the app's own Palace, with the board opened. Then **Map**: the board in the Commonplace lane, and after Make a Lumen, *From board* in the Lumens lane with the ▶ badge.
+
+The Palace and Map are the app's own code, bundled from `studiolo` main @ `6f8d396` (see `prototypes/boards/loci/README.md`).
 
 Nothing calls a model. Ask Loci's replies, the Lumen and its answers are written from the board's real contents.

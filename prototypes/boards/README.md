@@ -18,8 +18,12 @@ Open `index.html`. It is published as the claude.ai artifact **Commonplace Board
 | **Make a Lumen** | The goal is the brief and the board's pictures are the **picture shelf** (as in Lumen pictures), with *When nothing of yours fits*. Your arrows set the order and your questions become the check. **Play** it |
 | **Recall** | Your own words are covered. Say each one, tap to check, then mark *Got it* or *Not yet* |
 | **Commonplace** | The breadcrumb → **Boards** is a type with its slim bar (Questions ▾, + New board). **Shelves** has a *Pinned up* shelf |
-| **Loci** | The pill under the title opens Climate-responsive design. The inspector shows Boards, *Loci reads* (the goal), suggested links from your arrows, and open questions with *Explain…* |
+| **Loci › Palace** | The place pill under the board's title opens Loci on the **app's own Palace** (bundled from `studiolo` main, see `loci/README.md`), with the board open. The board is a Commonplace item: a square in Architecture's Commonplace stack. Opened, its slot card shows the goal, where it lives, the topics it reaches, its cards, its arrows as sentences and the Lumens made from it. Its cards sit beside their own topics, and its arrows are drawn between them as related links carrying the why |
+| **Loci › Map** | The **app's own Map** at Climate-responsive design: the board heads the Commonplace lane with its cover and *BOARD*. After **Make a Lumen**, the Lumen shows in the Lumens lane as *From board*, and the board's card gets the ▶ badge. Hover it for the app's peek, then **Play** |
+| **Loci › inspector** | Boards, *Loci reads* (the goal), suggested links from your arrows (**Link them** adds a related link to the Palace and Map), and open questions with *Explain…* |
 | **Guide** | *Prototype guide* (bottom right) adds five Boards tries above the photo ones |
+
+**What the arrows mean, and what a board is for:** the spec's §0 and §2.1. In short, an arrow is a claim you make about two things on this board (a word and a why), and a board is for understanding toward the goal you wrote first.
 
 Keys on a board: V H N Q A F (tools) · + (add) · 0 (fit) · = − (zoom) · Space (open the selected card, or hold to pan) · Delete (remove from the board) · Ctrl/⌘ Z (undo).
 
@@ -28,11 +32,14 @@ Keys on a board: V H N Q A F (tools) · + (add) · 0 (fit) · = − (zoom) · Sp
 - `index.src.html`: the Commonplace Photos page with Boards added. Hooks inside the photos code are marked `BOARDS`. The Boards styles are the `/* ---------- boards ---------- */` section, and the Boards script is the second `<script>`.
 - `build.mjs`: inlines the pictures' sizes and palettes (`../commonplace-photos/gen/meta.json`) and writes `index.html`, as the photos prototype does.
 - `img`: a link to `../commonplace-photos/img`, so the 32 pictures exist once in the repo.
+- `loci/`: the app's Palace and Map, bundled from `studiolo` main @ `6f8d396`, and how to rebuild them. `build.mjs` inlines them at `<!--LOCI-BUNDLES-->`. The Loci script that drives them is the last `<script>` in `index.src.html`.
+- `bimg/`: the two boards' covers for the Map's lane cards.
 - `v1/`: the first Boards prototype (its own look, before it was matched to Commonplace). Kept for reference; this one replaces it.
 
 ## Real or simulated
 
 - No model runs. Ask Loci's replies, the Lumen's slides and narration, and the two answers are written from the board's real contents.
+- The Palace and the Map are the app's real code, given the prototype's sample data. The List and Overview tabs are not built.
 - Changes last until you reload, as in Commonplace Photos.
 - The pictures are the generated ones from Commonplace Photos, not photographs.
 
