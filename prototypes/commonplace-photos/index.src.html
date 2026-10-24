@@ -1,0 +1,1357 @@
+<title>Commonplace Photos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the app's shell (58 px rail + main stage) with Commonplace's wall, shelves, quick view, and the proposed Photos mode, Sort mode and Loci map. Tokens are Studiolo's own (src/styles/tokens.css). */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --float: #fbfbf9; --hover: #ecece6; --mat: #e4e4de; --scrim-blur: rgba(243, 243, 239, .74);
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5;
+  --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a;
+  --pick: #b7791f; --pick-soft: #fbf3df;
+  --cover-paper: #202e38; --cover-ink: #edeff6;
+  --on-media: #ffffff; --media-badge: rgba(0, 0, 0, .68); --media-control: rgba(255, 255, 255, .92);
+  --fs-mat: #15191c; --fs-ink: #e6e8e4;
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, .07), 0 8px 22px rgba(34, 48, 58, .09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, .08), 0 16px 36px rgba(34, 48, 58, .15);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, .06), 0 18px 48px rgba(34, 48, 58, .16);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); --ease-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-q: 130ms; --dur-s: 220ms; --dur-m: 380ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --accent-soft: #263156; --accent-strong: #c3cff8;
+    --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim-blur: rgba(19, 26, 32, .82);
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+    --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --pick: #e8c27a; --pick-soft: #33291a;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --accent-soft: #263156; --accent-strong: #c3cff8;
+  --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim-blur: rgba(19, 26, 32, .82);
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --pick: #e8c27a; --pick-soft: #33291a;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, .34), 0 16px 36px rgba(0, 0, 0, .4);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-q: 1ms; --dur-s: 1ms; --dur-m: 1ms; } }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- shell ---------- */
+.app { display: flex; min-height: 100%; }
+.rail { position: fixed; inset: 0 auto 0 0; width: 58px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: calc(16px + env(safe-area-inset-top, 0px)) 0 calc(16px + env(safe-area-inset-bottom, 0px)); padding-left: env(safe-area-inset-left, 0px); border-right: 1px solid var(--line); background: var(--paper); z-index: 20; }
+.rail .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 17px var(--read); margin-bottom: 20px; }
+.rail button { all: unset; width: 40px; height: 36px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); cursor: pointer; position: relative; }
+.rail button:hover { background: var(--hover); color: var(--ink); }
+.rail button[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.rail button:focus-visible { outline: 2px solid var(--accent); }
+.rail .grow { flex: 1; }
+.rail .me { width: 26px; height: 26px; border-radius: 50%; background: var(--board); font-size: 11px; font-weight: 500; display: grid; place-items: center; }
+.rail svg { width: 18px; height: 18px; }
+.stage { flex: 1; min-width: 0; margin-left: 58px; padding: 32px 44px 120px; padding-left: max(44px, env(safe-area-inset-left, 0px)); padding-right: max(44px, env(safe-area-inset-right, 0px)); }
+.dest-head { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; color: var(--ink-2); margin-bottom: 14px; }
+.dest-head b { color: var(--ink); font-weight: 500; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 30px; overflow-x: auto; scrollbar-width: none; }
+.tabs button { all: unset; cursor: pointer; padding: 7px 12px 9px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); font-weight: 500; border-color: var(--accent); }
+.tabs button:hover { color: var(--ink); }
+
+/* ---------- toolbar ---------- */
+.toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+.search { flex: 1 1 320px; min-width: 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; font: 26px/1.2 var(--read); padding: 4px 0 10px; color: var(--ink); }
+.search::placeholder { color: var(--ink-2); opacity: .9; }
+.search:focus { outline: none; border-color: var(--accent); }
+.count { font-size: 13px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 4px; font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.btn:hover { background: var(--hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); }
+.btn.line { box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.btn.primary { background: var(--accent); color: var(--paper); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.on { background: var(--accent-soft); color: var(--accent-strong); }
+.btn.small { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn.danger { color: var(--warn); }
+.seg { display: inline-flex; background: var(--board); padding: 3px; border-radius: 8px; gap: 2px; }
+.seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px; border-radius: 6px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(34, 48, 58, .08); }
+.seg button:focus-visible { outline: 2px solid var(--accent); }
+.seg svg { width: 14px; height: 14px; }
+
+.chips { display: flex; align-items: center; gap: 4px; margin-bottom: 22px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.chip { all: unset; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 4px; font-size: 13.5px; color: var(--ink-2); white-space: nowrap; }
+.chip:hover { color: var(--ink); background: var(--hover); }
+.chip[aria-pressed="true"] { color: var(--ink); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.chip:focus-visible { outline: 2px solid var(--accent); }
+.chip .n { color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chip .dot { width: 7px; height: 7px; border-radius: 2px; background: var(--status-2); }
+.chips .sep { flex: none; width: 1px; height: 20px; background: var(--line); margin: 0 8px; }
+.chips .lab { flex: none; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
+.new { display: inline-block; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; vertical-align: 1px; }
+
+/* ---------- mixed wall (today's cards) ---------- */
+.mason { position: relative; display: flex; gap: 20px; align-items: flex-start; }
+.mason .col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.mcard { position: relative; border-radius: 6px; }
+.mcard.focus-ring { outline: 2px solid var(--accent); outline-offset: 4px; }
+.mcard .pic { position: relative; border-radius: 6px; overflow: hidden; background: var(--mat); box-shadow: var(--shadow-pic); transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease); }
+.mcard .pic img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--dur-m) var(--ease); }
+.mcard .pic img.in { opacity: 1; }
+.mcard:hover .pic { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.mcard .stack::before { content: ""; position: absolute; left: 6px; right: 6px; top: -6px; height: 10px; border-radius: 6px 6px 0 0; background: var(--line); }
+.mcard .badge { position: absolute; right: 8px; bottom: 8px; background: var(--media-badge); color: var(--on-media); font-size: 11.5px; padding: 1px 6px; border-radius: 3px; }
+.cap { padding: 10px 2px 0; display: flex; flex-direction: column; gap: 3px; }
+.kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+.mtitle { font-size: 13.5px; font-weight: 500; margin: 0; line-height: 1.3; color: var(--ink); }
+.mtitle a, .mtitle button { all: unset; cursor: pointer; }
+.mtitle button::after { content: ""; position: absolute; inset: 0; }
+.mdesc { font-size: 12px; color: var(--ink-2); margin: 0; }
+.mfoot { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--ink-2); margin-top: 3px; }
+.tdot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--ink-3); display: inline-block; flex: none; }
+.tdot.s1 { background: var(--status-1); border-color: var(--status-1); }
+.tdot.s2 { background: var(--status-2); border-color: var(--status-2); }
+.paper { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 16px; }
+.quote { background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); border-radius: 6px; padding: 18px 18px 12px; position: relative; }
+.quote::before { content: "\201C"; position: absolute; right: 14px; top: 2px; font: 44px/1 var(--read); color: var(--line); }
+.quote q { display: block; font: italic 19px/1.4 var(--read); quotes: none; margin-bottom: 14px; }
+.quote .src { font-size: 12.5px; color: var(--ink-2); border-top: 1px solid var(--quote-rule); padding-top: 10px; }
+.notecard { background: var(--note-paper); box-shadow: inset 0 0 0 1px var(--line); border-radius: 6px; padding: 16px; font: 16px/1.5 var(--read); }
+.notecard h3 { font: 500 19px/1.3 var(--read); margin: 0 0 8px; }
+.notecard p { margin: 0; color: var(--ink); }
+.cover { background: var(--cover-paper); color: var(--cover-ink); border-radius: 4px 6px 6px 4px; padding: 22px 18px; aspect-ratio: 2 / 2.7; display: flex; flex-direction: column; justify-content: space-between; font: 22px/1.2 var(--read); box-shadow: var(--shadow-pic); }
+.cover small { font: 12px var(--ui); opacity: .7; }
+.video { background: var(--cover-paper); color: var(--cover-ink); border-radius: 6px; aspect-ratio: 16 / 9; position: relative; padding: 14px; display: flex; align-items: flex-end; font: 18px/1.25 var(--read); box-shadow: var(--shadow-pic); }
+.video .prog { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--status-2); }
+.video .dur { position: absolute; right: 8px; bottom: 9px; background: var(--media-badge); color: #fff; font: 11.5px var(--ui); padding: 1px 6px; border-radius: 3px; }
+.capture { min-height: 300px; display: flex; flex-direction: column; justify-content: space-between; font: 17px var(--read); color: var(--ink-2); }
+.capture small { font: 12px var(--ui); display: flex; justify-content: space-between; }
+kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); color: var(--ink-2); }
+
+/* ---------- photos mode ---------- */
+.pbar { display: flex; flex-direction: column; gap: 10px; margin: -6px 0 22px; padding: 14px 16px; background: var(--panel); border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+.prow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.prow .chip { height: 28px; font-size: 13px; padding: 0 10px; }
+.prow .grow { flex: 1; }
+.prow label.ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
+.prow select { height: 28px; border-radius: 4px; border: 1px solid var(--line); background: var(--paper); padding: 0 6px; font-size: 12.5px; color: var(--ink); }
+.prow input[type=range] { width: 110px; accent-color: var(--accent); }
+.prow .seg button { height: 26px; font-size: 12.5px; padding: 0 9px; }
+.prow .lab { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 4px 0 6px; }
+.swatch { width: 18px; height: 18px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); flex: none; }
+.chip.active-filter { background: var(--accent-soft); color: var(--accent-strong); }
+.chip.active-filter .x { opacity: .7; margin-left: 2px; }
+.chip.view::before { content: ""; width: 8px; height: 10px; background: currentColor; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%); opacity: .6; }
+.chip.picks .star { color: var(--pick); }
+.chip.unsorted[aria-pressed="false"] .n { color: var(--warn); font-weight: 600; }
+.pop { position: absolute; z-index: 60; background: var(--float); border-radius: 12px; box-shadow: var(--shadow-float), inset 0 0 0 1px var(--line); padding: 14px; min-width: 240px; max-width: calc(100vw - 32px); }
+.pop h4 { margin: 0 0 10px; font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.swgrid { display: grid; grid-template-columns: repeat(5, 32px); gap: 8px; }
+.swgrid button { all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14); }
+.swgrid button[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+.swgrid button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pop .row { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12.5px; color: var(--ink-2); }
+.pop input[type=color] { width: 36px; height: 26px; border: 0; padding: 0; background: none; }
+.pop input[type=text] { width: 100%; height: 32px; border: 1px solid var(--line); border-radius: 4px; padding: 0 8px; background: var(--paper); }
+.pop .list { display: flex; flex-direction: column; max-height: 300px; overflow: auto; margin: 0 -6px; }
+.pop .list button { all: unset; cursor: pointer; padding: 6px 8px; border-radius: 4px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.pop .list button:hover, .pop .list button:focus-visible { background: var(--hover); }
+.pop .list .sub { padding-left: 22px; }
+.pop .list .area { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); padding: 8px 8px 2px; }
+.pop .list .chk { width: 14px; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--ink-3); display: grid; place-items: center; font-size: 10px; flex: none; }
+.pop .list .chk.on { background: var(--accent); box-shadow: none; color: var(--paper); }
+
+.pwall { position: relative; user-select: none; }
+.group-h { display: flex; align-items: baseline; gap: 10px; margin: 26px 0 12px; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.group-h:first-child { margin-top: 0; }
+.group-h::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.group-h .n { color: var(--ink-3); letter-spacing: 0; text-transform: none; }
+.group-h .sw { display: inline-flex; gap: 3px; }
+.rows .row { display: flex; gap: 8px; margin-bottom: 8px; }
+.pgrid { display: grid; gap: 8px; }
+.pmason { display: flex; gap: 12px; align-items: flex-start; }
+.pmason .col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ph { position: relative; margin: 0; flex: none; }
+.ph .pp { position: relative; overflow: hidden; border-radius: 4px; cursor: zoom-in; transition: transform var(--dur-s) var(--ease), box-shadow var(--dur-s) var(--ease); }
+.ph .pp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; filter: blur(6px); transition: opacity var(--dur-m) var(--ease), filter var(--dur-m) var(--ease); }
+.ph .pp img.in { opacity: 1; filter: none; }
+.ph:hover .pp { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.ph.focused .pp { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ph figcaption { padding: 6px 1px 2px; font-size: 12.5px; line-height: 1.3; }
+.ph figcaption b { font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph figcaption span { color: var(--ink-2); font-size: 11.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.caps-hover figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px; color: var(--on-media); background: linear-gradient(transparent, rgba(0, 0, 0, .62)); border-radius: 0 0 4px 4px; opacity: 0; transition: opacity var(--dur-s) var(--ease); pointer-events: none; }
+.caps-hover figcaption span { color: rgba(255, 255, 255, .8); }
+.caps-hover .ph:hover figcaption { opacity: 1; }
+.caps-hide figcaption { display: none; }
+.star-btn { all: unset; position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--media-control); color: #8a6a2c; font-size: 14px; opacity: 0; transition: opacity var(--dur-q); cursor: pointer; z-index: 2; }
+.ph:hover .star-btn, .star-btn.on, .star-btn:focus-visible { opacity: 1; }
+.star-btn.on { color: #b7791f; }
+.check { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--media-control); box-shadow: 0 0 0 1.5px rgba(0, 0, 0, .25); display: grid; place-items: center; color: transparent; font-size: 13px; z-index: 3; pointer-events: none; }
+.selecting .check { display: grid; }
+.check { display: none; }
+.sel .check { background: var(--accent); color: #fff; box-shadow: none; }
+.sel .pp, .sel .pic { outline: 3px solid var(--accent); outline-offset: 2px; }
+.src-tag { position: absolute; left: 6px; bottom: 6px; font-size: 10.5px; padding: 1px 6px; border-radius: 3px; background: var(--media-badge); color: var(--on-media); z-index: 1; }
+.pwall img, .mason img { -webkit-user-drag: none; user-select: none; }
+.lasso { position: absolute; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); pointer-events: none; z-index: 5; }
+.empty { padding: 60px 0; text-align: center; color: var(--ink-2); font: 18px var(--read); }
+
+.bulk { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40; display: flex; align-items: center; gap: 4px; padding: 6px 6px 6px 16px; border-radius: 10px; background: var(--float); box-shadow: var(--shadow-float), inset 0 0 0 1px var(--line); max-width: calc(100vw - 32px); overflow-x: auto; }
+.bulk .n { font-weight: 500; margin-right: 8px; white-space: nowrap; }
+
+/* ---------- shelves ---------- */
+.shelf-chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 22px; }
+.shelf-chips .chip { box-shadow: inset 0 0 0 1px var(--line); border-radius: 15px; }
+.shelf-chips .chip.dashed { box-shadow: none; outline: 1px dashed var(--ink-3); outline-offset: -1px; }
+.desk { display: flex; gap: 20px; padding: 18px 22px; background: var(--panel); border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 34px; flex-wrap: wrap; }
+.desk .intro { flex: 0 0 200px; }
+.desk .intro p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); }
+.desk h3 { margin: 0; font: 400 22px var(--read); }
+.desk .k { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+.desk .slots { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; min-width: 0; }
+.desk .slot { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); min-width: 0; }
+.desk .slot .th { width: 46px; height: 56px; flex: none; border-radius: 2px; background: var(--cover-paper); }
+.desk .slot div { min-width: 0; }
+.desk .slot small { font-size: 11.5px; color: var(--ink-2); }
+.desk .slot b { display: block; font: 400 16px var(--read); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sec-h { display: flex; align-items: center; gap: 14px; margin: 34px 0 20px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.sec-h::after { content: ""; flex: 1; height: 1px; background: var(--line); order: 1; }
+.sec-h .n { order: 2; letter-spacing: 0; text-transform: none; font-weight: 400; font-size: 12.5px; }
+.shelf { display: grid; grid-template-columns: 200px 1fr; gap: 32px; margin-bottom: 40px; align-items: end; }
+.shelf .meta .k { font-size: 11.5px; color: var(--ink-2); display: flex; gap: 6px; align-items: center; }
+.shelf .meta h3 { font: 400 23px var(--read); margin: 4px 0 6px; }
+.shelf .meta p { margin: 0 0 10px; font-size: 13px; color: var(--ink-2); }
+.shelf .meta .acts { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.linkbtn { all: unset; cursor: pointer; color: var(--accent); font-size: 13.5px; display: inline-flex; gap: 4px; align-items: center; }
+.linkbtn:hover { text-decoration: underline; }
+.linkbtn:focus-visible { outline: 2px solid var(--accent); }
+.board { position: relative; display: flex; align-items: flex-end; gap: 6px; overflow-x: auto; padding: 14px 4px 0; border-bottom: 2px solid var(--ink); scrollbar-width: thin; min-width: 0; }
+.board::after { content: ""; position: absolute; }
+.print { flex: none; background: #fff; padding: 6px 6px 22px; box-shadow: var(--shadow-pic); position: relative; cursor: zoom-in; border: 0; font: inherit; text-align: left; }
+.print img { display: block; object-fit: cover; }
+.print span { position: absolute; left: 7px; right: 7px; bottom: 5px; font-size: 10.5px; color: #4a5560; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.print:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.print .pk { position: absolute; top: 9px; right: 9px; color: #b7791f; font-size: 12px; text-shadow: 0 0 3px rgba(0, 0, 0, .4); }
+.shelf.unsorted .board { border-bottom-style: dashed; }
+.spine-v { flex: none; width: 196px; }
+
+/* ---------- quick view ---------- */
+.qv { position: fixed; inset: 0; z-index: 50; display: grid; grid-template-columns: 1fr 380px; gap: 0; background: var(--scrim-blur); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); animation: fadeIn var(--dur-s) var(--ease); }
+@keyframes fadeIn { from { opacity: 0; } }
+.qv-stage { position: relative; overflow: hidden; touch-action: none; margin: 24px 0 24px 24px; display: flex; flex-direction: column; min-width: 0; }
+.qv-view { position: relative; flex: 1; overflow: hidden; border-radius: 8px; }
+.qv-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; box-shadow: var(--shadow-float); }
+.qv-world img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; }
+.qv-view.can-pan { cursor: grab; }
+.qv-view.panning { cursor: grabbing; }
+.qv-view.drawing { cursor: crosshair; }
+.region { position: absolute; border: calc(2px * var(--inv, 1)) solid #fff; box-shadow: 0 0 0 calc(1px * var(--inv, 1)) rgba(0, 0, 0, .55); border-radius: calc(2px * var(--inv, 1)); }
+.region b { position: absolute; left: calc(-2px * var(--inv, 1)); top: calc(-2px * var(--inv, 1)); transform: translateY(-100%) scale(var(--inv, 1)); transform-origin: 0 100%; background: #fff; color: #111; font: 600 11px var(--ui); padding: 1px 6px; border-radius: 3px 3px 3px 0; white-space: nowrap; }
+.region.hot { border-color: #f6dc8f; }
+.region.hot b { background: #f6dc8f; }
+.region.draft { border-style: dashed; }
+.qv-hud { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; align-items: center; z-index: 4; padding: 4px; border-radius: 8px; background: var(--media-control); box-shadow: 0 2px 10px rgba(0, 0, 0, .12); color: #22303a; }
+.qv-hud button { all: unset; cursor: pointer; height: 28px; min-width: 28px; padding: 0 6px; display: grid; place-items: center; border-radius: 5px; font-size: 12.5px; font-weight: 500; }
+.qv-hud button:hover { background: rgba(34, 48, 58, .08); }
+.qv-hud button[aria-pressed="true"] { background: #22303a; color: #fff; }
+.qv-hud button:focus-visible { outline: 2px solid #1e3e9e; }
+.qv-hud .ro { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; font-size: 12px; color: #4a5866; }
+.qv-hud .sep { width: 1px; height: 18px; background: rgba(34, 48, 58, .15); }
+.qv-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--media-control); color: #22303a; display: grid; place-items: center; opacity: 0; transition: opacity var(--dur-q); z-index: 4; box-shadow: 0 2px 10px rgba(0, 0, 0, .15); }
+.qv-stage:hover .qv-nav, .qv-nav:focus-visible { opacity: 1; }
+.qv-nav.prev { left: 10px; } .qv-nav.next { right: 10px; }
+.qv-strip { display: flex; gap: 6px; padding: 12px 0 0; overflow-x: auto; scrollbar-width: none; flex: none; }
+.qv-strip button { all: unset; cursor: pointer; flex: none; width: 54px; height: 40px; border-radius: 3px; overflow: hidden; opacity: .55; transition: opacity var(--dur-q); background: var(--mat); }
+.qv-strip button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qv-strip button[aria-current="true"] { opacity: 1; outline: 2px solid var(--accent); outline-offset: 1px; }
+.qv-strip button:hover { opacity: 1; }
+.qv-tip { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); background: var(--media-badge); color: #fff; font-size: 12.5px; padding: 6px 12px; border-radius: 6px; z-index: 5; pointer-events: none; white-space: nowrap; }
+.qv-panel { margin: 24px; background: var(--float); border-radius: 12px; box-shadow: var(--shadow-float), inset 0 0 0 1px var(--line); display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.qv-ptop { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 0; }
+.qv-ptop .k { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.icon-btn { all: unset; cursor: pointer; width: 30px; height: 30px; border-radius: 6px; display: grid; place-items: center; color: var(--ink-2); }
+.icon-btn:hover { background: var(--hover); color: var(--ink); }
+.icon-btn:focus-visible { outline: 2px solid var(--accent); }
+.icon-btn.on { color: var(--pick); }
+.qv-body { padding: 8px 20px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.qv-body h2 { font: 400 26px/1.15 var(--read); margin: 0; text-wrap: balance; }
+.qv-body .capt { margin: 0; font-size: 14px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: 84px 1fr; gap: 6px 10px; font-size: 12.5px; align-items: center; }
+.facts dt { color: var(--ink-2); }
+.facts dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; min-width: 0; font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 8px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; background: var(--panel); }
+.pill button { all: unset; cursor: pointer; color: var(--ink-3); font-size: 11px; }
+.pill button:hover { color: var(--ink); }
+.addbtn { all: unset; cursor: pointer; font-size: 12px; color: var(--ink-2); padding: 0 4px; }
+.addbtn:hover { color: var(--accent); }
+.palette { display: flex; height: 22px; border-radius: 4px; overflow: hidden; width: 100%; box-shadow: inset 0 0 0 1px var(--line); }
+.palette button { all: unset; cursor: pointer; height: 100%; min-width: 10px; }
+.palette button:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+.palette button:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.subh { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 500; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.notes { display: flex; flex-direction: column; gap: 8px; }
+.notes .note { display: flex; gap: 8px; font-size: 13.5px; padding: 8px 10px; border-radius: 6px; background: var(--note-paper); box-shadow: inset 0 0 0 1px var(--line); }
+.notes .note .num { flex: none; width: 20px; height: 20px; border-radius: 4px; background: var(--ink); color: var(--paper); font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+.notes .note small { display: block; color: var(--ink-3); font-size: 11px; margin-top: 2px; }
+.composer { border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.composer label { font-size: 11.5px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.composer textarea { border: 0; background: transparent; resize: none; font: 15px/1.4 var(--read); min-height: 48px; color: var(--ink); }
+.composer textarea:focus { outline: none; }
+.composer .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--ink-3); }
+.qv-foot { border-top: 1px solid var(--line); padding: 12px 20px; display: flex; gap: 6px; flex-wrap: wrap; }
+.keys { font-size: 11.5px; color: var(--ink-3); line-height: 1.8; }
+.qv.fs { grid-template-columns: 1fr; background: var(--fs-mat); backdrop-filter: none; }
+.qv.fs .qv-panel { display: none; }
+.qv.fs .qv-stage { margin: 0; }
+.qv.fs .qv-view { border-radius: 0; }
+.qv.fs .qv-world { box-shadow: none; }
+.qv.fs .qv-strip { position: absolute; left: 0; right: 0; bottom: 0; justify-content: center; padding: 10px; background: linear-gradient(transparent, rgba(0, 0, 0, .5)); opacity: 0; transition: opacity var(--dur-s); }
+.qv.fs .qv-stage:hover .qv-strip { opacity: 1; }
+.fs-info { display: none; }
+.qv.fs .fs-info { display: block; position: absolute; left: 16px; top: 14px; color: var(--fs-ink); font-size: 13px; z-index: 4; text-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+.qv.fs .fs-info b { font: 400 18px var(--read); display: block; }
+
+/* ---------- sort mode ---------- */
+.sm { position: fixed; inset: 0; z-index: 55; background: var(--paper); display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: minmax(0, 1fr); animation: fadeIn var(--dur-s) var(--ease); }
+.sm-stage { position: relative; display: flex; flex-direction: column; padding: 24px; min-width: 0; min-height: 0; }
+.sm-img { flex: 1; min-height: 0; position: relative; }
+.sm-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.sm-strip { display: flex; gap: 6px; padding-top: 14px; overflow-x: auto; }
+.sm-strip div { flex: none; width: 60px; height: 44px; border-radius: 3px; overflow: hidden; opacity: .45; position: relative; }
+.sm-strip div.cur { opacity: 1; outline: 2px solid var(--accent); outline-offset: 1px; }
+.sm-strip div.done::after { content: "\2713"; position: absolute; right: 2px; bottom: 1px; color: #fff; font-size: 11px; background: var(--ok); border-radius: 50%; width: 15px; height: 15px; display: grid; place-items: center; }
+.sm-strip img { width: 100%; height: 100%; object-fit: cover; }
+.sm-panel { border-left: 1px solid var(--line); background: var(--panel); padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+.sm-panel h2 { margin: 0; font: 400 24px/1.2 var(--read); }
+.sm-prog { height: 4px; border-radius: 2px; background: var(--board); overflow: hidden; }
+.sm-prog i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-m) var(--ease); }
+.keychips { display: flex; flex-wrap: wrap; gap: 6px; }
+.keychip { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px 0 4px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); font-size: 13px; }
+.keychip kbd { min-width: 18px; text-align: center; }
+.keychip.on { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent-strong); }
+.keychip:focus-visible { outline: 2px solid var(--accent); }
+.sm-sec h4 { margin: 0 0 8px; font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); font-weight: 500; display: flex; justify-content: space-between; }
+.sm-done { text-align: center; padding: 40px 0; }
+.sm-done h2 { margin-bottom: 8px; }
+
+/* ---------- loci ---------- */
+.loci { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
+.loci-map { background: var(--board); border-radius: 10px; position: relative; overflow: hidden; }
+.loci-map svg { display: block; width: 100%; height: auto; }
+.loci-crumbs { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); margin-bottom: 14px; flex-wrap: wrap; }
+.loci-crumbs button { all: unset; cursor: pointer; color: var(--accent); }
+.loci-crumbs button:hover { text-decoration: underline; }
+.hl-bar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-strong); font-size: 13px; margin-bottom: 12px; flex-wrap: wrap; }
+.node { cursor: pointer; }
+.node text { font: 13px var(--ui); fill: var(--ink); paint-order: stroke; stroke: var(--board); stroke-width: 4px; }
+.node.center text { font: 400 20px var(--read); }
+.node.dim { opacity: .28; }
+.node:hover circle.dotc { filter: drop-shadow(0 3px 5px rgba(34, 48, 58, .22)); }
+.node:focus-visible { outline: none; }
+.node:focus-visible circle.dotc { stroke: var(--accent); stroke-width: 3; }
+.lane-card { cursor: pointer; }
+.lane-card rect.bg { fill: var(--panel); stroke: var(--line); }
+.lane-card:hover rect.bg { stroke: var(--accent); }
+.lane-card text { font: 12px var(--ui); fill: var(--ink); }
+.inspector { background: var(--float); border-radius: 12px; box-shadow: var(--shadow-float), inset 0 0 0 1px var(--line); padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.inspector .k { font-size: 11.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.inspector h2 { margin: 0; font: 400 26px/1.15 var(--read); }
+.keypic { position: relative; border-radius: 6px; overflow: hidden; aspect-ratio: 3 / 2; background: var(--mat); cursor: zoom-in; border: 0; padding: 0; width: 100%; }
+.keypic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.keypic span { position: absolute; left: 8px; bottom: 8px; font-size: 11px; background: var(--media-badge); color: #fff; padding: 2px 7px; border-radius: 3px; }
+.mood { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.mood button { all: unset; cursor: zoom-in; aspect-ratio: 1; border-radius: 3px; overflow: hidden; background: var(--mat); }
+.mood button img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mood button:focus-visible { outline: 2px solid var(--accent); }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); }
+
+/* ---------- guide, toasts ---------- */
+.guide-btn { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 45; height: 38px; padding: 0 14px; border-radius: 19px; background: var(--ink); color: var(--paper); font-size: 13px; font-weight: 500; border: 0; box-shadow: var(--shadow-lift); display: inline-flex; align-items: center; gap: 8px; }
+.guide { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); z-index: 46; width: 380px; max-width: calc(100vw - 32px); max-height: calc(100vh - 100px); overflow: auto; background: var(--float); border-radius: 12px; box-shadow: var(--shadow-float), inset 0 0 0 1px var(--line); padding: 18px 20px; }
+.guide h3 { margin: 0 0 4px; font: 400 21px var(--read); }
+.guide p { margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
+.guide ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.guide li { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: start; font-size: 13px; }
+.guide li .i { width: 20px; height: 20px; border-radius: 4px; background: var(--accent-soft); color: var(--accent-strong); font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+.guide li small { display: block; color: var(--ink-2); font-size: 12px; }
+.guide .note { margin-top: 14px; font-size: 11.5px; color: var(--ink-3); }
+.toasts { position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 70; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast { background: var(--ink); color: var(--paper); padding: 9px 14px; border-radius: 8px; font-size: 13px; box-shadow: var(--shadow-lift); animation: toastIn var(--dur-s) var(--ease-in); max-width: calc(100vw - 32px); }
+@keyframes toastIn { from { transform: translateY(8px); opacity: 0; } }
+.confirm { display: flex; align-items: center; gap: 8px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) { .loci { grid-template-columns: 1fr; } }
+@media (max-width: 980px) {
+  .qv { grid-template-columns: 1fr; grid-template-rows: minmax(0, 58vh) minmax(0, 1fr); }
+  .qv-stage { margin: 12px 12px 0; }
+  .qv-panel { margin: 12px; }
+  .sm { grid-template-columns: 1fr; grid-template-rows: minmax(0, 52vh) auto; overflow-y: auto; }
+  .sm-panel { border-left: 0; border-top: 1px solid var(--line); }
+  .shelf { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 700px) {
+  .rail { inset: auto 0 0 0; width: auto; height: calc(56px + env(safe-area-inset-bottom, 0px)); flex-direction: row; justify-content: space-around; padding: 0 max(8px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(8px, env(safe-area-inset-left, 0px)); border-right: 0; border-top: 1px solid var(--line); }
+  .rail .logo, .rail .grow, .rail .rail-extra { display: none; }
+  .stage { margin-left: 0; padding: 20px 16px 140px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .search { font-size: 21px; }
+  .desk .intro { flex-basis: 100%; }
+  .guide-btn { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .guide { bottom: calc(114px + env(safe-area-inset-bottom, 0px)); }
+  .bulk { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .prow { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .prow > * { flex: none; }
+  .prow .grow { display: none; }
+  .pbar { padding: 10px 12px; gap: 8px; }
+  .hud-l { display: none; }
+  .qv-hud { left: 8px; right: 8px; top: 8px; justify-content: space-between; }
+}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Studiolo">
+    <div class="logo" aria-hidden="true">S</div>
+    <button class="rail-extra" title="Capture" data-act="toast" data-msg="Capture isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7.5"/><path d="M10 6.5v7M6.5 10h7"/></svg><span class="vh">Capture</span></button>
+    <button title="Today" data-act="toast" data-msg="Today isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><span class="vh">Today</span></button>
+    <button title="Learn" data-act="toast" data-msg="Learn isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l8-4 8 4-8 4z"/><path d="M5.5 9.8V13c1.2 1.3 2.7 2 4.5 2s3.3-.7 4.5-2V9.8"/></svg><span class="vh">Learn</span></button>
+    <button id="nav-cp" title="Commonplace" data-act="dest" data-dest="commonplace"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4v12M7.5 4v12M11 4.5l3.5 11.2"/></svg><span class="vh">Commonplace</span></button>
+    <button id="nav-loci" title="Loci" data-act="dest" data-dest="loci"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2.5" width="4" height="4" rx="1"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><rect x="13.5" y="13.5" width="4" height="4" rx="1"/><path d="M10 6.5v3.5M4.5 13.5V10h11v3.5"/></svg><span class="vh">Loci</span></button>
+    <div class="grow"></div>
+    <button class="rail-extra" title="Switch theme" data-act="theme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8z"/></svg><span class="vh">Switch theme</span></button>
+    <div class="me rail-extra" aria-hidden="true">S</div>
+  </nav>
+  <main class="stage" id="main" tabindex="-1"></main>
+</div>
+<div id="layer"></div>
+<button class="guide-btn" data-act="guide" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="8"/><path d="M10 14v-4M10 6.5v.1"/></svg>Prototype guide</button>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================= data ================= */
+const META = /*META*/{};
+const TOPICS = [
+  { id: "a1", name: "Architecture", parent: null, status: 2 },
+  { id: "t1", name: "Islamic architecture", parent: "a1", status: 2 },
+  { id: "t1a", name: "Courtyards", parent: "t1", status: 2 },
+  { id: "t1b", name: "Arcades & hypostyle", parent: "t1", status: 1 },
+  { id: "t2", name: "Climate-responsive design", parent: "a1", status: 1 },
+  { id: "t2a", name: "Wind towers", parent: "t2", status: 1 },
+  { id: "t2b", name: "Shading & screens", parent: "t2", status: 0 },
+  { id: "t3", name: "Light & threshold", parent: "a1", status: 2 },
+  { id: "t4", name: "Materials", parent: "a1", status: 0 },
+  { id: "t4a", name: "Brick", parent: "t4", status: 1 },
+  { id: "t4b", name: "Earth", parent: "t4", status: 0 },
+  { id: "t4c", name: "Timber", parent: "t4", status: 0 },
+  { id: "t4d", name: "Tile & stone", parent: "t4", status: 0 },
+  { id: "a2", name: "Practice", parent: null, status: 1 },
+  { id: "t5", name: "Riyadh library competition", parent: "a2", status: 1 },
+  { id: "t5a", name: "Massing options", parent: "t5", status: 1 },
+  { id: "t6", name: "Housing study", parent: "a2", status: 0 },
+];
+const KINDS = [
+  { id: "site", name: "Site visits" }, { id: "refs", name: "References" }, { id: "renders", name: "Renders" },
+  { id: "drawings", name: "Drawings" }, { id: "materials", name: "Materials" },
+];
+const ALBUMS = { kairouan: "Kairouan, site visit", yazd: "Yazd, wind towers", comp: "Library competition, stage 1" };
+const COLLS = [{ id: "books", name: "Books" }, { id: "lectures", name: "Lectures" }, { id: "links", name: "Links" }, { id: "quotes", name: "Quotes" }];
+const SONY = "Sony α7 IV", IPH = "iPhone 16 Pro", ENS = "Rhino 8 + Enscape", SCAN = "Scan, 600 dpi";
+const P = (id, title, caption, kind, topics, date, camera, extra = {}) => ({ id, type: "photo", title, caption, kind, topics, date, camera, picked: false, album: null, source: null, notes: [], ...extra });
+const PHOTOS = [
+  P("courtyard-morning", "Courtyard toward the prayer hall", "Morning, from the north gate. The pool sits on the axis of the wider central bay.", "site", ["t1a", "t1b"], "2026-09-12", SONY, { picked: true, album: "kairouan", notes: [{ id: "n1", text: "The pool lines up with the axial bay, not with the gate.", region: [0.30, 0.56, 0.36, 0.1], date: "12 Sep" }, { id: "n2", text: "Minaret reads as the end of the axis from everywhere in the court.", region: [0.40, 0.08, 0.12, 0.52], date: "12 Sep" }] }),
+  P("courtyard-noon", "Arcade at noon", "Shade only inside the arcade at this hour; the court itself is a heat trap.", "site", ["t1a", "t2b"], "2026-09-12", SONY, { album: "kairouan" }),
+  P("hypostyle", "Hypostyle hall, light through the roof", "Openings in the roof slab, not windows: light arrives in pools between the columns.", "site", ["t1b", "t3"], "2026-09-12", SONY, { picked: true, album: "kairouan" }),
+  P("colonnade-dusk", "Colonnade at dusk", "The colonnade keeps its rhythm long after the court goes dark.", "site", ["t1b"], "2026-09-12", SONY, { album: "kairouan" }),
+  P("column-base", "Column base, reused capital", "A Roman piece turned upside down as a base. Every column here is different.", "site", ["t1b"], "2026-09-13", IPH, { album: "kairouan", notes: [{ id: "n3", text: "Two torus mouldings, the lower one wider. Compare with the Córdoba bases.", region: [0.18, 0.62, 0.62, 0.16], date: "13 Sep" }] }),
+  P("windtowers", "Wind towers over the old quarter", "Each tower faces the summer wind; the slots are on one side only.", "site", ["t2a"], "2026-04-03", IPH, { picked: true, album: "yazd" }),
+  P("earth-wall", "Rammed earth wall, long view", "Garden wall on the edge of town. You can count the lifts.", "site", ["t4b"], "2026-04-03", IPH, { album: "yazd" }),
+  P("vaults", "Vaulted roofs, mud brick", "Barrel vaults in a row, a dome at the end. No formwork used.", "site", ["t4b", "t1a"], "2026-04-04", IPH, { album: "yazd" }),
+  P("stepwell", "Stepwell, looking down", "", "site", [], "2026-04-04", IPH, { album: "yazd" }),
+  P("screen-shadow", "Mashrabiya shadow on the floor", "Late afternoon in a Cairo house. The screen draws on the floor for an hour.", "site", ["t2b", "t3"], "2026-02-18", IPH, { picked: true }),
+  P("brick-hall", "Brick prayer hall, light from above", "Saved for the way light comes down the brick, not across it.", "refs", ["t4a", "t3"], "2026-08-22", "", { picked: true, source: { site: "archdaily.com", url: "https://www.archdaily.com" } }),
+  P("stair-light", "Stair under a roof light", "Board-marked concrete, one slot of light at the top.", "refs", ["t3"], "2026-08-29", "", { source: { site: "archdaily.com", url: "https://www.archdaily.com" } }),
+  P("tower", "Tower with brise-soleil", "", "refs", [], "2026-10-02", "", { source: { site: "divisare.com", url: "https://divisare.com" } }),
+  P("block-axo", "Urban block, axonometric", "", "renders", [], "2026-10-06", ENS),
+  P("pavilion-a", "Massing option A: one long roof", "Reading hall under a single roof plane, closed to the north.", "renders", ["t5a"], "2026-10-14", ENS, { picked: true, album: "comp" }),
+  P("pavilion-b", "Massing option B: open both sides", "Same roof, colonnade both sides. Too much glare in the afternoon.", "renders", ["t5a"], "2026-10-14", ENS, { album: "comp" }),
+  P("reading-room", "Reading room with clerestory", "North clerestory, no direct sun on the tables.", "renders", ["t5", "t3"], "2026-10-15", ENS, { picked: true, album: "comp" }),
+  P("vault-study", "Vault study, clay model", "Testing barrel vaults over the stacks.", "renders", ["t5a", "t4b"], "2026-10-16", ENS, { album: "comp" }),
+  P("courthouse-aerial", "Courtyard house, aerial", "Four rooms round a court; the tall wing takes the wind tower.", "renders", ["t1a", "t6"], "2026-09-30", ENS),
+  P("plan-courtyard", "Courtyard house, ground floor plan", "Liwan to the west, majlis to the east. Columns only on the court.", "drawings", ["t1a", "t6"], "2026-09-28", SCAN, { picked: true }),
+  P("tplan", "T-plan prayer hall, column grid", "The wider axial aisle meets the qibla transept.", "drawings", ["t1b"], "2026-09-15", SCAN),
+  P("section-windtower", "Section through a wind tower", "Cool air down the tower, warm air out through the high openings.", "drawings", ["t2a"], "2026-04-10", SCAN, { picked: true }),
+  P("arcade-elevation", "Arcade elevation, bay proportions", "Bay 3.8 m, spring 3.2 m. Worth testing at 1:20.", "drawings", ["t1b"], "2026-09-16", SCAN),
+  P("stair-section", "Stair section, light study", "", "drawings", [], "2026-10-18", SCAN),
+  P("mat-brick", "Flemish bond, hand-made brick", "Headers a shade darker than the stretchers.", "materials", ["t4a"], "2026-07-02", IPH, { picked: true }),
+  P("mat-zellige", "Zellige, green glaze", "Each tile slightly different. The joints stay wide.", "materials", ["t4d"], "2026-07-02", IPH),
+  P("mat-earth", "Rammed earth sample", "Sample panel from the Yazd workshop.", "materials", ["t4b"], "2026-04-05", IPH),
+  P("mat-oak", "Oak boards, oiled", "", "materials", ["t4c"], "2026-06-20", IPH),
+  P("mat-terrazzo", "Terrazzo, warm aggregate", "", "materials", ["t4d"], "2026-08-11", "", { source: { site: "pinterest.com", url: "https://www.pinterest.com" } }),
+  P("mat-jali", "Perforated brick screen", "Half-bricks left out. Light and air, no glass.", "materials", ["t4a", "t2b"], "2026-07-03", IPH, { picked: true }),
+  P("mat-travertine", "Travertine, vein cut", "", "materials", [], "2026-10-12", IPH),
+  P("mat-concrete", "Board-marked concrete", "", "materials", [], "2026-10-20", IPH),
+];
+const OTHERS = [
+  { id: "q1", type: "quote", text: "Shade first, then mass, then air.", src: "Studio course · Climate and Architecture: lecture notes, p. 3", coll: "quotes", topics: ["t2"], date: "2026-10-21" },
+  { id: "n-sh", type: "note", text: "The mausoleum at Sultan Hassan faces the Citadel, not the city. Mentions Hassan Fathy.", topics: ["t1"], date: "2026-10-17" },
+  { id: "b1", type: "book", title: "Islamic Architecture: Form, Function and Meaning", creator: "Robert Hillenbrand, 1994", coll: "books", topics: ["t1"], date: "2026-10-09" },
+  { id: "v1", type: "video", title: "The Great Mosque of Córdoba, plan and extensions", creator: "Studio lecture", dur: "30:00", prog: .35, coll: "lectures", topics: ["t1b"], date: "2026-09-25" },
+  { id: "q2", type: "quote", text: "The eye never quite finds the end of the field.", src: "Studio lecture · Córdoba, 10:05", coll: "quotes", topics: ["t1b"], date: "2026-09-20" },
+  { id: "l1", type: "link", title: "Bait Ur Rouf Mosque, Marina Tabassum", site: "archdaily.com", desc: "Brick, no dome, light from above.", coll: "links", topics: ["t3", "t4a"], date: "2026-08-22" },
+  { id: "ln", type: "longnote", title: "What I took from Sultan Hassan", text: "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.", topics: ["t1a"], date: "2026-08-02" },
+  { id: "q3", type: "quote", text: "We have to design for the climate, not against it.", src: "Hassan Fathy", coll: "quotes", topics: ["t2"], date: "2026-05-02" },
+  { id: "v2", type: "video", title: "Murcutt draws a roof", creator: "youtube.com", dur: "12:40", prog: 0, coll: "lectures", topics: ["t5a"], date: "2026-10-19" },
+];
+PHOTOS.forEach((p, i) => { const m = META[p.id]; p.w = m[0]; p.h = m[1]; p.light = m[2]; p.palette = m[3].map(([hex, share]) => ({ hex, share, lab: hexToLab(hex) })); p.added = Date.parse(p.date) + i * 60000; });
+OTHERS.forEach((o, i) => { o.added = Date.parse(o.date) + 3600000 + i * 60000; });
+const BY = Object.fromEntries([...PHOTOS, ...OTHERS].map(x => [x.id, x]));
+const T = Object.fromEntries(TOPICS.map(t => [t.id, t]));
+const COLOURS = [
+  { id: "red", name: "Red", hex: "#b23a2c" }, { id: "terracotta", name: "Terracotta", hex: "#b26a3a" }, { id: "ochre", name: "Ochre", hex: "#c99a52" },
+  { id: "sand", name: "Sand", hex: "#dcc7a4" }, { id: "olive", name: "Olive", hex: "#7c8452" }, { id: "green", name: "Green", hex: "#2f7563" },
+  { id: "teal", name: "Teal", hex: "#3f6f87" }, { id: "sky", name: "Sky blue", hex: "#90afd3" }, { id: "navy", name: "Navy", hex: "#26385e" },
+  { id: "violet", name: "Violet", hex: "#6a5a8c" }, { id: "white", name: "White", hex: "#f4f2ec" }, { id: "grey", name: "Grey", hex: "#a8a7a2" },
+  { id: "charcoal", name: "Charcoal", hex: "#3a3936" }, { id: "black", name: "Black", hex: "#0e0c0a" }, { id: "brown", name: "Brown", hex: "#6b4428" },
+];
+
+/* ================= helpers ================= */
+function hexToLab(hex) {
+  const n = parseInt(hex.slice(1), 16); let r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+  [r, g, b] = [r, g, b].map(v => v > .04045 ? ((v + .055) / 1.055) ** 2.4 : v / 12.92);
+  let x = (r * .4124 + g * .3576 + b * .1805) / .95047, y = r * .2126 + g * .7152 + b * .0722, z = (r * .0193 + g * .1192 + b * .9505) / 1.08883;
+  const f = v => v > .008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116; x = f(x); y = f(y); z = f(z);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+const dE = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const fmtDate = d => { const x = new Date(d + "T12:00:00"); return `${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
+const monthOf = d => { const x = new Date(d + "T12:00:00"); return `${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
+const thumb = p => `img/${p.id}-t.jpg`, full = p => `img/${p.id}.jpg`;
+const kindName = id => KINDS.find(k => k.id === id)?.name || "";
+const ratioOf = p => p.w / p.h;
+const shapeOf = p => { const r = ratioOf(p); return r > 1.9 ? "panorama" : r > 1.12 ? "landscape" : r < .89 ? "portrait" : "square"; };
+const ratioLabel = p => { const r = ratioOf(p); const known = [[3, 2], [2, 3], [4, 5], [5, 4], [16, 9], [3, 1], [1, 1], [4, 3], [3, 4]]; for (const [a, b] of known) if (Math.abs(r - a / b) < .02) return `${a}:${b}`; return r.toFixed(2) + ":1"; };
+const mp = p => (p.w * p.h / 1e6).toFixed(1);
+const fsize = p => (p.w * p.h * (p.kind === "drawings" ? .18 : .62) / 1e6).toFixed(1) + " MB";
+const ancestors = id => { const out = []; let t = T[id]; while (t) { out.push(t.id); t = T[t.parent]; } return out; };
+const descendants = id => { const out = [id]; TOPICS.forEach(t => { if (t.parent === id) out.push(...descendants(t.id)); }); return out; };
+const areaOf = id => ancestors(id).slice(-1)[0];
+const leafTopics = () => TOPICS.filter(t => t.parent && !TOPICS.some(c => c.parent === t.id) || ["t3", "t6"].includes(t.id));
+const store = { get(k, d) { try { const v = localStorage.getItem("cp-photos:" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem("cp-photos:" + k, JSON.stringify(v)); } catch (e) { } } };
+
+/* ================= state ================= */
+const S = {
+  dest: "commonplace", view: "wall", chip: "all", q: "",
+  ph: Object.assign({ layout: "rows", size: 220, sort: "newest", group: "none", caps: "show" }, store.get("prefs", {})),
+  pf: { scope: "all", kind: null, view: null, colour: null, custom: null, shape: null, light: null, topic: null },
+  sel: { on: false, ids: new Set(), anchor: null }, focus: null,
+  covers: {}, views: [
+    { id: "v1", name: "Warm brick references", f: { scope: "all", kind: null, colour: "terracotta", shape: null, light: null, topic: "t4a" } },
+    { id: "v2", name: "Competition picks", f: { scope: "picks", kind: null, colour: null, shape: null, light: null, topic: "t5" } },
+  ],
+  loci: { focus: "a1", hl: null, centrePic: false },
+  qv: null, sm: null, guide: false,
+};
+const loaded = new Set();
+
+/* ================= filtering ================= */
+function inPhotosMode() { return S.chip === "type:photo" || S.chip.startsWith("kind:"); }
+function matchesQ(x) {
+  if (!S.q.trim()) return true; const q = S.q.trim().toLowerCase();
+  const hay = [x.title, x.caption, x.text, x.src, x.creator, x.desc, x.site, x.source?.site, kindName(x.kind), x.album && ALBUMS[x.album], ...(x.topics || []).map(t => T[t].name), ...(x.notes || []).map(n => n.text)].join(" ").toLowerCase();
+  return hay.includes(q);
+}
+function colourMatch(p, lab) { return p.palette.some(c => c.share >= .06 && dE(c.lab, lab) < 24); }
+function photoFilter(f = S.pf) {
+  let list = PHOTOS.filter(matchesQ);
+  if (f.scope === "unsorted") list = list.filter(p => !p.topics.length);
+  if (f.scope === "picks") list = list.filter(p => p.picked);
+  if (f.kind) list = list.filter(p => p.kind === f.kind);
+  if (f.topic) { const d = descendants(f.topic); list = list.filter(p => p.topics.some(t => d.includes(t))); }
+  if (f.colour) { const lab = hexToLab(f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex); list = list.filter(p => colourMatch(p, lab)); }
+  if (f.shape) list = list.filter(p => shapeOf(p) === f.shape);
+  if (f.light) list = list.filter(p => f.light === "dark" ? p.light < 40 : p.light > 60);
+  return list;
+}
+function hueOf(p) { const c = p.palette.find(x => x.share > .1) || p.palette[0]; const [L, a, b] = c.lab; const chroma = Math.hypot(a, b); return chroma < 8 ? 1000 + (100 - L) : (Math.atan2(b, a) * 180 / Math.PI + 360 + 330) % 360; }
+function sortPhotos(list) {
+  const s = S.ph.sort, l = [...list];
+  if (s === "newest") l.sort((a, b) => b.added - a.added);
+  if (s === "oldest") l.sort((a, b) => a.added - b.added);
+  if (s === "taken") l.sort((a, b) => b.date.localeCompare(a.date));
+  if (s === "colour") l.sort((a, b) => hueOf(a) - hueOf(b));
+  if (s === "shape") l.sort((a, b) => ratioOf(b) - ratioOf(a));
+  if (s === "res") l.sort((a, b) => b.w * b.h - a.w * a.h);
+  if (s === "title") l.sort((a, b) => a.title.localeCompare(b.title));
+  if (s === "shuffle") { let seed = S.shuffleSeed || (S.shuffleSeed = Math.floor(Math.random() * 1e6) + 1); const r = () => (seed = seed * 16807 % 2147483647) / 2147483647; l.forEach((_, i) => { const j = Math.floor(r() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; }); }
+  return l;
+}
+function groupPhotos(list) {
+  const g = S.ph.group; if (g === "none") return [{ key: null, items: list }];
+  const map = new Map(); const add = (k, label, p, extra) => { if (!map.has(k)) map.set(k, { key: k, label, items: [], extra }); map.get(k).items.push(p); };
+  for (const p of list) {
+    if (g === "kind") add(p.kind, kindName(p.kind), p);
+    if (g === "area") { const areas = [...new Set(p.topics.map(areaOf))]; if (!areas.length) add("none", "No area yet", p); areas.forEach(a => add(a, T[a].name, p)); }
+    if (g === "topic") { const tops = [...new Set(p.topics.map(t => T[t].parent && T[T[t].parent].parent ? T[t].parent : t))]; if (!tops.length) add("none", "No topic yet", p); tops.forEach(t => add(t, T[t].name, p)); }
+    if (g === "month") add(p.date.slice(0, 7), monthOf(p.date), p);
+    if (g === "album") add(p.album || "zz", p.album ? ALBUMS[p.album] : "Not in an album", p);
+    if (g === "colour") { const c = COLOURS.reduce((best, c) => { const d = dE(hexToLab(c.hex), (p.palette.find(x => x.share > .1) || p.palette[0]).lab); return d < best.d ? { c, d } : best; }, { d: 1e9 }).c; add(c.id, c.name, p, c.hex); }
+  }
+  let groups = [...map.values()];
+  if (g === "month") groups.sort((a, b) => b.key.localeCompare(a.key));
+  if (g === "colour") groups.sort((a, b) => COLOURS.findIndex(c => c.id === a.key) - COLOURS.findIndex(c => c.id === b.key));
+  if (g === "area" || g === "topic") groups.sort((a, b) => (a.key === "none") - (b.key === "none") || TOPICS.findIndex(t => t.id === a.key) - TOPICS.findIndex(t => t.id === b.key));
+  return groups;
+}
+function wallItems() {
+  let items;
+  const c = S.chip;
+  if (c === "all") items = [...PHOTOS, ...OTHERS];
+  else if (c.startsWith("coll:")) items = OTHERS.filter(o => o.coll === c.slice(5));
+  else if (c === "type:note") items = OTHERS.filter(o => o.type === "note" || o.type === "longnote");
+  else if (c === "type:quote") items = OTHERS.filter(o => o.type === "quote");
+  else if (c === "type:source") items = OTHERS.filter(o => ["book", "video", "link"].includes(o.type));
+  else items = [];
+  items = items.filter(matchesQ).sort((a, b) => b.added - a.added);
+  if (c === "all" && !S.q.trim()) { // today's rule: photo groups collapse into one card without a filter
+    const seen = new Set(); items = items.filter(x => { if (x.type !== "photo" || !x.album) return true; if (seen.has(x.album)) return false; seen.add(x.album); return true; });
+  }
+  return items;
+}
+function filterLabel() {
+  const f = S.pf, bits = [];
+  if (f.scope === "unsorted") bits.push("Unsorted"); if (f.scope === "picks") bits.push("Picks");
+  if (f.kind) bits.push(kindName(f.kind)); if (f.topic) bits.push(T[f.topic].name);
+  if (f.colour) bits.push(f.colour === "custom" ? "your colour" : COLOURS.find(c => c.id === f.colour).name.toLowerCase());
+  if (f.shape) bits.push(f.shape); if (f.light) bits.push(f.light); if (S.q.trim()) bits.push(`“${S.q.trim()}”`);
+  return bits.join(" · ") || "All photos";
+}
+
+/* ================= render: shell ================= */
+const main = document.getElementById("main"), layer = document.getElementById("layer");
+function render() {
+  document.getElementById("nav-cp").setAttribute("aria-current", S.dest === "commonplace" ? "page" : "false");
+  document.getElementById("nav-loci").setAttribute("aria-current", S.dest === "loci" ? "page" : "false");
+  if (S.dest === "loci") return renderLoci();
+  const photos = inPhotosMode();
+  const entries = PHOTOS.length + OTHERS.length;
+  main.innerHTML = `
+    <div class="dest-head"><b>Commonplace</b><span>/</span><span>${entries} entries, ${KINDS.length + COLLS.length} collections</span></div>
+    <div class="tabs" role="tablist">${["Everything", "Collections", "To read", "Templates"].map((t, i) => `<button role="tab" aria-selected="${i === 0}" ${i ? `data-act="toast" data-msg="${t} isn't part of this prototype."` : ""}>${t}</button>`).join("")}</div>
+    <div class="toolbar">
+      <input class="search" id="search" type="search" placeholder="Search your Commonplace (title, creator, topic, text)…" value="${esc(S.q)}" aria-label="Search your Commonplace">
+      <span class="count" id="count"></span>
+      ${S.view === "wall" ? `<button class="btn ${S.sel.on ? "on" : ""}" data-act="select">${S.sel.on ? "Done" : "Select"}</button>` : ""}
+      <div class="seg" role="group" aria-label="View">
+        <button aria-pressed="${S.view === "wall"}" data-act="view" data-v="wall"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="6"/><rect x="9" y="2" width="5" height="4"/><rect x="2" y="10" width="5" height="4"/><rect x="9" y="8" width="5" height="6"/></svg>Wall</button>
+        <button aria-pressed="${S.view === "shelves"}" data-act="view" data-v="shelves"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 13.5h12M3 13V5h2v8M6 13V3h2v10M9.5 13l1.6-8 2 .4-1.6 7.6"/></svg>Shelves</button>
+      </div>
+    </div>
+    <div id="body"></div>`;
+  const body = document.getElementById("body");
+  if (S.view === "shelves") body.innerHTML = shelvesHTML();
+  else { body.innerHTML = chipsHTML() + (photos ? pbarHTML() : "") + `<div id="wall"></div>`; renderWall(); }
+  updateCount();
+}
+function updateCount() {
+  const el = document.getElementById("count"); if (!el) return;
+  if (S.view === "shelves") { el.textContent = "8 shelves · in your order"; return; }
+  if (inPhotosMode()) { const n = photoFilter().length; el.textContent = `${n} photo${n === 1 ? "" : "s"} · ${({ newest: "newest first", oldest: "oldest first", taken: "by date taken", colour: "by colour", shape: "wide to tall", res: "largest first", title: "A–Z", shuffle: "shuffled" })[S.ph.sort]}`; }
+  else { const n = wallItems().length; el.textContent = `${n} entries · newest first`; }
+}
+function chipsHTML() {
+  const c = S.chip;
+  const chip = (id, label, extra = "") => `<button class="chip" aria-pressed="${c === id}" data-act="chip" data-chip="${id}">${extra}${label}</button>`;
+  return `<div class="chips" role="group" aria-label="Filter">
+    ${chip("all", "All")}
+    ${COLLS.map(k => chip("coll:" + k.id, k.name)).join("")}
+    ${KINDS.map(k => chip("kind:" + k.id, k.name)).join("")}
+    <span class="sep"></span><span class="lab">Type</span>
+    ${chip("type:note", "Notes")}${chip("type:quote", "Quotes")}${chip("type:photo", "Photos")}${chip("type:source", "Sources")}
+  </div>`;
+}
+function pbarHTML() {
+  const f = S.pf, base = PHOTOS.filter(matchesQ);
+  const scope = (id, label, n, cls = "") => `<button class="chip ${cls}" aria-pressed="${f.scope === id && !f.kind && !f.view}" data-act="scope" data-scope="${id}">${label} <span class="n">${n}</span></button>`;
+  const kinds = KINDS.map(k => `<button class="chip" aria-pressed="${f.kind === k.id}" data-act="kind" data-kind="${k.id}">${k.name} <span class="n">${base.filter(p => p.kind === k.id).length}</span></button>`).join("");
+  const views = S.views.map(v => `<button class="chip view" aria-pressed="${f.view === v.id}" data-act="openview" data-view="${v.id}">${esc(v.name)}</button>`).join("");
+  const active = [];
+  if (f.topic) active.push(`<button class="chip active-filter" data-act="clear" data-k="topic">Topic: ${esc(T[f.topic].name)} <span class="x">✕</span></button>`);
+  if (f.colour) active.push(`<button class="chip active-filter" data-act="clear" data-k="colour"><span class="swatch" style="background:${f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex}"></span>${f.colour === "custom" ? "Your colour" : COLOURS.find(c => c.id === f.colour).name} <span class="x">✕</span></button>`);
+  const sel = (id, label, opts, val) => `<label class="ctl">${label}<select id="${id}" data-act="pref" data-k="${id.slice(2)}">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? "selected" : ""}>${l}</option>`).join("")}</select></label>`;
+  return `<section class="pbar" aria-label="Photos">
+    <div class="prow">
+      ${scope("all", "All photos", base.length)}
+      ${scope("unsorted", "Unsorted", base.filter(p => !p.topics.length).length, "unsorted")}
+      ${scope("picks", '<span class="star">★</span> Picks', base.filter(p => p.picked).length, "picks")}
+      <span class="lab">Kind</span>${kinds}
+      <span class="lab">Views <span class="new">new</span></span>${views}
+      <button class="chip" data-act="saveview" title="Save these filters as a View">+ Save view</button>
+    </div>
+    <div class="prow">
+      <button class="chip" data-act="colourpop" aria-haspopup="dialog"><span class="swatch" style="background:conic-gradient(#b23a2c,#c99a52,#7c8452,#2f7563,#3f6f87,#6a5a8c,#b23a2c)"></span>Colour</button>
+      <button class="chip" data-act="topicpop" aria-haspopup="dialog">Topic ▾</button>
+      ${sel("f-shape", "Shape", [["", "Any"], ["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"], ["panorama", "Panorama"]], f.shape || "")}
+      ${sel("f-light", "Light", [["", "Any"], ["light", "Light"], ["dark", "Dark"]], f.light || "")}
+      ${active.join("")}
+      <span class="grow"></span>
+      <button class="btn small line" data-act="sortmode" title="Sort the unsorted photos with the keyboard">Sort photos <span class="new">new</span></button>
+      <button class="btn small line" data-act="showloci" title="Highlight the topics that hold these photos">Show on Loci</button>
+    </div>
+    <div class="prow">
+      <div class="seg" role="group" aria-label="Layout">${[["rows", "Rows"], ["masonry", "Masonry"], ["grid", "Grid"]].map(([v, l]) => `<button aria-pressed="${S.ph.layout === v}" data-act="layout" data-v="${v}">${l}</button>`).join("")}</div>
+      <label class="ctl">Size <input id="size" type="range" min="120" max="460" step="10" value="${S.ph.size}" aria-label="Photo size"></label>
+      <span class="grow"></span>
+      ${sel("p-sort", "Sort", [["newest", "Newest"], ["oldest", "Oldest"], ["taken", "Date taken"], ["colour", "Colour"], ["shape", "Shape"], ["res", "Resolution"], ["title", "Title"], ["shuffle", "Shuffle"]], S.ph.sort)}
+      ${sel("p-group", "Group", [["none", "None"], ["area", "Area"], ["topic", "Topic"], ["kind", "Kind"], ["album", "Album"], ["month", "Month taken"], ["colour", "Colour"]], S.ph.group)}
+      ${sel("p-caps", "Captions", [["show", "Show"], ["hover", "On hover"], ["hide", "Hide"]], S.ph.caps)}
+    </div>
+  </section>`;
+}
+
+/* ================= render: wall ================= */
+function renderWall() {
+  const wall = document.getElementById("wall"); if (!wall) return;
+  if (inPhotosMode()) return renderPhotoWall(wall);
+  const items = wallItems();
+  const W = wall.clientWidth || main.clientWidth - 88;
+  const cols = Math.max(1, Math.floor((W + 20) / 280));
+  wall.innerHTML = `<div class="mason ${S.sel.on ? "selecting" : ""}">${Array.from({ length: cols }, () => '<div class="col"></div>').join("")}</div>`;
+  const colEls = [...wall.querySelectorAll(".col")];
+  const list = S.chip === "all" && !S.q.trim() ? [{ type: "capture" }, ...items] : items;
+  if (!items.length) { wall.innerHTML = `<p class="empty">Nothing here matches. Try another word or filter.</p>`; return; }
+  list.forEach(x => { const shortest = colEls.reduce((a, b) => b.offsetHeight < a.offsetHeight ? b : a); shortest.insertAdjacentHTML("beforeend", cardHTML(x)); });
+  hookImages(wall);
+}
+function cardHTML(x) {
+  const topic = (x.topics || [])[0]; const more = (x.topics || []).length - 1;
+  const foot = topic ? `<div class="mfoot"><span class="tdot s${T[topic].status}"></span>${esc(T[topic].name)}${more > 0 ? ` <span>+${more}</span>` : ""}</div>` : "";
+  const selc = S.sel.ids.has(x.id) ? "sel" : "";
+  if (x.type === "capture") return `<div class="mcard paper capture"><span>Capture a thought, quote or link…</span><small><span>Note · Quote · Link</span><span>Press <kbd>C</kbd></span></small></div>`;
+  if (x.type === "photo") {
+    const r = ratioOf(x), bucket = r > 1.4 ? 3 / 2 : r < .9 ? 3 / 4 : 4 / 3; // today: three crop buckets
+    const albumN = x.album && S.chip === "all" && !S.q.trim() ? PHOTOS.filter(p => p.album === x.album).length : 0;
+    const title = albumN ? ALBUMS[x.album] : x.title;
+    return `<article class="mcard ${selc}" data-id="${x.id}" ${albumN ? `data-album="${x.album}"` : ""}>
+      <div class="pic ${albumN ? "stack" : ""}" style="aspect-ratio:${bucket};background:${x.palette[0].hex}"><img data-src="${thumb(x)}" alt="${esc(x.title)}">${albumN ? `<span class="badge">${albumN} photos</span>` : ""}<span class="check">✓</span></div>
+      <div class="cap"><p class="kicker">${esc(kindName(x.kind))}</p><h2 class="mtitle"><button data-act="open" data-id="${x.id}">${esc(title)}</button></h2>${x.caption ? `<p class="mdesc">${esc(x.caption)}</p>` : ""}${foot}</div></article>`;
+  }
+  const wrap = (inner, kicker = "") => `<article class="mcard ${selc}" data-id="${x.id}">${inner}${kicker}</article>`;
+  if (x.type === "quote") return wrap(`<div class="quote"><q>${esc(x.text)}</q><div class="src">${esc(x.src)}</div></div><div class="cap">${foot}</div>`);
+  if (x.type === "note") return wrap(`<div class="notecard"><p>${esc(x.text)}</p></div><div class="cap">${foot}</div>`);
+  if (x.type === "longnote") return wrap(`<div class="notecard"><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p></div><div class="cap"><p class="kicker">Notes</p>${foot}</div>`);
+  if (x.type === "book") return wrap(`<div class="cover">${esc(x.title)}<small>${esc(x.creator)}</small></div><div class="cap"><p class="kicker">Books</p><h2 class="mtitle">${esc(x.title)}</h2><p class="mdesc">${esc(x.creator)} · Reading</p>${foot}</div>`);
+  if (x.type === "video") return wrap(`<div class="video">${esc(x.title)}<span class="dur">${x.dur}</span>${x.prog ? `<span class="prog" style="width:${x.prog * 100}%"></span>` : ""}</div><div class="cap"><p class="kicker">Lectures</p><h2 class="mtitle">${esc(x.title)}</h2><p class="mdesc">${esc(x.creator)}</p>${foot}</div>`);
+  if (x.type === "link") return wrap(`<div class="paper"><p class="kicker">${esc(x.site)}</p><h3 style="font:400 19px/1.3 var(--read);margin:6px 0">${esc(x.title)}</h3><p class="mdesc">${esc(x.desc)}</p></div><div class="cap"><p class="kicker">Links</p>${foot}</div>`);
+  return "";
+}
+function hookImages(root) {
+  root.querySelectorAll("img[data-src]").forEach(img => {
+    const src = img.dataset.src; img.removeAttribute("data-src");
+    const done = () => { img.classList.add("in"); loaded.add(src); };
+    img.onload = done;
+    if (loaded.has(src)) { img.src = src; if (img.complete) done(); }
+    else setTimeout(() => { img.src = src; }, 120 + Math.random() * 650); // shows each photo's own colour while it loads
+  });
+}
+function renderPhotoWall(wall) {
+  const list = sortPhotos(photoFilter());
+  if (!list.length) { wall.innerHTML = `<p class="empty">No photos match ${esc(filterLabel())}.<br><button class="linkbtn" data-act="resetpf" style="font:14px var(--ui);margin-top:10px">Clear filters</button></p>`; return; }
+  const groups = groupPhotos(list);
+  const W = Math.floor(wall.clientWidth || (main.clientWidth - 88));
+  const caps = S.ph.caps, size = S.ph.size;
+  let html = `<div class="pwall caps-${caps} ${S.sel.on ? "selecting" : ""}" id="pwall">`;
+  for (const g of groups) {
+    if (g.key !== null) html += `<h3 class="group-h">${g.extra ? `<span class="swatch" style="background:${g.extra};width:12px;height:12px"></span>` : ""}${esc(g.label)} <span class="n">${g.items.length}</span></h3>`;
+    html += layoutHTML(g.items, W, size, caps);
+  }
+  wall.innerHTML = html + "</div>";
+  hookImages(wall);
+  if (S.focus) wall.querySelector(`.ph[data-id="${S.focus}"]`)?.classList.add("focused");
+}
+function phHTML(p, w, h, caps) {
+  const meta = [kindName(p.kind), p.topics[0] ? T[p.topics[0]].name : "No topic yet"].join(" · ");
+  return `<figure class="ph ${S.sel.ids.has(p.id) ? "sel" : ""}" data-id="${p.id}" style="width:${w}px">
+    <div class="pp" style="height:${h}px;background:${p.palette[0].hex}" data-act="open" data-id="${p.id}" role="button" tabindex="0" aria-label="${esc(p.title)}">
+      <img data-src="${thumb(p)}" alt="">${p.source ? `<span class="src-tag">${esc(p.source.site)}</span>` : ""}<span class="check">✓</span>
+    </div>
+    <button class="star-btn ${p.picked ? "on" : ""}" data-act="pick" data-id="${p.id}" aria-label="${p.picked ? "Unpick" : "Pick"} ${esc(p.title)}" aria-pressed="${p.picked}">${p.picked ? "★" : "☆"}</button>
+    ${caps !== "hide" ? `<figcaption><b>${esc(p.title)}</b><span>${esc(meta)}</span></figcaption>` : ""}
+  </figure>`;
+}
+function layoutHTML(items, W, size, caps) {
+  const capH = caps === "show" ? 40 : 0;
+  if (S.ph.layout === "grid") {
+    const cols = Math.max(2, Math.floor((W + 8) / (size + 8))); const cw = Math.floor((W - 8 * (cols - 1)) / cols);
+    return `<div class="pgrid" style="grid-template-columns:repeat(${cols},${cw}px)">${items.map(p => phHTML(p, cw, cw, caps)).join("")}</div>`;
+  }
+  if (S.ph.layout === "masonry") {
+    const cols = Math.max(2, Math.floor((W + 12) / (size + 12))); const cw = Math.floor((W - 12 * (cols - 1)) / cols);
+    const colH = new Array(cols).fill(0), colHtml = new Array(cols).fill("");
+    for (const p of items) { const r = Math.min(3, Math.max(1 / 3, ratioOf(p))); const h = Math.round(cw / r); const i = colH.indexOf(Math.min(...colH)); colHtml[i] += phHTML(p, cw, h, caps); colH[i] += h + capH + 12; }
+    return `<div class="pmason">${colHtml.map(c => `<div class="col">${c}</div>`).join("")}</div>`;
+  }
+  // Rows: justified, every photo whole, edges line up (Eagle / Flickr style).
+  const gap = 8, target = size; let out = "", row = [], sum = 0;
+  const flush = (last) => {
+    if (!row.length) return;
+    const avail = W - gap * (row.length - 1);
+    let h = avail / sum; if (last && h > target * 1.25) h = target;
+    h = Math.min(h, target * 2.2);
+    out += `<div class="row">${row.map(p => phHTML(p, Math.floor(h * Math.min(3, Math.max(1 / 3, ratioOf(p)))), Math.round(h), caps)).join("")}</div>`;
+    row = []; sum = 0;
+  };
+  for (const p of items) { row.push(p); sum += Math.min(3, Math.max(1 / 3, ratioOf(p))); if (sum * target + gap * (row.length - 1) >= W) flush(false); }
+  flush(true);
+  return `<div class="rows">${out}</div>`;
+}
+
+/* ================= render: shelves ================= */
+function shelvesHTML() {
+  const printOf = p => { const portrait = p.h > p.w; const w0 = portrait ? 112 : 158; let w = w0, h = w0 * p.h / p.w; if (h > 150) { h = 150; w = 150 * p.w / p.h; } return `<button class="print" data-act="open" data-id="${p.id}" data-list="kind:${p.kind}" aria-label="${esc(p.title)}"><img src="${thumb(p)}" alt="" style="width:${Math.round(w)}px;height:${Math.round(h)}px;background:${p.palette[0].hex}" loading="lazy"><span>${esc(p.title)}</span>${p.picked ? '<i class="pk">★</i>' : ""}</button>`; };
+  const shelf = (k, name, sub, items, inner, extra = "", cls = "") => `<div class="shelf ${cls}"><div class="meta"><span class="k"><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--status-2)"></span>${k}</span><h3>${name}</h3><p>${sub}</p><div class="acts">${extra}</div></div><div class="board">${inner}</div></div>`;
+  const unsorted = PHOTOS.filter(p => !p.topics.length);
+  const photoShelves = KINDS.map(k => { const items = PHOTOS.filter(p => p.kind === k.id).sort((a, b) => b.added - a.added); return shelf("Photos", k.name, `${items.length} photos · ${items.filter(p => p.picked).length} picks`, items, items.map(printOf).join(""), `<button class="linkbtn" data-act="openkind" data-kind="${k.id}">Open as a photo wall →</button><button class="linkbtn" style="color:var(--ink-2)" data-act="toast" data-msg="Open shelf works as it does today.">Open shelf ▾</button>`); }).join("");
+  const vid = OTHERS.filter(o => o.type === "video");
+  return `<div class="shelf-chips"><button class="chip">Sources <span class="n">2 shelves</span></button><button class="chip">Notes <span class="n">1 shelf</span></button><button class="chip" aria-pressed="true">Photos <span class="n">${KINDS.length} shelves</span></button><button class="chip dashed" data-act="scope-unsorted">Unsorted photos <span class="n">${unsorted.length}</span></button></div>
+  <div class="desk"><div class="intro"><span class="k">On the desk</span><h3>Open right now</h3><p>What you are reading, watching or sorting. It goes back on its shelf when you mark it done.</p></div>
+    <div class="slots"><div class="slot"><div class="th"></div><div><small>Reading · Books</small><b>Islamic Architecture: Form, Function and Meaning</b><small>Page 112</small></div></div>
+    <div class="slot"><div class="th" style="width:70px;height:40px"></div><div><small>Watching · Lectures</small><b>The Great Mosque of Córdoba</b><small>Resume at 10:30</small></div></div>
+    <div class="slot" style="cursor:pointer" data-act="sortmode"><img src="${thumb(unsorted[0])}" alt="" style="width:46px;height:56px;object-fit:cover;border-radius:2px;flex:none"><div><small>Sorting · Photos <span class="new">new</span></small><b>${unsorted.length} unsorted photos</b><small>Sort them with the keyboard</small></div></div></div></div>
+  <h2 class="sec-h">Sources <span class="n">2 shelves · ${OTHERS.filter(o => ["book", "video", "link"].includes(o.type)).length} items</span></h2>
+  ${shelf("Sources", "Lectures", `${vid.length} items`, vid, vid.map(v => `<div style="flex:none;width:196px"><div class="video" style="font-size:14px">${esc(v.title)}<span class="dur">${v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog * 100}%"></span>` : ""}</div><p class="mdesc" style="padding:6px 0 4px">${esc(v.title)}</p></div>`).join(""), `<button class="linkbtn" data-act="toast" data-msg="Open shelf works as it does today.">Open shelf ▾</button>`)}
+  <h2 class="sec-h">Photos <span class="n">${KINDS.length} shelves · ${PHOTOS.length} photos</span></h2>
+  ${photoShelves}
+  ${shelf("Photos", "Unsorted", `${unsorted.length} photos with no topic yet`, unsorted, unsorted.map(printOf).join(""), `<button class="linkbtn" data-act="sortmode">Sort them now →</button>`, "unsorted")}`;
+}
+
+/* ================= quick view ================= */
+function openQV(id, list) {
+  const p = BY[id]; if (!p || p.type !== "photo") return;
+  if (!list) {
+    if (S.dest === "commonplace" && inPhotosMode() && S.view === "wall") list = sortPhotos(photoFilter()).map(x => x.id);
+    else if (p.album && S.dest === "commonplace" && S.view === "wall" && !inPhotosMode()) list = PHOTOS.filter(x => x.album === p.album).map(x => x.id);
+    else list = [id];
+  }
+  if (!list.includes(id)) list = [id, ...list];
+  const from = document.querySelector(`[data-id="${id}"] .pp, [data-id="${id}"] .pic, .print[data-id="${id}"] img, [data-open-from="${id}"]`);
+  S.qv = { id, list, scale: 1, tx: 0, ty: 0, fit: 1, fs: false, draw: false, regions: true, draft: null, hot: null, fromRect: from ? from.getBoundingClientRect() : null, returnFocus: document.activeElement };
+  renderQV(true);
+}
+function closeQV() { const rf = S.qv?.returnFocus; S.qv = null; layer.innerHTML = ""; if (S.dest === "commonplace") { render(); } else renderLoci(); rf?.focus?.(); }
+function qvP() { return BY[S.qv.id]; }
+function renderQV(first) {
+  const q = S.qv, p = qvP(), idx = q.list.indexOf(p.id);
+  const topicPills = p.topics.map(t => `<span class="pill"><span class="tdot s${T[t].status}"></span>${esc(T[t].name)}<button data-act="untopic" data-t="${t}" aria-label="Remove ${esc(T[t].name)}">✕</button></span>`).join("");
+  const regionNotes = p.notes.filter(n => n.region);
+  const notes = p.notes.map((n, i) => `<div class="note" data-note="${n.id}"><span class="num" style="${n.region ? "" : "background:var(--ink-3)"}">${n.region ? regionNotes.indexOf(n) + 1 : "·"}</span><div>${esc(n.text)}<small>${n.region ? "On a detail" : "On the whole photo"} · ${n.date}</small></div></div>`).join("");
+  const albumN = p.album ? PHOTOS.filter(x => x.album === p.album) : [];
+  layer.innerHTML = `<div class="qv ${q.fs ? "fs" : ""}" role="dialog" aria-modal="true" aria-label="${esc(p.title)}">
+    <div class="qv-stage">
+      <div class="fs-info"><b>${esc(p.title)}</b>${idx + 1} of ${q.list.length} · Esc to leave full screen</div>
+      <div class="qv-view" id="qv-view">
+        <div class="qv-world" id="qv-world" style="width:${p.w}px;height:${p.h}px"><img src="${full(p)}" alt="${esc(p.title)}" draggable="false" style="background:${p.palette[0].hex}"><div id="qv-regions"></div></div>
+        <div class="qv-hud" role="toolbar" aria-label="Zoom">
+          <button data-act="zout" title="Zoom out (−)" aria-label="Zoom out">−</button><span class="ro" id="qv-ro" aria-live="polite">Fit</span><button data-act="zin" title="Zoom in (+)" aria-label="Zoom in">+</button>
+          <span class="sep"></span><button data-act="zfit" title="Fit (0)">Fit</button><button data-act="z100" title="Actual pixels (Z)">1:1</button>
+          <span class="sep"></span><button data-act="drawmode" aria-pressed="${q.draw}" title="Note on a detail (N)">▢<span class="hud-l"> Note on a detail</span></button>
+          <button data-act="regions" aria-pressed="${q.regions}" title="Show detail notes (R)" aria-label="Show detail notes">${regionNotes.length || ""} ▣</button>
+          <span class="sep"></span><button data-act="fs" aria-pressed="${q.fs}" title="Full screen (F)">${q.fs ? "Exit" : "⛶"}</button>
+        </div>
+        ${q.list.length > 1 ? `<button class="qv-nav prev" data-act="prev" aria-label="Previous photo">‹</button><button class="qv-nav next" data-act="next" aria-label="Next photo">›</button>` : ""}
+        ${q.draw ? `<div class="qv-tip">Drag a box over the detail you want to write about</div>` : ""}
+      </div>
+      ${q.list.length > 1 ? `<div class="qv-strip">${q.list.map(id => `<button data-act="goto" data-id="${id}" aria-current="${id === p.id}" aria-label="${esc(BY[id].title)}"><img src="${thumb(BY[id])}" alt=""></button>`).join("")}</div>` : ""}
+    </div>
+    <aside class="qv-panel">
+      <div class="qv-ptop"><span class="k">Photo · ${esc(kindName(p.kind))}${q.list.length > 1 ? ` · ${idx + 1} of ${q.list.length}` : ""}</span>
+        <span style="display:flex;gap:2px"><button class="icon-btn ${p.picked ? "on" : ""}" data-act="pick" data-id="${p.id}" aria-pressed="${p.picked}" title="Pick (P)" aria-label="Pick">${p.picked ? "★" : "☆"}</button><button class="icon-btn" data-act="qvmenu" title="More" aria-label="More">⋯</button><button class="icon-btn" data-act="close" title="Close (Esc)" aria-label="Close">✕</button></span></div>
+      <div class="qv-body">
+        <h2>${esc(p.title)}</h2>
+        ${p.caption ? `<p class="capt">${esc(p.caption)}</p>` : `<p class="capt" style="color:var(--ink-3)">Add a caption…</p>`}
+        <dl class="facts">
+          <dt>Topics</dt><dd>${topicPills || '<span style="color:var(--warn);font-size:12px">Unsorted</span>'}<button class="addbtn" data-act="qvtopic">+ Topic</button></dd>
+          <dt>Kind</dt><dd><span class="pill">${esc(kindName(p.kind))}</span><button class="addbtn" data-act="qvkind">Change</button></dd>
+          ${p.album ? `<dt>Album</dt><dd>${esc(ALBUMS[p.album])} · ${albumN.indexOf(p) + 1} of ${albumN.length}</dd>` : ""}
+          ${p.source ? `<dt>From</dt><dd><a href="${p.source.url}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(p.source.site)} ↗</a></dd>` : ""}
+          <dt>Colours</dt><dd style="display:block"><div class="palette">${p.palette.map(c => `<button style="flex:${c.share};background:${c.hex}" data-act="bycolour" data-hex="${c.hex}" title="Find photos with ${c.hex}" aria-label="Find photos with this colour"></button>`).join("")}</div></dd>
+          <dt>Size</dt><dd>${p.w.toLocaleString()} × ${p.h.toLocaleString()} · ${mp(p)} MP · ${ratioLabel(p)}</dd>
+          <dt>File</dt><dd>JPEG · ${fsize(p)}</dd>
+          <dt>${p.camera ? "Taken" : "Saved"}</dt><dd>${fmtDate(p.date)}${p.camera ? ` · ${esc(p.camera)}` : ""}</dd>
+        </dl>
+        <div class="subh">Margin notes <span style="font-weight:400;color:var(--ink-3);font-size:12px">${p.notes.length || "None yet"}</span></div>
+        <div class="notes">${notes}</div>
+        <div class="composer"><label for="qv-note">${q.draft ? `<span class="num" style="width:18px;height:18px;border-radius:4px;background:#f6dc8f;color:#111;display:inline-grid;place-items:center;font-size:10px;font-weight:600">${regionNotes.length + 1}</span> Note on this detail` : "Add an observation"}</label>
+          <textarea id="qv-note" placeholder="${q.draft ? "What do you notice in this part?" : "What do you notice in this image?"}"></textarea>
+          <div class="row"><span>Ctrl+Enter saves${q.draft ? ' · <button class="addbtn" data-act="canceldraft">Cancel detail</button>' : ""}</span><button class="btn small primary" data-act="savenote">Save note</button></div></div>
+        <p class="keys"><kbd>←</kbd> <kbd>→</kbd> browse · <kbd>Z</kbd> 1:1 · <kbd>+</kbd> <kbd>−</kbd> zoom · <kbd>0</kbd> fit · scroll to zoom, drag to pan · <kbd>F</kbd> full screen · <kbd>P</kbd> pick · <kbd>N</kbd> note on a detail</p>
+      </div>
+      <div class="qv-foot"><button class="btn small line" data-act="copyimg">Copy image</button><button class="btn small line" data-act="download">Download original</button><button class="btn small line" data-act="topicpic">Use as topic picture</button><button class="btn small" data-act="toast" data-msg="The full Image page works as it does today, with the same zoom.">Open full page ↗</button></div>
+    </aside>
+  </div>`;
+  hookQV(first);
+}
+function hookQV(first) {
+  const q = S.qv, p = qvP(), view = document.getElementById("qv-view"), world = document.getElementById("qv-world");
+  const fitNow = () => { const r = view.getBoundingClientRect(); q.vw = r.width; q.vh = r.height; q.fit = Math.min(r.width / p.w, r.height / p.h) * .96; };
+  fitNow();
+  if (first || q.reset !== false) { q.scale = q.fit; centre(); }
+  q.reset = false;
+  applyT(false);
+  drawRegions();
+  layer.querySelector('.qv-strip [aria-current="true"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+  if (first && q.fromRect && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const to = world.getBoundingClientRect(), f = q.fromRect;
+    world.animate([{ transform: `translate(${f.left - to.left + q.tx}px,${f.top - to.top + q.ty}px) scale(${f.width / p.w})`, opacity: .6 }, { transform: `translate(${q.tx}px,${q.ty}px) scale(${q.scale})`, opacity: 1 }], { duration: 320, easing: "cubic-bezier(0.16, 1, 0.3, 1)" });
+  }
+  // wheel zoom around the cursor
+  view.addEventListener("wheel", e => { e.preventDefault(); const r = view.getBoundingClientRect(); zoomAt(q.scale * Math.exp(-e.deltaY * .0016), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+  view.addEventListener("dblclick", e => { const r = view.getBoundingClientRect(); if (q.scale > q.fit * 1.01) { q.scale = q.fit; centre(); applyT(true); } else zoomAt(1, e.clientX - r.left, e.clientY - r.top, true); });
+  let drag = null; const pts = new Map();
+  view.addEventListener("pointerdown", e => {
+    if (e.target.closest("button")) return;
+    view.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]);
+    const r = view.getBoundingClientRect();
+    if (q.draw) { const [ix, iy] = toImg(e.clientX - r.left, e.clientY - r.top); drag = { mode: "draw", x0: ix, y0: iy }; q.draft = [ix, iy, 0, 0]; drawRegions(); return; }
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; drag = { mode: "pinch", d0: Math.hypot(a[0] - b[0], a[1] - b[1]), s0: q.scale }; return; }
+    drag = { mode: "pan", x: e.clientX, y: e.clientY, tx: q.tx, ty: q.ty, moved: 0 }; view.classList.add("panning");
+  });
+  view.addEventListener("pointermove", e => {
+    if (!drag) return; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    const r = view.getBoundingClientRect();
+    if (drag.mode === "draw") { const [ix, iy] = toImg(e.clientX - r.left, e.clientY - r.top); const x = Math.max(0, Math.min(drag.x0, ix)), y = Math.max(0, Math.min(drag.y0, iy)); q.draft = [x, y, Math.min(1, Math.max(drag.x0, ix)) - x, Math.min(1, Math.max(drag.y0, iy)) - y]; drawRegions(); return; }
+    if (drag.mode === "pinch" && pts.size === 2) { const [a, b] = [...pts.values()]; zoomAt(drag.s0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / drag.d0, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top); return; }
+    if (drag.mode === "pan") { drag.moved += Math.abs(e.movementX) + Math.abs(e.movementY); if (q.scale <= q.fit * 1.01) { return; } q.tx = drag.tx + e.clientX - drag.x; q.ty = drag.ty + e.clientY - drag.y; clampT(); applyT(false); }
+  });
+  const end = e => {
+    pts.delete(e.pointerId); view.classList.remove("panning");
+    if (drag?.mode === "draw") { if (!q.draft || q.draft[2] < .02 || q.draft[3] < .02) { q.draft = null; drawRegions(); } else { q.draw = false; const keep = q.draft; q.reset = false; renderQV(false); q.draft = keep; drawRegions(); document.getElementById("qv-note")?.focus(); } }
+    else if (drag?.mode === "pan" && drag.moved < 4 && q.list.length > 1 && q.scale <= q.fit * 1.01 && e.pointerType !== "mouse") { /* tap */ }
+    drag = null;
+  };
+  view.addEventListener("pointerup", end); view.addEventListener("pointercancel", end);
+  // swipe on touch at fit: step photos
+  let sx = null; view.addEventListener("touchstart", e => { if (e.touches.length === 1) sx = [e.touches[0].clientX, e.touches[0].clientY]; }, { passive: true });
+  view.addEventListener("touchend", e => { if (!sx || q.scale > q.fit * 1.01 || q.draw) return; const t = e.changedTouches[0]; const dx = t.clientX - sx[0], dy = t.clientY - sx[1]; if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1); else if (dy > 80) closeQV(); sx = null; }, { passive: true });
+  const note = document.getElementById("qv-note"); note?.addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveNote(); } });
+  if (first) layer.querySelector('[data-act="close"]')?.focus({ preventScroll: true });
+}
+function centre() { const q = S.qv, p = qvP(); q.tx = (q.vw - p.w * q.scale) / 2; q.ty = (q.vh - p.h * q.scale) / 2; }
+function clampT() { const q = S.qv, p = qvP(); const w = p.w * q.scale, h = p.h * q.scale; q.tx = w <= q.vw ? (q.vw - w) / 2 : Math.min(0, Math.max(q.vw - w, q.tx)); q.ty = h <= q.vh ? (q.vh - h) / 2 : Math.min(0, Math.max(q.vh - h, q.ty)); }
+function zoomAt(s, cx, cy, anim) { const q = S.qv; s = Math.max(q.fit, Math.min(4, s)); const k = s / q.scale; q.tx = cx - (cx - q.tx) * k; q.ty = cy - (cy - q.ty) * k; q.scale = s; clampT(); applyT(anim); }
+function applyT(anim) {
+  const q = S.qv, world = document.getElementById("qv-world"), view = document.getElementById("qv-view"); if (!world) return;
+  world.style.transition = anim ? "transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1)" : "none";
+  world.style.transform = `translate(${q.tx}px,${q.ty}px) scale(${q.scale})`;
+  world.style.setProperty("--inv", (1 / q.scale).toFixed(4));
+  const ro = document.getElementById("qv-ro"); if (ro) ro.textContent = Math.round(q.scale * 100) + "%";
+  view.classList.toggle("can-pan", q.scale > q.fit * 1.01 && !q.draw); view.classList.toggle("drawing", q.draw);
+}
+function toImg(x, y) { const q = S.qv, p = qvP(); return [Math.max(0, Math.min(1, (x - q.tx) / q.scale / p.w)), Math.max(0, Math.min(1, (y - q.ty) / q.scale / p.h))]; }
+function drawRegions() {
+  const q = S.qv, p = qvP(), el = document.getElementById("qv-regions"); if (!el) return;
+  const rs = q.regions ? p.notes.filter(n => n.region) : [];
+  const box = (r, label, cls) => `<div class="region ${cls}" style="left:${r[0] * 100}%;top:${r[1] * 100}%;width:${r[2] * 100}%;height:${r[3] * 100}%"><b>${label}</b></div>`;
+  el.innerHTML = rs.map((n, i) => box(n.region, i + 1, q.hot === n.id ? "hot" : "")).join("") + (q.draft ? box(q.draft, rs.length + 1, "hot draft") : "");
+}
+function step(d) { const q = S.qv; const i = q.list.indexOf(q.id); const n = (i + d + q.list.length) % q.list.length; q.id = q.list[n]; q.draft = null; q.draw = false; q.reset = true; renderQV(false); }
+function saveNote() {
+  const q = S.qv, p = qvP(), ta = document.getElementById("qv-note"); const text = ta.value.trim();
+  if (!text) { toast("Write the note first."); ta.focus(); return; }
+  p.notes.push({ id: "n" + Date.now(), text, region: q.draft, date: "Today" }); const was = !!q.draft; q.draft = null; q.reset = false; renderQV(false);
+  toast(was ? "Saved a note on that detail." : "Saved a note on this photo.");
+}
+
+/* ================= sort mode ================= */
+function openSM(ids) {
+  const queue = ids || PHOTOS.filter(p => !p.topics.length).map(p => p.id);
+  if (!queue.length) { toast("Nothing to sort: every photo has a topic."); return; }
+  S.sm = { queue, i: 0, hist: [], touched: new Set(), picker: false }; renderSM();
+}
+function smTopics(p) {
+  const recent = ["t5a", "t3", "t4b", "t1a", "t4a", "t2a", "t1b", "t6", "t4d"];
+  const sugg = { refs: ["t3", "t4a"], renders: ["t5a", "t6"], drawings: ["t1a", "t6"], materials: ["t4d", "t4a", "t4b", "t4c"], site: ["t4b", "t1a"] }[p.kind] || [];
+  return [...new Set([...sugg, ...recent])].slice(0, 9);
+}
+function renderSM() {
+  const s = S.sm; if (!s) { layer.innerHTML = ""; return; }
+  if (s.i >= s.queue.length) {
+    layer.innerHTML = `<div class="sm" role="dialog" aria-modal="true" aria-label="Sort photos"><div class="sm-stage"><div class="sm-done" style="margin:auto"><h2 style="font:400 30px var(--read)">All ${s.queue.length} sorted</h2><p style="color:var(--ink-2)">${s.touched.size} photos now have topics and will show in Loci.</p><p><button class="btn primary" data-act="smclose">Back to Commonplace</button> <button class="btn line" data-act="smback">Review again</button></p></div></div></div>`;
+    layer.querySelector("[data-act=smclose]").focus(); return;
+  }
+  const p = BY[s.queue[s.i]], tops = smTopics(p), left = PHOTOS.filter(x => !x.topics.length).length;
+  layer.innerHTML = `<div class="sm" role="dialog" aria-modal="true" aria-label="Sort photos">
+    <div class="sm-stage"><div class="sm-img"><img src="${full(p)}" alt="${esc(p.title)}"></div>
+      <div class="sm-strip">${s.queue.map((id, i) => `<div class="${i === s.i ? "cur" : ""} ${BY[id].topics.length ? "done" : ""}"><img src="${thumb(BY[id])}" alt=""></div>`).join("")}</div></div>
+    <aside class="sm-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="kicker">Sort mode · ${s.i + 1} of ${s.queue.length} <span class="new">new</span></span><button class="icon-btn" data-act="smclose" aria-label="Close sort mode">✕</button></div>
+      <div class="sm-prog"><i style="width:${(s.i / s.queue.length) * 100}%"></i></div>
+      <div><h2>${esc(p.title)}</h2><p style="margin:4px 0 0;color:var(--ink-2);font-size:13px">${esc(kindName(p.kind))}${p.source ? ` · from ${esc(p.source.site)}` : ""} · ${left} unsorted left</p></div>
+      <div class="sm-sec"><h4><span>Topics</span><span style="text-transform:none;letter-spacing:0">press a number</span></h4><div class="keychips">${tops.map((t, i) => `<button class="keychip ${p.topics.includes(t) ? "on" : ""}" data-act="smtopic" data-t="${t}"><kbd>${i + 1}</kbd>${esc(T[t].name)}</button>`).join("")}<button class="keychip" data-act="smpicker"><kbd>T</kbd>Other topic…</button></div></div>
+      <div class="sm-sec"><h4><span>Kind</span><span style="text-transform:none;letter-spacing:0"><kbd>K</kbd> next kind</span></h4><div class="keychips">${KINDS.map(k => `<button class="keychip ${p.kind === k.id ? "on" : ""}" data-act="smkind" data-kind="${k.id}">${k.name}</button>`).join("")}</div></div>
+      <div class="sm-sec"><h4><span>Pick</span></h4><div class="keychips"><button class="keychip ${p.picked ? "on" : ""}" data-act="smpick"><kbd>P</kbd>${p.picked ? "★ Picked" : "☆ Pick this one"}</button>${p.album && p.topics.length ? `<button class="keychip" data-act="smalbum"><kbd>A</kbd>Same topics for the rest of “${esc(ALBUMS[p.album])}”</button>` : ""}</div></div>
+      <div style="display:flex;gap:8px;margin-top:auto;flex-wrap:wrap"><button class="btn line" data-act="smprev">← Back</button><button class="btn primary" data-act="smnext">Next →</button><button class="btn" data-act="smundo" ${s.hist.length ? "" : "disabled"}>Undo <kbd>⌫</kbd></button></div>
+      <p class="keys">Topics come from your own tree. Suggestions here are your recent topics; in Phase 3C they become AI suggestions from what is in the photo.</p>
+    </aside></div>`;
+}
+function smDo(fn) { const s = S.sm, p = BY[s.queue[s.i]]; s.hist.push({ id: p.id, topics: [...p.topics], kind: p.kind, picked: p.picked, album: p.album ? PHOTOS.filter(x => x.album === p.album).map(x => [x.id, [...x.topics]]) : null }); fn(p); s.touched.add(p.id); renderSM(); }
+function smUndo() { const s = S.sm, h = s.hist.pop(); if (!h) return; const p = BY[h.id]; p.topics = h.topics; p.kind = h.kind; p.picked = h.picked; if (h.album) h.album.forEach(([id, t]) => BY[id].topics = t); s.i = Math.max(0, s.queue.indexOf(h.id)); renderSM(); toast("Undone."); }
+
+/* ================= loci ================= */
+function photosUnder(tid) { const d = descendants(tid); return PHOTOS.filter(p => p.topics.some(t => d.includes(t))).sort((a, b) => b.added - a.added); }
+function keyPicture(tid) {
+  if (S.covers[tid]) return { p: BY[S.covers[tid]], why: "Your topic picture" };
+  const ph = photosUnder(tid); const pick = ph.find(p => p.picked);
+  if (pick) return { p: pick, why: "Newest pick (automatic)" }; if (ph[0]) return { p: ph[0], why: "Newest photo (automatic)" }; return null;
+}
+function topicPalette(tid) {
+  const bins = new Map();
+  for (const p of photosUnder(tid)) for (const c of p.palette) { const k = COLOURS.reduce((b, x) => { const d = dE(hexToLab(x.hex), c.lab); return d < b.d ? { x, d } : b; }, { d: 1e9 }).x; bins.set(k.id, (bins.get(k.id) || 0) + c.share * (p.picked ? 2 : 1)); }
+  const tot = [...bins.values()].reduce((a, b) => a + b, 0) || 1;
+  return [...bins.entries()].map(([id, v]) => ({ c: COLOURS.find(x => x.id === id), share: v / tot })).filter(x => x.share > .03).sort((a, b) => b.share - a.share);
+}
+function renderLoci() {
+  const L = S.loci, f = T[L.focus] || null;
+  const centreId = L.focus === "root" ? null : L.focus;
+  const kids = TOPICS.filter(t => t.parent === (centreId || null));
+  const crumbs = centreId ? ancestors(centreId).reverse() : [];
+  const hl = L.hl, isHot = id => !hl || descendants(id).some(d => hl.ids.has(d));
+  const W = 820, H = 560, cx = 285, cy = 280;
+  const R = Math.min(140, Math.max(105, 80 + 12 * kids.length));
+  const short = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+  const nodeR = t => t.status === 2 ? "var(--status-2)" : t.status === 1 ? "var(--status-1)" : "none";
+  let svg = "";
+  const kp = centreId ? keyPicture(centreId) : null;
+  kids.forEach((t, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / kids.length, x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1.5" class="${isHot(t.id) ? "" : "dim"}"/>`;
+  });
+  kids.forEach((t, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / kids.length, x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+    const n = photosUnder(t.id).length, hot = hl && isHot(t.id);
+    const lx = Math.cos(a) >= -.2 ? x + 14 : x - 14, anchor = Math.cos(a) >= -.2 ? "start" : "end";
+    svg += `<g class="node ${isHot(t.id) ? "" : "dim"}" tabindex="0" role="button" aria-label="${esc(t.name)}" data-act="lfocus" data-t="${t.id}">
+      ${hot ? `<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="var(--accent)" stroke-width="2.5"/>` : ""}
+      <circle class="dotc" cx="${x}" cy="${y}" r="7" fill="${nodeR(t)}" stroke="${t.status ? "none" : "var(--ink-3)"}" stroke-width="1.5"/>
+      <text x="${lx}" y="${y + 4}" text-anchor="${anchor}"><title>${esc(t.name)}</title>${esc(short(t.name, 20))}${n ? ` · ${n}` : ""}</text></g>`;
+  });
+  if (centreId) {
+    const cr = L.centrePic && kp ? 34 : 14;
+    svg += `<g class="node center"><defs><clipPath id="cclip"><circle cx="${cx}" cy="${cy}" r="${cr}"/></clipPath></defs>
+      ${L.centrePic && kp ? `<image href="${thumb(kp.p)}" x="${cx - cr}" y="${cy - cr}" width="${cr * 2}" height="${cr * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#cclip)"/><circle cx="${cx}" cy="${cy}" r="${cr}" fill="none" stroke="var(--status-3)" stroke-width="3"/>` : `<circle class="dotc" cx="${cx}" cy="${cy}" r="${cr}" fill="var(--status-3)"/>`}
+      <text x="${cx}" y="${cy + cr + 26}" text-anchor="middle">${esc(f.name)}</text></g>`;
+    // In your Commonplace lane
+    const lane = photosUnder(centreId).slice(0, 7);
+    if (lane.length) {
+      svg += `<text x="612" y="${cy - lane.length * 20 - 10}" style="font:11px var(--ui);letter-spacing:.08em;fill:var(--ink-2)">IN YOUR COMMONPLACE</text>`;
+      lane.forEach((p, i) => { const y = cy - lane.length * 20 + i * 40; svg += `<g class="lane-card" data-act="open" data-id="${p.id}" data-open-from="${p.id}" tabindex="0" role="button" aria-label="${esc(p.title)}"><rect class="bg" x="612" y="${y}" width="196" height="34" rx="4"/><clipPath id="lc${i}"><rect x="614" y="${y + 2}" width="30" height="30" rx="3"/></clipPath><image href="${thumb(p)}" x="614" y="${y + 2}" width="30" height="30" preserveAspectRatio="xMidYMid slice" clip-path="url(#lc${i})"/><text x="652" y="${y + 21}">${esc(short(p.title, 22))}</text></g>`; });
+      const more = photosUnder(centreId).length - lane.length; if (more > 0) svg += `<text x="652" y="${cy - lane.length * 20 + lane.length * 40 + 16}" style="font:12px var(--ui);fill:var(--accent);cursor:pointer" data-act="seeall" data-t="${centreId}">+ ${more} more</text>`;
+    }
+  } else {
+    svg += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" style="font:400 18px var(--read);fill:var(--ink-2)">Everything you know</text>`;
+  }
+  const insp = centreId ? inspectorHTML(centreId) : `<div class="inspector"><span class="k">Overview</span><h2>Your areas</h2><p style="margin:0;color:var(--ink-2);font-size:13px">Choose an area to see its topics, its key picture and the photos you have collected for it.</p></div>`;
+  main.innerHTML = `<div class="dest-head"><b>Loci</b><span>/</span><span>Map</span></div>
+    <div class="tabs" role="tablist">${["Palace", "Map", "List", "Overview"].map(t => `<button role="tab" aria-selected="${t === "Map"}" ${t !== "Map" ? `data-act="toast" data-msg="Only the Map is in this prototype. In the Palace, an open room would draw these photos as small prints."` : ""}>${t}</button>`).join("")}</div>
+    ${hl ? `<div class="hl-bar"><span>Showing topics that hold <b>${hl.n}</b> photos matching <b>${esc(hl.label)}</b></span><span style="flex:1"></span><button class="btn small" data-act="backtophotos">Back to those photos</button><button class="btn small" data-act="clearhl">Clear</button></div>` : ""}
+    <div class="loci-crumbs"><button data-act="lfocus" data-t="root">Overview</button>${crumbs.map(c => ` / <button data-act="lfocus" data-t="${c}">${esc(T[c].name)}</button>`).join("")}
+      <span style="flex:1"></span><label style="display:inline-flex;gap:6px;align-items:center;color:var(--ink-2)"><input type="checkbox" id="centrepic" ${L.centrePic ? "checked" : ""}> Key picture in the centre <span class="new">new</span></label></div>
+    <div class="loci"><div class="loci-map"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${esc(f?.name || "your areas")}">${svg}</svg></div>${insp}</div>`;
+  updateCount();
+}
+function inspectorHTML(tid) {
+  const t = T[tid], kp = keyPicture(tid), ph = photosUnder(tid), pal = topicPalette(tid);
+  const mood = [...ph.filter(p => p.picked), ...ph.filter(p => !p.picked)].slice(0, 5);
+  const status = ["Not started", "Learning", "Learned"][t.status];
+  return `<aside class="inspector"><span class="k">${t.parent ? "Topic" : "Area"}</span><h2>${esc(t.name)}</h2>
+    <span class="status"><span class="tdot s${t.status}"></span>${status} · ${ph.length} photo${ph.length === 1 ? "" : "s"}</span>
+    ${kp ? `<button class="keypic" data-act="open" data-id="${kp.p.id}" data-open-from="${kp.p.id}" aria-label="Open ${esc(kp.p.title)}"><img src="${thumb(kp.p)}" alt=""><span>${kp.why}</span></button>` : `<div class="keypic" style="display:grid;place-items:center;color:var(--ink-3);font-size:13px;cursor:default">No photos on this topic yet</div>`}
+    ${mood.length ? `<div><div class="kicker" style="font-size:11px;margin-bottom:6px">Mood <span class="new">new</span></div><div class="mood">${mood.map(p => `<button data-act="open" data-id="${p.id}" data-open-from="${p.id}" aria-label="${esc(p.title)}"><img src="${thumb(p)}" alt=""></button>`).join("")}</div></div>` : ""}
+    ${pal.length ? `<div><div class="kicker" style="font-size:11px;margin-bottom:6px">Colours of this topic</div><div class="palette">${pal.map(x => `<button style="flex:${x.share};background:${x.c.hex}" data-act="topiccolour" data-t="${tid}" data-c="${x.c.id}" title="${x.c.name}: open these photos" aria-label="${x.c.name} photos"></button>`).join("")}</div><p class="keys" style="margin:6px 0 0">From the photos' own colours. Nodes keep their status colours.</p></div>` : ""}
+    ${ph.length ? `<button class="btn line" data-act="seeall" data-t="${tid}">See all ${ph.length} photos →</button>` : ""}
+  </aside>`;
+}
+
+/* ================= popovers ================= */
+let popEl = null;
+function closePop() { popEl?.remove(); popEl = null; }
+function openPop(anchor, html, onClick) {
+  closePop(); popEl = document.createElement("div"); popEl.className = "pop"; popEl.setAttribute("role", "dialog"); popEl.innerHTML = html; document.body.appendChild(popEl);
+  const r = anchor.getBoundingClientRect(), pw = popEl.offsetWidth, ph = popEl.offsetHeight;
+  let left = Math.min(window.innerWidth - pw - 16, Math.max(16, r.left)), top = r.bottom + 6; if (top + ph > window.innerHeight - 10) top = Math.max(10, r.top - ph - 6);
+  popEl.style.left = left + "px"; popEl.style.top = top + window.scrollY + "px"; popEl.style.position = "absolute";
+  popEl.addEventListener("click", e => { const b = e.target.closest("[data-pv]"); if (b) onClick(b.dataset.pv, b, e); });
+  (popEl.querySelector("input,button") || popEl).focus?.();
+}
+function topicListHTML(checked = [], withSearch = true) {
+  const rows = []; const walk = (id, depth) => TOPICS.filter(t => t.parent === id).forEach(t => { if (!t.parent) rows.push(`<div class="area">${esc(t.name)}</div>`); else rows.push(`<button data-pv="${t.id}" class="${depth > 1 ? "sub" : ""}"><span class="chk ${checked.includes(t.id) ? "on" : ""}">${checked.includes(t.id) ? "✓" : ""}</span>${esc(t.name)}</button>`); walk(t.id, depth + 1); });
+  walk(null, 0);
+  return `${withSearch ? `<input type="text" placeholder="Find a topic" id="tsearch" aria-label="Find a topic" style="margin-bottom:8px">` : ""}<div class="list" id="tlist">${rows.join("")}</div>`;
+}
+function hookTopicSearch() { const s = document.getElementById("tsearch"); s?.addEventListener("input", () => { const q = s.value.toLowerCase(); document.querySelectorAll("#tlist button").forEach(b => b.hidden = !b.textContent.toLowerCase().includes(q)); }); s?.focus(); }
+
+/* ================= actions ================= */
+function toast(msg) { const el = document.createElement("div"); el.className = "toast"; el.textContent = msg; document.getElementById("toasts").appendChild(el); setTimeout(() => el.remove(), 2600); }
+function savePrefs() { store.set("prefs", S.ph); }
+function setChip(c) { S.chip = c; S.sel.ids.clear(); if (c.startsWith("kind:")) { S.pf = { ...S.pf, scope: "all", kind: c.slice(5), view: null }; } else if (c === "type:photo") { S.pf.kind = null; S.pf.view = null; } render(); }
+function enterPhotos(f) { S.dest = "commonplace"; S.view = "wall"; S.chip = f.kind ? "kind:" + f.kind : "type:photo"; S.pf = { scope: "all", kind: null, view: null, colour: null, custom: null, shape: null, light: null, topic: null, ...f }; render(); window.scrollTo(0, 0); }
+function togglePick(id) { const p = BY[id]; p.picked = !p.picked; toast(p.picked ? `Picked “${p.title}”.` : `Unpicked “${p.title}”.`); }
+function selectedIds() { return [...S.sel.ids].flatMap(id => BY[id]?.type === "photo" && BY[id].album && S.chip === "all" && !S.q.trim() && document.querySelector(`[data-album="${BY[id].album}"]`) ? PHOTOS.filter(p => p.album === BY[id].album).map(p => p.id) : [id]); }
+function renderBulk() {
+  document.querySelector(".bulk")?.remove(); if (!S.sel.on || S.dest !== "commonplace") return;
+  const n = selectedIds().length; const el = document.createElement("div"); el.className = "bulk"; el.setAttribute("role", "toolbar"); el.setAttribute("aria-label", "Selection");
+  el.innerHTML = n ? `<span class="n">${n} selected</span><button class="btn small" data-act="bulktopic">Add topics…</button><button class="btn small" data-act="bulkkind">Set kind…</button><button class="btn small" data-act="bulkpick">★ Pick</button><button class="btn small" data-act="bulksort">Sort these</button><button class="btn small danger" data-act="bulkdelete">Delete…</button><button class="btn small" data-act="selnone">Clear</button>`
+    : `<span class="n">Select photos</span><span style="font-size:12.5px;color:var(--ink-2);padding-right:10px">Click, Shift-click a range, or drag a box on the wall.</span>`;
+  document.body.appendChild(el);
+}
+function showOnLoci() {
+  const list = photoFilter(); const ids = new Set(list.flatMap(p => p.topics.flatMap(ancestors)));
+  S.loci.hl = { ids, label: filterLabel(), n: list.length, f: { ...S.pf }, chip: S.chip }; S.loci.focus = "a1"; S.dest = "loci"; S.sel.on = false; render(); window.scrollTo(0, 0);
+}
+
+document.addEventListener("click", e => {
+  if (popEl && !popEl.contains(e.target) && !e.target.closest("[data-act$=pop],[data-act=qvtopic],[data-act=qvkind],[data-act=qvmenu],[data-act=saveview],[data-act=bulktopic],[data-act=bulkkind],[data-act=bulkdelete],[data-act=smpicker]")) closePop();
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  // selection mode intercepts card clicks
+  if (S.sel.on && (a === "open") && S.dest === "commonplace") { e.preventDefault(); toggleSel(id, e.shiftKey); return; }
+  switch (a) {
+    case "dest": S.dest = b.dataset.dest; if (S.dest === "commonplace") S.loci.hl = null; S.sel.on = false; render(); renderBulk(); window.scrollTo(0, 0); break;
+    case "theme": { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; break; }
+    case "toast": toast(b.dataset.msg); break;
+    case "view": S.view = b.dataset.v; S.sel.on = false; render(); renderBulk(); break;
+    case "chip": setChip(b.dataset.chip); break;
+    case "scope": S.pf = { ...S.pf, scope: b.dataset.scope, kind: null, view: null }; S.chip = "type:photo"; render(); break;
+    case "scope-unsorted": enterPhotos({ scope: "unsorted" }); break;
+    case "kind": S.pf = { ...S.pf, kind: S.pf.kind === b.dataset.kind ? null : b.dataset.kind, view: null }; S.chip = S.pf.kind ? "kind:" + S.pf.kind : "type:photo"; render(); break;
+    case "openkind": enterPhotos({ kind: b.dataset.kind }); break;
+    case "openview": { const v = S.views.find(v => v.id === b.dataset.view); S.pf = { custom: null, ...v.f, view: v.id }; S.chip = "type:photo"; render(); break; }
+    case "clear": S.pf[b.dataset.k] = null; S.pf.view = null; render(); break;
+    case "resetpf": enterPhotos({}); break;
+    case "layout": S.ph.layout = b.dataset.v; savePrefs(); render(); break;
+    case "open": openQV(id); break;
+    case "pick": e.stopPropagation(); togglePick(id); if (S.qv) { S.qv.reset = false; renderQV(false); } else render(); break;
+    case "select": S.sel.on = !S.sel.on; S.sel.ids.clear(); render(); renderBulk(); break;
+    case "selnone": S.sel.ids.clear(); render(); renderBulk(); break;
+    case "colourpop": openPop(b, `<h4>Colour</h4><div class="swgrid">${COLOURS.map(c => `<button data-pv="${c.id}" style="background:${c.hex}" title="${c.name}" aria-label="${c.name}" aria-pressed="${S.pf.colour === c.id}"></button>`).join("")}</div><div class="row"><input type="color" id="custom-c" value="${S.pf.custom || "#b26a3a"}" aria-label="Pick any colour"> Any colour <span style="flex:1"></span>${S.pf.colour ? '<button class="btn small" data-pv="none">Clear</button>' : ""}</div>`, v => { S.pf.view = null; S.pf.colour = v === "none" ? null : v; closePop(); render(); });
+      document.getElementById("custom-c")?.addEventListener("change", ev => { S.pf.colour = "custom"; S.pf.custom = ev.target.value; S.pf.view = null; closePop(); render(); }); break;
+    case "topicpop": openPop(b, `<h4>Topic</h4>${topicListHTML(S.pf.topic ? [S.pf.topic] : [])}`, v => { S.pf.topic = S.pf.topic === v ? null : v; S.pf.view = null; closePop(); render(); }); hookTopicSearch(); break;
+    case "saveview": openPop(b, `<h4>Save as a View</h4><p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-2)">${esc(filterLabel())}, with this layout. A View holds no photos, only the question.</p><form id="vform"><input type="text" id="vname" placeholder="Name this view" aria-label="View name" value=""><div class="row"><span style="flex:1"></span><button class="btn small primary" type="submit">Save view</button></div></form>`, () => { });
+      document.getElementById("vform").addEventListener("submit", ev => { ev.preventDefault(); const name = document.getElementById("vname").value.trim() || filterLabel(); const v = { id: "v" + Date.now(), name, f: { ...S.pf, view: null } }; S.views.push(v); S.pf.view = v.id; closePop(); render(); toast(`Saved the View “${name}”.`); }); document.getElementById("vname").focus(); break;
+    case "sortmode": openSM(); break;
+    case "showloci": showOnLoci(); break;
+    case "close": closeQV(); break;
+    case "prev": step(-1); break;
+    case "next": step(1); break;
+    case "goto": S.qv.id = id; S.qv.reset = true; S.qv.draft = null; renderQV(false); break;
+    case "zin": { const q = S.qv; zoomAt(q.scale * 1.4, q.vw / 2, q.vh / 2, true); break; }
+    case "zout": { const q = S.qv; zoomAt(q.scale / 1.4, q.vw / 2, q.vh / 2, true); break; }
+    case "zfit": S.qv.scale = S.qv.fit; centre(); applyT(true); break;
+    case "z100": { const q = S.qv; zoomAt(1, q.vw / 2, q.vh / 2, true); break; }
+    case "drawmode": S.qv.draw = !S.qv.draw; S.qv.reset = false; renderQV(false); break;
+    case "regions": S.qv.regions = !S.qv.regions; b.setAttribute("aria-pressed", S.qv.regions); drawRegions(); break;
+    case "canceldraft": S.qv.draft = null; S.qv.reset = false; renderQV(false); break;
+    case "fs": S.qv.fs = !S.qv.fs; S.qv.reset = true; renderQV(false); try { if (S.qv.fs) document.documentElement.requestFullscreen?.().catch(() => { }); else if (document.fullscreenElement) document.exitFullscreen(); } catch (err) { } break;
+    case "savenote": saveNote(); break;
+    case "untopic": { const p = qvP(); p.topics = p.topics.filter(t => t !== b.dataset.t); S.qv.reset = false; renderQV(false); break; }
+    case "qvtopic": openPop(b, `<h4>Topics</h4>${topicListHTML(qvP().topics)}`, (v, el) => { const p = qvP(); p.topics = p.topics.includes(v) ? p.topics.filter(t => t !== v) : [...p.topics, v]; const c = el.querySelector(".chk"); c.classList.toggle("on"); c.textContent = c.classList.contains("on") ? "✓" : ""; S.qv.reset = false; const keep = popEl; renderQV(false); popEl = keep; document.body.appendChild(keep); }); hookTopicSearch(); break;
+    case "qvkind": openPop(b, `<h4>Kind</h4><div class="list">${KINDS.map(k => `<button data-pv="${k.id}"><span class="chk ${qvP().kind === k.id ? "on" : ""}">${qvP().kind === k.id ? "✓" : ""}</span>${k.name}</button>`).join("")}</div>`, v => { qvP().kind = v; closePop(); S.qv.reset = false; renderQV(false); toast(`Moved to ${kindName(v)}.`); }); break;
+    case "qvmenu": openPop(b, `<div class="list"><button data-pv="topicpic">Use as topic picture…</button><button data-pv="cover">Make album cover</button><button data-pv="similar">More like this (Phase 3C)</button><button data-pv="delete" style="color:var(--warn)">Delete…</button></div>`, v => { closePop(); if (v === "topicpic") document.querySelector('[data-act="topicpic"]').click(); else if (v === "similar") toast("Finds photos that look like this one. It arrives with the AI phase (3C)."); else if (v === "delete") toast("Delete asks inline, as on the wall. Nothing is deleted in the prototype."); else toast("Done."); }); break;
+    case "topicpic": { const p = qvP(); if (!p.topics.length) { toast("Give this photo a topic first."); break; } openPop(b, `<h4>Topic picture for</h4><div class="list">${[...new Set(p.topics.flatMap(ancestors))].map(t => `<button data-pv="${t}">${esc(T[t].name)}${S.covers[t] === p.id ? " ✓" : ""}</button>`).join("")}</div>`, v => { S.covers[v] = p.id; closePop(); toast(`Now the picture for ${T[v].name} in Loci.`); }); break; }
+    case "bycolour": { const hex = b.dataset.hex; closeQV(); enterPhotos({ colour: "custom", custom: hex }); toast("Photos with a similar colour."); break; }
+    case "copyimg": { const p = qvP(); (async () => { try { const blob = await (await fetch(full(p))).blob(); const png = await toPng(blob); await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]); toast("Copied the image. Paste it into Miro, InDesign or a deck."); } catch (err) { toast("This preview can't write images to your clipboard. The app can."); } })(); break; }
+    case "download": toast("Downloads are blocked inside this preview. In the app this saves the original file."); break;
+    case "smclose": S.sm = null; layer.innerHTML = ""; render(); break;
+    case "smback": S.sm.i = 0; renderSM(); break;
+    case "smnext": S.sm.i++; renderSM(); break;
+    case "smprev": S.sm.i = Math.max(0, S.sm.i - 1); renderSM(); break;
+    case "smundo": smUndo(); break;
+    case "smtopic": smDo(p => { const t = b.dataset.t; p.topics = p.topics.includes(t) ? p.topics.filter(x => x !== t) : [...p.topics, t]; }); break;
+    case "smkind": smDo(p => { p.kind = b.dataset.kind; }); break;
+    case "smpick": smDo(p => { p.picked = !p.picked; }); break;
+    case "smalbum": smDo(p => { PHOTOS.filter(x => x.album === p.album).forEach(x => { x.topics = [...new Set([...x.topics, ...p.topics])]; }); toast(`Gave the whole album the same topics.`); }); break;
+    case "smpicker": openPop(b, `<h4>Any topic</h4>${topicListHTML(BY[S.sm.queue[S.sm.i]].topics)}`, v => { closePop(); smDo(p => { p.topics = p.topics.includes(v) ? p.topics.filter(x => x !== v) : [...p.topics, v]; }); }); hookTopicSearch(); break;
+    case "lfocus": S.loci.focus = b.dataset.t; renderLoci(); break;
+    case "seeall": S.loci.hl = null; enterPhotos({ topic: b.dataset.t }); break;
+    case "topiccolour": S.loci.hl = null; enterPhotos({ topic: b.dataset.t, colour: b.dataset.c }); break;
+    case "clearhl": S.loci.hl = null; renderLoci(); break;
+    case "backtophotos": { const h = S.loci.hl; S.loci.hl = null; S.dest = "commonplace"; S.view = "wall"; S.chip = h.chip; S.pf = h.f; render(); break; }
+    case "bulkpick": { const ids = selectedIds(); ids.forEach(i => BY[i].type === "photo" && (BY[i].picked = true)); toast(`Picked ${ids.length} photos.`); render(); renderBulk(); break; }
+    case "bulksort": { const ids = selectedIds().filter(i => BY[i].type === "photo"); S.sel.on = false; S.sel.ids.clear(); renderBulk(); openSM(ids); break; }
+    case "bulktopic": openPop(b, `<h4>Add topics to ${selectedIds().length}</h4>${topicListHTML([])}`, v => { selectedIds().forEach(i => { const x = BY[i]; if (x.topics && !x.topics.includes(v)) x.topics.push(v); }); closePop(); toast(`Added ${T[v].name} to ${selectedIds().length} items.`); render(); renderBulk(); }); hookTopicSearch(); break;
+    case "bulkkind": openPop(b, `<h4>Set kind</h4><div class="list">${KINDS.map(k => `<button data-pv="${k.id}">${k.name}</button>`).join("")}</div>`, v => { selectedIds().forEach(i => { if (BY[i].type === "photo") BY[i].kind = v; }); closePop(); toast(`Moved to ${kindName(v)}.`); render(); renderBulk(); }); break;
+    case "bulkdelete": openPop(b, `<h4>Delete ${selectedIds().length} items?</h4><p style="margin:0 0 10px;font-size:13px;color:var(--ink-2);max-width:260px">Their notes go with them. This can't be undone.</p><div class="confirm"><button class="btn small" data-pv="no">Keep them</button><button class="btn small primary" style="background:var(--warn)" data-pv="yes">Delete</button></div>`, v => { closePop(); if (v === "yes") toast("In the prototype nothing is deleted."); }); break;
+    case "guide": S.guide = !S.guide; b.setAttribute("aria-expanded", S.guide); renderGuide(); break;
+    case "try": closeGuide(); runTry(b.dataset.t); break;
+  }
+});
+async function toPng(blob) { const bmp = await createImageBitmap(blob); const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height; c.getContext("2d").drawImage(bmp, 0, 0); return await new Promise(r => c.toBlob(r, "image/png")); }
+function toggleSel(id, shift) {
+  const order = [...document.querySelectorAll("[data-id].ph, article.mcard[data-id]")].map(e => e.dataset.id);
+  if (shift && S.sel.anchor) { const a = order.indexOf(S.sel.anchor), b = order.indexOf(id); order.slice(Math.min(a, b), Math.max(a, b) + 1).forEach(i => S.sel.ids.add(i)); }
+  else { S.sel.ids.has(id) ? S.sel.ids.delete(id) : S.sel.ids.add(id); S.sel.anchor = id; }
+  document.querySelectorAll("[data-id].ph, article.mcard[data-id]").forEach(e => e.classList.toggle("sel", S.sel.ids.has(e.dataset.id)));
+  renderBulk();
+}
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id === "centrepic") { S.loci.centrePic = t.checked; renderLoci(); }
+  if (t.dataset.act === "pref") { const k = t.dataset.k; if (k === "shape" || k === "light") { S.pf[k] = t.value || null; S.pf.view = null; } else { S.ph[{ sort: "sort", group: "group", caps: "caps" }[k]] = t.value; if (k === "sort" && t.value === "shuffle") S.shuffleSeed = 0; savePrefs(); } render(); }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "search") { clearTimeout(window._qt); window._qt = setTimeout(() => { S.q = e.target.value; const pos = e.target.selectionStart; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(pos, pos); }, 250); }
+  if (e.target.id === "size") { S.ph.size = +e.target.value; savePrefs(); renderWall(); }
+});
+// card focus for Space-to-look and arrow keys
+document.addEventListener("mouseover", e => { const c = e.target.closest(".ph[data-id], article.mcard[data-id]"); if (c && BY[c.dataset.id]?.type === "photo") setFocus(c.dataset.id, false); });
+function setFocus(id, scroll) { S.focus = id; document.querySelectorAll(".ph.focused, .mcard.focus-ring").forEach(e => e.classList.remove("focused", "focus-ring")); const el = document.querySelector(`.ph[data-id="${id}"], article.mcard[data-id="${id}"]`); if (el) { el.classList.add(el.classList.contains("ph") ? "focused" : "focus-ring"); if (scroll) el.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }
+
+// lasso selection: drag anywhere on the wall in Select mode (a short press is still a click)
+let lasso = null, pendingLasso = null, swallowClick = false;
+document.addEventListener("pointerdown", e => {
+  const wall = e.target.closest("#wall"); if (!wall || !S.sel.on || e.target.closest(".star-btn") || e.button !== 0 || e.pointerType === "touch") return;
+  pendingLasso = { x: e.clientX, y: e.clientY, wall }; e.preventDefault();
+});
+document.addEventListener("pointermove", e => {
+  if (pendingLasso && !lasso && Math.hypot(e.clientX - pendingLasso.x, e.clientY - pendingLasso.y) > 6) {
+    const wall = pendingLasso.wall, r = wall.getBoundingClientRect();
+    lasso = { x0: pendingLasso.x - r.left, y0: pendingLasso.y - r.top, el: document.createElement("div"), wall, base: new Set(S.sel.ids) };
+    lasso.el.className = "lasso"; wall.style.position = "relative"; wall.appendChild(lasso.el); document.body.style.userSelect = "none";
+  }
+  if (!lasso) return;
+  const r = lasso.wall.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  const L = Math.min(x, lasso.x0), Tp = Math.min(y, lasso.y0), W = Math.abs(x - lasso.x0), H = Math.abs(y - lasso.y0);
+  Object.assign(lasso.el.style, { left: L + "px", top: Tp + "px", width: W + "px", height: H + "px" });
+  S.sel.ids = new Set(lasso.base);
+  lasso.wall.querySelectorAll(".ph[data-id], article.mcard[data-id]").forEach(c => {
+    const cr = c.getBoundingClientRect(), cx = cr.left - r.left, cy = cr.top - r.top;
+    if (cx < L + W && cx + cr.width > L && cy < Tp + H && cy + cr.height > Tp) S.sel.ids.add(c.dataset.id);
+    c.classList.toggle("sel", S.sel.ids.has(c.dataset.id));
+  });
+});
+document.addEventListener("pointerup", () => {
+  pendingLasso = null; if (!lasso) return;
+  lasso.el.remove(); lasso = null; document.body.style.userSelect = "";
+  swallowClick = true; setTimeout(() => { swallowClick = false; }, 0); renderBulk();
+});
+document.addEventListener("dragstart", e => { if (e.target.closest?.("#wall")) e.preventDefault(); });
+// the click that ends a drag must not also toggle the card under the pointer
+document.addEventListener("click", e => { if (swallowClick) { e.stopPropagation(); e.preventDefault(); swallowClick = false; } }, true);
+
+/* ================= keyboard ================= */
+document.addEventListener("keydown", e => {
+  const tag = e.target.tagName, typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+  if (e.key === "Escape" && popEl) { closePop(); return; }
+  if (S.sm) {
+    if (typing) return; const s = S.sm; if (s.i >= s.queue.length) { if (e.key === "Escape") { S.sm = null; layer.innerHTML = ""; render(); } return; }
+    const p = BY[s.queue[s.i]], tops = smTopics(p);
+    if (/^[1-9]$/.test(e.key)) { const t = tops[+e.key - 1]; if (t) smDo(x => { x.topics = x.topics.includes(t) ? x.topics.filter(y => y !== t) : [...x.topics, t]; }); }
+    else if (e.key === "ArrowRight" || e.key === "Enter") { s.i++; renderSM(); }
+    else if (e.key === "ArrowLeft") { s.i = Math.max(0, s.i - 1); renderSM(); }
+    else if (e.key === "Backspace") { e.preventDefault(); smUndo(); }
+    else if (e.key.toLowerCase() === "p") smDo(x => { x.picked = !x.picked; });
+    else if (e.key.toLowerCase() === "k") smDo(x => { x.kind = KINDS[(KINDS.findIndex(k => k.id === x.kind) + 1) % KINDS.length].id; });
+    else if (e.key.toLowerCase() === "a" && p.album && p.topics.length) document.querySelector('[data-act="smalbum"]')?.click();
+    else if (e.key.toLowerCase() === "t") { e.preventDefault(); document.querySelector('[data-act="smpicker"]')?.click(); }
+    else if (e.key === "Escape") { S.sm = null; layer.innerHTML = ""; render(); }
+    return;
+  }
+  if (S.qv) {
+    if (typing) { if (e.key === "Escape") e.target.blur(); return; }
+    const q = S.qv, k = e.key;
+    if (k === "Escape") { if (q.draw || q.draft) { q.draw = false; q.draft = null; q.reset = false; renderQV(false); } else if (q.fs) { q.fs = false; q.reset = true; renderQV(false); try { document.fullscreenElement && document.exitFullscreen(); } catch (err) { } } else closeQV(); }
+    else if (k === "ArrowRight") step(1); else if (k === "ArrowLeft") step(-1);
+    else if (k === " ") { e.preventDefault(); closeQV(); }
+    else if (k === "z" || k === "Z") { if (q.scale > q.fit * 1.01 && Math.abs(q.scale - 1) < .01) { q.scale = q.fit; centre(); applyT(true); } else zoomAt(1, q.vw / 2, q.vh / 2, true); }
+    else if (k === "+" || k === "=") zoomAt(q.scale * 1.4, q.vw / 2, q.vh / 2, true);
+    else if (k === "-" || k === "_") zoomAt(q.scale / 1.4, q.vw / 2, q.vh / 2, true);
+    else if (k === "0") { q.scale = q.fit; centre(); applyT(true); }
+    else if (k === "f" || k === "F") document.querySelector('[data-act="fs"]').click();
+    else if (k === "p" || k === "P") { togglePick(q.id); q.reset = false; renderQV(false); }
+    else if (k === "n" || k === "N") { e.preventDefault(); q.draw = true; q.reset = false; renderQV(false); }
+    else if (k === "r" || k === "R") document.querySelector('[data-act="regions"]').click();
+    return;
+  }
+  if (typing) return;
+  if (S.dest !== "commonplace" || S.view !== "wall") return;
+  if (e.key === " " && S.focus) { e.preventDefault(); openQV(S.focus); return; }
+  if (e.key === "/") { e.preventDefault(); document.getElementById("search")?.focus(); return; }
+  if (e.key === "Escape" && S.sel.on) { S.sel.on = false; S.sel.ids.clear(); render(); renderBulk(); return; }
+  if ((e.ctrlKey || e.metaKey) && (e.key === "=" || e.key === "+" || e.key === "-") && inPhotosMode()) { e.preventDefault(); S.ph.size = Math.max(120, Math.min(460, S.ph.size + (e.key === "-" ? -40 : 40))); savePrefs(); render(); return; }
+  if (["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
+    const cards = [...document.querySelectorAll(".ph[data-id], article.mcard[data-id]")].filter(c => BY[c.dataset.id]?.type === "photo"); if (!cards.length) return;
+    e.preventDefault(); const cur = cards.findIndex(c => c.dataset.id === S.focus);
+    if (cur < 0) { setFocus(cards[0].dataset.id, true); return; }
+    const r0 = cards[cur].getBoundingClientRect();
+    let next = null;
+    if (e.key === "ArrowRight") next = cards[cur + 1]; else if (e.key === "ArrowLeft") next = cards[cur - 1];
+    else { const dir = e.key === "ArrowDown" ? 1 : -1; let best = 1e9; cards.forEach(c => { const r = c.getBoundingClientRect(); const dy = (r.top - r0.top) * dir; if (dy > 10) { const d = dy + Math.abs((r.left + r.width / 2) - (r0.left + r0.width / 2)) * 2; if (d < best) { best = d; next = c; } } }); }
+    if (next) setFocus(next.dataset.id, true);
+  }
+});
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches?.('[role="button"][data-act]') && !S.qv) { e.preventDefault(); e.target.click(); } });
+
+/* ================= guide ================= */
+const TRIES = [
+  ["zoom", "Zoom into a photo", "Scroll or pinch to zoom, drag to pan, Z for 1:1, F for full screen."],
+  ["detail", "Write a note on a detail", "In the viewer, press N and drag a box."],
+  ["wall", "The photo wall", "Photos chip: Rows, Masonry or Grid, a size slider, nothing cropped."],
+  ["colour", "Find by colour", "Pick a swatch, or click a colour in any photo's panel."],
+  ["sort", "Sort a pile with the keyboard", "Unsorted photos, numbers for topics, P to pick."],
+  ["views", "Views and Picks", "Saved searches and keepers, never folders."],
+  ["shelves", "Photo shelves", "Shelves by kind, plus an Unsorted shelf."],
+  ["loci", "Photos in Loci", "Key picture, mood strip, topic colours, Show on Loci."],
+];
+function renderGuide() {
+  document.querySelector(".guide")?.remove(); if (!S.guide) return;
+  const el = document.createElement("div"); el.className = "guide"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Prototype guide");
+  el.innerHTML = `<h3>Commonplace photos</h3><p>Today's Commonplace with the proposed photo features built in. Click <b>Try</b> to jump to each one.</p>
+    <ol>${TRIES.map(([k, t, d], i) => `<li><span class="i">${i + 1}</span><span>${t}<small>${d}</small></span><button class="btn small line" data-act="try" data-t="${k}">Try</button></li>`).join("")}</ol>
+    <p class="note">The wall under the All chip is today's behaviour (cropped cards, albums as one card). The sample pictures were rendered for this prototype; they are not real photographs. Changes you make last until you reload.</p>`;
+  document.body.appendChild(el);
+}
+function closeGuide() { S.guide = false; document.querySelector(".guide-btn").setAttribute("aria-expanded", "false"); renderGuide(); }
+function runTry(k) {
+  if (S.qv) closeQV(); if (S.sm) { S.sm = null; layer.innerHTML = ""; }
+  if (k === "zoom") { enterPhotos({}); setTimeout(() => { openQV("plan-courtyard"); setTimeout(() => { const q = S.qv; zoomAt(1, q.vw * .55, q.vh * .42, true); }, 420); }, 50); }
+  if (k === "detail") { enterPhotos({}); setTimeout(() => openQV("courtyard-morning"), 50); }
+  if (k === "wall") { S.ph.layout = "rows"; enterPhotos({}); }
+  if (k === "colour") { enterPhotos({ colour: "terracotta" }); }
+  if (k === "sort") { enterPhotos({ scope: "unsorted" }); setTimeout(openSM, 60); }
+  if (k === "views") { const v = S.views[1]; enterPhotos({ ...v.f, view: v.id }); }
+  if (k === "shelves") { S.dest = "commonplace"; S.view = "shelves"; render(); setTimeout(() => document.querySelectorAll(".sec-h")[1]?.scrollIntoView({ behavior: "smooth" }), 60); }
+  if (k === "loci") { S.dest = "loci"; S.loci.focus = "t4"; S.loci.hl = null; render(); window.scrollTo(0, 0); }
+}
+
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (S.qv) { S.qv.reset = true; hookQVResize(); } else if (S.dest === "commonplace" && S.view === "wall") renderWall(); }, 150); });
+function hookQVResize() { const q = S.qv, p = qvP(), view = document.getElementById("qv-view"); if (!view) return; const r = view.getBoundingClientRect(); q.vw = r.width; q.vh = r.height; q.fit = Math.min(r.width / p.w, r.height / p.h) * .96; q.scale = Math.max(q.scale, q.fit); clampT(); applyT(false); }
+
+/* boot: open on the photo wall, so the proposal is visible at first sight */
+(function boot() { const hash = location.hash.slice(1); if (hash === "today") { S.chip = "all"; } else if (hash === "shelves") { S.view = "shelves"; } else if (hash === "loci") { S.dest = "loci"; S.loci.focus = "t4"; } else { S.chip = "type:photo"; } render(); })();
+</script>
