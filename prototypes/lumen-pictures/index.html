@@ -1,0 +1,1071 @@
+<title>Lumen Pictures</title>
+<meta name="description" content="A Studiolo Lumen built with the learner's own Commonplace photos, drawings and notes, with a generated picture only where nothing of theirs fits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Studiolo's tokens (src/styles/tokens.css, via the Commonplace photos prototype). Layout: the app's shell, Learn's Lumen page, and the proposed picture blocks. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --accent-strong: #142b73; --hl: #dfe6f7;
+  --hover: #ecece6; --mat: #e4e4de; --slide: #fbfbf9; --cap: #ebebe6;
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9;
+  --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a; --ok-soft: #e2efe7;
+  --pick: #b7791f; --pick-soft: #fbf3df; --gen: #6b4fa0; --gen-soft: #efeaf8;
+  --on-media: #ffffff; --media-badge: rgba(0, 0, 0, .64);
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, .07), 0 8px 22px rgba(34, 48, 58, .09);
+  --shadow-float: 0 1px 2px rgba(34, 48, 58, .06), 0 18px 48px rgba(34, 48, 58, .16);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); --dur-s: 220ms; --dur-m: 380ms; --dur-l: 900ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8; --hl: #2a3657;
+    --hover: #2a353f; --mat: #0d1317; --slide: #1a232a; --cap: #222c34;
+    --quote-paper: #29271f; --quote-rule: #3f3a2e;
+    --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a; --gen: #c4b0f0; --gen-soft: #2c2540;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+    --shadow-float: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --accent: #9db0f3; --accent-soft: #263156; --accent-strong: #c3cff8; --hl: #2a3657;
+  --hover: #2a353f; --mat: #0d1317; --slide: #1a232a; --cap: #222c34;
+  --quote-paper: #29271f; --quote-rule: #3f3a2e;
+  --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329; --pick: #e8c27a; --pick-soft: #33291a; --gen: #c4b0f0; --gen-soft: #2c2540;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-float: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 48px rgba(0, 0, 0, .42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-s: 1ms; --dur-m: 1ms; --dur-l: 1ms; } }
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--ui); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+img { display: block; }
+
+/* shell */
+.rail { position: fixed; inset: 0 auto 0 0; width: 58px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 0; border-right: 1px solid var(--line); background: var(--paper); z-index: 20; }
+.rail .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 17px var(--read); margin-bottom: 20px; }
+.rail button { all: unset; width: 40px; height: 36px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); cursor: pointer; }
+.rail button:hover { background: var(--hover); color: var(--ink); }
+.rail button[aria-current="page"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.rail button:focus-visible { outline: 2px solid var(--accent); }
+.rail svg { width: 18px; height: 18px; }
+.rail .grow { flex: 1; }
+.stage { margin-left: 58px; padding: 28px 44px 80px; min-width: 0; }
+@media (max-width: 980px) { .stage { padding: 24px 24px 80px; } }
+@media (max-width: 699px) {
+  .rail { inset: auto 0 0 0; width: auto; height: 56px; flex-direction: row; justify-content: space-around; padding: 0 8px; border-right: 0; border-top: 1px solid var(--line); }
+  .rail .logo, .rail .grow, .rail .rail-extra { display: none; }
+  .stage { margin-left: 0; padding: 16px 16px 120px; }
+}
+
+/* prototype bar */
+.proto { position: sticky; top: 0; z-index: 15; margin: -28px -44px 22px; padding: 10px 44px; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; }
+@media (max-width: 980px) { .proto { margin: -24px -24px 20px; padding: 10px 24px; } }
+@media (max-width: 699px) { .proto { margin: -16px -16px 16px; padding: 8px 16px; } }
+.proto .tag { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.proto nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.proto nav button { all: unset; cursor: pointer; padding: 5px 10px; border-radius: 4px; font-size: 13px; color: var(--ink-2); }
+.proto nav button:hover { background: var(--hover); color: var(--ink); }
+.proto nav button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.proto nav button:focus-visible { outline: 2px solid var(--accent); }
+.proto .grow { flex: 1; }
+.seg { display: inline-flex; padding: 2px; border-radius: 6px; background: var(--board); }
+.seg button { all: unset; cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.seg button:focus-visible { outline: 2px solid var(--accent); }
+
+/* buttons, chips */
+.btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 4px; font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.btn:hover { background: var(--hover); }
+.btn:focus-visible { outline: 2px solid var(--accent); }
+.btn.line { box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.btn.primary { background: var(--accent); color: var(--paper); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.small { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn svg { width: 14px; height: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 8px; border-radius: 4px; font-size: 12px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); white-space: nowrap; }
+.chip b { color: var(--ink); font-weight: 500; }
+.chip.gen { color: var(--gen); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gen) 40%, transparent); background: var(--gen-soft); }
+.chip.yours { color: var(--ok); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ok) 35%, transparent); background: var(--ok-soft); }
+.chip.pick { color: var(--pick); background: var(--pick-soft); box-shadow: none; }
+
+/* Lumen page head */
+.crumb { font-size: 13px; color: var(--ink-2); margin-bottom: 10px; }
+.crumb a { color: var(--ink-2); }
+.crumb b { color: var(--ink); font-weight: 500; }
+.lhead { display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; padding: 10px 0 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.lhead h1 { margin: 0; font: 400 24px/1.2 var(--read); flex: 1 1 280px; min-width: 0; }
+@media (max-width: 1023px) { .lhead h1 { font-size: 20px; flex-basis: 100%; } }
+.switch { max-width: 100%; overflow-x: auto; scrollbar-width: none; display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: var(--board); }
+.switch button { all: unset; flex: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 13.5px; color: var(--ink-2); white-space: nowrap; }
+.switch button[aria-pressed="true"] { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.switch button:focus-visible { outline: 2px solid var(--accent); }
+.switch .n { color: var(--ink-3); font-size: 12px; font-weight: 400; }
+.switch .sep { width: 1px; height: 18px; background: var(--line); margin: 0 3px; }
+.switch .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); opacity: .7; }
+.switch svg { width: 14px; height: 14px; }
+.lsub { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0 18px; }
+.lsub .q { font: italic 16px/1.4 var(--read); color: var(--ink-2); flex-basis: 100%; }
+
+/* player layout */
+.player { display: grid; grid-template-columns: minmax(0, 1fr) clamp(280px, 30vw, 400px); gap: 20px; align-items: start; }
+@media (max-width: 1023px) { .player { grid-template-columns: minmax(0, 1fr); } }
+.screen { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: var(--slide); box-shadow: var(--shadow-pic), 0 0 0 1px var(--line); }
+.screen .fit { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; }
+.controls { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.play { all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--paper); display: grid; place-items: center; flex: none; }
+.play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.play svg { width: 14px; height: 14px; }
+.bar { flex: 1; display: flex; gap: 3px; }
+.bar button { all: unset; cursor: pointer; flex: 1; height: 16px; display: grid; align-items: center; }
+.bar button::before { content: ""; height: 4px; border-radius: 2px; background: var(--line); }
+.bar button[data-done="true"]::before { background: var(--accent); }
+.bar button[data-now="true"]::before { background: linear-gradient(90deg, var(--accent) var(--p, 0%), var(--line) var(--p, 0%)); }
+.bar button:focus-visible { outline: 2px solid var(--accent); }
+.count { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.voice { all: unset; cursor: pointer; font-size: 12.5px; color: var(--ink-2); display: inline-flex; gap: 5px; align-items: center; padding: 4px 6px; border-radius: 4px; }
+.voice:hover { background: var(--hover); }
+.voice:focus-visible { outline: 2px solid var(--accent); }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin-top: 14px; }
+.thumbs button { all: unset; cursor: pointer; display: block; }
+.thumbs .tv { aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; position: relative; background: var(--slide); box-shadow: 0 0 0 1px var(--line); }
+.thumbs .tv .fit { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; pointer-events: none; }
+.thumbs button[aria-current="true"] .tv { box-shadow: 0 0 0 2px var(--accent); }
+.thumbs button:focus-visible .tv { outline: 2px solid var(--accent); outline-offset: 2px; }
+.thumbs .tl { font-size: 11.5px; color: var(--ink-2); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* side panel */
+.side { background: var(--panel); border-radius: 6px; box-shadow: 0 0 0 1px var(--line); min-width: 0; }
+.side .tabs { display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--line); }
+.side .tabs button { all: unset; cursor: pointer; padding: 11px 8px 10px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 6px; align-items: center; }
+.side .tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--accent); }
+.side .tabs button:focus-visible { outline: 2px solid var(--accent); }
+.side .tabs .n { font-size: 11.5px; color: var(--ink-3); }
+.side .body { padding: 14px; max-height: 620px; overflow: auto; }
+.tr p { margin: 0 0 10px; font-size: 13.5px; color: var(--ink-2); }
+.tr p.now { color: var(--ink); }
+.tr p b { display: block; font-size: 11.5px; font-weight: 500; color: var(--ink-3); margin-bottom: 2px; }
+.pl { display: grid; gap: 14px; }
+.pl .it { display: grid; grid-template-columns: 76px 1fr; gap: 10px; }
+.pl .it.off { opacity: .55; }
+.pl .ph { width: 76px; height: 76px; border-radius: 3px; overflow: hidden; background: var(--mat); position: relative; }
+.pl .ph img { width: 100%; height: 100%; object-fit: cover; }
+.pl h4 { margin: 0 0 3px; font-size: 13.5px; font-weight: 500; }
+.pl .meta { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+.pl .why { font-size: 12.5px; color: var(--ink-2); margin: 0 0 6px; }
+.pl .acts { display: flex; gap: 4px; flex-wrap: wrap; margin-left: -10px; }
+.pl .sum { font-size: 12.5px; color: var(--ink-2); padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.src { display: grid; gap: 10px; }
+.src .s { padding: 10px 12px; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line); }
+.src .s h4 { margin: 0 0 3px; font-size: 13.5px; font-weight: 500; }
+.src .s p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.src .s q { font-family: var(--read); font-size: 14.5px; color: var(--ink); }
+
+/* ============ slides (1280 × 720 design space) ============ */
+.sl { position: absolute; inset: 0; background: var(--slide); color: var(--ink); overflow: hidden; }
+.sl h2 { position: absolute; left: 72px; top: 54px; right: 72px; margin: 0; font: 400 50px/1.1 var(--read); letter-spacing: -.005em; }
+.sl ul, .sl ol { margin: 0; padding: 0; list-style: none; }
+.sl .items { position: absolute; left: 72px; top: 170px; display: grid; gap: 14px; }
+.sl .items li { position: relative; font-size: 25px; line-height: 1.3; padding: 6px 12px 6px 34px; margin-left: -12px; border-radius: 3px; transition: background var(--dur-m) var(--ease); }
+.sl .items li::before { content: ""; position: absolute; left: 14px; top: 19px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.sl .items.ol { counter-reset: n; }
+.sl .items.ol li { counter-increment: n; padding-left: 46px; }
+.sl .items.ol li::before { content: counter(n); width: 24px; height: 24px; left: 10px; top: 9px; background: var(--accent-soft); color: var(--accent-strong); font-size: 15px; font-weight: 600; display: grid; place-items: center; }
+.sl .items li.lit { background: var(--hl); }
+.sl .cap { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: 900px; max-width: calc(100% - 120px); background: var(--cap); padding: 10px 20px; font-size: 21px; line-height: 1.35; text-align: center; color: var(--ink-3); border-radius: 2px; }
+.sl .cap span.on { color: var(--ink); }
+.sl .cap:empty { display: none; }
+.sl .brand { position: absolute; right: 22px; top: 18px; width: 22px; height: 22px; border-radius: 4px; background: var(--ink-3); color: var(--paper); display: grid; place-items: center; font: 500 13px var(--read); opacity: .6; }
+
+/* the picture frame: sized in JS to the picture's own ratio, so marks sit in picture coordinates */
+.frame { position: absolute; overflow: hidden; border-radius: 3px; background: var(--dom, var(--mat)); box-shadow: var(--shadow-pic); }
+.frame .zoom { position: absolute; inset: 0; transform-origin: 50% 50%; transition: transform var(--dur-l) var(--ease); }
+.frame img { width: 100%; height: 100%; object-fit: cover; }
+.credit { position: absolute; left: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px 4px 7px; border-radius: 3px; background: var(--media-badge); color: var(--on-media); font-size: 14px; line-height: 1.2; max-width: calc(100% - 20px); }
+.credit .dot { width: 7px; height: 7px; border-radius: 50%; background: #8fd1ad; flex: none; }
+.sl.cover .credit { top: 14px; bottom: auto; left: 14px; }
+.credit.gen .dot { background: #c7b3f4; }
+.mark { position: absolute; border: 2.5px solid #fff; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 0 0 9999px rgba(0,0,0,0); opacity: 0; transition: opacity var(--dur-m) var(--ease), box-shadow var(--dur-l) var(--ease); }
+.mark.on { opacity: 1; box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 0 0 9999px rgba(10,14,18,.38); }
+.mark .lab { position: absolute; left: -2px; top: calc(100% + 8px); width: max-content; max-width: 330px; background: #fff; color: #1d2830; font-size: 18px; line-height: 1.3; padding: 7px 11px; border-radius: 3px; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.mark .lab small { display: block; font-size: 13px; color: #5d6c77; margin-top: 2px; }
+.mark.r .lab { left: auto; right: -2px; }
+.mark.low .lab { top: auto; bottom: calc(100% + 8px); }
+.mark.quiet.on { box-shadow: 0 0 0 1px rgba(0,0,0,.35); }
+.mark .num { position: absolute; left: -13px; top: -13px; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #1d2830; font-size: 14px; font-weight: 600; display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(0,0,0,.3); }
+.trace path { fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke-dashoffset var(--dur-l) var(--ease), opacity var(--dur-m); }
+.trace .cool { stroke: #1e5fd6; stroke-width: 7; }
+.trace .warm { stroke: #c2412d; stroke-width: 7; }
+.trace .step { opacity: 0; transition: opacity var(--dur-m); }
+.trace .step.on { opacity: 1; }
+.trace .step circle { fill: #fff; stroke: #1d2830; stroke-width: 1.5; }
+.trace .step text { font: 600 15px var(--ui); fill: #1d2830; text-anchor: middle; dominant-baseline: central; }
+
+/* cover */
+.sl.cover .txt { position: absolute; left: 72px; top: 0; bottom: 0; width: 600px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.sl.cover .kick { display: flex; align-items: center; gap: 10px; font-size: 16px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.sl.cover .kick i { font-style: normal; width: 26px; height: 26px; border-radius: 5px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font: 500 16px var(--read); letter-spacing: 0; }
+.sl.cover h1 { margin: 0; font: 400 66px/1.04 var(--read); letter-spacing: -.01em; }
+.sl.cover .qq { margin: 0; font: italic 27px/1.3 var(--read); color: var(--ink-2); }
+.sl.cover .meta { font-size: 17px; color: var(--ink-3); }
+
+/* quote */
+.sl.quote { background: var(--quote-paper); }
+.sl.quote blockquote { position: absolute; left: 140px; right: 140px; top: 180px; margin: 0; padding-left: 36px; border-left: 4px solid var(--quote-rule); font: 400 64px/1.12 var(--read); }
+.sl.quote .from { position: absolute; left: 176px; top: 420px; display: flex; gap: 12px; align-items: center; font-size: 19px; color: var(--ink-2); }
+.sl.quote .from .doc { width: 34px; height: 42px; border-radius: 2px; background: var(--panel); box-shadow: 0 0 0 1px var(--line), 2px 2px 0 var(--line); }
+
+/* pair */
+.pair-lab { position: absolute; font-size: 21px; line-height: 1.3; padding: 6px 10px; margin-left: -10px; border-radius: 3px; transition: background var(--dur-m); }
+.pair-lab b { display: block; font-weight: 600; font-size: 15px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
+.pair-lab.lit { background: var(--hl); }
+.frame.dim { opacity: .45; transition: opacity var(--dur-m); }
+.frame.undim { opacity: 1; transition: opacity var(--dur-m); }
+
+/* table */
+.sl table { position: absolute; left: 72px; top: 178px; width: 600px; border-collapse: collapse; font-size: 22px; }
+.sl th { text-align: left; font-weight: 500; color: var(--ink-2); font-size: 17px; padding: 0 12px 10px; border-bottom: 1.5px solid var(--ink); }
+.sl td { padding: 13px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sl tr.lit td { background: var(--hl); }
+.ask { position: absolute; border-radius: 4px; border: 1.5px dashed var(--line); background: var(--board); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 14px; padding: 36px; }
+.ask h3 { margin: 0; font: 400 30px/1.2 var(--read); }
+.ask p { margin: 0; font-size: 19px; color: var(--ink-2); }
+.ask .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.ask .btn { height: 44px; font-size: 18px; padding: 0 18px; }
+.ask .btn svg { width: 18px; height: 18px; }
+.ask .spin { display: flex; gap: 10px; align-items: center; font-size: 19px; color: var(--gen); }
+.ask .spin::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: sp 0.9s linear infinite; }
+@keyframes sp { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) { .ask .spin::before { animation-duration: 3s; } }
+
+/* quiz */
+.sl.quiz .hit { all: unset; position: absolute; inset: 0; cursor: crosshair; }
+.sl.quiz .hit:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.sl.quiz .pin { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 4px 10px rgba(0,0,0,.3); }
+.sl.quiz .pin.yes { background: var(--ok); }
+.sl.quiz .pin.no { background: var(--warn); }
+.sl.quiz .fb { position: absolute; left: 72px; right: 72px; top: 124px; margin: 0; font-size: 22px; color: var(--ink-2); }
+.sl.quiz .fb.yes { color: var(--ok); }
+.sl.quiz .fb.no { color: var(--warn); }
+
+/* end */
+.sl.end .strip { position: absolute; left: 72px; right: 72px; top: 196px; display: flex; gap: 16px; align-items: flex-end; }
+.sl.end .strip figure { margin: 0; flex: 1; min-width: 0; }
+.sl.end .strip .frame { position: relative; width: 100%; aspect-ratio: 1; }
+.sl.end .strip figcaption { font-size: 15px; color: var(--ink-2); margin-top: 8px; line-height: 1.3; }
+.sl.end .tally { position: absolute; left: 72px; top: 470px; display: flex; gap: 10px; font-size: 18px; }
+.sl.end .tally .chip { height: 32px; font-size: 16px; padding: 0 12px; }
+
+/* words-only (today) */
+.sl.words .items { width: 1000px; }
+
+/* ============ Read ============ */
+.read { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 40px; }
+@media (max-width: 1023px) { .read { grid-template-columns: minmax(0, 1fr); } .read .toc { display: none; } }
+.article { max-width: 66ch; font: 18px/1.56 var(--read); }
+@media (max-width: 699px) { .article { font-size: 16px; line-height: 1.55; } }
+.article .lede { font-size: 1.22em; line-height: 1.42; color: var(--ink); margin: 0 0 22px; }
+.article h2 { font: 500 24px/1.25 var(--read); margin: 38px 0 10px; scroll-margin-top: 80px; }
+.article p { margin: 0 0 16px; }
+.article blockquote { margin: 24px 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--quote-rule); font-size: 1.3em; line-height: 1.3; }
+.article blockquote cite { display: block; font: 13px var(--ui); color: var(--ink-2); font-style: normal; margin-top: 8px; }
+.fig { margin: 26px 0; font-family: var(--ui); }
+.fig.wide { margin-left: -6%; margin-right: -6%; }
+@media (max-width: 1023px) { .fig.wide { margin-left: 0; margin-right: 0; } }
+.fig .frame { position: relative; width: 100%; box-shadow: var(--shadow-pic); }
+.fig .frame .lab { font-size: 13px; }
+.fig figcaption { display: flex; gap: 8px 10px; align-items: baseline; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 1.45; }
+.fig figcaption .t { flex: 1 1 260px; }
+.fig .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .fig .pair { grid-template-columns: 1fr; } }
+.fig .pair .frame { aspect-ratio: 4/5; }
+.fig .tog { margin-top: 8px; }
+.fig .credit { font-size: 12px; }
+.fig .mark .lab { font-size: 13px; padding: 5px 8px; }
+.fig .mark .num { width: 20px; height: 20px; font-size: 12px; left: -11px; top: -11px; }
+.toc { position: sticky; top: 80px; align-self: start; font-size: 13px; }
+.toc b { display: block; font-weight: 500; margin-bottom: 8px; }
+.toc a { display: block; color: var(--ink-2); text-decoration: none; padding: 4px 0 4px 10px; border-left: 2px solid var(--line); }
+.toc a:hover { color: var(--ink); }
+.toc .pics { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--ink-2); display: grid; gap: 6px; }
+
+/* ============ Make ============ */
+.make { max-width: 980px; }
+.make h1 { font: 400 28px/1.2 var(--read); margin: 0 0 16px; }
+.askbar { display: flex; gap: 8px; padding: 8px; border-radius: 8px; background: var(--panel); box-shadow: 0 0 0 1px var(--line), var(--shadow-pic); }
+.askbar input { flex: 1; min-width: 0; border: 0; background: none; padding: 0 10px; font-size: 16px; outline: none; }
+.askbar:focus-within { box-shadow: 0 0 0 2px var(--accent), var(--shadow-pic); }
+.brief { font-size: 13px; color: var(--ink-2); margin: 10px 2px 26px; line-height: 1.7; }
+.brief b { color: var(--ink); font-weight: 500; }
+.shelf h2 { font: 500 16px var(--ui); margin: 0 0 4px; }
+.shelf .lead { margin: 0 0 14px; color: var(--ink-2); font-size: 13.5px; max-width: 72ch; }
+.cands { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 14px; }
+.cand { border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); overflow: hidden; display: flex; flex-direction: column; }
+.cand[data-st="must"] { box-shadow: 0 0 0 2px var(--accent); }
+.cand[data-st="out"] .cimg { opacity: .35; }
+.cand .cimg { aspect-ratio: 4/3; position: relative; background: var(--mat); }
+.cand .cimg { overflow: hidden; }
+.cand .cimg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cand .rank { position: absolute; left: 8px; top: 8px; }
+.cand .cb { padding: 9px 10px 10px; display: grid; gap: 6px; flex: 1; }
+.cand h4 { margin: 0; font-size: 13px; font-weight: 500; line-height: 1.3; }
+.cand .why { font-size: 12px; color: var(--ink-2); line-height: 1.35; }
+.cand .seg { align-self: end; justify-self: start; }
+.cand .seg button { padding: 3px 8px; font-size: 12px; }
+.policy { margin: 26px 0 0; padding: 16px; border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); display: grid; gap: 10px; }
+@media (max-width: 699px) { .policy .seg, .cand .seg { flex-wrap: wrap; } .askbar { flex-wrap: wrap; } .askbar input { flex-basis: 100%; height: 40px; } }
+.policy h3 { margin: 0; font-size: 14px; font-weight: 500; }
+.policy p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.making { margin-top: 26px; padding: 16px 18px; border-radius: 6px; background: var(--panel); box-shadow: 0 0 0 1px var(--line); }
+.making ol { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; font-size: 13.5px; }
+.making li { color: var(--ink-3); display: flex; gap: 8px; align-items: center; }
+.making li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.making li.on { color: var(--ink); }
+.making li.on::before { background: var(--accent); }
+.making li.done { color: var(--ink-2); }
+.making li.done::before { background: var(--ok); }
+.making li small { color: var(--ink-3); }
+
+/* ============ Commonplace ============ */
+.cp h1 { font: 400 28px/1.2 var(--read); margin: 0 0 4px; }
+.cp .sub { color: var(--ink-2); margin: 0 0 18px; }
+.cp .wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.cp .card { all: unset; cursor: pointer; display: block; position: relative; }
+.cp .card .frame { position: relative; aspect-ratio: 4/3; }
+.cp .card .t { font-size: 13px; margin-top: 6px; line-height: 1.3; }
+.cp .card .used { position: absolute; right: 8px; top: 8px; }
+.cp .card .sel { position: absolute; left: 8px; top: 8px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.25); box-shadow: 0 0 0 1px rgba(0,0,0,.3); }
+.cp .card[aria-pressed="true"] .sel { background: var(--accent); }
+.cp .card[aria-pressed="true"] .frame { box-shadow: 0 0 0 3px var(--accent); }
+.cp .card:focus-visible .frame { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cp .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+@media (max-width: 1023px) { .cp .wrap { grid-template-columns: 1fr; } }
+.info { background: var(--panel); border-radius: 6px; box-shadow: 0 0 0 1px var(--line); padding: 16px; position: sticky; top: 80px; }
+.info h3 { font: 400 20px/1.25 var(--read); margin: 10px 0 6px; }
+.info p { margin: 0 0 10px; color: var(--ink-2); font-size: 13px; }
+.info .frame { position: relative; aspect-ratio: 4/3; }
+.info .sec { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.info .sec b { display: block; font-size: 12px; font-weight: 500; color: var(--ink-3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
+.info .lu { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 13px; padding: 6px 0; }
+.selbar { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; display: flex; gap: 8px; align-items: center; padding: 8px 8px 8px 16px; border-radius: 8px; background: var(--ink); color: var(--paper); box-shadow: var(--shadow-float); font-size: 13.5px; }
+.selbar .btn { color: var(--paper); }
+.selbar .btn:hover { background: rgba(255,255,255,.12); }
+.selbar .btn.primary { background: var(--paper); color: var(--ink); }
+@media (max-width: 699px) { .selbar { bottom: 70px; } }
+
+/* dialog, toast */
+.scrim { position: fixed; inset: 0; z-index: 50; background: rgba(20, 26, 30, .38); display: grid; place-items: center; padding: 16px; }
+.dlg { width: min(760px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--panel); border-radius: 8px; box-shadow: var(--shadow-float); padding: 20px; }
+.dlg h3 { margin: 0 0 4px; font: 400 22px/1.25 var(--read); }
+.dlg .lead { margin: 0 0 16px; color: var(--ink-2); font-size: 13.5px; }
+.dlg .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.dlg .grid button { all: unset; cursor: pointer; display: block; border-radius: 4px; }
+.dlg .grid button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dlg .grid .frame { position: relative; aspect-ratio: 4/3; }
+.dlg .grid .t { font-size: 12.5px; margin-top: 6px; }
+.dlg .grid .w { font-size: 11.5px; color: var(--ink-3); }
+.dlg .foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 60; max-width: 360px; padding: 12px 14px; border-radius: 6px; background: var(--ink); color: var(--paper); font-size: 13.5px; box-shadow: var(--shadow-float); opacity: 0; transform: translateY(8px); transition: opacity var(--dur-s), transform var(--dur-s); pointer-events: none; }
+.toast.on { opacity: 1; transform: none; }
+.toast b { display: block; font-weight: 500; }
+@media (max-width: 699px) { .toast { left: 16px; right: 16px; bottom: 72px; } }
+.guide { margin: 0 0 18px; padding: 12px 14px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); font-size: 13.5px; line-height: 1.5; }
+.guide b { font-weight: 600; }
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Studiolo">
+    <div class="logo" aria-hidden="true">S</div>
+    <button class="rail-extra" title="Capture" data-toast="Capture isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7.5"/><path d="M10 6.5v7M6.5 10h7"/></svg><span class="vh">Capture</span></button>
+    <button title="Today" data-toast="Today isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg><span class="vh">Today</span></button>
+    <button id="nav-learn" title="Learn" data-go="watch"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l8-4 8 4-8 4z"/><path d="M5.5 9.8V13c1.2 1.3 2.7 2 4.5 2s3.3-.7 4.5-2V9.8"/></svg><span class="vh">Learn</span></button>
+    <button id="nav-cp" title="Commonplace" data-go="commonplace"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4v12M7.5 4v12M11 4.5l3.5 11.2"/></svg><span class="vh">Commonplace</span></button>
+    <button title="Loci" data-toast="Loci isn't part of this prototype."><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2.5" width="4" height="4" rx="1"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><rect x="13.5" y="13.5" width="4" height="4" rx="1"/><path d="M10 6.5v3.5M4.5 13.5V10h11v3.5"/></svg><span class="vh">Loci</span></button>
+    <div class="grow"></div>
+    <button class="rail-extra" title="Switch theme" data-act="theme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 12.5A6.5 6.5 0 0 1 7.5 4.5a6.5 6.5 0 1 0 8 8z"/></svg><span class="vh">Switch theme</span></button>
+  </nav>
+  <main class="stage" id="main" tabindex="-1"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const main = $("#main");
+
+  /* ================= the learner's Commonplace (sample; pictures are generated stand-ins) ================= */
+  // regions are fractions of the picture: [x, y, w, h]
+  const PICS = {
+    windtowers: { title: "Wind towers over the old quarter", caption: "Each tower faces the summer wind; the slots are on one side only.", kind: "Site visits", album: "Yazd, wind towers", place: "Yazd", date: "3 Apr 2026", topics: ["Wind towers"], pick: true, w: 1800, h: 2250, dom: "#8f5323",
+      notes: [{ id: "n1", text: "Slots on the windward face only", date: "3 Apr", region: [0.715, 0.0, 0.205, 0.135] }] },
+    "section-windtower": { title: "Section through a wind tower", caption: "Cool air down the tower, warm air out through the high openings.", kind: "Drawings", place: "Scan, 600 dpi", date: "10 Apr 2026", topics: ["Wind towers"], pick: true, w: 2560, h: 1440, dom: "#f8f6f0", notes: [] },
+    "courtyard-noon": { title: "Arcade at noon", caption: "Shade only inside the arcade at this hour; the court itself is a heat trap.", kind: "Site visits", album: "Kairouan, site visit", place: "Kairouan", date: "12 Sep 2026", topics: ["Courtyards", "Shading & screens"], w: 1800, h: 2250, dom: "#aabbce", notes: [] },
+    "screen-shadow": { title: "Mashrabiya shadow on the floor", caption: "Late afternoon in a Cairo house. The screen draws on the floor for an hour.", kind: "Site visits", place: "Cairo", date: "18 Feb 2026", topics: ["Shading & screens", "Light & threshold"], pick: true, w: 2000, h: 2000, dom: "#dec79c", notes: [] },
+    "courthouse-aerial": { title: "Courtyard house, aerial", caption: "Four rooms round a court; the tall wing takes the wind tower.", kind: "Renders", place: "Rhino 8 + Enscape", date: "30 Sep 2026", topics: ["Courtyards", "Housing study"], w: 2000, h: 2000, dom: "#dddcda",
+      notes: [{ id: "n2", text: "The tall wing takes the tower", date: "30 Sep", region: [0.72, 0.06, 0.16, 0.6] }] },
+    "mat-jali": { title: "Perforated brick screen", caption: "Half-bricks left out. Light and air, no glass.", kind: "Materials", place: "iPhone 16 Pro", date: "3 Jul 2026", topics: ["Brick", "Shading & screens"], pick: true, w: 1600, h: 2000, dom: "#f3cfa1", notes: [] },
+    "plan-courtyard": { title: "Courtyard house, ground floor plan", caption: "Liwan to the west, majlis to the east. Columns only on the court.", kind: "Drawings", place: "Scan, 600 dpi", date: "28 Sep 2026", topics: ["Courtyards", "Housing study"], pick: true, w: 2200, h: 2200, dom: "#f8f6f0", notes: [] },
+    "courtyard-morning": { title: "Courtyard toward the prayer hall", caption: "Morning, from the north gate. The pool sits on the axis of the wider central bay.", kind: "Site visits", album: "Kairouan, site visit", place: "Kairouan", date: "12 Sep 2026", topics: ["Courtyards", "Arcades & hypostyle"], pick: true, w: 2400, h: 1600, dom: "#ba9c6e", notes: [] },
+    vaults: { title: "Vaulted roofs, mud brick", caption: "Barrel vaults in a row, a dome at the end. No formwork used.", kind: "Site visits", album: "Yazd, wind towers", place: "Yazd", date: "4 Apr 2026", topics: ["Earth", "Courtyards"], w: 2400, h: 1600, dom: "#a46231", notes: [] },
+    "earth-wall": { title: "Rammed earth wall, long view", caption: "Garden wall on the edge of town. You can count the lifts.", kind: "Site visits", album: "Yazd, wind towers", place: "Yazd", date: "3 Apr 2026", topics: ["Earth"], w: 3000, h: 1000, dom: "#a76e3a", notes: [] },
+    "barjeel-gen": { title: "A barjeel, open on four sides", caption: "Generated for this Lumen: a Gulf wind tower of the usual kind, not a real building.", kind: "Generated", gen: true, place: "Generated", date: "24 Oct 2026", topics: [], w: 2400, h: 1600, dom: "#c8b892", notes: [] },
+  };
+  const src = (id, full) => `img/${id}${full ? "" : "-t"}.jpg`;
+
+  // Why the shelf ranked each picture (shown in Make and in the Pictures tab)
+  const WHY = {
+    windtowers: "Tagged Wind towers · a Pick · your note marks the slots",
+    "section-windtower": "Tagged Wind towers · a Pick · a section, so the air's path can be traced on it",
+    "courtyard-noon": "Tagged Shading & screens · its caption says the court is a heat trap",
+    "screen-shadow": "Tagged Shading & screens · a Pick",
+    "courthouse-aerial": "Your Housing study · its caption names the wind tower",
+    "mat-jali": "Tagged Shading & screens · a Pick · not needed: the screen photo says it better",
+    "plan-courtyard": "Your Housing study · a plan; the aerial shows the tower",
+    "courtyard-morning": "Tagged Courtyards · about the axis, not the climate",
+    vaults: "From the Yazd album · about roofs, not wind",
+  };
+  const SHELF = ["windtowers", "section-windtower", "courtyard-noon", "screen-shadow", "courthouse-aerial", "mat-jali", "plan-courtyard", "courtyard-morning", "vaults"];
+
+  /* ================= the Lumen ================= */
+  const L = {
+    title: "How a wind tower cools a house", q: "How does a tower cool a house without a fan?", path: ["Architecture", "Climate-responsive design", "Wind towers"], dur: "3:10",
+  };
+  // Each beat: a block the writer chose, what's said over it, cues (word → what lights), and the words-only version Lumens make today.
+  const BEATS = [
+    { kind: "cover", pic: "windtowers", alts: ["section-windtower"], title: "A wind tower cools a house",
+      say: "A wind tower catches the breeze high above the roofs and sends it down into the house. Let's start with the photo you took in Yazd.",
+      plain: { title: "How a wind tower cools a house", items: [] }, plainSay: "A wind tower catches the breeze high above the roofs and sends it down into the house." },
+    { kind: "photo", pic: "windtowers", alts: ["courtyard-morning"], title: "A tower that catches the wind",
+      items: ["Rises above the roofs", "Catches faster, cleaner wind up high", "Open on one side, to the summer wind"],
+      say: "Here are the towers over the old quarter, from your April visit. Each one rises above the roofs, where the wind is faster and cleaner. And as you noted, the slots are on one side only: the open face is turned to the summer wind.",
+      cues: [["rises", "i0"], ["cleaner", "i1"], ["slots", "n1"], ["open", "i2"]],
+      plain: { title: "A tower that catches the wind", items: ["Rises above the roofs", "Catches faster, cleaner wind up high", "Open face turned to the breeze"] },
+      plainSay: "A wind tower rises above the roofs, where the wind is faster and cleaner. Its open face is turned to the prevailing breeze." },
+    { kind: "trace", pic: "section-windtower", alts: [], title: "Down the shaft, into the room",
+      items: ["Wind enters the open face", "Drops down the narrow shaft", "Spreads across the room, low", "Pushes the warm air out"],
+      say: "Your section shows the path. The wind enters the open face, drops down the narrow shaft, and spreads across the room near the floor. As it spreads, it pushes the warmer air up and out.",
+      cues: [["enters", "s1"], ["drops", "s2"], ["spreads", "s3"], ["pushes", "s4"]],
+      plain: { title: "Down the shaft, into the room", items: ["Wind enters the open face", "Drops down the narrow shaft", "Spreads across the room, low", "Pushes the warm air out"], ol: true },
+      plainSay: "The wind enters the open face, drops down the narrow shaft, and spreads across the room near the floor, pushing the warmer air out." },
+    { kind: "quote", text: "Shade first, then mass, then air.", from: "Studio course · Climate and Architecture, lecture notes, p. 3", title: "Shade first",
+      say: "Your lecture notes put the order in one line: shade first, then mass, then air. The tower is the last of the three, so it works best in a house that is already shaded.",
+      plain: { title: "Shade first", items: ["Shade comes first", "Then thermal mass", "Then moving air"] },
+      plainSay: "Passive cooling usually starts with shade, then thermal mass, then moving air. The tower works best in a house that is already shaded." },
+    { kind: "pair", pics: ["courtyard-noon", "screen-shadow"], alts: [["courtyard-morning"], ["mat-jali"]], title: "Shade does half the work",
+      labels: [["Kairouan, noon", "Open court: a heat trap"], ["Cairo, afternoon", "A screen: light without the sun"]],
+      say: "Two of your photos show why. At noon in Kairouan the open court is a heat trap, with shade only inside the arcade. In the Cairo house, the screen lets the light in and keeps the sun off the floor.",
+      cues: [["Kairouan", "L"], ["Cairo", "R"]],
+      plain: { title: "Shade does half the work", items: ["An open court at noon gathers heat", "Arcades and screens keep the sun off", "Shade lets moving air do its job"] },
+      plainSay: "An open court at noon gathers heat. Arcades and screens keep the sun off, so moving air can do its job." },
+    { kind: "table", pic: "barjeel-gen", gap: true, title: "Malqaf, badgir or barjeel?",
+      head: ["", "Where", "Opens"], rows: [["Malqaf", "Cairo", "One side, to the breeze"], ["Badgir", "Yazd", "One side or several"], ["Barjeel", "The Gulf", "Usually four sides"]],
+      say: "Towers differ by region. Cairo's malqaf faces one way, to the breeze. In Yazd the slots can face one way or several. The Gulf's barjeel usually opens on four sides, to catch wind from any direction.",
+      sayGen: " This last picture is generated: there's no barjeel in your Commonplace yet.",
+      cues: [["malqaf", "r0"], ["Yazd", "r1"], ["barjeel", "r2"]],
+      plain: null, plainSay: "Towers differ by region. Cairo's malqaf faces one way, to the breeze. In Yazd the slots can face one way or several. The Gulf's barjeel usually opens on four sides, to catch wind from any direction." },
+    { kind: "photo", pic: "courthouse-aerial", alts: ["plan-courtyard"], title: "In your housing study", left: true,
+      items: ["Turn its open face to the summer breeze", "Give the room an outlet on the court", "Shade the court first"],
+      say: "And in your housing study, you gave the tall wing the wind tower. Three things to check there: turn its open face to the summer breeze, give the room an outlet on the court side, and shade the court first.",
+      cues: [["tall", "n2"], ["turn", "i0"], ["outlet", "i1"], ["shade", "i2"]],
+      plain: { title: "Applying it to a courtyard house", items: ["Turn the open face to the prevailing breeze", "Give each room an outlet on the court", "Shade the court first"] },
+      plainSay: "In a courtyard house, turn the tower's open face to the prevailing breeze, give each room an outlet on the court, and shade the court first." },
+    { kind: "quiz", pic: "section-windtower", title: "Where does the cool air come in?",
+      say: "One question. Tap the place in your section where the cool air comes into the room.",
+      zone: [0.43, 0.33, 0.13, 0.17],
+      plain: null, plainSay: "One question. Where does the cooled air enter the room?" },
+    { kind: "end", title: "Pictures in this Lumen",
+      say: "That's the idea: catch the wind high, bring it down, let it push the warm air out. Every picture here came from your Commonplace, except the one marked generated.",
+      plain: { title: "In short", items: ["Catch the wind high", "Bring it down the shaft", "Let it push the warm air out"] },
+      plainSay: "That's the idea: catch the wind high, bring it down the shaft, and let it push the warm air out." },
+  ];
+
+  /* ================= state ================= */
+  const S = {
+    view: "watch", mode: "pictures", i: 0, w: 0, playing: false, voice: false, tab: "pictures",
+    policy: "ask", gen: "none", // gap picture: none | making | made | removed | found:<id>
+    swaps: {}, // beat index -> picture id (or array for pairs) or "words"
+    shelf: Object.fromEntries(SHELF.map((id) => [id, "auto"])), // auto | must | out
+    quiz: null, sel: new Set(), cpOpen: "windtowers", trace: true, made: true,
+  };
+  let timer = null, utt = null;
+
+  /* ================= which picture a beat shows ================= */
+  function picFor(bi) {
+    const b = BEATS[bi];
+    if (S.mode === "words") return null;
+    if (S.swaps[bi] === "words") return null;
+    if (b.gap) {
+      if (S.gen.startsWith("found:")) return S.gen.slice(6);
+      return S.gen === "made" ? b.pic : null;
+    }
+    if (b.kind === "pair") {
+      const ids = (S.swaps[bi] || b.pics).map((id, k) => S.shelf[id] === "out" ? (b.alts[k] || []).find((a) => S.shelf[a] !== "out") : id);
+      return ids.every(Boolean) ? ids : null;
+    }
+    if (S.swaps[bi]) return S.swaps[bi];
+    if (!b.pic) return null;
+    if (S.shelf[b.pic] !== "out") return b.pic;
+    return (b.alts || []).find((a) => S.shelf[a] !== "out") || null;
+  }
+  function sayFor(bi) {
+    const b = BEATS[bi];
+    if (S.mode === "words") return b.plainSay;
+    const p = picFor(bi);
+    if (b.gap) return b.say + (p && PICS[p]?.gen ? b.sayGen : "");
+    if (b.kind === "end" || b.kind === "quote") return b.say;
+    if (b.kind === "pair") return p ? b.say : b.plainSay;
+    if (!p) return b.plainSay;
+    if (p !== b.pic) return generic(bi, p);
+    return b.say;
+  }
+  // When a picture is swapped, the slide's lines are rewritten for it (one repair call in the app). Here: a plain line naming it.
+  function generic(bi, p) {
+    const b = BEATS[bi];
+    if (b.kind === "cover") return b.plainSay + ` Let's start with your ${PICS[p].kind === "Drawings" ? "drawing" : "picture"}, ${PICS[p].title.toLowerCase()}.`;
+    return `${b.plainSay} Your ${PICS[p].kind === "Drawings" ? "drawing" : "picture"}, ${PICS[p].title.toLowerCase()}, is on screen.`;
+  }
+  const words = (t) => t.split(/\s+/).filter(Boolean);
+
+  /* ================= picture frame ================= */
+  // Fit a picture of w×h into a box (contain), returning the frame's rect in the box's coordinates.
+  function fit(p, bx, by, bw, bh, mode = "contain") {
+    const r = p.w / p.h, br = bw / bh;
+    let w, h;
+    if ((mode === "contain") === (r > br)) { w = bw; h = bw / r; } else { h = bh; w = bh * r; }
+    return { x: bx + (bw - w) / 2, y: by + (bh - h) / 2, w, h };
+  }
+  function credit(id) {
+    const p = PICS[id];
+    if (p.gen) return `<span class="credit gen"><span class="dot"></span>Generated · not a real building</span>`;
+    return `<span class="credit"><span class="dot"></span>Your ${p.kind === "Drawings" ? "drawing" : p.kind === "Renders" ? "render" : "photo"} · ${esc(p.place)}, ${esc(p.date.replace(/ 2026$/, ""))}</span>`;
+  }
+  function marks(id, opts = {}) {
+    return PICS[id].notes.map((n, k) => `<div class="mark${opts.allOn ? " on" : ""}${opts.quiet ? " quiet" : ""}${n.region[0] + n.region[2] > 0.6 ? " r" : ""}${n.region[1] + n.region[3] > 0.8 ? " low" : ""}" data-cue="${n.id}" style="left:${n.region[0] * 100}%;top:${n.region[1] * 100}%;width:${n.region[2] * 100}%;height:${n.region[3] * 100}%"><span class="num">${k + 1}</span><span class="lab">${esc(n.text)}<small>Your note · ${esc(n.date)}</small></span></div>`).join("");
+  }
+  function frame(id, rect, { cls = "", inner = "", noCredit = false, style = "" } = {}) {
+    const p = PICS[id];
+    const pos = rect ? `left:${rect.x}px;top:${rect.y}px;width:${rect.w}px;height:${rect.h}px;` : "";
+    return `<div class="frame ${cls}" data-pic="${id}" style="${pos}--dom:${p.dom};${style}"><div class="zoom"><img src="${src(id, true)}" alt="${esc(p.title)}" loading="lazy" decoding="async">${inner}</div>${noCredit ? "" : credit(id)}</div>`;
+  }
+  // The trace drawn over the learner's section (picture coordinates 640 × 360)
+  const TRACE = `<svg class="trace" viewBox="0 0 640 360" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+    <path class="cool" data-step="s1" d="M240 8 C 280 10, 305 20, 316 46" pathLength="1" />
+    <path class="cool" data-step="s2" d="M316 46 L 316 146" pathLength="1" />
+    <path class="cool" data-step="s3" d="M314 160 L 232 232 L 146 232" pathLength="1" />
+    <path class="warm" data-step="s4" d="M150 196 C 190 186, 230 176, 262 168" pathLength="1" />
+    <g class="step" data-num="s1"><circle cx="232" cy="22" r="11"/><text x="232" y="22">1</text></g>
+    <g class="step" data-num="s2"><circle cx="334" cy="96" r="11"/><text x="334" y="96">2</text></g>
+    <g class="step" data-num="s3"><circle cx="190" cy="250" r="11"/><text x="190" y="250">3</text></g>
+    <g class="step" data-num="s4"><circle cx="140" cy="196" r="11"/><text x="140" y="196">4</text></g>
+  </svg>`;
+
+  /* ================= slides ================= */
+  function itemsHtml(items, ol, x = 72, y = 170, w = 470) {
+    return `<ul class="items${ol ? " ol" : ""}" style="left:${x}px;top:${y}px;width:${w}px">${items.map((t, k) => `<li data-cue="i${k}">${esc(t)}</li>`).join("")}</ul>`;
+  }
+  function wordsSlide(b) {
+    const pl = b.plain;
+    if (b.kind === "table") return tableSlide(b, null);
+    if (b.kind === "quiz") return `<section class="sl words"><h2>Where does the cooled air enter?</h2>${itemsHtml(["Through the window on the street", "At the foot of the tower", "Through the high opening"], false, 72, 170, 1000)}</section>`;
+    return `<section class="sl words"><h2>${esc(pl.title)}</h2>${itemsHtml(pl.items, pl.ol, 72, 170, 1000)}</section>`;
+  }
+  function tableSlide(b, p) {
+    const tbl = `<table><thead><tr>${b.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${b.rows.map((r, k) => `<tr data-cue="r${k}">${r.map((c, j) => `<td>${j ? esc(c) : `<b style="font-weight:500">${esc(c)}</b>`}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    const box = { x: 720, y: 150, w: 488, h: 420 };
+    if (S.mode === "words") return `<section class="sl words"><h2>${esc(b.title)}</h2>${tbl.replace("<table>", '<table style="width:1000px">')}</section>`;
+    let right;
+    if (p) right = frame(p, fit(PICS[p], box.x, box.y, box.w, box.h, "cover"));
+    else if (S.gen === "making") right = `<div class="ask" style="left:${box.x}px;top:${box.y}px;width:${box.w}px;height:${box.h}px"><span class="spin">Making a picture of a barjeel…</span><p>About 10 seconds. It will be marked Generated.</p></div>`;
+    else if (S.gen === "removed" || S.policy === "never") right = "";
+    else right = `<div class="ask" style="left:${box.x}px;top:${box.y}px;width:${box.w}px;height:${box.h}px">
+      <h3>No barjeel in your Commonplace</h3>
+      <p>Studiolo looked through 14 pictures under Climate-responsive design. None shows a Gulf tower.</p>
+      <div class="acts"><button class="btn primary" data-act="gen">${ICON.spark}Generate one</button><button class="btn line" data-act="find" data-beat="5">Pick one of mine</button></div>
+      <p style="font-size:16px;color:var(--ink-3)">Or leave this slide as words.</p></div>`;
+    return `<section class="sl"><h2>${esc(b.title)}</h2>${tbl}${right}</section>`;
+  }
+  function slideHtml(bi, { thumb = false } = {}) {
+    const b = BEATS[bi];
+    if (S.mode === "words" && b.kind !== "end") return wordsSlide(b);
+    const p = picFor(bi);
+    switch (b.kind) {
+      case "cover": {
+        if (!p) return `<section class="sl cover"><div class="txt" style="width:1000px"><div class="kick"><i>S</i>Studiolo Lumen</div><h1>${esc(L.title)}</h1><p class="qq">${esc(L.q)}</p><p class="meta">Climate-responsive design · ${L.dur} · narrated</p></div></section>`;
+        const r = fit(PICS[p], 700, 0, 580, 720, "cover");
+        return `<section class="sl cover"><div style="position:absolute;left:700px;top:0;width:580px;height:720px;overflow:hidden">${frame(p, { x: r.x - 700, y: r.y, w: r.w, h: r.h }, { style: "border-radius:0;box-shadow:none" })}</div><div class="txt"><div class="kick"><i>S</i>Studiolo Lumen</div><h1>${esc(L.title)}</h1><p class="qq">${esc(L.q)}</p><p class="meta">Climate-responsive design · ${L.dur} · narrated</p></div></section>`;
+      }
+      case "photo": {
+        if (!p) return wordsSlide({ ...b, plain: b.plain });
+        const left = b.left;
+        const box = left ? { x: 72, y: 54, w: 560, h: 540 } : { x: 640, y: 54, w: 568, h: 540 };
+        const r = fit(PICS[p], box.x, box.y, box.w, box.h);
+        return `<section class="sl"><h2 style="${left ? "left:680px" : "right:660px"}">${esc(b.title)}</h2>${itemsHtml(b.items, false, left ? 680 : 72, 230, 520)}${frame(p, r, { inner: marks(p) })}</section>`;
+      }
+      case "trace": {
+        if (!p) return wordsSlide(b);
+        const r = fit(PICS[p], 470, 150, 750, 440);
+        return `<section class="sl"><h2>${esc(b.title)}</h2>${itemsHtml(b.items, true, 72, 200, 380).replace(/data-cue="i(\d)"/g, (m, k) => `data-cue="s${+k + 1}"`)}${frame(p, r, { inner: TRACE })}</section>`;
+      }
+      case "quote":
+        return `<section class="sl quote"><blockquote>${esc(b.text)}</blockquote><div class="from"><span class="doc"></span><span>From your Commonplace<br><b style="color:var(--ink);font-weight:500">${esc(b.from)}</b></span></div></section>`;
+      case "pair": {
+        if (!p) return wordsSlide(b);
+        const [a, c] = p;
+        const ra = fit(PICS[a], 72, 150, 548, 360, "cover"), rc = fit(PICS[c], 660, 150, 548, 360, "cover");
+        const clip = (id, rr, bx, k) => `<div class="frame" data-side="${k}" style="left:${bx}px;top:150px;width:548px;height:360px;--dom:${PICS[id].dom}"><div class="zoom"><img src="${src(id, true)}" alt="${esc(PICS[id].title)}" style="position:absolute;left:${rr.x - bx}px;top:${rr.y - 150}px;width:${rr.w}px;height:${rr.h}px"></div>${credit(id)}</div>`;
+        return `<section class="sl"><h2>${esc(b.title)}</h2>${clip(a, ra, 72, "L")}${clip(c, rc, 660, "R")}
+          <div class="pair-lab" data-cue="L" style="left:72px;top:526px;width:548px"><b>${esc(b.labels[0][0])}</b>${esc(b.labels[0][1])}</div>
+          <div class="pair-lab" data-cue="R" style="left:660px;top:526px;width:548px"><b>${esc(b.labels[1][0])}</b>${esc(b.labels[1][1])}</div></section>`;
+      }
+      case "table": return tableSlide(b, p);
+      case "quiz": {
+        const r = fit(PICS[b.pic], 160, 196, 960, 392);
+        const q = S.quiz;
+        const pin = q ? `<span class="pin ${q.ok ? "yes" : "no"}" style="left:${q.x * 100}%;top:${q.y * 100}%"></span>` : "";
+        const zone = q ? `<div class="mark on quiet" style="left:${b.zone[0] * 100}%;top:${b.zone[1] * 100}%;width:${b.zone[2] * 100}%;height:${b.zone[3] * 100}%;${q.ok ? "" : "box-shadow:0 0 0 1px rgba(0,0,0,.35)"}"><span class="lab">The foot of the shaft<small>${q.ok ? "Right" : "Here"}</small></span></div>` : "";
+        const fb = q ? (q.ok ? `<p class="fb yes">Right. The air comes down the shaft and enters at its foot, low in the room.</p>` : `<p class="fb no">Not quite. Look for where the shaft meets the room: the air drops down it and enters low.</p>`) : `<p class="fb">Tap the picture.</p>`;
+        return `<section class="sl quiz"><h2>${esc(b.title)}</h2>${fb}${frame(b.pic, r, { inner: zone + pin + (thumb ? "" : `<button class="hit" data-act="quiz" aria-label="Tap where the cool air comes into the room"></button>`) })}</section>`;
+      }
+      case "end": {
+        if (S.mode === "words") return `<section class="sl words"><h2>${esc(b.plain.title)}</h2>${itemsHtml(b.plain.items, false, 72, 170, 1000)}</section>`;
+        const used = usedPictures();
+        const yours = used.filter((u) => !PICS[u.id].gen).length, gen = used.length - yours;
+        return `<section class="sl end"><h2>${esc(b.title)}</h2><div class="strip">${used.slice(0, 6).map((u) => `<figure>${frame(u.id, null, { noCredit: true })}<figcaption>${esc(PICS[u.id].title)}</figcaption></figure>`).join("")}</div>
+          <div class="tally"><span class="chip yours">${yours} from your Commonplace</span>${gen ? `<span class="chip gen">${gen} generated</span>` : ""}<span class="chip">1 quote from your lecture notes</span></div></section>`;
+      }
+    }
+  }
+
+  /* ================= which pictures the Lumen uses ================= */
+  function usedPictures() {
+    const out = [];
+    BEATS.forEach((b, bi) => {
+      if (b.kind === "end") return;
+      const p = picFor(bi);
+      if (!p) return;
+      (Array.isArray(p) ? p : [p]).forEach((id) => {
+        const e = out.find((u) => u.id === id);
+        if (e) e.slides.push(bi + 1); else out.push({ id, slides: [bi + 1], beat: bi });
+      });
+    });
+    return out;
+  }
+
+  /* ================= Watch ================= */
+  const ICON = {
+    play: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5z"/></svg>',
+    pause: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>',
+    watch: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="3" width="13" height="10" rx="1.5"/><path d="M6.5 6v4l3.5-2z" fill="currentColor"/></svg>',
+    listen: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 10V8a5.5 5.5 0 0 1 11 0v2"/><rect x="2" y="9.5" width="3" height="4" rx="1"/><rect x="11" y="9.5" width="3" height="4" rx="1"/></svg>',
+    read: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 4c-1.5-1-3.5-1.3-6-1v10c2.5-.3 4.5 0 6 1 1.5-1 3.5-1.3 6-1V3c-2.5-.3-4.5 0-6 1zM8 4v10"/></svg>',
+    share: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 10V2M5 5l3-3 3 3M3 9v4.5h10V9"/></svg>',
+    spark: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5l1.6 4.9 4.9 1.6-4.9 1.6L8 14.5l-1.6-4.9L1.5 8l4.9-1.6z"/></svg>',
+    sound: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 6h3l4-3v10l-4-3H2zM11.5 5.5a3.5 3.5 0 0 1 0 5"/></svg>',
+  };
+  function head(cur) {
+    const used = usedPictures(), gen = used.filter((u) => PICS[u.id].gen).length, yours = used.length - gen;
+    return `<div class="crumb">Learn / <a href="#" data-go="make">Lumens</a> / <b>${esc(L.title)}</b></div>
+      <div class="lhead"><h1>${esc(L.title)}</h1>
+        <div class="switch" role="group" aria-label="Format">
+          <button aria-pressed="${cur === "watch"}" data-go="watch">${ICON.watch}Watch <span class="n">${L.dur}</span></button>
+          <button aria-pressed="false" data-toast="Listen has no pictures, but the hosts can say “the photo you took in Yazd”, and its cover is your photo.">${ICON.listen}Listen <span class="n">+</span></button>
+          <button aria-pressed="${cur === "read"}" data-go="read">${ICON.read}Read <span class="n">9 min</span></button>
+          <span class="sep"></span><button class="live" aria-pressed="false" data-toast="Live can show a picture from the Lumen's shelf when you ask: “show me my section again”.">Live</button>
+        </div>
+        <button class="btn" data-act="share">${ICON.share}Share</button></div>
+      <div class="lsub"><span class="q">${esc(L.q)}</span>
+        <span class="chip">${L.path.slice(0, -1).map(esc).join(" › ")} › <b>${esc(L.path.at(-1))}</b></span>
+        ${S.mode === "words" ? `<span class="chip">Today's Lumen: words only</span>` : `<span class="chip yours">${yours} of your pictures</span>${gen ? `<span class="chip gen">1 generated</span>` : ""}<span class="chip">1 quote from your notes</span>`}
+      </div>`;
+  }
+  function renderWatch() {
+    main.innerHTML = proto() + guide("watch") + head("watch") + `
+      <div class="player">
+        <div>
+          <div class="screen" id="screen" role="region" aria-label="Slide"><div class="fit" id="fit"></div></div>
+          <div class="controls">
+            <button class="play" id="play" aria-label="Play">${ICON.play}</button>
+            <div class="bar" id="bar">${BEATS.map((b, k) => `<button aria-label="Slide ${k + 1}: ${esc(b.title)}" data-seek="${k}"></button>`).join("")}</div>
+            <span class="count" id="count"></span>
+            <button class="voice" id="voice" aria-pressed="false">${ICON.sound}<span>Voice off</span></button>
+          </div>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+        <aside class="side">
+          <div class="tabs" role="tablist">
+            <button role="tab" data-tab="transcript" aria-selected="${S.tab === "transcript"}">Transcript</button>
+            <button role="tab" data-tab="sources" aria-selected="${S.tab === "sources"}">Sources</button>
+            <button role="tab" data-tab="pictures" aria-selected="${S.tab === "pictures"}">Pictures <span class="n">${usedPictures().length}</span></button>
+          </div>
+          <div class="body" id="sidebody"></div>
+        </aside>
+      </div>`;
+    drawSlide(); drawThumbs(); drawSide(); sizeFits();
+  }
+  function drawSlide() {
+    const f = $("#fit"); if (!f) return;
+    f.innerHTML = slideHtml(S.i) + `<span class="brand">S</span>`;
+    const cap = document.createElement("div"); cap.className = "cap"; cap.id = "cap";
+    $(".sl", f).appendChild(cap);
+    S.w = 0; drawCap(); applyCues(false);
+    $("#count").textContent = `Slide ${S.i + 1} of ${BEATS.length}`;
+    $$("#bar button").forEach((b, k) => { b.dataset.done = String(k < S.i); b.dataset.now = String(k === S.i); });
+    $$("#thumbs button").forEach((b, k) => b.setAttribute("aria-current", String(k === S.i)));
+    if (S.tab === "transcript") drawSide();
+  }
+  function drawCap() {
+    const cap = $("#cap"); if (!cap) return;
+    const ws = words(sayFor(S.i));
+    // show a window of ~18 words around the current word
+    const start = Math.max(0, Math.min(S.w - 6, ws.length - 18)), end = Math.min(ws.length, start + 18);
+    cap.innerHTML = ws.slice(start, end).map((w, k) => `<span class="${start + k < S.w ? "on" : ""}">${esc(w)}</span>`).join(" ");
+    const bar = $$("#bar button")[S.i]; if (bar) bar.style.setProperty("--p", `${Math.round((S.w / ws.length) * 100)}%`);
+  }
+  // Light what the narration has reached
+  function applyCues(animate = true) {
+    const b = BEATS[S.i], f = $("#fit"); if (!f) return;
+    const said = words(sayFor(S.i)).slice(0, S.w).join(" ").toLowerCase();
+    const reached = new Set();
+    let from = 0;
+    for (const [w, target] of b.cues || []) { const at = said.indexOf(w.toLowerCase(), from); if (at < 0) break; reached.add(target); from = at + w.length; }
+    if (S.mode === "words") { // today's slides light items in order
+      const n = $$(".items li", f).length, frac = S.w / Math.max(1, words(sayFor(S.i)).length);
+      $$(".items li", f).forEach((li, k) => li.classList.toggle("lit", frac > k / Math.max(1, n) && frac < 1.01));
+      return;
+    }
+    // marks stay on once reached; list items, rows and labels light only while they're the latest
+    const order = [...reached];
+    $$("[data-cue]", f).forEach((el) => {
+      if (el.classList.contains("mark")) return el.classList.toggle("on", reached.has(el.dataset.cue));
+      const sameKind = $$(el.tagName, f).filter((x) => x.dataset.cue).map((x) => x.dataset.cue);
+      const latest = order.filter((c) => sameKind.includes(c)).at(-1);
+      el.classList.toggle("lit", el.dataset.cue === latest && S.w < words(sayFor(S.i)).length);
+    });
+    // a learner's note zooms the picture to it while it's lit
+    $$(".frame", f).forEach((fr) => {
+      const m = $(".mark.on", fr), z = $(".zoom", fr); if (!z) return;
+      const n = m && PICS[fr.dataset.pic]?.notes.find((x) => x.id === m.dataset.cue);
+      if (n && !reduced) { const cx = n.region[0] + n.region[2] / 2, cy = n.region[1] + n.region[3] / 2; z.style.transformOrigin = `${cx * 100}% ${cy * 100}%`; z.style.transform = "scale(1.18)"; }
+      else z.style.transform = "";
+    });
+    // trace: each step draws when reached
+    $$(".trace [data-step]", f).forEach((p) => { const on = reached.has(p.dataset.step); p.style.strokeDasharray = "1"; p.style.strokeDashoffset = on ? "0" : "1"; });
+    $$(".trace [data-num]", f).forEach((g) => g.classList.toggle("on", reached.has(g.dataset.num)));
+    // pair: dim the side not being talked about
+    const side = reached.has("R") ? "R" : reached.has("L") ? "L" : null;
+    const talking = S.w < words(sayFor(S.i)).length;
+    $$("[data-side]", f).forEach((fr) => { fr.classList.toggle("dim", talking && !!side && fr.dataset.side !== side); });
+  }
+  function drawThumbs() {
+    const t = $("#thumbs"); if (!t) return;
+    t.innerHTML = BEATS.map((b, k) => `<button data-seek="${k}" aria-current="${k === S.i}" aria-label="Slide ${k + 1}"><div class="tv"><div class="fit">${slideHtml(k, { thumb: true }).replace(/<(\/?)button/g, "<$1span")}</div></div><div class="tl">${k + 1} ${esc(b.title)}</div></button>`).join("");
+    // thumbnails show the slide's finished state
+    $$("#thumbs .fit").forEach((f) => { $$(".mark", f).forEach((m) => m.classList.add("on")); $$(".items li", f).forEach((li) => li.classList.remove("lit")); $$(".trace [data-step]", f).forEach((p) => { p.style.strokeDasharray = "1"; p.style.strokeDashoffset = "0"; }); $$(".trace [data-num]", f).forEach((g) => g.classList.add("on")); });
+    sizeFits();
+  }
+  function drawSide() {
+    const body = $("#sidebody"); if (!body) return;
+    $$(".side .tabs button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === S.tab)));
+    const n = $('.side .tabs [data-tab="pictures"] .n'); if (n) n.textContent = usedPictures().length;
+    if (S.tab === "transcript") {
+      body.innerHTML = `<div class="tr">${BEATS.map((b, k) => `<p class="${k === S.i ? "now" : ""}"><b>${k + 1} · ${esc(b.title)}</b>${esc(sayFor(k))}</p>`).join("")}</div>`;
+    } else if (S.tab === "sources") {
+      body.innerHTML = `<div class="src">
+        <div class="s"><h4>Climate and Architecture, lecture notes</h4><p><q>Shade first, then mass, then air.</q> p. 3 · quoted on slide 4</p></div>
+        <div class="s"><h4>Your pictures and their captions</h4><p>What's said about your photos comes from their captions and your notes: “the slots are on one side only”, “the court itself is a heat trap”, “the tall wing takes the wind tower”.</p></div>
+        <div class="s"><h4>General knowledge</h4><p>How the air moves and the malqaf / badgir / barjeel comparison are from general knowledge, as Lumens on a topic are today.</p></div></div>`;
+    } else {
+      if (S.mode === "words") { body.innerHTML = `<p class="pl sum">Today's Lumens have no pictures: the writer sees only the titles and notes of up to 8 items, and a photo is “a photo, which cannot be seen here”.</p>`; return; }
+      const used = usedPictures();
+      const gap = BEATS.findIndex((b) => b.gap);
+      const gapRow = !picFor(gap) && S.gen !== "removed" && S.policy !== "never" ? `<div class="it"><div class="ph" style="display:grid;place-items:center;color:var(--ink-3);border:1.5px dashed var(--line);background:none">?</div><div><h4>Slide ${gap + 1} has no picture</h4><p class="why">None of your 14 pictures under Climate-responsive design shows a barjeel.</p><div class="acts"><button class="btn small" data-act="gen">${ICON.spark}Generate one</button><button class="btn small" data-act="find" data-beat="${gap}">Pick one of mine</button></div></div></div>` : "";
+      body.innerHTML = `<div class="pl"><p class="sum">Studiolo looked at 9 of your pictures and used ${used.filter((u) => !PICS[u.id].gen).length}. Swapping a picture rewrites only that slide's lines.</p>
+        ${used.map((u) => { const p = PICS[u.id]; return `<div class="it"><div class="ph"><img src="${src(u.id)}" alt=""></div><div>
+          <h4>${esc(p.title)}</h4>
+          <div class="meta">${p.gen ? `<span class="chip gen">Generated</span>` : `<span class="chip yours">${esc(p.kind)}</span>`}${p.pick ? `<span class="chip pick">★ Pick</span>` : ""}<span class="chip">Slide ${u.slides.join(", ")}</span></div>
+          <p class="why">${p.gen ? "Made because nothing in your Commonplace shows a barjeel. It never names a real building." : esc(WHY[u.id] || "Chosen by you")}</p>
+          <div class="acts">${p.gen ? `<button class="btn small" data-act="keep">Keep in Commonplace</button><button class="btn small" data-act="find" data-beat="${u.beat}">Pick one of mine</button><button class="btn small" data-act="ungen">Remove</button>` : `<button class="btn small" data-act="seek" data-beat="${u.beat}">Show</button><button class="btn small" data-act="find" data-beat="${u.beat}" data-pic="${u.id}">Swap…</button><button class="btn small" data-act="openCp" data-pic="${u.id}">Open in Commonplace</button>`}</div></div></div>`; }).join("")}
+        ${gapRow}</div>`;
+    }
+  }
+  function sizeFits() {
+    $$(".fit").forEach((f) => { const box = f.parentElement; const s = box.clientWidth / 1280; f.style.transform = `scale(${s})`; });
+  }
+  addEventListener("resize", sizeFits);
+
+  /* ================= playback ================= */
+  function play() {
+    if (S.view !== "watch") return;
+    S.playing = true; $("#play").innerHTML = ICON.pause; $("#play").setAttribute("aria-label", "Pause");
+    tick();
+  }
+  function pause() {
+    S.playing = false; clearTimeout(timer); if (speechSynthesis?.speaking) speechSynthesis.cancel();
+    const p = $("#play"); if (p) { p.innerHTML = ICON.play; p.setAttribute("aria-label", "Play"); }
+  }
+  function tick() {
+    clearTimeout(timer);
+    if (!S.playing) return;
+    const ws = words(sayFor(S.i));
+    if (S.voice && "speechSynthesis" in window && S.w === 0) {
+      speechSynthesis.cancel();
+      utt = new SpeechSynthesisUtterance(sayFor(S.i)); utt.rate = 1.02;
+      const mine = utt;
+      utt.onboundary = (e) => { if (utt !== mine || e.name !== "word") return; S.w = sayFor(S.i).slice(0, e.charIndex).split(/\s+/).filter(Boolean).length + 1; drawCap(); applyCues(); };
+      utt.onend = () => { if (utt !== mine || !S.playing) return; S.w = ws.length; drawCap(); applyCues(); timer = setTimeout(next, 900); };
+      speechSynthesis.speak(utt);
+      return;
+    }
+    if (S.voice) return;
+    if (S.w < ws.length) { S.w++; drawCap(); applyCues(); timer = setTimeout(tick, 330 + (/[.,:]$/.test(ws[S.w - 1]) ? 220 : 0)); }
+    else timer = setTimeout(next, 1100);
+  }
+  function next() {
+    if (BEATS[S.i].kind === "quiz" && !S.quiz) { pause(); return; }
+    if (S.i >= BEATS.length - 1) { pause(); return; }
+    S.i++; drawSlide(); tick();
+  }
+  function seek(k) { if (speechSynthesis?.speaking) speechSynthesis.cancel(); utt = null; S.i = k; drawSlide(); if (S.playing) tick(); else { S.w = words(sayFor(S.i)).length; drawCap(); applyCues(); } }
+
+  /* ================= Read ================= */
+  function fig(id, cap, { wide = false, inner = "", extra = "" } = {}) {
+    if (!id) return "";
+    const p = PICS[id];
+    const maxW = Math.round(560 * p.w / p.h), tall = p.h >= p.w;
+    return `<figure class="fig${wide && !tall ? " wide" : ""}"><div class="frame" data-pic="${id}" style="aspect-ratio:${p.w}/${p.h};--dom:${p.dom};${tall ? `width:min(100%, ${maxW}px)` : ""}"><div class="zoom"><img src="${src(id, true)}" alt="${esc(p.title)}" loading="lazy">${inner}</div>${credit(id)}</div><figcaption><span class="t">${cap}</span>${extra}</figcaption></figure>`;
+  }
+  function renderRead() {
+    pause();
+    const words_ = S.mode === "words";
+    const P = (bi) => words_ ? null : picFor(bi);
+    const pair = P(4), gen = P(5), cover = P(1), sec = P(2), proj = P(6);
+    main.innerHTML = proto() + guide("read") + head("read") + `<div class="read"><article class="article">
+      <p class="lede">A wind tower can't make air colder by itself. What it does is catch the breeze where it's strongest, high above the roofs, and send it down through the house, where moving air carries heat away from people and pushes the warmest air out.</p>
+      ${cover ? fig(cover, `${esc(PICS[cover].caption)} <i>Your caption.</i>`, { wide: true, inner: marks(cover, { allOn: true, quiet: true }) }) : ""}
+      <h2 id="r1">Catching the wind</h2>
+      <p>The tower rises above the roofs because the wind is faster and cleaner up there than in the lane. ${cover === "windtowers" ? "In your Yazd photo, the slots are on one side only: the open face is turned to the summer wind, and the back is closed so the breeze can't simply pass through." : "Its open face is turned to the prevailing breeze, and the back is closed so the breeze can't simply pass through."}</p>
+      <h2 id="r2">Down the shaft</h2>
+      <p>Inside, the shaft is narrow. Air pushed in at the top drops down it and enters the room near the floor, then spreads across. As it spreads it pushes the warmer air up and out through high openings.</p>
+      ${sec ? fig(sec, "Your section, with the air's path traced over it: 1 in at the open face, 2 down the shaft, 3 across the room, 4 warm air out.", { inner: TRACE.replace(/class="step"/g, 'class="step on"'), extra: `<button class="btn small line tog" data-act="trace" aria-pressed="${S.trace}">${S.trace ? "Hide" : "Show"} the path</button>` }) : ""}
+      <h2 id="r3">Shade first</h2>
+      <blockquote>Shade first, then mass, then air.<cite>Your lecture notes · Climate and Architecture, p. 3</cite></blockquote>
+      <p>A tower is the last of the three. Moving air helps most in a house that's already shaded, so the sun isn't heating the rooms faster than the breeze can cool them.</p>
+      ${pair ? `<figure class="fig wide"><div class="pair">${pair.map((id) => `<div class="frame" data-pic="${id}" style="--dom:${PICS[id].dom}"><div class="zoom"><img src="${src(id, true)}" alt="${esc(PICS[id].title)}" loading="lazy"></div>${credit(id)}</div>`).join("")}</div><figcaption><span class="t">Left: <i>“${esc(PICS[pair[0]].caption)}”</i> Right: <i>“${esc(PICS[pair[1]].caption)}”</i> Your captions.</span></figcaption></figure>` : ""}
+      <h2 id="r4">Three kinds of tower</h2>
+      <p>Cairo's <b>malqaf</b> faces one way, to the breeze. In Yazd the <b>badgir</b>'s slots can face one way or several. The Gulf's <b>barjeel</b> usually opens on four sides, to catch wind from any direction.</p>
+      ${gen ? fig(gen, PICS[gen].gen ? "A barjeel of the usual Gulf kind. <b>Generated for this Lumen</b>: there was no barjeel among your pictures. It shows a type, not a real building." : esc(PICS[gen].caption)) : ""}
+      <h2 id="r5">In your housing study</h2>
+      ${proj ? fig(proj, `${esc(PICS[proj].caption)} <i>Your caption.</i>`, { inner: marks(proj, { allOn: true, quiet: true }) }) : ""}
+      <p>Turn the tower's open face to the summer breeze, give the room under it an outlet on the court side so the air has somewhere to go, and shade the court first.</p>
+    </article>
+    <nav class="toc" aria-label="Sections"><b>In this Read</b><a href="#r1">Catching the wind</a><a href="#r2">Down the shaft</a><a href="#r3">Shade first</a><a href="#r4">Three kinds of tower</a><a href="#r5">In your housing study</a>
+      ${words_ ? "" : `<div class="pics"><span class="chip yours" style="justify-self:start">${usedPictures().filter((u) => !PICS[u.id].gen).length} of your pictures</span><span>The same pictures as Watch, as figures with your captions.</span></div>`}</nav></div>`;
+  }
+
+  /* ================= Make ================= */
+  function renderMake(stage = 0) {
+    pause();
+    const st = (id) => S.shelf[id];
+    main.innerHTML = proto() + guide("make") + `<div class="make">
+      <div class="crumb">Learn / <b>Home</b></div>
+      <h1>Make a Lumen</h1>
+      <div class="askbar"><input id="q" value="${esc(L.q)}" aria-label="Your question"><button class="btn primary" data-act="make">Make a Lumen</button></div>
+      <p class="brief">For <b>Thesis · Dubai courtyard house</b> · under <b>Wind towers</b> · from <b>1 quote</b> in your lecture notes · with <b>your pictures</b> (below) · builds on <b>2 Lumens you've seen</b></p>
+      <section class="shelf"><h2>Pictures Studiolo will look at</h2>
+        <p class="lead">Your pictures tagged under Climate-responsive design and its sub-topics, Picks first, plus your project that names a wind tower. The writer sees each one and its caption and notes, then uses the ones that show what a slide says. Set one to <b>Use</b> to make sure it's in, or <b>Leave out</b>.</p>
+        <div class="cands">${SHELF.map((id, k) => { const p = PICS[id]; return `<div class="cand" data-st="${st(id)}"><div class="cimg"><img src="${src(id)}" alt="${esc(p.title)}">${p.pick ? `<span class="chip pick rank">★ Pick</span>` : ""}</div><div class="cb"><h4>${esc(p.title)}</h4><div class="why">${esc(WHY[id])}</div>
+          <div class="seg" role="group" aria-label="${esc(p.title)}"><button aria-pressed="${st(id) === "auto"}" data-shelf="${id}" data-v="auto">Studiolo picks</button><button aria-pressed="${st(id) === "must"}" data-shelf="${id}" data-v="must">Use</button><button aria-pressed="${st(id) === "out"}" data-shelf="${id}" data-v="out">Leave out</button></div></div></div>`; }).join("")}</div>
+        <div class="policy"><h3>When none of your pictures fits a point</h3>
+          <div class="seg" role="group" aria-label="Generated pictures"><button aria-pressed="${S.policy === "ask"}" data-policy="ask">Ask me on the slide</button><button aria-pressed="${S.policy === "gen"}" data-policy="gen">Generate one, marked Generated</button><button aria-pressed="${S.policy === "never"}" data-policy="never">Words only</button></div>
+          <p>Generated pictures show a type of thing (“a barjeel of the Gulf kind”), never a real named building or a person. A mechanism is drawn as a diagram instead. Each generated picture costs about as much as one narrated slide.</p></div>
+      </section>
+      ${stage ? `<div class="making" aria-live="polite"><b>Making “${esc(L.title)}”</b><ol>${["Reading your quote and 2 Lumens you've seen", "Looking at 9 of your pictures <small>about 4,000 tokens</small>", "Writing 9 slides, placing 5 pictures", "Checking each picture is one of yours and each mark is your note", S.policy === "gen" ? "Generating 1 picture <small>slide 6</small>" : "Leaving slide 6 for you to fill", "Voicing"].map((t, k) => `<li class="${k + 1 < stage ? "done" : k + 1 === stage ? "on" : ""}">${t}</li>`).join("")}</ol></div>` : ""}
+    </div>`;
+  }
+  function make() {
+    let stage = 1; S.made = false;
+    renderMake(stage);
+    const step = () => { stage++; if (stage > 6) { S.made = true; S.gen = S.policy === "gen" ? "made" : "none"; S.swaps = {}; S.i = 0; S.w = 0; S.quiz = null; go("watch"); toast("Your Lumen is ready", "How a wind tower cools a house · 9 slides"); return; } renderMake(stage); setTimeout(step, reduced ? 350 : 650); };
+    setTimeout(step, reduced ? 350 : 700);
+  }
+
+  /* ================= Commonplace ================= */
+  const CP = ["windtowers", "section-windtower", "courthouse-aerial", "screen-shadow", "courtyard-noon", "mat-jali", "plan-courtyard", "vaults", "earth-wall", "courtyard-morning"];
+  function renderCp() {
+    pause();
+    const used = usedPictures();
+    const inL = (id) => used.find((u) => u.id === id);
+    const o = S.cpOpen, p = PICS[o], u = inL(o);
+    main.innerHTML = proto() + guide("commonplace") + `<div class="cp"><div class="crumb">Commonplace / Photos / <b>Climate-responsive design</b></div>
+      <h1>Climate-responsive design</h1><p class="sub">${CP.length} pictures, with sub-topics. Click one for its panel; select some to make a Lumen from them.</p>
+      <div class="wrap"><div class="wall">${CP.map((id) => { const q = PICS[id]; return `<button class="card" data-cp="${id}" aria-pressed="${S.sel.has(id)}"><div class="frame" style="--dom:${q.dom}"><div class="zoom"><img src="${src(id)}" alt="${esc(q.title)}"></div></div><span class="sel" data-sel="${id}" aria-hidden="true"></span>${inL(id) ? `<span class="chip used">In 1 Lumen</span>` : ""}<div class="t">${esc(q.title)}</div></button>`; }).join("")}</div>
+      <aside class="info"><div class="frame" style="--dom:${p.dom}"><div class="zoom"><img src="${src(o)}" alt="${esc(p.title)}"></div></div>
+        <h3>${esc(p.title)}</h3><p>${esc(p.caption)}</p>
+        <div class="meta" style="display:flex;gap:5px;flex-wrap:wrap"><span class="chip">${esc(p.kind)}</span>${p.topics.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>
+        <div class="sec"><b>In Lumens</b>${u ? `<div class="lu"><span>${esc(L.title)}<br><span style="color:var(--ink-3)">Slide ${u.slides.join(", ")}</span></span><button class="btn small line" data-act="seek" data-beat="${u.beat}">Open at slide ${u.slides[0]}</button></div>` : `<p style="margin:0">Not in a Lumen yet.</p>`}</div>
+        <div class="sec"><b>Make</b><button class="btn small line" data-act="makeFrom" data-pic="${o}">${ICON.spark}Make a Lumen about this picture</button></div>
+        ${p.notes.length ? `<div class="sec"><b>Your notes on a detail</b>${p.notes.map((n) => `<p style="margin:0 0 4px">${esc(n.text)} · ${esc(n.date)}</p>`).join("")}<p style="margin:0;color:var(--ink-3)">Lumens point at these when they show the picture.</p></div>` : ""}
+      </aside></div></div>
+      ${S.sel.size ? `<div class="selbar"><span>${S.sel.size} selected</span><button class="btn" data-act="clearSel">Clear</button><button class="btn primary" data-act="makeFromSel">Make a Lumen from these</button></div>` : ""}`;
+  }
+
+  /* ================= swap dialog ================= */
+  function openFind(bi, picId) {
+    const b = BEATS[bi];
+    const cur = picFor(bi);
+    const list = SHELF.filter((id) => !(Array.isArray(cur) ? cur : [cur]).includes(id));
+    const layer = document.createElement("div"); layer.className = "scrim";
+    layer.innerHTML = `<div class="dlg" role="dialog" aria-modal="true" aria-label="Choose a picture"><h3>${b.gap ? "Pick one of your pictures" : picId ? `Swap “${esc(PICS[picId].title)}”` : "Swap the picture on slide " + (bi + 1)}</h3>
+      <p class="lead">From the pictures Studiolo looked at, best match first. The slide's lines are rewritten for the picture you choose${b.kind === "pair" ? " (this replaces the left one)" : ""}.</p>
+      <div class="grid">${list.map((id) => `<button data-pickfor="${bi}" data-id="${id}"><div class="frame" style="--dom:${PICS[id].dom}"><div class="zoom"><img src="${src(id)}" alt=""></div></div><div class="t">${esc(PICS[id].title)}</div><div class="w">${esc(PICS[id].kind)}</div></button>`).join("")}</div>
+      <div class="foot">${b.gap ? "" : `<button class="btn" data-pickfor="${bi}" data-id="words">Use words on this slide</button>`}<button class="btn line" data-act="close">Cancel</button></div></div>`;
+    document.body.appendChild(layer);
+    $("button", layer)?.focus();
+    layer.addEventListener("click", (e) => {
+      const t = e.target.closest("button");
+      if (e.target === layer || t?.dataset.act === "close") return layer.remove();
+      if (t?.dataset.pickfor) {
+        const k = +t.dataset.pickfor, id = t.dataset.id;
+        // a picture used on several slides is swapped on all of them
+        const ks = picId ? BEATS.map((_, j) => j).filter((j) => { const q = picFor(j); return q === picId || (Array.isArray(q) && q.includes(picId)); }) : [k];
+        for (const j of ks) {
+          if (BEATS[j].gap) S.gen = "found:" + id;
+          else if (BEATS[j].kind === "pair") { const cur = picFor(j) || BEATS[j].pics; S.swaps[j] = id === "words" ? "words" : cur.map((x, n) => (picId ? x === picId : n === 0) ? id : x); }
+          else S.swaps[j] = id;
+        }
+        layer.remove(); S.i = k; S.w = 0; rerender();
+        const sl = (picId ? BEATS.map((_, j) => j).filter((j) => S.swaps[j] !== undefined && (S.swaps[j] === id || (Array.isArray(S.swaps[j]) && S.swaps[j].includes(id)))) : [k]).map((j) => j + 1).join(" and ");
+        toast(id === "words" ? "Words only on slide " + sl : "Picture swapped", id === "words" ? "Each slide keeps its words-only version." : `Slide ${sl}: the lines were rewritten for it and voiced again.`);
+      }
+    });
+    layer.addEventListener("keydown", (e) => { if (e.key === "Escape") layer.remove(); });
+  }
+
+  /* ================= share ================= */
+  function openShare() {
+    const layer = document.createElement("div"); layer.className = "scrim";
+    layer.innerHTML = `<div class="dlg" role="dialog" aria-modal="true" aria-label="Share"><h3>Share this Lumen</h3>
+      <p class="lead">Anyone with the link can watch it. Your pictures are private until you choose here.</p>
+      <div class="policy" style="margin:0"><h3>Your pictures</h3>
+        <div class="seg" role="group"><button aria-pressed="true">Include them</button><button aria-pressed="false">Leave them out</button></div>
+        <p>Included: viewers see the pictures on the slides, never your Commonplace or your notes' words. The 2 lines that quote your notes (“as you noted, the slots are on one side only”) are rewritten for the shared copy. Left out: those slides show their words-only version. The generated picture is shared either way.</p></div>
+      <div class="foot"><button class="btn line" data-act="close">Cancel</button><button class="btn primary" data-act="close">Copy link</button></div></div>`;
+    document.body.appendChild(layer);
+    layer.addEventListener("click", (e) => { const t = e.target.closest("button"); if (e.target === layer || t?.dataset.act === "close") { layer.remove(); if (t?.classList.contains("primary")) toast("Link copied", "A placeholder in this prototype: nothing leaves the page."); } if (t && t.parentElement.classList.contains("seg")) $$("button", t.parentElement).forEach((b) => b.setAttribute("aria-pressed", String(b === t))); });
+  }
+
+  /* ================= frame and routing ================= */
+  function proto() {
+    return `<div class="proto"><span class="tag">Prototype · Lumen pictures</span>
+      <nav aria-label="Prototype screens">${[["make", "1 Make"], ["watch", "2 Watch"], ["read", "3 Read"], ["commonplace", "4 From Commonplace"]].map(([k, t]) => `<button data-go="${k}" aria-pressed="${S.view === k}">${t}</button>`).join("")}</nav>
+      <span class="grow"></span>
+      <div class="seg" role="group" aria-label="Compare"><button data-mode="words" aria-pressed="${S.mode === "words"}">Today: words only</button><button data-mode="pictures" aria-pressed="${S.mode === "pictures"}">With your pictures</button></div></div>`;
+  }
+  function guide(v) {
+    const g = {
+      watch: "<b>Press play.</b> The cover and slide 2 are your Yazd photo, and your note on the slots lights up when it's mentioned. Slide 3 traces the air over your own section drawing, and slide 4 quotes your lecture notes. Slide 6 has no picture of yours, so it asks before generating one. Open the <b>Pictures</b> tab to see why each was chosen, or to swap one. Use <b>Today: words only</b> to compare.",
+      read: "The same Lumen as a long read: your pictures become figures with your own captions, and the section keeps its traced path.",
+      make: "Before making, the brief shows the <b>picture shelf</b>: the pictures the writer will look at, ranked, each with why. Set any to Use or Leave out, choose what happens when nothing fits, then press <b>Make a Lumen</b>.",
+      commonplace: "The other direction. A photo's panel says which Lumens use it, and opens the Lumen at that slide. Select a few photos and <b>Make a Lumen from these</b>.",
+    }[v];
+    return `<p class="guide">${g}</p>`;
+  }
+  function go(v) {
+    S.view = v; if (v !== "watch") pause();
+    $$(".rail [data-go]").forEach((b) => b.toggleAttribute("aria-current", false));
+    (v === "commonplace" ? $("#nav-cp") : $("#nav-learn")).setAttribute("aria-current", "page");
+    rerender(); scrollTo(0, 0);
+  }
+  function rerender() {
+    if (S.view === "watch") renderWatch();
+    else if (S.view === "read") renderRead();
+    else if (S.view === "make") renderMake();
+    else renderCp();
+  }
+  let toastT;
+  function toast(title, body = "") { const t = $("#toast"); t.innerHTML = `<b>${esc(title)}</b>${esc(body)}`; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3600); }
+
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("button, a"); if (!t) return;
+    const d = t.dataset;
+    if (d.go) { e.preventDefault(); return go(d.go); }
+    if (d.toast) return toast(d.toast);
+    if (d.mode) { S.mode = d.mode; pause(); S.w = 0; return rerender(); }
+    if (d.seek !== undefined && t.closest("#bar, #thumbs")) return seek(+d.seek);
+    if (d.tab) { S.tab = d.tab; return drawSide(); }
+    if (d.shelf) { S.shelf[d.shelf] = d.v; return renderMake(); }
+    if (d.policy) { S.policy = d.policy; return renderMake(); }
+    if (d.cp) {
+      if (e.target.closest("[data-sel]") || S.sel.size) { S.sel.has(d.cp) ? S.sel.delete(d.cp) : S.sel.add(d.cp); }
+      else S.cpOpen = d.cp;
+      return renderCp();
+    }
+    switch (d.act) {
+      case "theme": { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; return; }
+      case "make": return make();
+      case "gen": S.gen = "making"; rerender(); setTimeout(() => { S.gen = "made"; S.w = 0; rerender(); toast("Picture generated", "Marked Generated on the slide, in Pictures and when shared."); }, reduced ? 400 : 1800); return;
+      case "ungen": S.gen = "removed"; rerender(); return toast("Generated picture removed", "Slide 6 shows its table alone.");
+      case "keep": return toast("Kept in Commonplace", "Saved as a Generated picture under Wind towers, with the Lumen it came from.");
+      case "find": return openFind(+d.beat, d.pic);
+      case "seek": S.view = "watch"; S.i = +d.beat; S.w = 0; go("watch"); return;
+      case "openCp": S.cpOpen = d.pic; return go("commonplace");
+      case "share": return openShare();
+      case "trace": S.trace = !S.trace; $$(".article .trace").forEach((s) => (s.style.display = S.trace ? "" : "none")); t.textContent = S.trace ? "Hide the path" : "Show the path"; t.setAttribute("aria-pressed", String(S.trace)); return;
+      case "clearSel": S.sel.clear(); return renderCp();
+      case "makeFrom": case "makeFromSel": {
+        const ids = d.act === "makeFrom" ? [d.pic] : [...S.sel];
+        Object.keys(S.shelf).forEach((k) => { if (S.shelf[k] === "must") S.shelf[k] = "auto"; });
+        ids.forEach((id) => { if (id in S.shelf) S.shelf[id] = "must"; });
+        S.sel.clear(); go("make");
+        return toast(`${ids.length} picture${ids.length > 1 ? "s" : ""} set to Use`, "They're in the brief; the question is yours to change.");
+      }
+      case "quiz": return;
+    }
+  });
+  // quiz taps: picture coordinates
+  document.addEventListener("pointerdown", (e) => {
+    const hit = e.target.closest('[data-act="quiz"]'); if (!hit) return;
+    const r = hit.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    const z = BEATS[S.i].zone, pad = 0.04;
+    S.quiz = { x, y, ok: x > z[0] - pad && x < z[0] + z[2] + pad && y > z[1] - pad && y < z[1] + z[3] + pad };
+    const f = $("#fit"); f.innerHTML = slideHtml(S.i) + `<span class="brand">S</span>`; const cap = document.createElement("div"); cap.className = "cap"; cap.id = "cap"; $(".sl", f).appendChild(cap); S.w = words(sayFor(S.i)).length; drawCap();
+    if (S.quiz.ok) setTimeout(() => { if (S.view === "watch" && S.i === BEATS.length - 2) { S.i++; drawSlide(); S.playing ? tick() : play(); } }, 2200);
+  });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#play")) { S.playing ? pause() : (S.i === BEATS.length - 1 && S.w >= words(sayFor(S.i)).length ? (S.i = 0, S.quiz = null, drawSlide(), play()) : play()); }
+    if (e.target.closest("#voice")) {
+      S.voice = !S.voice && "speechSynthesis" in window; const v = $("#voice"); v.setAttribute("aria-pressed", String(S.voice)); $("span", v).textContent = S.voice ? "Voice on" : "Voice off";
+      if (!("speechSynthesis" in window)) toast("No browser voice here", "The captions still play.");
+      if (S.playing) { pause(); S.w = 0; play(); }
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (S.view !== "watch" || e.target.closest("input, .dlg")) return;
+    if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); S.playing ? pause() : play(); }
+    if (e.key === "ArrowRight" && S.i < BEATS.length - 1) seek(S.i + 1);
+    if (e.key === "ArrowLeft" && S.i > 0) seek(S.i - 1);
+  });
+
+  go("watch");
+  // show slide 1 settled until play
+  S.w = 0; drawCap();
+})();
+</script>
