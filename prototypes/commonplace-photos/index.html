@@ -77,7 +77,7 @@ button { cursor: pointer; }
 .stage { flex: 1; min-width: 0; margin-left: 58px; padding: 32px 44px 120px; padding-left: max(44px, env(safe-area-inset-left, 0px)); padding-right: max(44px, env(safe-area-inset-right, 0px)); }
 .dest-head { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; color: var(--ink-2); margin-bottom: 14px; }
 .dest-head b { color: var(--ink); font-weight: 500; }
-.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 30px; overflow-x: auto; scrollbar-width: none; }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
 .tabs button { all: unset; cursor: pointer; padding: 7px 12px 9px; font-size: 13.5px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
 .tabs button[aria-selected="true"] { color: var(--ink); font-weight: 500; border-color: var(--accent); }
 .tabs button:hover { color: var(--ink); }
@@ -113,6 +113,50 @@ button { cursor: pointer; }
 .chips .sep { flex: none; width: 1px; height: 20px; background: var(--line); margin: 0 8px; }
 .chips .lab { flex: none; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
 .new { display: inline-block; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; vertical-align: 1px; }
+
+/* ---------- command row, types (redesigned header) ---------- */
+.cmd { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.searchbox { flex: 1 1 460px; min-width: 0; max-width: 780px; display: flex; align-items: center; height: 46px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--dur-q) var(--ease); }
+.searchbox:focus-within { box-shadow: inset 0 0 0 1.5px var(--accent), 0 0 0 4px var(--accent-soft); }
+.searchbox .scope { all: unset; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 7px; height: 46px; padding: 0 12px 0 14px; border-right: 1px solid var(--line); border-radius: 10px 0 0 10px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.searchbox .scope:hover { background: var(--hover); color: var(--ink); }
+.searchbox .scope:focus-visible { outline: 2px solid var(--accent); }
+.searchbox .scope.on { color: var(--accent-strong); font-weight: 500; }
+.adot { width: 8px; height: 8px; border-radius: 50%; background: var(--status-3); flex: none; }
+.car { font-size: 10px; opacity: .7; }
+.sfield { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px; color: var(--ink-3); cursor: text; }
+.sfield svg { width: 16px; height: 16px; flex: none; }
+.sfield input { flex: 1; min-width: 0; height: 44px; border: 0; padding: 0; background: transparent; font: 19px/1.2 var(--read); color: var(--ink); }
+.sfield input:focus { outline: none; }
+.sfield input::placeholder { color: var(--ink-2); }
+.sfield input::-webkit-search-cancel-button { display: none; }
+.slash { margin-right: 12px; }
+.sclear { all: unset; cursor: pointer; margin-right: 10px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-3); font-size: 12px; }
+.sclear:hover { background: var(--hover); color: var(--ink); }
+.cgrow { flex: 1; }
+.vmark { width: 8px; height: 10px; background: currentColor; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%); opacity: .6; flex: none; }
+.viewbtn { height: 34px; border-radius: 17px; }
+.viewbtn button { height: 34px; }
+.typebar { display: flex; align-items: center; gap: 4px; margin: 0 0 12px; padding: 2px; overflow-x: auto; scrollbar-width: none; }
+.ttab { all: unset; cursor: pointer; flex: none; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px 0 12px; border-radius: 17px; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+.ttab svg { width: 15px; height: 15px; }
+.ttab:hover { background: var(--hover); color: var(--ink); }
+.ttab:focus-visible, .coll:focus-visible { outline: 2px solid var(--accent); }
+.ttab[aria-current="true"] { background: var(--ink); color: var(--paper); }
+.ttab .n { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.ttab[aria-current="true"] .n { color: inherit; opacity: .6; }
+.subcolls { flex: none; display: inline-flex; align-items: center; gap: 2px; margin: 0 8px 0 0; padding-right: 10px; border-right: 1px solid var(--line); }
+.subcolls:last-child { border-right: 0; }
+.chev { color: var(--ink-3); margin: 0 4px 0 6px; font-size: 16px; }
+.coll { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 15px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.coll:hover { background: var(--hover); color: var(--ink); }
+.coll[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+.coll .n { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pbar .count { font-size: 12.5px; color: var(--ink-3); margin-right: 2px; }
+.shelfq { flex: none; width: 210px; }
+.quote.shelfq q { font-size: 15px; }
+.notecard.shelfq { font-size: 14px; }
+.notecard.shelfq h3 { font-size: 16px; }
 
 /* ---------- mixed wall (today's cards) ---------- */
 .mason { position: relative; display: flex; gap: 20px; align-items: flex-start; }
@@ -153,7 +197,7 @@ button { cursor: pointer; }
 kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); color: var(--ink-2); }
 
 /* ---------- photos mode ---------- */
-.pbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: -10px 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.pbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0 0 20px; padding: 10px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .pbar .seg { padding: 2px; }
 .pbar .seg button { height: 26px; font-size: 12.5px; padding: 0 10px; }
 .pbar .seg .n { color: var(--ink-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
@@ -436,6 +480,10 @@ kbd { font: 11px var(--ui); padding: 0 4px; border: 1px solid var(--line); borde
   .guide-btn { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
   .guide { bottom: calc(114px + env(safe-area-inset-bottom, 0px)); }
   .bulk { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  .searchbox { flex-basis: 100%; }
+  .searchbox .scope { padding: 0 10px; }
+  .slash { display: none; }
+  .sfield input { font-size: 17px; }
   .pbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .pbar > * { flex: none; }
   .pbar .grow { display: none; }
@@ -490,7 +538,7 @@ const KINDS = [
   { id: "drawings", name: "Drawings" }, { id: "materials", name: "Materials" },
 ];
 const ALBUMS = { kairouan: "Kairouan, site visit", yazd: "Yazd, wind towers", comp: "Library competition, stage 1" };
-const COLLS = [{ id: "books", name: "Books" }, { id: "lectures", name: "Lectures" }, { id: "links", name: "Links" }, { id: "quotes", name: "Quotes" }];
+const COLLS = [{ id: "reflections", name: "Reflections", type: "note" }, { id: "books", name: "Books", type: "source" }, { id: "lectures", name: "Lectures", type: "source" }, { id: "links", name: "Links", type: "source" }];
 const SONY = "Sony α7 IV", IPH = "iPhone 16 Pro", ENS = "Rhino 8 + Enscape", SCAN = "Scan, 600 dpi";
 const P = (id, title, caption, kind, topics, date, camera, extra = {}) => ({ id, type: "photo", title, caption, kind, topics, date, camera, picked: false, album: null, source: null, notes: [], ...extra });
 const PHOTOS = [
@@ -528,15 +576,17 @@ const PHOTOS = [
   P("mat-concrete", "Board-marked concrete", "", "materials", [], "2026-10-20", IPH),
 ];
 const OTHERS = [
-  { id: "q1", type: "quote", text: "Shade first, then mass, then air.", src: "Studio course · Climate and Architecture: lecture notes, p. 3", coll: "quotes", topics: ["t2"], date: "2026-10-21" },
-  { id: "n-sh", type: "note", text: "The mausoleum at Sultan Hassan faces the Citadel, not the city. Mentions Hassan Fathy.", topics: ["t1"], date: "2026-10-17" },
-  { id: "b1", type: "book", title: "Islamic Architecture: Form, Function and Meaning", creator: "Robert Hillenbrand, 1994", coll: "books", topics: ["t1"], date: "2026-10-09" },
-  { id: "v1", type: "video", title: "The Great Mosque of Córdoba, plan and extensions", creator: "Studio lecture", dur: "30:00", prog: .35, coll: "lectures", topics: ["t1b"], date: "2026-09-25" },
-  { id: "q2", type: "quote", text: "The eye never quite finds the end of the field.", src: "Studio lecture · Córdoba, 10:05", coll: "quotes", topics: ["t1b"], date: "2026-09-20" },
-  { id: "l1", type: "link", title: "Bait Ur Rouf Mosque, Marina Tabassum", site: "archdaily.com", desc: "Brick, no dome, light from above.", coll: "links", topics: ["t3", "t4a"], date: "2026-08-22" },
-  { id: "ln", type: "longnote", title: "What I took from Sultan Hassan", text: "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.", topics: ["t1a"], date: "2026-08-02" },
-  { id: "q3", type: "quote", text: "We have to design for the climate, not against it.", src: "Hassan Fathy", coll: "quotes", topics: ["t2"], date: "2026-05-02" },
-  { id: "v2", type: "video", title: "Murcutt draws a roof", creator: "youtube.com", dur: "12:40", prog: 0, coll: "lectures", topics: ["t5a"], date: "2026-10-19" },
+  { id: "q1", type: "quote", text: "Shade first, then mass, then air.", src: "Studio course · Climate and Architecture: lecture notes, p. 3", topics: ["t2"], date: "2026-10-21", picked: true },
+  { id: "n-sh", type: "note", text: "The mausoleum at Sultan Hassan faces the Citadel, not the city. Mentions Hassan Fathy.", coll: "reflections", topics: ["t1"], date: "2026-10-17" },
+  { id: "b1", type: "book", title: "Islamic Architecture: Form, Function and Meaning", creator: "Robert Hillenbrand, 1994", coll: "books", state: "reading", picked: true, topics: ["t1"], date: "2026-10-09" },
+  { id: "v1", type: "video", title: "The Great Mosque of Córdoba, plan and extensions", creator: "Studio lecture", dur: "30:00", prog: .35, coll: "lectures", state: "reading", topics: ["t1b"], date: "2026-09-25" },
+  { id: "q2", type: "quote", text: "The eye never quite finds the end of the field.", src: "Studio lecture · Córdoba, 10:05", topics: ["t1b"], date: "2026-09-20" },
+  { id: "l1", type: "link", title: "Bait Ur Rouf Mosque, Marina Tabassum", site: "archdaily.com", desc: "Brick, no dome, light from above.", coll: "links", state: "read", topics: ["t3", "t4a"], date: "2026-08-22" },
+  { id: "ln", type: "longnote", title: "What I took from Sultan Hassan", text: "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.", coll: "reflections", picked: true, topics: ["t1a"], date: "2026-08-02" },
+  { id: "q3", type: "quote", text: "We have to design for the climate, not against it.", src: "Hassan Fathy", topics: ["t2"], date: "2026-05-02" },
+  { id: "v2", type: "video", title: "Murcutt draws a roof", creator: "youtube.com", dur: "12:40", prog: 0, coll: "lectures", state: "unread", topics: ["t5a"], date: "2026-10-19" },
+  { id: "n2", type: "note", text: "Ask the client about north light in the reading hall before stage 2.", topics: [], date: "2026-10-22" },
+  { id: "l2", type: "link", title: "Rammed earth: a contractor's guide", site: "earthbuilding.org", desc: "Lifts, formwork and curing times.", coll: "links", state: "unread", topics: [], date: "2026-10-20" },
 ];
 PHOTOS.forEach((p, i) => { const m = META[p.id]; p.w = m[0]; p.h = m[1]; p.light = m[2]; p.palette = m[3].map(([hex, share]) => ({ hex, share, lab: hexToLab(hex) })); p.added = Date.parse(p.date) + i * 60000; });
 OTHERS.forEach((o, i) => { o.added = Date.parse(o.date) + 3600000 + i * 60000; });
@@ -577,57 +627,95 @@ const leafTopics = () => TOPICS.filter(t => t.parent && !TOPICS.some(c => c.pare
 const store = { get(k, d) { try { const v = localStorage.getItem("cp-photos:" + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem("cp-photos:" + k, JSON.stringify(v)); } catch (e) { } } };
 
 /* ================= state ================= */
+const FDEF = { scope: "all", kind: null, view: null, topic: null, colour: null, custom: null, shape: null, light: null, status: null, style: null };
 const S = {
-  dest: "commonplace", view: "wall", chip: "all", q: "",
+  dest: "commonplace", view: "wall", type: "photo", area: "all", q: "",
   ph: Object.assign({ layout: "rows", size: 220, sort: "newest", group: "none", caps: "show" }, store.get("prefs", {})),
-  pf: { scope: "all", kind: null, view: null, colour: null, custom: null, shape: null, light: null, topic: null },
+  mix: Object.assign({ sort: "newest", group: "none" }, store.get("mix", {})),
+  pf: { ...FDEF },
   sel: { on: false, ids: new Set(), anchor: null }, focus: null,
   covers: {}, views: [
-    { id: "v1", name: "Warm brick references", f: { scope: "all", kind: null, colour: "terracotta", shape: null, light: null, topic: "t4a" } },
-    { id: "v2", name: "Competition picks", f: { scope: "picks", kind: null, colour: null, shape: null, light: null, topic: "t5" } },
+    { id: "v1", name: "Warm brick references", type: "photo", area: "all", f: { colour: "terracotta", topic: "t4a" } },
+    { id: "v2", name: "Competition picks", type: "photo", area: "a2", f: { scope: "picks", topic: "t5" } },
+    { id: "v3", name: "Reading now", type: "source", area: "all", f: { status: "reading" } },
   ],
   loci: { focus: "a1", hl: null, centrePic: false },
   qv: null, sm: null, guide: false,
 };
 const loaded = new Set();
 
-/* ================= filtering ================= */
-function inPhotosMode() { return S.chip === "type:photo" || S.chip.startsWith("kind:"); }
+/* ================= types, collections, filtering ================= */
+// The owner's rule: system types on top; collections sit under the type they belong to.
+const TYPES = [
+  { id: "all", name: "All", one: "entry", many: "entries" },
+  { id: "note", name: "Notes", one: "note", many: "notes" },
+  { id: "source", name: "Sources", one: "source", many: "sources" },
+  { id: "photo", name: "Photos", one: "photo", many: "photos" },
+];
+const TYPE_ICONS = {
+  all: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>',
+  note: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 2.5h7l3 3v8H3z"/><path d="M5.5 7.5h5M5.5 10h5"/></svg>',
+  source: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 3.5c2-.8 3.8-.8 5.5.5v9c-1.7-1.3-3.5-1.3-5.5-.5zM13.5 3.5c-2-.8-3.8-.8-5.5.5v9c1.7-1.3 3.5-1.3 5.5-.5z"/></svg>',
+  photo: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="10" rx="1.5"/><circle cx="6" cy="6.5" r="1.2"/><path d="M2.5 12l3.5-3.5 3 3 2-2 2.5 2.5"/></svg>',
+};
+const typeOf = x => x.type === "photo" ? "photo" : ["note", "longnote", "quote"].includes(x.type) ? "note" : "source";
+const STYLES = [["plain", "Plain"], ["long", "Long"], ["quote", "Quote"]];
+const styleOf = x => ({ note: "plain", longnote: "long", quote: "quote" })[x.type];
+const STATUSES = [["unread", "To read"], ["reading", "Reading"], ["read", "Read"]];
+const SHAPES = [["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"], ["panorama", "Panorama"]];
+const collsOf = type => type === "photo" ? KINDS : COLLS.filter(c => c.type === type);
+const collName = id => (KINDS.find(k => k.id === id) || COLLS.find(c => c.id === id))?.name || "";
+const collOf = x => x.type === "photo" ? x.kind : x.coll;
+const ALL_ITEMS = () => [...PHOTOS, ...OTHERS];
+function inPhotosMode() { return S.type === "photo"; }
 function matchesQ(x) {
   if (!S.q.trim()) return true; const q = S.q.trim().toLowerCase();
-  const hay = [x.title, x.caption, x.text, x.src, x.creator, x.desc, x.site, x.source?.site, kindName(x.kind), x.album && ALBUMS[x.album], ...(x.topics || []).map(t => T[t].name), ...(x.notes || []).map(n => n.text)].join(" ").toLowerCase();
+  const hay = [x.title, x.caption, x.text, x.src, x.creator, x.desc, x.site, x.source?.site, kindName(x.kind), collName(x.coll), x.album && ALBUMS[x.album], ...(x.topics || []).map(t => T[t].name), ...(x.notes || []).map(n => n.text)].join(" ").toLowerCase();
   return hay.includes(q);
 }
+const areaMatch = (x, area = S.area) => area === "all" ? true : area === "none" ? !x.topics.length : x.topics.some(t => areaOf(t) === area);
 function colourMatch(p, lab) { return p.palette.some(c => c.share >= .06 && dE(c.lab, lab) < 24); }
-function photoFilter(f = S.pf) {
-  let list = PHOTOS.filter(matchesQ);
-  if (f.scope === "unsorted") list = list.filter(p => !p.topics.length);
-  if (f.scope === "picks") list = list.filter(p => p.picked);
-  if (f.kind) list = list.filter(p => p.kind === f.kind);
-  if (f.topic) { const d = descendants(f.topic); list = list.filter(p => p.topics.some(t => d.includes(t))); }
-  if (f.colour) { const lab = hexToLab(f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex); list = list.filter(p => colourMatch(p, lab)); }
-  if (f.shape) list = list.filter(p => shapeOf(p) === f.shape);
-  if (f.light) list = list.filter(p => f.light === "dark" ? p.light < 40 : p.light > 60);
+// What the type tabs count: everything of that type in this area and search, before the slim bar's filters.
+const baseOf = (type, area = S.area) => ALL_ITEMS().filter(x => (type === "all" || typeOf(x) === type) && matchesQ(x) && areaMatch(x, area));
+function itemFilter(f = S.pf, type = S.type, area = S.area) {
+  let list = baseOf(type, area);
+  if (f.scope === "unsorted") list = list.filter(x => !x.topics.length);
+  if (f.scope === "picks") list = list.filter(x => x.picked);
+  if (f.kind) list = list.filter(x => collOf(x) === f.kind);
+  if (f.topic) { const d = descendants(f.topic); list = list.filter(x => x.topics.some(t => d.includes(t))); }
+  if (type === "photo") {
+    if (f.colour) { const lab = hexToLab(f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex); list = list.filter(p => colourMatch(p, lab)); }
+    if (f.shape) list = list.filter(p => shapeOf(p) === f.shape);
+    if (f.light) list = list.filter(p => f.light === "dark" ? p.light < 40 : p.light > 60);
+  }
+  if (type === "source" && f.status) list = list.filter(x => x.state === f.status);
+  if (type === "note" && f.style) list = list.filter(x => styleOf(x) === f.style);
   return list;
 }
+const photoFilter = (f = S.pf) => itemFilter(f, "photo");
+const anyFilter = () => S.pf.scope !== "all" || S.pf.kind || S.pf.topic || S.area !== "all" || S.q.trim();
+const collapseAlbums = () => S.type === "all" && !anyFilter(); // today's rule: a photo group is one card on an unfiltered wall
 function hueOf(p) { const c = p.palette.find(x => x.share > .1) || p.palette[0]; const [L, a, b] = c.lab; const chroma = Math.hypot(a, b); return chroma < 8 ? 1000 + (100 - L) : (Math.atan2(b, a) * 180 / Math.PI + 360 + 330) % 360; }
-function sortPhotos(list) {
-  const s = S.ph.sort, l = [...list];
+const titleOf = x => x.title || x.text || "";
+function sortItems(list, s) {
+  const l = [...list];
   if (s === "newest") l.sort((a, b) => b.added - a.added);
   if (s === "oldest") l.sort((a, b) => a.added - b.added);
   if (s === "taken") l.sort((a, b) => b.date.localeCompare(a.date));
   if (s === "colour") l.sort((a, b) => hueOf(a) - hueOf(b));
   if (s === "shape") l.sort((a, b) => ratioOf(b) - ratioOf(a));
   if (s === "res") l.sort((a, b) => b.w * b.h - a.w * a.h);
-  if (s === "title") l.sort((a, b) => a.title.localeCompare(b.title));
+  if (s === "title") l.sort((a, b) => titleOf(a).localeCompare(titleOf(b)));
   if (s === "shuffle") { let seed = S.shuffleSeed || (S.shuffleSeed = Math.floor(Math.random() * 1e6) + 1); const r = () => (seed = seed * 16807 % 2147483647) / 2147483647; l.forEach((_, i) => { const j = Math.floor(r() * (i + 1)); [l[i], l[j]] = [l[j], l[i]]; }); }
   return l;
 }
-function groupPhotos(list) {
-  const g = S.ph.group; if (g === "none") return [{ key: null, items: list }];
+const sortPhotos = list => sortItems(list, S.ph.sort);
+function groupItems(list, g) {
+  if (g === "none") return [{ key: null, items: list }];
   const map = new Map(); const add = (k, label, p, extra) => { if (!map.has(k)) map.set(k, { key: k, label, items: [], extra }); map.get(k).items.push(p); };
   for (const p of list) {
-    if (g === "kind") add(p.kind, kindName(p.kind), p);
+    if (g === "kind") { const c = collOf(p); add(c || "zz", c ? collName(c) : "No collection", p); }
+    if (g === "type") add(typeOf(p), TYPES.find(t => t.id === typeOf(p)).name, p);
     if (g === "area") { const areas = [...new Set(p.topics.map(areaOf))]; if (!areas.length) add("none", "No area yet", p); areas.forEach(a => add(a, T[a].name, p)); }
     if (g === "topic") { const tops = [...new Set(p.topics.map(t => T[t].parent && T[T[t].parent].parent ? T[t].parent : t))]; if (!tops.length) add("none", "No topic yet", p); tops.forEach(t => add(t, T[t].name, p)); }
     if (g === "month") add(p.date.slice(0, 7), monthOf(p.date), p);
@@ -637,108 +725,116 @@ function groupPhotos(list) {
   let groups = [...map.values()];
   if (g === "month") groups.sort((a, b) => b.key.localeCompare(a.key));
   if (g === "colour") groups.sort((a, b) => COLOURS.findIndex(c => c.id === a.key) - COLOURS.findIndex(c => c.id === b.key));
+  if (g === "type") groups.sort((a, b) => TYPES.findIndex(t => t.id === a.key) - TYPES.findIndex(t => t.id === b.key));
   if (g === "area" || g === "topic") groups.sort((a, b) => (a.key === "none") - (b.key === "none") || TOPICS.findIndex(t => t.id === a.key) - TOPICS.findIndex(t => t.id === b.key));
   return groups;
 }
+const groupPhotos = list => groupItems(list, S.ph.group);
 function wallItems() {
-  let items;
-  const c = S.chip;
-  if (c === "all") items = [...PHOTOS, ...OTHERS];
-  else if (c.startsWith("coll:")) items = OTHERS.filter(o => o.coll === c.slice(5));
-  else if (c === "type:note") items = OTHERS.filter(o => o.type === "note" || o.type === "longnote");
-  else if (c === "type:quote") items = OTHERS.filter(o => o.type === "quote");
-  else if (c === "type:source") items = OTHERS.filter(o => ["book", "video", "link"].includes(o.type));
-  else items = [];
-  items = items.filter(matchesQ).sort((a, b) => b.added - a.added);
-  if (c === "all" && !S.q.trim()) { // today's rule: photo groups collapse into one card without a filter
-    const seen = new Set(); items = items.filter(x => { if (x.type !== "photo" || !x.album) return true; if (seen.has(x.album)) return false; seen.add(x.album); return true; });
-  }
+  let items = sortItems(itemFilter(), S.mix.sort);
+  if (collapseAlbums()) { const seen = new Set(); items = items.filter(x => { if (x.type !== "photo" || !x.album) return true; if (seen.has(x.album)) return false; seen.add(x.album); return true; }); }
   return items;
 }
 function filterLabel() {
   const f = S.pf, bits = [];
+  if (S.area !== "all") bits.push(S.area === "none" ? "No area" : T[S.area].name);
   if (f.scope === "unsorted") bits.push("Unsorted"); if (f.scope === "picks") bits.push("Picks");
-  if (f.kind) bits.push(kindName(f.kind)); if (f.topic) bits.push(T[f.topic].name);
+  if (f.kind) bits.push(collName(f.kind)); if (f.topic) bits.push(T[f.topic].name);
   if (f.colour) bits.push(f.colour === "custom" ? "your colour" : COLOURS.find(c => c.id === f.colour).name.toLowerCase());
-  if (f.shape) bits.push(f.shape); if (f.light) bits.push(f.light); if (S.q.trim()) bits.push(`“${S.q.trim()}”`);
-  return bits.join(" · ") || "All photos";
+  if (f.shape) bits.push(f.shape); if (f.light) bits.push(f.light);
+  if (f.status) bits.push(STATUSES.find(s => s[0] === f.status)[1].toLowerCase()); if (f.style) bits.push(f.style + " notes");
+  if (S.q.trim()) bits.push(`“${S.q.trim()}”`);
+  return bits.join(" · ") || `All ${TYPES.find(t => t.id === S.type).many}`;
 }
 
 /* ================= render: shell ================= */
 const main = document.getElementById("main"), layer = document.getElementById("layer");
+const PLACEHOLDER = { all: "Search everything: titles, text, topics, notes…", note: "Search notes and quotes…", source: "Search books, lectures and links…", photo: "Search photos by title, topic, place or note…" };
 function render() {
   document.getElementById("nav-cp").setAttribute("aria-current", S.dest === "commonplace" ? "page" : "false");
   document.getElementById("nav-loci").setAttribute("aria-current", S.dest === "loci" ? "page" : "false");
   if (S.dest === "loci") return renderLoci();
-  const photos = inPhotosMode();
   const entries = PHOTOS.length + OTHERS.length;
+  const view = S.views.find(v => v.id === S.pf.view);
+  const areaLabel = S.area === "all" ? "All areas" : S.area === "none" ? "No area yet" : T[S.area].name;
   main.innerHTML = `
     <div class="dest-head"><b>Commonplace</b><span>/</span><span>${entries} entries, ${KINDS.length + COLLS.length} collections</span></div>
     <div class="tabs" role="tablist">${["Everything", "Collections", "To read", "Templates"].map((t, i) => `<button role="tab" aria-selected="${i === 0}" ${i ? `data-act="toast" data-msg="${t} isn't part of this prototype."` : ""}>${t}</button>`).join("")}</div>
-    <div class="toolbar">
-      <input class="search" id="search" type="search" placeholder="Search your Commonplace (title, creator, topic, text)…" value="${esc(S.q)}" aria-label="Search your Commonplace">
-      <span class="count" id="count"></span>
+    <div class="cmd">
+      <div class="searchbox">
+        <button class="scope ${S.area !== "all" ? "on" : ""}" data-act="areapop" aria-haspopup="dialog" title="Which area to search in"><span class="adot"></span>${esc(areaLabel)}<span class="car">▾</span></button>
+        <label class="sfield"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3.5 3.5"/></svg>
+          <input id="search" type="search" placeholder="${PLACEHOLDER[S.type]}" value="${esc(S.q)}" aria-label="Search your Commonplace" autocomplete="off"></label>
+        ${S.q ? `<button class="sclear" data-act="clearq" aria-label="Clear search">✕</button>` : `<kbd class="slash" aria-hidden="true">/</kbd>`}
+      </div>
+      ${view ? `<span class="fbtn on viewbtn"><button data-act="viewspop" aria-haspopup="menu"><span class="vmark"></span>${esc(view.name)}</button><button class="x" data-act="clearview" aria-label="Leave this view">✕</button></span>`
+      : `<button class="btn line" data-act="viewspop" aria-haspopup="menu"><span class="vmark"></span>Views <span class="car">▾</span></button>`}
+      <span class="cgrow"></span>
       ${S.view === "wall" ? `<button class="btn ${S.sel.on ? "on" : ""}" data-act="select">${S.sel.on ? "Done" : "Select"}</button>` : ""}
       <div class="seg" role="group" aria-label="View">
         <button aria-pressed="${S.view === "wall"}" data-act="view" data-v="wall"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="6"/><rect x="9" y="2" width="5" height="4"/><rect x="2" y="10" width="5" height="4"/><rect x="9" y="8" width="5" height="6"/></svg>Wall</button>
         <button aria-pressed="${S.view === "shelves"}" data-act="view" data-v="shelves"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 13.5h12M3 13V5h2v8M6 13V3h2v10M9.5 13l1.6-8 2 .4-1.6 7.6"/></svg>Shelves</button>
       </div>
     </div>
+    ${typebarHTML()}
     <div id="body"></div>`;
   const body = document.getElementById("body");
   if (S.view === "shelves") body.innerHTML = shelvesHTML();
-  else { body.innerHTML = chipsHTML() + (photos ? pbarHTML() : "") + `<div id="wall"></div>`; renderWall(); }
-  updateCount();
+  else { body.innerHTML = fbarHTML() + `<div id="wall"></div>`; renderWall(); }
+  const tb = main.querySelector(".typebar"), cur = tb?.querySelector('[aria-current="true"]');
+  if (tb && cur && cur.offsetLeft + cur.offsetWidth > tb.clientWidth) tb.scrollLeft = cur.offsetLeft - 16;
 }
-function updateCount() {
-  const el = document.getElementById("count"); if (!el) return;
-  if (S.view === "shelves") { el.textContent = "8 shelves · in your order"; return; }
-  if (inPhotosMode()) { const n = photoFilter().length; el.textContent = `${n} photo${n === 1 ? "" : "s"} · ${({ newest: "newest first", oldest: "oldest first", taken: "by date taken", colour: "by colour", shape: "wide to tall", res: "largest first", title: "A–Z", shuffle: "shuffled" })[S.ph.sort]}`; }
-  else { const n = wallItems().length; el.textContent = `${n} entries · newest first`; }
-}
-function chipsHTML() {
-  const c = S.chip, photos = inPhotosMode();
-  const chip = (id, label, extra = "") => `<button class="chip" aria-pressed="${c === id && !(photos && S.pf.view)}" data-act="chip" data-chip="${id}">${extra}${label}</button>`;
-  return `<div class="chips" role="group" aria-label="Filter">
-    ${chip("all", "All")}
-    ${COLLS.map(k => chip("coll:" + k.id, k.name)).join("")}
-    ${KINDS.map(k => chip("kind:" + k.id, k.name)).join("")}
-    <span class="sep"></span><span class="lab">Type</span>
-    ${chip("type:note", "Notes")}${chip("type:quote", "Quotes")}${chip("type:photo", "Photos")}${chip("type:source", "Sources")}
-    <span class="sep"></span><span class="lab">Views</span>
-    ${S.views.map(v => `<button class="chip view" aria-pressed="${photos && S.pf.view === v.id}" data-act="openview" data-view="${v.id}">${esc(v.name)}</button>`).join("")}
-  </div>`;
+function updateCount() { }
+// Types on top; the chosen type opens its own collections in the same row.
+function typebarHTML() {
+  return `<nav class="typebar" aria-label="Types">${TYPES.map(t => {
+    const on = S.type === t.id, n = baseOf(t.id).length;
+    const colls = on && t.id !== "all" ? collsOf(t.id) : [];
+    return `<button class="ttab" aria-pressed="${on && !S.pf.kind}" ${on ? 'aria-current="true"' : ""} data-act="type" data-type="${t.id}">${TYPE_ICONS[t.id]}${t.name} <span class="n">${n}</span></button>`
+      + (colls.length ? `<span class="subcolls" role="group" aria-label="${t.name} collections"><span class="chev" aria-hidden="true">›</span>${colls.map(c => `<button class="coll" aria-pressed="${S.pf.kind === c.id}" data-act="coll" data-kind="${c.id}">${esc(c.name)} <span class="n">${baseOf(t.id).filter(x => collOf(x) === c.id).length}</span></button>`).join("")}</span>` : "");
+  }).join("")}</nav>`;
 }
 const LAYOUT_ICONS = {
   rows: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="6" height="5" rx="1"/><rect x="8" y="2" width="7" height="5" rx="1"/><rect x="1" y="9" width="9" height="5" rx="1"/><rect x="11" y="9" width="4" height="5" rx="1"/></svg>',
   masonry: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="8" rx="1"/><rect x="9" y="1" width="6" height="5" rx="1"/><rect x="1" y="11" width="6" height="4" rx="1"/><rect x="9" y="8" width="6" height="7" rx="1"/></svg>',
   grid: '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>',
 };
-const SHAPES = [["landscape", "Landscape"], ["portrait", "Portrait"], ["square", "Square"], ["panorama", "Panorama"]];
-// One slim line: what to show (All, Unsorted, Picks), the three filters that matter, then how to show it.
-function pbarHTML() {
-  const f = S.pf, base = PHOTOS.filter(matchesQ);
-  const unsorted = base.filter(p => !p.topics.length).length;
+// The same slim bar for every type: Show, Topic, one or two filters that belong to the type, then results and display.
+function fbarHTML() {
+  const f = S.pf, t = TYPES.find(x => x.id === S.type), base = itemFilter({ ...f, scope: "all" });
+  const unsorted = base.filter(x => !x.topics.length).length;
   const scope = (id, label, n) => `<button aria-pressed="${f.scope === id}" data-act="scope" data-scope="${id}">${label} <span class="n">${n}</span></button>`;
   const fbtn = (on, act, label, k) => `<span class="fbtn ${on ? "on" : ""}"><button data-act="${act}" aria-haspopup="dialog">${label}</button>${on ? `<button class="x" data-act="clear" data-k="${k}" aria-label="Clear">✕</button>` : ""}</span>`;
-  const colourHex = f.colour ? (f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex) : null;
-  const colourLabel = f.colour ? `<span class="swatch" style="background:${colourHex};width:14px;height:14px"></span>${f.colour === "custom" ? "Your colour" : COLOURS.find(c => c.id === f.colour).name}` : `<span class="swatch rainbow" style="width:14px;height:14px"></span>Colour`;
-  const more = [f.shape && SHAPES.find(s => s[0] === f.shape)[1], f.light && (f.light === "dark" ? "Dark" : "Light")].filter(Boolean).join(" · ");
-  return `<section class="pbar" aria-label="Photos">
-    <div class="seg scope" role="group" aria-label="Show">${scope("all", "All", base.length)}${scope("unsorted", "Unsorted", unsorted)}${scope("picks", '<span class="star">★</span> Picks', base.filter(p => p.picked).length)}</div>
+  let typeFilters = "";
+  if (S.type === "photo") {
+    const hex = f.colour ? (f.colour === "custom" ? f.custom : COLOURS.find(c => c.id === f.colour).hex) : null;
+    const more = [f.shape && SHAPES.find(s => s[0] === f.shape)[1], f.light && (f.light === "dark" ? "Dark" : "Light")].filter(Boolean).join(" · ");
+    typeFilters = fbtn(!!f.colour, "colourpop", f.colour ? `<span class="swatch" style="background:${hex};width:14px;height:14px"></span>${f.colour === "custom" ? "Your colour" : COLOURS.find(c => c.id === f.colour).name}` : `<span class="swatch rainbow" style="width:14px;height:14px"></span>Colour`, "colour")
+      + fbtn(!!more, "morepop", more || "More ▾", "more");
+  }
+  if (S.type === "source") typeFilters = fbtn(!!f.status, "statuspop", f.status ? STATUSES.find(s => s[0] === f.status)[1] : "Status ▾", "status");
+  if (S.type === "note") typeFilters = fbtn(!!f.style, "stylepop", f.style ? STYLES.find(s => s[0] === f.style)[1] + " notes" : "Style ▾", "style");
+  const n = itemFilter().length;
+  const sortWord = (S.type === "photo" ? { newest: "newest first", oldest: "oldest first", taken: "by date taken", colour: "by colour", shape: "wide to tall", res: "largest first", title: "A–Z", shuffle: "shuffled" }[S.ph.sort] : { newest: "newest first", oldest: "oldest first", title: "A–Z" }[S.mix.sort]);
+  return `<section class="pbar" aria-label="Filters">
+    <div class="seg scope" role="group" aria-label="Show">${scope("all", "All", base.length)}${scope("unsorted", "Unsorted", unsorted)}${scope("picks", '<span class="star">★</span> Picks', base.filter(x => x.picked).length)}</div>
     <span class="vr"></span>
-    ${fbtn(!!f.colour, "colourpop", colourLabel, "colour")}
     ${fbtn(!!f.topic, "topicpop", f.topic ? esc(T[f.topic].name) : "Topic ▾", "topic")}
-    ${fbtn(!!more, "morepop", more || "More ▾", "more")}
+    ${typeFilters}
     ${f.scope === "unsorted" && unsorted ? `<button class="btn small primary" data-act="sortmode">Sort these ${unsorted}</button>` : ""}
     <span class="grow"></span>
-    <button class="icon-btn" data-act="menupop" title="Save as view, Show on Loci, Sort photos" aria-label="More actions" aria-haspopup="menu">⋯</button>
-    <div class="seg icons" role="group" aria-label="Layout">${["rows", "masonry", "grid"].map(v => `<button aria-pressed="${S.ph.layout === v}" data-act="layout" data-v="${v}" title="${v[0].toUpperCase() + v.slice(1)}" aria-label="${v}">${LAYOUT_ICONS[v]}</button>`).join("")}</div>
+    <span class="count" id="count">${n} ${n === 1 ? t.one : t.many} · ${sortWord}</span>
+    <button class="icon-btn" data-act="menupop" title="Save as a View, Show on Loci, Sort" aria-label="More actions" aria-haspopup="menu">⋯</button>
+    ${S.type === "photo" ? `<div class="seg icons" role="group" aria-label="Layout">${["rows", "masonry", "grid"].map(v => `<button aria-pressed="${S.ph.layout === v}" data-act="layout" data-v="${v}" title="${v[0].toUpperCase() + v.slice(1)}" aria-label="${v}">${LAYOUT_ICONS[v]}</button>`).join("")}</div>` : ""}
     <button class="btn small line" data-act="displaypop" aria-haspopup="dialog">Display ▾</button>
   </section>`;
 }
 function displayPopHTML() {
-  const sel = (id, label, opts, val) => `<label for="${id}">${label}</label><select id="${id}" data-act="pref" data-k="${id.slice(2)}">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  const sel = (id, label, opts, val) => `<label for="${id}">${label}</label><select id="${id}" data-act="pref">${opts.map(([v, l]) => `<option value="${v}" ${v === val ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  if (S.type !== "photo") return `<h4>Display</h4><div class="dgrid">
+    ${sel("m-sort", "Sort", [["newest", "Newest"], ["oldest", "Oldest"], ["title", "Title"]], S.mix.sort)}
+    ${sel("m-group", "Group", [["none", "None"], ["area", "Area"], ["topic", "Topic"], ...(S.type === "all" ? [["type", "Type"]] : []), ["kind", "Collection"], ["month", "Month added"]], S.mix.group)}
+  </div>`;
   return `<h4>Display</h4><div class="dgrid">
     <label for="size">Size</label><input id="size" type="range" min="120" max="460" step="10" value="${S.ph.size}">
     ${sel("p-sort", "Sort", [["newest", "Newest"], ["oldest", "Oldest"], ["taken", "Date taken"], ["colour", "Colour"], ["shape", "Shape"], ["res", "Resolution"], ["title", "Title"], ["shuffle", "Shuffle"]], S.ph.sort)}
@@ -750,9 +846,21 @@ function morePopHTML() {
   const f = S.pf, seg = (k, opts) => `<div class="seg">${[["", "Any"], ...opts].map(([v, l]) => `<button data-pv="${k}:${v}" aria-pressed="${(f[k] || "") === v}">${l}</button>`).join("")}</div>`;
   return `<h4>Shape</h4>${seg("shape", SHAPES)}<h4 style="margin-top:14px">Light</h4>${seg("light", [["light", "Light"], ["dark", "Dark"]])}`;
 }
+function listPopHTML(title, k, opts) { return `<h4>${title}</h4><div class="list">${[["", "Any"], ...opts].map(([v, l]) => `<button data-pv="${k}:${v}"><span class="chk ${(S.pf[k] || "") === v ? "on" : ""}">${(S.pf[k] || "") === v ? "✓" : ""}</span>${l}</button>`).join("")}</div>`; }
+function areaPopHTML() {
+  const row = (id, label, n) => `<button data-pv="${id}"><span class="chk ${S.area === id ? "on" : ""}">${S.area === id ? "✓" : ""}</span>${label}<span style="margin-left:auto;color:var(--ink-3);font-size:12px">${n}</span></button>`;
+  const count = a => ALL_ITEMS().filter(x => areaMatch(x, a)).length;
+  return `<h4>Search in</h4><div class="list">${row("all", "All areas", count("all"))}${TOPICS.filter(t => !t.parent).map(t => row(t.id, esc(t.name), count(t.id))).join("")}${row("none", "No area yet", count("none"))}</div><p class="keys" style="margin:8px 0 0">Areas are your top-level topics. They narrow every type and both views.</p>`;
+}
+function viewsPopHTML() {
+  return `<h4>Views</h4><div class="list" role="menu">${S.views.map(v => `<button data-pv="open:${v.id}" role="menuitem">${TYPE_ICONS[v.type].replace("<svg", '<svg width="14" height="14"')}${esc(v.name)}${S.pf.view === v.id ? " ✓" : ""}</button>`).join("")}</div>
+    <div class="row" style="border-top:1px solid var(--line);padding-top:10px"><button class="btn small line" data-pv="save">Save current as a View…</button></div>
+    <p class="keys" style="margin:8px 0 0">A View keeps a search and its filters, never the items themselves.</p>`;
+}
+function applyView(v) { S.type = v.type; S.area = v.area || "all"; S.pf = { ...FDEF, ...v.f, view: v.id }; S.view = "wall"; render(); }
 function openSaveView(b) {
-  openPop(b, `<h4>Save as a View</h4><p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-2)">${esc(filterLabel())}, with this layout. A View holds no photos, only the question.</p><form id="vform"><input type="text" id="vname" placeholder="Name this view" aria-label="View name" value=""><div class="row"><span style="flex:1"></span><button class="btn small primary" type="submit">Save view</button></div></form>`, () => { });
-  document.getElementById("vform").addEventListener("submit", ev => { ev.preventDefault(); const name = document.getElementById("vname").value.trim() || filterLabel(); const v = { id: "v" + Date.now(), name, f: { ...S.pf, view: null } }; S.views.push(v); S.pf.view = v.id; closePop(); render(); toast(`Saved the View “${name}”. It sits with your chips.`); });
+  openPop(b, `<h4>Save as a View</h4><p style="margin:0 0 8px;font-size:12.5px;color:var(--ink-2)">${esc(filterLabel())}. A View holds no items, only the question.</p><form id="vform"><input type="text" id="vname" placeholder="Name this view" aria-label="View name" value=""><div class="row"><span style="flex:1"></span><button class="btn small primary" type="submit">Save view</button></div></form>`, () => { });
+  document.getElementById("vform").addEventListener("submit", ev => { ev.preventDefault(); const name = document.getElementById("vname").value.trim() || filterLabel(); const f = { ...S.pf }; delete f.view; const v = { id: "v" + Date.now(), name, type: S.type, area: S.area, f }; S.views.push(v); S.pf.view = v.id; closePop(); render(); toast(`Saved the View “${name}”. Find it under Views.`); });
   document.getElementById("vname").focus();
 }
 
@@ -761,13 +869,16 @@ function renderWall() {
   const wall = document.getElementById("wall"); if (!wall) return;
   if (inPhotosMode()) return renderPhotoWall(wall);
   const items = wallItems();
+  if (!items.length) { wall.innerHTML = `<p class="empty">Nothing here matches ${esc(filterLabel())}.<br><button class="linkbtn" data-act="resetpf" style="font:14px var(--ui);margin-top:10px">Clear filters</button></p>`; return; }
   const W = wall.clientWidth || main.clientWidth - 88;
   const cols = Math.max(1, Math.floor((W + 20) / 280));
-  wall.innerHTML = `<div class="mason ${S.sel.on ? "selecting" : ""}">${Array.from({ length: cols }, () => '<div class="col"></div>').join("")}</div>`;
-  const colEls = [...wall.querySelectorAll(".col")];
-  const list = S.chip === "all" && !S.q.trim() ? [{ type: "capture" }, ...items] : items;
-  if (!items.length) { wall.innerHTML = `<p class="empty">Nothing here matches. Try another word or filter.</p>`; return; }
-  list.forEach(x => { const shortest = colEls.reduce((a, b) => b.offsetHeight < a.offsetHeight ? b : a); shortest.insertAdjacentHTML("beforeend", cardHTML(x)); });
+  const groups = groupItems(items, S.mix.group);
+  wall.innerHTML = groups.map((g, i) => `${g.key !== null ? `<h3 class="group-h">${esc(g.label)} <span class="n">${g.items.length}</span></h3>` : ""}<div class="mason ${S.sel.on ? "selecting" : ""}" data-g="${i}">${Array.from({ length: cols }, () => '<div class="col"></div>').join("")}</div>`).join("");
+  groups.forEach((g, i) => {
+    const colEls = [...wall.querySelectorAll(`.mason[data-g="${i}"] .col`)];
+    const list = i === 0 && S.type === "all" && !anyFilter() && S.mix.group === "none" ? [{ type: "capture" }, ...g.items] : g.items;
+    list.forEach(x => { const shortest = colEls.reduce((a, b) => b.offsetHeight < a.offsetHeight ? b : a); shortest.insertAdjacentHTML("beforeend", cardHTML(x)); });
+  });
   hookImages(wall);
 }
 function cardHTML(x) {
@@ -777,7 +888,7 @@ function cardHTML(x) {
   if (x.type === "capture") return `<div class="mcard paper capture"><span>Capture a thought, quote or link…</span><small><span>Note · Quote · Link</span><span>Press <kbd>C</kbd></span></small></div>`;
   if (x.type === "photo") {
     const r = ratioOf(x), bucket = r > 1.4 ? 3 / 2 : r < .9 ? 3 / 4 : 4 / 3; // today: three crop buckets
-    const albumN = x.album && S.chip === "all" && !S.q.trim() ? PHOTOS.filter(p => p.album === x.album).length : 0;
+    const albumN = x.album && collapseAlbums() ? PHOTOS.filter(p => p.album === x.album).length : 0;
     const title = albumN ? ALBUMS[x.album] : x.title;
     return `<article class="mcard ${selc}" data-id="${x.id}" ${albumN ? `data-album="${x.album}"` : ""}>
       <div class="pic ${albumN ? "stack" : ""}" style="aspect-ratio:${bucket};background:${x.palette[0].hex}"><img data-src="${thumb(x)}" alt="${esc(x.title)}">${albumN ? `<span class="badge">${albumN} photos</span>` : ""}<span class="check">✓</span></div>
@@ -855,21 +966,44 @@ function layoutHTML(items, W, size, caps) {
 
 /* ================= render: shelves ================= */
 function shelvesHTML() {
-  const printOf = p => { const portrait = p.h > p.w; const w0 = portrait ? 112 : 158; let w = w0, h = w0 * p.h / p.w; if (h > 150) { h = 150; w = 150 * p.w / p.h; } return `<button class="print" data-act="open" data-id="${p.id}" data-list="kind:${p.kind}" aria-label="${esc(p.title)}"><img src="${thumb(p)}" alt="" style="width:${Math.round(w)}px;height:${Math.round(h)}px;background:${p.palette[0].hex}" loading="lazy"><span>${esc(p.title)}</span>${p.picked ? '<i class="pk">★</i>' : ""}</button>`; };
-  const shelf = (k, name, sub, items, inner, extra = "", cls = "") => `<div class="shelf ${cls}"><div class="meta"><span class="k"><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--status-2)"></span>${k}</span><h3>${name}</h3><p>${sub}</p><div class="acts">${extra}</div></div><div class="board">${inner}</div></div>`;
-  const unsorted = PHOTOS.filter(p => !p.topics.length);
-  const photoShelves = KINDS.map(k => { const items = PHOTOS.filter(p => p.kind === k.id).sort((a, b) => b.added - a.added); return shelf("Photos", k.name, `${items.length} photos · ${items.filter(p => p.picked).length} picks`, items, items.map(printOf).join(""), `<button class="linkbtn" data-act="openkind" data-kind="${k.id}">Open as a photo wall →</button><button class="linkbtn" style="color:var(--ink-2)" data-act="toast" data-msg="Open shelf works as it does today.">Open shelf ▾</button>`); }).join("");
-  const vid = OTHERS.filter(o => o.type === "video");
-  return `<div class="shelf-chips"><button class="chip">Sources <span class="n">2 shelves</span></button><button class="chip">Notes <span class="n">1 shelf</span></button><button class="chip" aria-pressed="true">Photos <span class="n">${KINDS.length} shelves</span></button><button class="chip dashed" data-act="scope-unsorted">Unsorted photos <span class="n">${unsorted.length}</span></button></div>
-  <div class="desk"><div class="intro"><span class="k">On the desk</span><h3>Open right now</h3><p>What you are reading, watching or sorting. It goes back on its shelf when you mark it done.</p></div>
+  const printOf = p => { const portrait = p.h > p.w; const w0 = portrait ? 112 : 158; let w = w0, h = w0 * p.h / p.w; if (h > 150) { h = 150; w = 150 * p.w / p.h; } return `<button class="print" data-act="open" data-id="${p.id}" aria-label="${esc(p.title)}"><img src="${thumb(p)}" alt="" style="width:${Math.round(w)}px;height:${Math.round(h)}px;background:${p.palette[0].hex}" loading="lazy"><span>${esc(p.title)}</span>${p.picked ? '<i class="pk">★</i>' : ""}</button>`; };
+  const shelf = (k, name, sub, inner, extra = "", cls = "") => `<div class="shelf ${cls}"><div class="meta"><span class="k"><span class="swatch" style="width:9px;height:9px;border-radius:2px;background:var(--status-2)"></span>${k}</span><h3>${name}</h3><p>${sub}</p><div class="acts">${extra}</div></div><div class="board">${inner}</div></div>`;
+  const openShelf = `<button class="linkbtn" style="color:var(--ink-2)" data-act="toast" data-msg="Open shelf works as it does today.">Open shelf ▾</button>`;
+  const show = t => S.type === "all" || S.type === t;
+  const pool = t => itemFilter({ ...FDEF }, t).sort((a, b) => b.added - a.added);
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  let html = "";
+  if (S.type === "all" || S.type === "photo") {
+    const unsorted = PHOTOS.filter(p => !p.topics.length);
+    html += `<div class="desk"><div class="intro"><span class="k">On the desk</span><h3>Open right now</h3><p>What you are reading, watching or sorting. It goes back on its shelf when you mark it done.</p></div>
     <div class="slots"><div class="slot"><div class="th"></div><div><small>Reading · Books</small><b>Islamic Architecture: Form, Function and Meaning</b><small>Page 112</small></div></div>
     <div class="slot"><div class="th" style="width:70px;height:40px"></div><div><small>Watching · Lectures</small><b>The Great Mosque of Córdoba</b><small>Resume at 10:30</small></div></div>
-    <div class="slot" style="cursor:pointer" data-act="sortmode"><img src="${thumb(unsorted[0])}" alt="" style="width:46px;height:56px;object-fit:cover;border-radius:2px;flex:none"><div><small>Sorting · Photos <span class="new">new</span></small><b>${unsorted.length} unsorted photos</b><small>Sort them with the keyboard</small></div></div></div></div>
-  <h2 class="sec-h">Sources <span class="n">2 shelves · ${OTHERS.filter(o => ["book", "video", "link"].includes(o.type)).length} items</span></h2>
-  ${shelf("Sources", "Lectures", `${vid.length} items`, vid, vid.map(v => `<div style="flex:none;width:196px"><div class="video" style="font-size:14px">${esc(v.title)}<span class="dur">${v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog * 100}%"></span>` : ""}</div><p class="mdesc" style="padding:6px 0 4px">${esc(v.title)}</p></div>`).join(""), `<button class="linkbtn" data-act="toast" data-msg="Open shelf works as it does today.">Open shelf ▾</button>`)}
-  <h2 class="sec-h">Photos <span class="n">${KINDS.length} shelves · ${PHOTOS.length} photos</span></h2>
-  ${photoShelves}
-  ${shelf("Photos", "Unsorted", `${unsorted.length} photos with no topic yet`, unsorted, unsorted.map(printOf).join(""), `<button class="linkbtn" data-act="sortmode">Sort them now →</button>`, "unsorted")}`;
+    ${unsorted.length ? `<div class="slot" style="cursor:pointer" data-act="sortmode"><img src="${thumb(unsorted[0])}" alt="" style="width:46px;height:56px;object-fit:cover;border-radius:2px;flex:none"><div><small>Sorting · Photos <span class="new">new</span></small><b>${unsorted.length} unsorted photos</b><small>Sort them with the keyboard</small></div></div>` : ""}</div></div>`;
+  }
+  if (show("note")) {
+    const notes = pool("note"), quotes = notes.filter(x => x.type === "quote"), refl = notes.filter(x => x.coll === "reflections"), loose = notes.filter(x => x.type !== "quote" && !x.coll);
+    const qcard = x => `<div class="quote shelfq"><q>${esc(x.text)}</q><div class="src">${esc(x.src)}</div></div>`;
+    const ncard = x => `<div class="notecard shelfq">${x.title ? `<h3>${esc(x.title)}</h3>` : ""}<p>${esc(x.text)}</p></div>`;
+    html += `<h2 class="sec-h">Notes <span class="n">${plural(notes.length, "note", "notes")}</span></h2>`;
+    if (refl.length) html += shelf("Notes", "Reflections", plural(refl.length, "note", "notes"), refl.map(ncard).join(""), openShelf);
+    if (quotes.length) html += shelf("Notes · Quote style", "Quotes", plural(quotes.length, "quote", "quotes"), quotes.map(qcard).join(""), openShelf);
+    if (loose.length) html += shelf("Notes", "Not on a shelf", plural(loose.length, "note", "notes"), loose.map(ncard).join(""), "", "unsorted");
+  }
+  if (show("source")) {
+    const src = pool("source");
+    const face = x => x.type === "video" ? `<div style="flex:none;width:196px"><div class="video" style="font-size:14px">${esc(x.title)}<span class="dur">${x.dur}</span>${x.prog ? `<span class="prog" style="width:${x.prog * 100}%"></span>` : ""}</div><p class="mdesc" style="padding:6px 0 4px">${esc(x.title)}</p></div>`
+      : x.type === "book" ? `<div class="cover" style="flex:none;width:118px;font-size:14px;padding:12px 10px">${esc(x.title)}<small>${esc(x.creator)}</small></div>`
+      : `<div class="paper" style="flex:none;width:210px"><p class="kicker">${esc(x.site)}</p><p style="font:400 16px/1.3 var(--read);margin:6px 0 0">${esc(x.title)}</p></div>`;
+    html += `<h2 class="sec-h">Sources <span class="n">${plural(src.length, "source", "sources")}</span></h2>`;
+    COLLS.filter(c => c.type === "source").forEach(c => { const items = src.filter(x => x.coll === c.id); if (items.length) html += shelf("Sources", c.name, plural(items.length, "item", "items"), items.map(face).join(""), openShelf); });
+  }
+  if (show("photo")) {
+    const ph = pool("photo"), unsorted = ph.filter(p => !p.topics.length);
+    html += `<h2 class="sec-h">Photos <span class="n">${KINDS.length} shelves · ${plural(ph.length, "photo", "photos")}</span></h2>`;
+    KINDS.forEach(k => { const items = ph.filter(p => p.kind === k.id); if (items.length) html += shelf("Photos", k.name, `${plural(items.length, "photo", "photos")} · ${items.filter(p => p.picked).length} picks`, items.map(printOf).join(""), `<button class="linkbtn" data-act="openkind" data-kind="${k.id}">Open as a photo wall →</button>${openShelf}`); });
+    if (unsorted.length) html += shelf("Photos", "Unsorted", `${plural(unsorted.length, "photo", "photos")} with no topic yet`, unsorted.map(printOf).join(""), `<button class="linkbtn" data-act="sortmode">Sort them now →</button>`, "unsorted");
+  }
+  return html || `<p class="empty">Nothing on the shelves matches. Try another area or word.</p>`;
 }
 
 /* ================= quick view ================= */
@@ -877,7 +1011,7 @@ function openQV(id, list) {
   const p = BY[id]; if (!p || p.type !== "photo") return;
   if (!list) {
     if (S.dest === "commonplace" && inPhotosMode() && S.view === "wall") list = sortPhotos(photoFilter()).map(x => x.id);
-    else if (p.album && S.dest === "commonplace" && S.view === "wall" && !inPhotosMode()) list = PHOTOS.filter(x => x.album === p.album).map(x => x.id);
+    else if (p.album && S.dest === "commonplace" && S.view === "wall" && collapseAlbums()) list = PHOTOS.filter(x => x.album === p.album).map(x => x.id);
     else list = [id];
   }
   if (!list.includes(id)) list = [id, ...list];
@@ -1100,7 +1234,7 @@ function renderLoci() {
   const insp = centreId ? inspectorHTML(centreId) : `<div class="inspector"><span class="k">Overview</span><h2>Your areas</h2><p style="margin:0;color:var(--ink-2);font-size:13px">Choose an area to see its topics, its key picture and the photos you have collected for it.</p></div>`;
   main.innerHTML = `<div class="dest-head"><b>Loci</b><span>/</span><span>Map</span></div>
     <div class="tabs" role="tablist">${["Palace", "Map", "List", "Overview"].map(t => `<button role="tab" aria-selected="${t === "Map"}" ${t !== "Map" ? `data-act="toast" data-msg="Only the Map is in this prototype. In the Palace, an open room would draw these photos as small prints."` : ""}>${t}</button>`).join("")}</div>
-    ${hl ? `<div class="hl-bar"><span>Showing topics that hold <b>${hl.n}</b> photos matching <b>${esc(hl.label)}</b></span><span style="flex:1"></span><button class="btn small" data-act="backtophotos">Back to those photos</button><button class="btn small" data-act="clearhl">Clear</button></div>` : ""}
+    ${hl ? `<div class="hl-bar"><span>Showing topics that hold <b>${hl.n}</b> ${TYPES.find(t => t.id === hl.type).many} matching <b>${esc(hl.label)}</b></span><span style="flex:1"></span><button class="btn small" data-act="backtophotos">Back to Commonplace</button><button class="btn small" data-act="clearhl">Clear</button></div>` : ""}
     <div class="loci-crumbs"><button data-act="lfocus" data-t="root">Overview</button>${crumbs.map(c => ` / <button data-act="lfocus" data-t="${c}">${esc(T[c].name)}</button>`).join("")}
       <span style="flex:1"></span><label style="display:inline-flex;gap:6px;align-items:center;color:var(--ink-2)"><input type="checkbox" id="centrepic" ${L.centrePic ? "checked" : ""}> Key picture in the centre <span class="new">new</span></label></div>
     <div class="loci"><div class="loci-map"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of ${esc(f?.name || "your areas")}">${svg}</svg></div>${insp}</div>`;
@@ -1140,10 +1274,10 @@ function hookTopicSearch() { const s = document.getElementById("tsearch"); s?.ad
 /* ================= actions ================= */
 function toast(msg) { const el = document.createElement("div"); el.className = "toast"; el.textContent = msg; document.getElementById("toasts").appendChild(el); setTimeout(() => el.remove(), 2600); }
 function savePrefs() { store.set("prefs", S.ph); }
-function setChip(c) { S.chip = c; S.sel.ids.clear(); if (c.startsWith("kind:")) { S.pf = { ...S.pf, scope: "all", kind: c.slice(5), view: null }; } else if (c === "type:photo") { S.pf.kind = null; S.pf.view = null; } render(); }
-function enterPhotos(f) { S.dest = "commonplace"; S.view = "wall"; S.chip = f.kind ? "kind:" + f.kind : "type:photo"; S.pf = { scope: "all", kind: null, view: null, colour: null, custom: null, shape: null, light: null, topic: null, ...f }; render(); window.scrollTo(0, 0); }
+
+function enterPhotos(f) { S.dest = "commonplace"; S.view = "wall"; S.type = "photo"; S.pf = { ...FDEF, ...f }; render(); window.scrollTo(0, 0); }
 function togglePick(id) { const p = BY[id]; p.picked = !p.picked; toast(p.picked ? `Picked “${p.title}”.` : `Unpicked “${p.title}”.`); }
-function selectedIds() { return [...S.sel.ids].flatMap(id => BY[id]?.type === "photo" && BY[id].album && S.chip === "all" && !S.q.trim() && document.querySelector(`[data-album="${BY[id].album}"]`) ? PHOTOS.filter(p => p.album === BY[id].album).map(p => p.id) : [id]); }
+function selectedIds() { return [...S.sel.ids].flatMap(id => BY[id]?.type === "photo" && BY[id].album && collapseAlbums() && document.querySelector(`[data-album="${BY[id].album}"]`) ? PHOTOS.filter(p => p.album === BY[id].album).map(p => p.id) : [id]); }
 function renderBulk() {
   document.querySelector(".bulk")?.remove(); if (!S.sel.on || S.dest !== "commonplace") return;
   const n = selectedIds().length; const el = document.createElement("div"); el.className = "bulk"; el.setAttribute("role", "toolbar"); el.setAttribute("aria-label", "Selection");
@@ -1152,12 +1286,14 @@ function renderBulk() {
   document.body.appendChild(el);
 }
 function showOnLoci() {
-  const list = photoFilter(); const ids = new Set(list.flatMap(p => p.topics.flatMap(ancestors)));
-  S.loci.hl = { ids, label: filterLabel(), n: list.length, f: { ...S.pf }, chip: S.chip }; S.loci.focus = "a1"; S.dest = "loci"; S.sel.on = false; render(); window.scrollTo(0, 0);
+  const list = itemFilter(); const ids = new Set(list.flatMap(p => p.topics.flatMap(ancestors)));
+  S.loci.hl = { ids, label: anyFilter() || S.type !== "all" ? filterLabel() : "everything", n: list.length, type: S.type, area: S.area, f: { ...S.pf } }; S.loci.focus = "a1"; S.dest = "loci"; S.sel.on = false; render(); window.scrollTo(0, 0);
 }
 
 document.addEventListener("click", e => {
   if (popEl && !popEl.contains(e.target) && !e.target.closest("[data-act$=pop],[data-act=qvtopic],[data-act=qvkind],[data-act=qvmenu],[data-act=saveview],[data-act=bulktopic],[data-act=bulkkind],[data-act=bulkdelete],[data-act=smpicker]")) closePop();
+  const card = S.sel.on && S.dest === "commonplace" && !S.qv && e.target.closest("#wall article.mcard[data-id]");
+  if (card && !e.target.closest("[data-act]")) { toggleSel(card.dataset.id, e.shiftKey); return; }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const a = b.dataset.act, id = b.dataset.id;
   // selection mode intercepts card clicks
@@ -1167,14 +1303,19 @@ document.addEventListener("click", e => {
     case "theme": { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; break; }
     case "toast": toast(b.dataset.msg); break;
     case "view": S.view = b.dataset.v; S.sel.on = false; render(); renderBulk(); break;
-    case "chip": setChip(b.dataset.chip); break;
+    case "type": S.type = b.dataset.type; S.pf = { ...FDEF, scope: S.pf.scope, topic: S.pf.topic }; S.sel.ids.clear(); render(); break;
     case "scope": S.pf = { ...S.pf, scope: b.dataset.scope, view: null }; render(); break;
     case "scope-unsorted": enterPhotos({ scope: "unsorted" }); break;
-    case "kind": S.pf = { ...S.pf, kind: S.pf.kind === b.dataset.kind ? null : b.dataset.kind, view: null }; S.chip = S.pf.kind ? "kind:" + S.pf.kind : "type:photo"; render(); break;
+    case "coll": S.pf = { ...S.pf, kind: S.pf.kind === b.dataset.kind ? null : b.dataset.kind, view: null }; render(); break;
     case "openkind": enterPhotos({ kind: b.dataset.kind }); break;
-    case "openview": { const v = S.views.find(v => v.id === b.dataset.view); S.pf = { custom: null, ...v.f, view: v.id }; S.chip = "type:photo"; render(); break; }
+    case "areapop": openPop(b, areaPopHTML(), v => { S.area = v; S.pf.view = null; closePop(); render(); }); break;
+    case "viewspop": openPop(b, viewsPopHTML(), v => { closePop(); if (v === "save") openSaveView(document.querySelector('[data-act="viewspop"]')); else applyView(S.views.find(x => x.id === v.slice(5))); }); break;
+    case "clearview": S.pf = { ...FDEF }; S.area = "all"; render(); break;
+    case "clearq": S.q = ""; render(); document.getElementById("search")?.focus(); break;
+    case "statuspop": openPop(b, listPopHTML("Status", "status", STATUSES), v => { const [k, val] = v.split(":"); S.pf[k] = val || null; S.pf.view = null; closePop(); render(); }); break;
+    case "stylepop": openPop(b, listPopHTML("Style", "style", STYLES), v => { const [k, val] = v.split(":"); S.pf[k] = val || null; S.pf.view = null; closePop(); render(); }); break;
     case "clear": if (b.dataset.k === "more") { S.pf.shape = null; S.pf.light = null; } else S.pf[b.dataset.k] = null; S.pf.view = null; render(); break;
-    case "resetpf": enterPhotos({}); break;
+    case "resetpf": S.pf = { ...FDEF }; S.area = "all"; S.q = ""; render(); break;
     case "layout": S.ph.layout = b.dataset.v; savePrefs(); render(); break;
     case "open": openQV(id); break;
     case "pick": e.stopPropagation(); togglePick(id); if (S.qv) { S.qv.reset = false; renderQV(false); } else render(); break;
@@ -1186,7 +1327,7 @@ document.addEventListener("click", e => {
     case "saveview": openSaveView(b); break;
     case "displaypop": openPop(b, displayPopHTML(), () => { }); break;
     case "morepop": openPop(b, morePopHTML(), v => { const [k, val] = v.split(":"); S.pf[k] = val || null; S.pf.view = null; closePop(); render(); }); break;
-    case "menupop": openPop(b, `<div class="list" role="menu"><button data-pv="save" role="menuitem">Save as a View…</button><button data-pv="loci" role="menuitem">Show these on Loci</button><button data-pv="sort" role="menuitem">Sort unsorted photos</button></div>`, v => { closePop(); if (v === "save") openSaveView(b); if (v === "loci") showOnLoci(); if (v === "sort") openSM(); }); break;
+    case "menupop": openPop(b, `<div class="list" role="menu"><button data-pv="save" role="menuitem">Save as a View…</button><button data-pv="loci" role="menuitem">Show these on Loci</button>${S.type === "photo" || S.type === "all" ? '<button data-pv="sort" role="menuitem">Sort unsorted photos</button>' : ""}</div>`, v => { closePop(); if (v === "save") openSaveView(b); if (v === "loci") showOnLoci(); if (v === "sort") openSM(); }); break;
     case "sortmode": openSM(); break;
     case "showloci": showOnLoci(); break;
     case "close": closeQV(); break;
@@ -1224,7 +1365,7 @@ document.addEventListener("click", e => {
     case "seeall": S.loci.hl = null; enterPhotos({ topic: b.dataset.t }); break;
     case "topiccolour": S.loci.hl = null; enterPhotos({ topic: b.dataset.t, colour: b.dataset.c }); break;
     case "clearhl": S.loci.hl = null; renderLoci(); break;
-    case "backtophotos": { const h = S.loci.hl; S.loci.hl = null; S.dest = "commonplace"; S.view = "wall"; S.chip = h.chip; S.pf = h.f; render(); break; }
+    case "backtophotos": { const h = S.loci.hl; S.loci.hl = null; S.dest = "commonplace"; S.view = "wall"; S.type = h.type; S.area = h.area; S.pf = h.f; render(); break; }
     case "bulkpick": { const ids = selectedIds(); ids.forEach(i => BY[i].type === "photo" && (BY[i].picked = true)); toast(`Picked ${ids.length} photos.`); render(); renderBulk(); break; }
     case "bulksort": { const ids = selectedIds().filter(i => BY[i].type === "photo"); S.sel.on = false; S.sel.ids.clear(); renderBulk(); openSM(ids); break; }
     case "bulktopic": openPop(b, `<h4>Add topics to ${selectedIds().length}</h4>${topicListHTML([])}`, v => { selectedIds().forEach(i => { const x = BY[i]; if (x.topics && !x.topics.includes(v)) x.topics.push(v); }); closePop(); toast(`Added ${T[v].name} to ${selectedIds().length} items.`); render(); renderBulk(); }); hookTopicSearch(); break;
@@ -1245,7 +1386,7 @@ function toggleSel(id, shift) {
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.id === "centrepic") { S.loci.centrePic = t.checked; renderLoci(); }
-  if (t.dataset.act === "pref") { const k = t.dataset.k; if (k === "shape" || k === "light") { S.pf[k] = t.value || null; S.pf.view = null; } else { S.ph[{ sort: "sort", group: "group", caps: "caps" }[k]] = t.value; if (k === "sort" && t.value === "shuffle") S.shuffleSeed = 0; savePrefs(); } render(); }
+  if (t.dataset.act === "pref") { const [ns, k] = t.id.split("-"); if (ns === "m") { S.mix[k] = t.value; store.set("mix", S.mix); } else { S.ph[k] = t.value; if (k === "sort" && t.value === "shuffle") S.shuffleSeed = 0; savePrefs(); } render(); }
 });
 document.addEventListener("input", e => {
   if (e.target.id === "search") { clearTimeout(window._qt); window._qt = setTimeout(() => { S.q = e.target.value; const pos = e.target.selectionStart; render(); const s = document.getElementById("search"); s.focus(); s.setSelectionRange(pos, pos); }, 250); }
@@ -1342,12 +1483,13 @@ document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === 
 
 /* ================= guide ================= */
 const TRIES = [
+  ["header", "Search, areas and types", "One search row with an area scope. Types on top; the chosen type shows its collections."],
   ["zoom", "Zoom into a photo", "Scroll or pinch to zoom, drag to pan, Z for 1:1, F for full screen."],
   ["detail", "Write a note on a detail", "In the viewer, press N and drag a box."],
   ["wall", "The photo wall", "Photos chip: one slim bar. Layout icons and Display on the right; nothing cropped."],
   ["colour", "Find by colour", "Colour, Topic and More are the only filters. Or click a colour in a photo's panel."],
   ["sort", "Sort a pile with the keyboard", "Unsorted photos, numbers for topics, P to pick."],
-  ["views", "Views and Picks", "Saved searches sit with the chips; ⋯ saves a new one. Never folders."],
+  ["views", "Views and Picks", "Views ▾ keeps searches for any type. Picks and Unsorted work for every type."],
   ["shelves", "Photo shelves", "Shelves by kind, plus an Unsorted shelf."],
   ["loci", "Photos in Loci", "Key picture, mood strip, topic colours, Show on Loci."],
 ];
@@ -1367,7 +1509,8 @@ function runTry(k) {
   if (k === "wall") { S.ph.layout = "rows"; enterPhotos({}); }
   if (k === "colour") { enterPhotos({ colour: "terracotta" }); }
   if (k === "sort") { enterPhotos({ scope: "unsorted" }); setTimeout(openSM, 60); }
-  if (k === "views") { const v = S.views[1]; enterPhotos({ ...v.f, view: v.id }); }
+  if (k === "views") applyView(S.views[1]);
+  if (k === "header") { S.dest = "commonplace"; S.view = "wall"; S.type = "source"; S.area = "a1"; S.pf = { ...FDEF }; render(); window.scrollTo(0, 0); }
   if (k === "shelves") { S.dest = "commonplace"; S.view = "shelves"; render(); setTimeout(() => document.querySelectorAll(".sec-h")[1]?.scrollIntoView({ behavior: "smooth" }), 60); }
   if (k === "loci") { S.dest = "loci"; S.loci.focus = "t4"; S.loci.hl = null; render(); window.scrollTo(0, 0); }
 }
@@ -1376,5 +1519,5 @@ let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTime
 function hookQVResize() { const q = S.qv, p = qvP(), view = document.getElementById("qv-view"); if (!view) return; const r = view.getBoundingClientRect(); q.vw = r.width; q.vh = r.height; q.fit = Math.min(r.width / p.w, r.height / p.h) * .96; q.scale = Math.max(q.scale, q.fit); clampT(); applyT(false); }
 
 /* boot: open on the photo wall, so the proposal is visible at first sight */
-(function boot() { const hash = location.hash.slice(1); if (hash === "today") { S.chip = "all"; } else if (hash === "shelves") { S.view = "shelves"; } else if (hash === "loci") { S.dest = "loci"; S.loci.focus = "t4"; } else { S.chip = "type:photo"; } render(); })();
+(function boot() { const hash = location.hash.slice(1); if (hash === "today") S.type = "all"; else if (hash === "shelves") S.view = "shelves"; else if (hash === "loci") { S.dest = "loci"; S.loci.focus = "t4"; } render(); })();
 </script>
