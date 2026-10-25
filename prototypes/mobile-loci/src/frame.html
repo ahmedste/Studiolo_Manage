@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Studiolo on a phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab; --accent: #1e3e9e; --accent-soft: #e6ebf8; --bezel: #1c2329; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --bezel: #05080a; color-scheme: dark; } }
+  :root[data-theme="dark"] { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --bezel: #05080a; color-scheme: dark; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font: 15px/1.5 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { min-height: 100%; display: flex; gap: 56px; align-items: center; justify-content: center; padding: 24px 32px; box-sizing: border-box; }
+  .phone { flex: none; width: calc(390px * var(--k) + 24px); height: calc(844px * var(--k) + 24px); border-radius: calc(58px * var(--k) + 12px); background: var(--bezel); padding: 12px; box-sizing: border-box; box-shadow: 0 30px 80px rgba(20, 30, 40, .28), inset 0 0 0 1.5px rgba(255, 255, 255, .08); position: relative; }
+  .screen { width: 390px; height: 844px; transform: scale(var(--k)); transform-origin: 0 0; border-radius: 52px; overflow: hidden; position: relative; background: #000; }
+  .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .island { position: absolute; top: calc(11px * var(--k) + 12px); left: 50%; width: calc(124px * var(--k)); height: calc(36px * var(--k)); margin-left: calc(-62px * var(--k)); border-radius: 20px; background: #000; z-index: 2; pointer-events: none; }
+  .guide { max-width: 430px; }
+  .guide h1 { font: 500 34px/1.1 "Newsreader", Georgia, serif; margin: 0 0 10px; letter-spacing: -.01em; }
+  .guide p { color: var(--ink-2); margin: 0 0 14px; }
+  .guide h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 24px 0 8px; }
+  .guide ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+  .guide li::marker { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .guide b { font-weight: 600; }
+  .guide kbd { font: 600 12px "Instrument Sans", system-ui; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); background: var(--panel); }
+  .note { margin-top: 22px; padding: 12px 14px; border-radius: 12px; background: var(--accent-soft); color: var(--ink); font-size: 13.5px; }
+  @media (max-width: 980px) { .guide { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="phone" id="phone"><div class="screen"><iframe id="screen" title="Studiolo on a phone (prototype)"></iframe></div><div class="island"></div></div>
+  <div class="guide">
+    <h1>Studiolo on a phone</h1>
+    <p>The foot of the screen is for doing, not going. One bar asks Loci, finds a place, dictates and creates. The four destinations move to a drawer. In Loci, what you open shows as a card, the way Maps shows a place.</p>
+    <h2>Try this</h2>
+    <ol>
+      <li><b>Swipe from the left edge</b> or tap ☰: Today, Learn, Commonplace, Loci, and the places you opened last.</li>
+      <li>In the card, tap a topic chip, <b>Daylight &amp; shading</b>, to dive in without hunting for a dot.</li>
+      <li><b>＋ Sub-topic</b>: type a name and press Return, again and again. Or tap Loci’s suggestions. A draft mark waits on the Palace.</li>
+      <li><b>Hold</b> any mark on the Palace (right-click with a mouse): open, add, make a Lumen, ask, set its status.</li>
+      <li><b>Lumen</b>: pick Watch, Listen or Read, and Make. Keep exploring; it lands on the topic. Play, then swipe the player down.</li>
+      <li>Tap the <b>mic</b> and speak, or <b>hold</b> it to talk and let go to send. Try “suggest sub-topics” or “open passive design”.</li>
+      <li>Type in the bar: places come first, then “Ask Loci”.</li>
+      <li>Drag the card’s top: peek, card, full. Tap <b>‹</b> to go back, hold it for the whole trail. On a phone, a two-finger tap or a pinch out goes back too.</li>
+      <li>Switch <b>Palace · Map · List</b> from the title. The Map shows areas only until you open one.</li>
+    </ol>
+    <div class="note">The Palace and the Map are Studiolo’s own engines (main @ 6f8d396). Loci’s answers are simulated; the mic is real where the browser allows it. Open this page on a phone to use it full screen.</div>
+  </div>
+</div>
+<script>
+(() => {
+  const APP = /*APP*/"";
+  // On a phone the app replaces this page (once it has loaded: document.open is ignored while the parser runs).
+  if (matchMedia("(max-width: 699.98px)").matches) {
+    document.getElementById("wrap").hidden = true;
+    addEventListener("load", () => setTimeout(() => { document.open(); document.write(APP); document.close(); }), { once: true });
+    return;
+  }
+  const fit = () => document.documentElement.style.setProperty("--k", Math.min(1, (innerHeight - 48) / 868).toFixed(4));
+  fit(); addEventListener("resize", fit);
+  document.getElementById("screen").srcdoc = APP.replace('<html lang="en">', '<html lang="en" class="framed">');
+})();
+</script>
+</body>
+</html>
