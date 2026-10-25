@@ -6,6 +6,7 @@ HIGH (new field types, a page layout per type, views; extends existing records, 
 **Status:** Idea, explored. Claude, 25 October 2026. Nothing here is agreed until the owner says so in the conversation.
 **Checked against:** Craft *02 Product → Library* and *TBS → Library – polishment Phase* ("How it works (verified against code)", `studiolo` @ `ad38415`, 17 Oct 2026). **`studiolo` itself was not read for this document** (the repo could not be attached to this session), so column names for `collection_fields` and `item_field_values` and the field-type list are taken from those notes and from [`2026-10-24-work-any-field-design.md`](2026-10-24-work-any-field-design.md) §1. Check them before any build.
 **Builds on:** [Work, in any field](2026-10-24-work-any-field-design.md) (one engine, each field names it), [Commonplace photos roadmap](2026-10-24-commonplace-photos-roadmap-design.md) (Views, the type row), [Boards](2026-10-24-boards-design.md).
+**Superseded in part (25 Oct):** §8–§10 are replaced by [Objects: build phases](2026-10-25-objects-build-phases.md), written after reading `studiolo` @ `b5eeee2`. §1 and §6 still stand.
 **Prototype:** [`prototypes/objects-any-field/`](../../../prototypes/objects-any-field/README.md). One engine, three fields: an architect, a lawyer and a doctor, each with their own object types, pages and views.
 
 ## 0. In short
