@@ -1,0 +1,1290 @@
+<meta charset="utf-8">
+<title>Objects in Any Field</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: Commonplace › Objects. Types down the side, the chosen type's view (or one object's page) in the stage, Edit type as a side drawer that updates the stage live. Tokens are Studiolo's own (src/styles/tokens.css), as in the other prototypes. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --accent-soft: #e6ebf8; --accent-strong: #142b73;
+  --float: #fbfbf9; --hover: #ecece6; --mat: #e4e4de; --scrim: rgba(243, 243, 239, .74);
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5;
+  --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a; --ok-soft: #e2efe7;
+  --work: #7a5a2e; --work-soft: #f3ecdf; --pick: #b7791f; --decision-rule: #c9b48a;
+  --on-media: #ffffff; --media-badge: rgba(0, 0, 0, .56);
+  --c0-bg: #e3e9f8; --c0-fg: #23408f; --c1-bg: #e0efe5; --c1-fg: #2d6544;
+  --c2-bg: #f7ecd6; --c2-fg: #85571a; --c3-bg: #f6e2e0; --c3-fg: #93392f;
+  --c4-bg: #ece5f5; --c4-fg: #5b3f8a; --c5-bg: #e6e9eb; --c5-fg: #44535e;
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, .07), 0 8px 22px rgba(34, 48, 58, .09);
+  --shadow-float: 0 0 0 1px rgba(34, 48, 58, .04), 0 1px 2px rgba(34, 48, 58, .06), 0 18px 48px rgba(34, 48, 58, .16);
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-q: 130ms; --dur-s: 220ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --accent-soft: #263156; --accent-strong: #c3cff8;
+    --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+    --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329;
+    --work: #d9b57c; --work-soft: #352b1c; --pick: #e8c27a; --decision-rule: #7d6a45;
+    --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad;
+    --c2-bg: #352b1c; --c2-fg: #e3c38d; --c3-bg: #3a2521; --c3-fg: #eea597;
+    --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --accent-soft: #263156; --accent-strong: #c3cff8;
+  --float: #232e37; --hover: #2a353f; --mat: #0d1317; --scrim: rgba(19, 26, 32, .82);
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c;
+  --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2; --ok-soft: #1f3329;
+  --work: #d9b57c; --work-soft: #352b1c; --pick: #e8c27a; --decision-rule: #7d6a45;
+  --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad;
+  --c2-bg: #352b1c; --c2-fg: #e3c38d; --c3-bg: #3a2521; --c3-fg: #eea597;
+  --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, .32), 0 8px 22px rgba(0, 0, 0, .26);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, .05), 0 18px 48px rgba(0, 0, 0, .42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-q: 1ms; --dur-s: 1ms; } }
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+body { background: var(--paper); color: var(--ink); font: 14px/1.5 var(--ui); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100%; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.side { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow: auto; padding-block: 22px; padding-right: 18px; border-right: 1px solid var(--line); display: grid; gap: 16px; }
+.crumb { font-size: 12px; color: var(--ink-3); letter-spacing: .02em; }
+.crumb b { color: var(--ink); font-weight: 600; }
+.fsw { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--board); border-radius: 8px; padding: 3px; gap: 2px; }
+.fsw button { border: 0; background: transparent; border-radius: 6px; padding: 6px 4px; font-size: 13px; color: var(--ink-2); }
+.fsw button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: var(--shadow-pic); font-weight: 500; }
+.who { font-size: 12px; color: var(--ink-2); }
+.types { display: grid; gap: 1px; }
+.tbtn { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; border: 0; background: transparent; padding: 7px 8px; border-radius: 6px; text-align: left; color: var(--ink-2); }
+.tbtn:hover { background: var(--hover); }
+.tbtn[aria-current="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+.tbtn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.tbtn[aria-current="true"] span { color: var(--accent-strong); font-weight: 500; }
+.tbtn b { font-weight: 400; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.tbtn em { font-style: normal; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--warn); }
+.ico { width: 18px; height: 18px; display: block; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.addtype { justify-self: start; border: 1px dashed var(--line); background: transparent; border-radius: 6px; padding: 6px 10px; color: var(--ink-2); font-size: 13px; }
+.addtype:hover { border-color: var(--ink-3); color: var(--ink); }
+.sidenote { font-size: 11px; color: var(--ink-3); line-height: 1.45; }
+
+.stage { min-width: 0; padding-block: 24px 80px; padding-left: 32px; }
+.wrap { max-width: 1080px; display: grid; gap: 20px; }
+
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 6px 12px; color: var(--ink); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.btn:hover { border-color: var(--ink-3); }
+.btn.pri { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn.on { background: var(--accent-soft); border-color: var(--status-2); color: var(--accent-strong); }
+.btn.sm { padding: 3px 8px; font-size: 12px; }
+.ghost { border: 0; background: transparent; color: var(--ink-2); padding: 4px 6px; border-radius: 5px; }
+.ghost:hover { background: var(--hover); color: var(--ink); }
+
+.thead { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+.thead .l { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.tico { width: 44px; height: 44px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-strong); display: grid; place-items: center; flex: none; }
+.tico .ico { width: 22px; height: 22px; }
+.thead h1 { font: 500 30px/1.1 var(--read); }
+.meta { font-size: 13px; color: var(--ink-2); }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 8px; font-size: 13px; background: var(--warn-soft); color: var(--warn); }
+.banner.info { background: var(--accent-soft); color: var(--accent-strong); }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab { border: 0; background: transparent; padding: 8px 12px 9px; color: var(--ink-2); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
+.tab[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
+.tab small { color: var(--ink-3); font-size: 11px; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 12px; line-height: 20px; white-space: nowrap; border: 0; }
+.c0 { background: var(--c0-bg); color: var(--c0-fg); } .c1 { background: var(--c1-bg); color: var(--c1-fg); }
+.c2 { background: var(--c2-bg); color: var(--c2-fg); } .c3 { background: var(--c3-bg); color: var(--c3-fg); }
+.c4 { background: var(--c4-bg); color: var(--c4-fg); } .c5 { background: var(--c5-bg); color: var(--c5-fg); }
+.rchip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); background: var(--panel); border-radius: 5px; padding: 0 7px; font-size: 13px; line-height: 22px; color: var(--ink); max-width: 100%; }
+.rchip:hover { border-color: var(--status-2); color: var(--accent-strong); }
+.rchip .ico { width: 13px; height: 13px; color: var(--ink-3); flex: none; }
+.rchip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.add { border: 1px dashed var(--line); background: transparent; color: var(--ink-3); border-radius: 5px; padding: 0 7px; line-height: 20px; font-size: 12px; }
+.add:hover { color: var(--ink); border-color: var(--ink-3); }
+.tp { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 1px 10px 1px 8px; font-size: 12px; background: var(--panel); }
+.tdot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--status-2); }
+.tdot.s1 { background: var(--status-1); } .tdot.s2 { background: var(--status-3); border-color: var(--status-3); }
+.dots { display: inline-flex; gap: 2px; }
+.dots button { border: 0; background: transparent; padding: 0 1px; color: var(--ink-3); font-size: 13px; line-height: 1; }
+.dots button.f { color: var(--pick); }
+.tick { border: 1px solid var(--line); background: var(--panel); width: 18px; height: 18px; border-radius: 4px; display: inline-grid; place-items: center; font-size: 12px; padding: 0; color: var(--paper); }
+.tick.y { background: var(--ok); border-color: var(--ok); }
+
+/* gallery */
+.gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
+.card { border: 0; background: transparent; padding: 0; text-align: left; display: grid; gap: 8px; align-content: start; }
+.card .cb { display: grid; gap: 1px; min-width: 0; }
+.card b { font-weight: 500; font-size: 14px; }
+.card small { font-size: 12px; color: var(--ink-2); }
+.card:hover b { color: var(--accent); }
+.pic { aspect-ratio: 4 / 3; border-radius: 4px; overflow: hidden; box-shadow: var(--shadow-pic); background: var(--mat); max-width: 100%; }
+.pic svg { width: 100%; height: 100%; display: block; }
+.por { aspect-ratio: 4 / 3; border-radius: 4px; background: var(--board); display: grid; place-items: center; max-width: 100%; }
+.face { border-radius: 50%; display: grid; place-items: center; color: #fff; font: 500 30px/1 var(--read); letter-spacing: .02em; }
+.tile { aspect-ratio: 4 / 3; border-radius: 4px; background: var(--quote-paper); border: 1px solid var(--quote-rule); padding: 14px; display: grid; align-content: space-between; gap: 8px; max-width: 100%; overflow: hidden; }
+.tile .ico { color: var(--ink-3); }
+.tile .tt { font: italic 400 17px/1.25 var(--read); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.tile .sc { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+
+/* table */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; }
+th { font-size: 12px; color: var(--ink-2); text-align: left; font-weight: 500; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th i { font-style: normal; color: var(--ink-3); font-size: 11px; margin-right: 5px; font-variant-numeric: tabular-nums; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; max-width: 260px; }
+tr:last-child td { border-bottom: 0; }
+td.tt button { border: 0; background: transparent; padding: 0; text-align: left; font-weight: 500; color: var(--ink); }
+td.tt button:hover { color: var(--accent); text-decoration: underline; }
+td .muted, .muted { color: var(--ink-3); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* board */
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+.bcol { background: var(--board); border-radius: 8px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 220px; transition: box-shadow var(--dur-q) var(--ease); }
+.bcol.over { box-shadow: inset 0 0 0 2px var(--status-2); }
+.bcol h4 { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; padding: 2px 2px 4px; }
+.bcol h4 b { font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bcard { background: var(--panel); border-radius: 6px; padding: 9px 10px; box-shadow: var(--shadow-pic); display: grid; gap: 3px; cursor: grab; border: 0; text-align: left; }
+.bcard b { font-weight: 500; font-size: 13px; }
+.bcard small { color: var(--ink-2); font-size: 12px; }
+.bcard .thumb { aspect-ratio: 16 / 9; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+.bcard .thumb svg { width: 100%; height: 100%; display: block; }
+
+/* timeline */
+.tl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.tlin { min-width: 680px; padding: 8px 0 14px; }
+.tlrow { display: grid; grid-template-columns: 210px minmax(0, 1fr); align-items: center; min-height: 34px; }
+.tlrow .lab { padding: 0 14px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tlrow .lab button { border: 0; background: transparent; padding: 0; color: var(--ink); }
+.tlrow .lab button:hover { color: var(--accent); }
+.track { position: relative; height: 34px; margin-right: 24px; }
+.axis { height: 26px; border-bottom: 1px solid var(--line); }
+.tick-l { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; padding-bottom: 5px; white-space: nowrap; }
+.grid-l { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); opacity: .6; }
+.bar { position: absolute; top: 11px; height: 12px; border-radius: 6px; background: var(--status-2); min-width: 12px; }
+.bar.open { -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent); mask-image: linear-gradient(90deg, #000 72%, transparent); }
+.pt { position: absolute; top: 10px; width: 14px; height: 14px; border-radius: 50%; transform: translateX(-50%); border: 2px solid var(--panel); }
+.tlleg { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); padding: 0 14px 6px; }
+
+/* object page */
+.back { border: 0; background: transparent; color: var(--ink-2); padding: 0; display: inline-flex; gap: 6px; align-items: center; font-size: 13px; justify-self: start; }
+.back:hover { color: var(--ink); }
+.phead { display: flex; gap: 20px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; }
+.phead .l { display: flex; gap: 18px; align-items: center; min-width: 0; flex: 1 1 360px; }
+.phead .tx { display: grid; gap: 6px; min-width: 0; }
+.tchip { justify-self: start; display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--accent-strong); background: var(--accent-soft); border: 0; border-radius: 999px; padding: 2px 10px 2px 7px; }
+.tchip .ico { width: 14px; height: 14px; }
+.ptitle { font: 500 clamp(28px, 4vw, 40px)/1.08 var(--read); outline: none; border-radius: 4px; }
+.ptitle:focus { box-shadow: 0 0 0 2px var(--accent-soft); }
+.ptitle:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.sub { color: var(--ink-2); font-size: 15px; }
+
+.hero { position: relative; aspect-ratio: 16 / 8; max-height: 480px; width: 100%; border-radius: 6px; overflow: hidden; box-shadow: var(--shadow-pic); background: var(--mat); }
+.hero svg { width: 100%; height: 100%; display: block; }
+.hero .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--media-badge); color: var(--on-media); font-size: 20px; line-height: 1; display: grid; place-items: center; }
+.hero .nav.p { left: 12px; } .hero .nav.n { right: 12px; }
+.hero .cnt { position: absolute; right: 12px; bottom: 12px; background: var(--media-badge); color: var(--on-media); font-size: 12px; padding: 2px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.strip { display: flex; gap: 6px; overflow-x: auto; }
+.strip button { flex: none; width: 72px; aspect-ratio: 4 / 3; padding: 0; border: 2px solid transparent; border-radius: 4px; overflow: hidden; background: var(--mat); }
+.strip button[aria-pressed="true"] { border-color: var(--ink); }
+.strip svg { width: 100%; height: 100%; display: block; }
+.dochero { background: var(--quote-paper); border: 1px solid var(--quote-rule); border-radius: 4px; padding: 30px 28px 26px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+.dochero .court { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.dochero .t { font: italic 400 clamp(22px, 3vw, 30px)/1.2 var(--read); max-width: 30ch; }
+.dochero .cit { font: 400 15px/1.4 var(--read); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.dochero hr { width: 48px; border: 0; border-top: 1px solid var(--decision-rule); margin: 2px 0; }
+.bigface { flex: none; }
+
+.cols { display: grid; gap: 36px; }
+.cols.two { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+.colm, .cola { display: grid; gap: 30px; align-content: start; min-width: 0; }
+.blk { display: grid; gap: 10px; min-width: 0; position: relative; }
+.blk > h3 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; display: flex; gap: 8px; align-items: baseline; }
+.blk > h3 small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+.prose { font: 400 18px/1.6 var(--read); max-width: 65ch; outline: none; border-radius: 4px; padding: 2px 4px; margin: -2px -4px; }
+.prose:hover { background: var(--hover); }
+.prose:focus { background: var(--panel); box-shadow: 0 0 0 2px var(--accent-soft); }
+.prose:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.facts { margin: 0; display: grid; }
+.fr { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.fr:first-child { border-top: 1px solid var(--line); }
+.fr dt { color: var(--ink-2); font-size: 13px; }
+.fr dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ed { outline: none; border-radius: 3px; padding: 1px 3px; margin: -1px -3px; display: inline-block; min-width: 40px; }
+.ed:hover { background: var(--hover); }
+.ed:focus { background: var(--panel); box-shadow: 0 0 0 2px var(--accent-soft); }
+.ed:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.ext { color: var(--ink-3); text-decoration: none; margin-left: 4px; }
+.ext:hover { color: var(--accent); }
+.minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.cola .minis { grid-template-columns: 1fr; }
+.mini { border: 0; background: transparent; padding: 0; text-align: left; display: grid; gap: 6px; align-content: start; }
+.mini.row { grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 10px; }
+.mini .pic, .mini .por, .mini .tile { aspect-ratio: 4 / 3; }
+.mini.row .pic, .mini.row .por, .mini.row .tile { aspect-ratio: 1; padding: 0; border-radius: 4px; display: grid; place-items: center; }
+.mini b { font-weight: 500; font-size: 13px; display: block; }
+.mini small { font-size: 12px; color: var(--ink-2); }
+.mini:hover b { color: var(--accent); }
+.from { font-size: 12px; color: var(--ink-3); }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.pgrid .pic { box-shadow: none; }
+.ments { display: grid; gap: 10px; }
+.ment { padding: 12px 14px; border-radius: 6px; background: var(--note-paper); border: 1px solid var(--line); display: grid; gap: 4px; }
+.ment.Quote { background: var(--quote-paper); border-color: var(--quote-rule); }
+.ment.Quote p { font: italic 400 17px/1.5 var(--read); }
+.ment.Work { background: var(--work-soft); border-color: transparent; color: var(--work); }
+.ment small { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.ment.Work small { color: var(--work); }
+
+/* arrange */
+.arrbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 14px; border-radius: 8px; background: var(--accent-soft); color: var(--accent-strong); box-shadow: var(--shadow-pic); }
+.arrbar .grp { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+.seg { display: inline-flex; background: var(--panel); border-radius: 6px; padding: 2px; gap: 2px; }
+.seg button { border: 0; background: transparent; border-radius: 4px; padding: 3px 9px; font-size: 12px; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.seg button:disabled { opacity: .35; cursor: not-allowed; }
+.arrbar p { flex: 1 1 220px; font-size: 13px; }
+.blk.arr { outline: 1px dashed var(--status-2); outline-offset: 8px; border-radius: 2px; }
+.blk.off > :not(.bctl) { opacity: .38; }
+.bctl { position: absolute; top: -6px; right: -4px; display: flex; gap: 2px; background: var(--panel); border-radius: 6px; box-shadow: var(--shadow-pic); padding: 2px; z-index: 2; }
+.bctl button { border: 0; background: transparent; border-radius: 4px; padding: 1px 7px; font-size: 12px; color: var(--ink-2); }
+.bctl button:hover { background: var(--hover); color: var(--ink); }
+.emptyb { font-size: 13px; color: var(--ink-3); font-style: italic; }
+
+/* drawer */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(430px, 100%); background: var(--float); box-shadow: var(--shadow-float); overflow: auto; z-index: 40; padding: calc(20px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) 22px; display: grid; gap: 22px; align-content: start; }
+.drawer h2 { font: 500 22px/1.2 var(--read); }
+.dh { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.dsec { display: grid; gap: 8px; }
+.dsec > label, .dsec > .lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.dsec .hint { font-size: 12px; color: var(--ink-2); }
+.inp { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 6px 9px; width: 100%; min-width: 0; }
+.inp:focus { outline: none; border-color: var(--status-2); box-shadow: 0 0 0 3px var(--accent-soft); }
+.two-in { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.segw { display: flex; flex-wrap: wrap; gap: 4px; }
+.segw button { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 3px 11px; font-size: 12px; color: var(--ink-2); }
+.segw button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.flist { display: grid; gap: 4px; }
+.frow { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto auto; gap: 6px; align-items: center; padding: 4px; border-radius: 6px; }
+.frow:hover { background: var(--hover); }
+.frow .inp { padding: 4px 7px; border-color: transparent; background: transparent; }
+.frow .inp:hover { border-color: var(--line); }
+.glyph { width: 26px; height: 22px; border-radius: 4px; background: var(--board); color: var(--ink-2); display: grid; place-items: center; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kind { border: 0; background: transparent; font-size: 12px; color: var(--ink-3); padding: 2px 4px; border-radius: 4px; white-space: nowrap; }
+.kind:hover { color: var(--ink); background: var(--board); }
+.oncard { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.x { border: 0; background: transparent; color: var(--ink-3); font-size: 16px; padding: 0 6px; border-radius: 4px; }
+.x:hover { color: var(--warn); background: var(--warn-soft); }
+.fcfg { margin: 0 0 6px 34px; padding: 10px 12px; border-radius: 6px; background: var(--board); display: grid; gap: 8px; font-size: 12px; color: var(--ink-2); }
+.fcfg label { display: grid; gap: 4px; }
+.fcfg .rowl { display: flex; gap: 6px; align-items: center; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cat button { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 8px 10px; text-align: left; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 2px 8px; align-items: start; }
+.cat button:hover { border-color: var(--status-2); }
+.cat b { font-weight: 500; font-size: 13px; }
+.cat small { grid-column: 2; font-size: 11px; color: var(--ink-2); line-height: 1.35; }
+.cat .glyph { grid-row: span 2; }
+
+/* modal, popover, toast */
+.mwrap { position: fixed; inset: 0; background: var(--scrim); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 50; display: grid; place-items: center; padding: 16px; }
+.modal { width: min(580px, 100%); max-height: calc(100% - 32px); overflow: auto; background: var(--float); border-radius: 12px; box-shadow: var(--shadow-float); padding: 24px; display: grid; gap: 16px; }
+.modal h2 { font: 500 24px/1.2 var(--read); }
+.loci { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.sugg { display: flex; flex-wrap: wrap; gap: 6px; }
+.sugg button { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 3px 11px; font-size: 13px; color: var(--ink-2); }
+.sugg button:hover { color: var(--ink); border-color: var(--ink-3); }
+.draft { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 14px; display: grid; gap: 10px; }
+.draft .dfl { display: grid; gap: 4px; }
+.draft .dfl div { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; }
+.draft .dfl em { font-style: normal; color: var(--ink-3); font-size: 12px; }
+.mact { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.pop { position: fixed; z-index: 60; background: var(--float); border-radius: 8px; box-shadow: var(--shadow-float); padding: 6px; min-width: 210px; max-width: min(300px, calc(100vw - 32px)); max-height: 340px; overflow: auto; display: grid; gap: 1px; }
+.pop .opt { border: 0; background: transparent; border-radius: 5px; padding: 6px 8px; text-align: left; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; }
+.pop .opt:hover { background: var(--hover); }
+.pop .opt i { font-style: normal; color: var(--accent); font-size: 12px; }
+.pop .inp { margin-bottom: 4px; }
+.pop h5 { margin: 4px 8px; font-size: 11px; color: var(--ink-3); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 70; box-shadow: var(--shadow-float); max-width: calc(100% - 32px); }
+.empty { padding: 40px 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; display: grid; gap: 10px; justify-items: center; color: var(--ink-2); }
+
+@media (min-width: 1100px) { .with-drawer .stage { padding-right: 446px; } }
+@media (max-width: 1360px) { .with-drawer .cols.two { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) {
+  .cols.two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding-right: 0; padding-block: 16px 12px; gap: 12px; }
+  .types { display: flex; overflow-x: auto; gap: 4px; padding-bottom: 2px; }
+  .tbtn { grid-template-columns: 18px auto auto auto; flex: none; border: 1px solid var(--line); }
+  .sidenote { display: none; }
+  .stage { padding-left: 0; padding-block: 18px 60px; }
+  .thead h1 { font-size: 26px; }
+  .fr { grid-template-columns: 100px minmax(0, 1fr); }
+  .gal { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 12px; }
+  .hero { aspect-ratio: 4 / 3; }
+}
+</style>
+
+<div class="app">
+  <aside class="side" id="side"></aside>
+  <main class="stage"><div class="wrap" id="main"></div></main>
+</div>
+<div id="drawer"></div>
+<div id="modal"></div>
+<div id="pop" class="pop" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const opts = list => list.map((v, i) => ({ v, c: i % 6 }));
+const fld = (id, name, t, o = {}) => ({ id, name, t, o });
+const choice = (id, name, list, o = {}) => fld(id, name, "choice", { ...o, opts: opts(list) });
+const rel = (id, name, to, o = {}) => fld(id, name, "rel", { to, many: true, ...o });
+const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const NOW_YEAR = 2026;
+
+const ICONS = {
+  building: '<path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6M9 11h.01M15 11h.01"/>',
+  person: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5c1.4-3.9 4-5.6 7-5.6s5.6 1.7 7 5.6"/>',
+  layers: '<path d="M12 3.5l8.5 4.6L12 12.7 3.5 8.1z"/><path d="M3.5 12.4l8.5 4.6 8.5-4.6M3.5 16.5L12 21l8.5-4.5"/>',
+  scale: '<path d="M12 4v16M8 20h8M5 7h14M5 7l-3 6.5a3 3 0 0 0 6 0zM19 7l-3 6.5a3 3 0 0 0 6 0z"/>',
+  columns: '<path d="M3 9.5h18M12 3.5l8.5 6h-17zM6 9.5v8M10 9.5v8M14 9.5v8M18 9.5v8M3 20.5h18"/>',
+  section: '<path d="M15 6.5c-.6-1.4-1.8-2.2-3.3-2.2-1.9 0-3.2 1.1-3.2 2.6 0 3.8 7.2 3 7.2 7 0 1.2-.8 2.1-2 2.5M9 17.5c.6 1.4 1.8 2.2 3.3 2.2 1.9 0 3.2-1.1 3.2-2.6 0-3.8-7.2-3-7.2-7 0-1.2.8-2.1 2-2.5"/>',
+  pill: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-40 12 12)"/><path d="M9.6 9.1l5.3 5.9"/>',
+  book: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7h6"/>',
+  clip: '<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3H9zM8.5 11h7M8.5 15h4.5"/>',
+  file: '<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12.5h6M9 16.5h4"/>',
+  pin: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.2"/>',
+  calendar: '<rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  pot: '<path d="M4 11h16v2.5a6.5 6.5 0 0 1-6.5 6.5h-3A6.5 6.5 0 0 1 4 13.5zM9 7.5c0-1.6 1.6-1.6 1.6-3.5M14 7.5c0-1.6 1.6-1.6 1.6-3.5"/>',
+  case: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 12.5h18"/>',
+  dot: '<circle cx="12" cy="12" r="4.5"/>'
+};
+const icon = k => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[k] || ICONS.dot}</svg>`;
+
+const KINDS = [
+  ["text", "Text", "A line: a citation, a nationality"],
+  ["long", "Long text", "A section on the page: a holding, why it matters"],
+  ["number", "Number", "With a unit: m², days, £"],
+  ["date", "Date", "A day, a year, or a range like 1959–65"],
+  ["choice", "Choice", "Options with colours. Group a board by it"],
+  ["check", "Checkbox", "Yes or no: visited, renal adjustment"],
+  ["rating", "Rating", "One to five"],
+  ["link", "Web link", "A page on the web"],
+  ["place", "Place", "Where it is. Shows on a map"],
+  ["rel", "Relation", "Links to another type, both ways"],
+  ["topics", "Topics", "Topics on your map it teaches"],
+  ["pics", "Pictures", "Photos, as a gallery or slideshow"]
+];
+const KLABEL = Object.fromEntries(KINDS.map(k => [k[0], k[1]]));
+const GLYPH = { text: "Aa", long: "¶", number: "#", date: "31", choice: "◉", check: "✓", rating: "★", link: "↗", place: "⌖", rel: "⇄", topics: "◎", pics: "▦" };
+const BASES = {
+  person: ["Person", "Portrait at the top, lived or active dates."],
+  group: ["Group", "A firm, court, hospital or practice."],
+  place: ["Place", "A location. Shows on a map."],
+  thing: ["Thing", "Something made or written: a building, a case, a drug."],
+  event: ["Event", "Something with a date: a hearing, a procedure, a visit."]
+};
+const SENS = {
+  normal: ["Normal", "Loci may remember what you keep here."],
+  confidential: ["Confidential", "Off the record. Loci remembers only the lessons you file, never names or facts."],
+  clinical: ["Clinical", "Confidential, plus: bands not identifiers, and a warning when text looks like one."]
+};
+const HEROES = { pics: "Slideshow", picture: "Picture", portrait: "Portrait", doc: "Document", none: "None" };
+
+/* ---------- sample data ---------- */
+function ty(d) {
+  return Object.assign({ base: "thing", sens: "normal", card: [], sub: [], ext: null, tex: false, views: [["g", "Gallery", "gallery"], ["t", "Table", "table"]] }, d, {
+    layout: { hero: d.hero || "none", cols: d.cols || 1, blocks: [] },
+    views: (d.views || [["g", "Gallery", "gallery"], ["t", "Table", "table"]]).map(([id, name, l, by]) => ({ id, name, l, by })),
+    cur: null
+  });
+}
+const ob = (id, t, title, v, x = {}) => ({ id, t, title, v, pics: x.pics || 0, ments: x.ments || [] });
+const tp = (n, s) => ({ n, s });
+
+function makeDB() {
+  const architect = {
+    label: "Architect", who: "Sample: an architect who teaches studio.",
+    types: [
+      ty({ id: "prec", name: "Precedents", one: "Precedent", icon: "building", hero: "pics", cols: 2,
+        fields: [rel("arch", "Architect", "archs", { inv: "Works" }), fld("year", "Year", "date"), fld("place", "Place", "place"),
+          choice("typ", "Typology", ["House", "Museum", "Laboratory", "Civic", "Religious"]),
+          rel("mat", "Materials", "mats", { inv: "Used in", cards: true }), fld("why", "Why it matters", "long"),
+          fld("topics", "Teaches", "topics"), choice("stat", "My status", ["To study", "Studied", "Visited"]),
+          fld("pics", "Pictures", "pics"), fld("link", "Web link", "link")],
+        card: ["arch", "year"], sub: ["arch", "year", "place"],
+        views: [["g", "Gallery", "gallery"], ["b", "By my status", "board", "stat"], ["tl", "Timeline", "timeline", "year"], ["t", "Table", "table"]] }),
+      ty({ id: "archs", name: "Architects", one: "Architect", icon: "person", base: "person", ext: "People", hero: "portrait", cols: 1,
+        fields: [fld("lived", "Lived", "date"), fld("nat", "Nationality", "text"),
+          choice("mov", "Movement", ["Modernism", "Late modernism", "Critical regionalism", "Contemporary"]), fld("link", "Web link", "link")],
+        card: ["lived", "nat"], sub: ["lived", "nat"],
+        views: [["g", "Gallery", "gallery"], ["tl", "Timeline", "timeline", "lived"], ["t", "Table", "table"]] }),
+      ty({ id: "mats", name: "Materials", one: "Material", icon: "layers", tex: true, hero: "picture", cols: 2,
+        fields: [choice("cat", "Category", ["Concrete", "Stone", "Masonry", "Timber"]), fld("fin", "Typical finish", "text"), fld("note", "Notes", "long")],
+        card: ["cat", "fin"], sub: ["cat", "fin"] })
+    ],
+    objs: [
+      ob("savoye", "prec", "Villa Savoye", { arch: ["corb"], year: [1928, 1931], place: "Poissy, France", typ: ["House"], mat: ["conc"], stat: ["Studied"], link: "https://en.wikipedia.org/wiki/Villa_Savoye",
+        why: "Le Corbusier's five points in one house: pilotis, a free plan, a free façade, ribbon windows and a roof garden. The ramp turns the section into something you walk.",
+        topics: [tp("Promenade architecturale", 1), tp("Free plan", 2)] }, { pics: 4 }),
+      ob("salk", "prec", "Salk Institute", { arch: ["kahn"], year: [1959, 1965], place: "La Jolla, California", typ: ["Laboratory"], mat: ["conc", "teak", "trav"], stat: ["Visited"], link: "https://en.wikipedia.org/wiki/Salk_Institute_for_Biological_Studies",
+        why: "Two laboratory blocks frame a travertine court open to the Pacific, with one channel of water running to the horizon. The labs are clear spans; the services live in floors between them, Kahn's served and servant spaces.",
+        topics: [tp("Light & threshold", 1), tp("Served and servant spaces", 2)] },
+        { pics: 5, ments: [{ k: "Note", text: "Bring the section through the court to Thursday's crit: how the study towers step back.", by: "Your note · 3 Oct" }] }),
+      ob("kimbell", "prec", "Kimbell Art Museum", { arch: ["kahn"], year: [1966, 1972], place: "Fort Worth, Texas", typ: ["Museum"], mat: ["conc", "trav"], stat: ["To study"],
+        why: "Cycloid concrete vaults split at the crown let daylight in along a slot, and a pierced aluminium reflector spreads it across the vault. Natural light for paintings, without direct sun.",
+        topics: [tp("Light & threshold", 1), tp("Daylighting", 0)] },
+        { pics: 4, ments: [{ k: "Work", text: "Used in Prayer hall, Al Barsha: for the qibla wall light.", by: "Work · Project" }] }),
+      ob("saynatsalo", "prec", "Säynätsalo Town Hall", { arch: ["aalto"], year: [1949, 1952], place: "Säynätsalo, Finland", typ: ["Civic"], mat: ["brick"], stat: ["Studied"],
+        why: "A raised courtyard reached by grass steps. The council chamber is the tallest room, roofed with timber fan trusses: civic dignity at the scale of a small town.",
+        topics: [tp("Civic courtyards", 0)] }, { pics: 4 }),
+      ob("light", "prec", "Church of the Light", { arch: ["ando"], year: [1987, 1989], place: "Ibaraki, Osaka", typ: ["Religious"], mat: ["conc"], stat: ["To study"],
+        why: "A cross cut through the concrete wall behind the altar is the only ornament. The light is the figure, and the room stays dark enough for it to read.",
+        topics: [tp("Light & threshold", 1)] },
+        { pics: 3, ments: [{ k: "Work", text: "Used in Prayer hall, Al Barsha: keep the room dark enough for one source to lead.", by: "Work · Project" }] }),
+      ob("sancaklar", "prec", "Sancaklar Mosque", { arch: ["arolat"], year: [2011, 2012], place: "Büyükçekmece, Istanbul", typ: ["Religious"], mat: ["conc"], stat: ["Studied"],
+        why: "The prayer hall is dug into the slope, so you go down into it. Daylight through fissures along the qibla wall takes the place of a dome.",
+        topics: [tp("Light & threshold", 1), tp("Qibla wall", 0)] },
+        { pics: 4, ments: [{ k: "Work", text: "Used in Prayer hall, Al Barsha: light from fissures, not windows.", by: "Work · Project" }] }),
+      ob("corb", "archs", "Le Corbusier", { lived: [1887, 1965], nat: "Swiss-French", mov: ["Modernism"] }),
+      ob("kahn", "archs", "Louis Kahn", { lived: [1901, 1974], nat: "American, born in Estonia", mov: ["Late modernism"] },
+        { ments: [{ k: "Quote", text: "The sun never knew how great it was until it struck the side of a building.", by: "Quote · said by Louis Kahn" }] }),
+      ob("aalto", "archs", "Alvar Aalto", { lived: [1898, 1976], nat: "Finnish", mov: ["Modernism"] }),
+      ob("ando", "archs", "Tadao Ando", { lived: [1941, null], nat: "Japanese", mov: ["Critical regionalism"] }),
+      ob("arolat", "archs", "Emre Arolat", { lived: [1963, null], nat: "Turkish", mov: ["Contemporary"] }),
+      ob("conc", "mats", "Board-formed concrete", { cat: ["Concrete"], fin: "Board-marked, sealed", note: "The boards leave their grain and the tie holes stay as a grid. Plan the tie-hole rhythm with the joints, as Kahn did at the Salk." }),
+      ob("trav", "mats", "Travertine", { cat: ["Stone"], fin: "Honed, unfilled" }),
+      ob("teak", "mats", "Teak", { cat: ["Timber"], fin: "Oiled; weathers to silver" }),
+      ob("brick", "mats", "Red brick", { cat: ["Masonry"], fin: "Irregular coursing, lime mortar" })
+    ]
+  };
+
+  const lawyer = {
+    label: "Lawyer", who: "Sample: a construction lawyer in London.",
+    types: [
+      ty({ id: "cases", name: "Cases", one: "Case", icon: "scale", hero: "doc", cols: 2,
+        fields: [fld("cit", "Citation", "text"), rel("court", "Court", "courts", { many: false, inv: "Decisions" }), fld("year", "Year", "date"),
+          rel("judge", "Leading judgment", "judges", { many: false, inv: "Judgments" }), choice("area", "Area of law", ["Tort", "Contract", "Construction"]),
+          fld("hold", "Holding", "long"), fld("ratio", "Ratio", "long"), rel("cites", "Cites", "cases", { inv: "Cited by", cards: true }),
+          choice("use", "How I use it", ["Rely on", "Distinguish", "Background"]), fld("topics", "Topics", "topics"), fld("link", "Judgment", "link")],
+        card: ["cit", "court"], sub: ["cit"],
+        views: [["t", "Table", "table"], ["b", "By area", "board", "area"], ["tl", "Timeline", "timeline", "year"], ["g", "Gallery", "gallery"]] }),
+      ty({ id: "courts", name: "Courts", one: "Court", icon: "columns", base: "group", hero: "none", cols: 1,
+        fields: [fld("jur", "Jurisdiction", "text"), choice("lvl", "Level", ["Final appeal", "High Court", "Historic"])],
+        card: ["jur", "lvl"], sub: ["jur"], views: [["t", "Table", "table"], ["g", "Gallery", "gallery"]] }),
+      ty({ id: "judges", name: "Judges", one: "Judge", icon: "person", base: "person", ext: "People", hero: "portrait", cols: 1,
+        fields: [fld("role", "Known as", "text")], card: ["role"], sub: ["role"] }),
+      ty({ id: "clauses", name: "Clauses & sections", one: "Clause", icon: "section", hero: "doc", cols: 1,
+        fields: [fld("inst", "Instrument", "text"), fld("sec", "Section", "text"), fld("txt", "What it says", "long"),
+          rel("cons", "Considered in", "cases", { inv: "Clauses", cards: true }), fld("topics", "Topics", "topics")],
+        card: ["inst", "sec"], sub: ["inst", "sec"], views: [["t", "Table", "table"], ["g", "Gallery", "gallery"]] })
+    ],
+    objs: [
+      ob("donoghue", "cases", "Donoghue v Stevenson", { cit: "[1932] AC 562", court: ["hl"], year: 1932, judge: ["atkin"], area: ["Tort"], use: ["Background"],
+        hold: "A manufacturer of products sold in a form the consumer can't inspect owes that consumer a duty to take reasonable care. The snail in the ginger beer bottle.",
+        ratio: "The neighbour principle: take reasonable care to avoid acts or omissions you can reasonably foresee would be likely to injure your neighbour.",
+        topics: [tp("Duty of care", 2)] },
+        { ments: [{ k: "Quote", text: "You must take reasonable care to avoid acts or omissions which you can reasonably foresee would be likely to injure your neighbour.", by: "Quote · said by Lord Atkin" }] }),
+      ob("caparo", "cases", "Caparo Industries plc v Dickman", { cit: "[1990] 2 AC 605", court: ["hl"], year: 1990, judge: ["bridge"], area: ["Tort"], cites: ["donoghue"], use: ["Distinguish"],
+        hold: "Auditors preparing statutory accounts owed no duty of care to investors who bought shares relying on them.",
+        ratio: "Foreseeability, proximity, and whether it is fair, just and reasonable to impose a duty.",
+        topics: [tp("Duty of care", 2), tp("Pure economic loss", 1)] }),
+      ob("robinson", "cases", "Robinson v Chief Constable of West Yorkshire Police", { cit: "[2018] UKSC 4", court: ["uksc"], year: 2018, judge: ["reed"], area: ["Tort"], cites: ["caparo", "donoghue"], use: ["Rely on"],
+        hold: "Officers making an arrest owed a duty of care to a passer-by injured in the struggle: a positive act, not an omission.",
+        ratio: "Caparo is not a universal three-stage test. In established categories, follow precedent; develop novel ones step by step, by analogy.",
+        topics: [tp("Duty of care", 2)] }),
+      ob("hadley", "cases", "Hadley v Baxendale", { cit: "(1854) 9 Exch 341", court: ["exch"], year: 1854, judge: ["alderson"], area: ["Contract"], use: ["Rely on"],
+        hold: "A carrier who delayed delivering a broken crankshaft was not liable for the mill's lost profits, which it had not been told of.",
+        ratio: "Damages are recoverable for losses arising naturally from the breach, or that both parties contemplated when they made the contract.",
+        topics: [tp("Remoteness of damage", 1)] }),
+      ob("multiplex", "cases", "Multiplex Constructions (UK) Ltd v Honeywell Control Systems Ltd (No 2)", { cit: "[2007] EWHC 447 (TCC)", court: ["tcc"], year: 2007, judge: ["jackson"], area: ["Construction"], use: ["Rely on"],
+        hold: "Where the contract lets time be extended for the employer's acts, the prevention principle doesn't defeat a notice condition the contractor failed to meet.",
+        ratio: "Use the contract's own mechanism for extending time, notice provisions included.",
+        topics: [tp("Extensions of time", 1), tp("Prevention principle", 0)] },
+        { ments: [{ k: "Work", text: "Used in Matter: fit-out delay claim, on the 28-day notice.", by: "Work · Matter" }] }),
+      ob("triple", "cases", "Triple Point Technology Inc v PTT Public Company Ltd", { cit: "[2021] UKSC 29", court: ["uksc"], year: 2021, judge: ["arden"], area: ["Construction"], use: ["Rely on"],
+        hold: "Liquidated damages for delay accrue up to termination even when the contractor never completes the work.",
+        ratio: "Unless the clause clearly says otherwise, accrued liquidated damages survive termination; general damages apply after it.",
+        topics: [tp("Liquidated damages", 1)] },
+        { ments: [{ k: "Work", text: "Used in Matter: fit-out delay claim, on LDs after termination.", by: "Work · Matter" }] }),
+      ob("hl", "courts", "House of Lords", { jur: "United Kingdom, until 2009", lvl: ["Final appeal"] }),
+      ob("uksc", "courts", "UK Supreme Court", { jur: "United Kingdom", lvl: ["Final appeal"] }),
+      ob("tcc", "courts", "Technology and Construction Court", { jur: "England & Wales", lvl: ["High Court"] }),
+      ob("exch", "courts", "Court of Exchequer", { jur: "England & Wales", lvl: ["Historic"] }),
+      ob("atkin", "judges", "Lord Atkin", { role: "Lord of Appeal in Ordinary" }),
+      ob("bridge", "judges", "Lord Bridge of Harwich", { role: "Lord of Appeal in Ordinary" }),
+      ob("reed", "judges", "Lord Reed", { role: "President of the Supreme Court since 2020" }),
+      ob("alderson", "judges", "Alderson B", { role: "Baron of the Exchequer" }),
+      ob("jackson", "judges", "Jackson J", { role: "TCC judge, later Jackson LJ" }),
+      ob("arden", "judges", "Lady Arden", { role: "Justice of the Supreme Court" }),
+      ob("fidic85", "clauses", "Extension of Time for Completion", { inst: "FIDIC Red Book 2017", sec: "Sub-Clause 8.5", cons: ["multiplex"],
+        txt: "The contractor is entitled, subject to Sub-Clause 20.2, to an extension of time if completion is or will be delayed by one of the listed causes.", topics: [tp("Extensions of time", 1)] }),
+      ob("fidic202", "clauses", "Claims for payment and/or EOT", { inst: "FIDIC Red Book 2017", sec: "Sub-Clause 20.2", cons: ["multiplex"],
+        txt: "Notice within 28 days of becoming aware of the event, then a fully detailed claim within 84 days.", topics: [tp("Extensions of time", 1)] }),
+      ob("hgcra108", "clauses", "Right to refer disputes to adjudication", { inst: "Housing Grants, Construction and Regeneration Act 1996", sec: "s.108",
+        txt: "A party to a construction contract has the right to refer a dispute arising under it to adjudication.", topics: [tp("Adjudication", 0)] })
+    ]
+  };
+
+  const doctor = {
+    label: "Doctor", who: "Sample: a foundation doctor in the UK. De-identified, for learning.",
+    types: [
+      ty({ id: "drugs", name: "Drugs", one: "Drug", icon: "pill", hero: "none", cols: 2,
+        fields: [choice("cls", "Class", ["DOAC", "Vitamin K antagonist", "LMWH"]), choice("route", "Route", ["Oral", "Subcutaneous", "IV"], { many: true }),
+          fld("mon", "Monitoring", "text"), fld("renal", "Renal adjustment", "check"),
+          rel("alt", "Alternatives", "drugs", { sym: true }), fld("topics", "Topics", "topics"), fld("note", "My notes", "long"), fld("link", "BNF", "link")],
+        card: ["cls", "route"], sub: ["cls"],
+        views: [["t", "Table", "table"], ["b", "By class", "board", "cls"], ["g", "Gallery", "gallery"]] }),
+      ty({ id: "guides", name: "Guidelines", one: "Guideline", icon: "book", hero: "doc", cols: 2,
+        fields: [choice("iss", "Issuer", ["NICE", "ESC", "BTS"]), fld("code", "Code", "text"), fld("pub", "Published", "date"),
+          rel("recs", "Recommends", "drugs", { inv: "Recommended in", cards: true }), fld("key", "Key points", "long"), fld("topics", "Topics", "topics"), fld("link", "Web link", "link")],
+        card: ["iss", "code"], sub: ["iss", "code", "pub"],
+        views: [["t", "Table", "table"], ["tl", "Timeline", "timeline", "pub"], ["g", "Gallery", "gallery"]] }),
+      ty({ id: "procs", name: "Procedures", one: "Procedure", icon: "clip", base: "event", hero: "none", cols: 2,
+        fields: [fld("date", "Date", "date"), choice("proc", "Procedure", ["Arterial blood gas", "Cannulation", "Lumbar puncture", "Pleural tap"]),
+          choice("set", "Setting", ["ED", "AMU", "Ward"]), choice("sup", "Supervision", ["Observed", "Supervised", "Independent"]),
+          choice("out", "Outcome", ["Successful", "Unsuccessful"]), fld("refl", "Reflection", "long")],
+        card: ["date", "sup"], sub: ["date", "set"],
+        views: [["tl", "Logbook", "timeline", "date"], ["b", "By supervision", "board", "sup"], ["t", "Table", "table"]] }),
+      ty({ id: "tcases", name: "Teaching cases", one: "Teaching case", icon: "file", sens: "clinical", hero: "none", cols: 2,
+        fields: [choice("age", "Age band", ["20–29", "30–39", "40–49", "50–59", "60–69", "70–79"]), choice("set", "Setting", ["ED", "AMU", "Ward", "GP"]),
+          fld("pc", "Presenting complaint", "text"), rel("guide", "Guideline", "guides", { inv: "Teaching cases" }), fld("topics", "Topics", "topics"), fld("lp", "Learning points", "long")],
+        card: ["age", "set"], sub: ["age", "set"], views: [["g", "Gallery", "gallery"], ["t", "Table", "table"]] })
+    ],
+    objs: [
+      ob("apix", "drugs", "Apixaban", { cls: ["DOAC"], route: ["Oral"], mon: "Renal function, bleeding", renal: true, alt: ["rivar", "warf"], topics: [tp("Pulmonary embolism", 1), tp("Atrial fibrillation", 0)], link: "https://bnf.nice.org.uk/drugs/apixaban/" },
+        { ments: [{ k: "Note", text: "Ask pharmacy: apixaban or rivaroxaban when renal function is borderline?", by: "Your note · 9 Oct" }] }),
+      ob("rivar", "drugs", "Rivaroxaban", { cls: ["DOAC"], route: ["Oral"], mon: "Renal function, bleeding", renal: true, alt: ["apix", "warf"], topics: [tp("Pulmonary embolism", 1)] }),
+      ob("warf", "drugs", "Warfarin", { cls: ["Vitamin K antagonist"], route: ["Oral"], mon: "INR", renal: false, alt: ["apix", "rivar"], topics: [tp("Atrial fibrillation", 0)] }),
+      ob("enox", "drugs", "Enoxaparin", { cls: ["LMWH"], route: ["Subcutaneous"], mon: "Platelets; anti-Xa in selected patients", renal: true, topics: [tp("Pulmonary embolism", 1)] }),
+      ob("ng158", "guides", "Venous thromboembolic diseases: diagnosis, management and thrombophilia testing", { iss: ["NICE"], code: "NG158", pub: 2020, recs: ["apix", "rivar"],
+        key: "Use the two-level Wells score to decide between imaging and a D-dimer. Offer apixaban or rivaroxaban first for confirmed PE or DVT.", topics: [tp("Pulmonary embolism", 1), tp("Deep vein thrombosis", 0)], link: "https://www.nice.org.uk/guidance/ng158" }),
+      ob("ng196", "guides", "Atrial fibrillation: diagnosis and management", { iss: ["NICE"], code: "NG196", pub: 2021, recs: ["apix", "rivar"],
+        key: "Assess stroke risk with CHA₂DS₂-VASc and bleeding risk before offering anticoagulation. A DOAC is the first choice.", topics: [tp("Atrial fibrillation", 0)] }),
+      ob("esc19", "guides", "Guidelines for the diagnosis and management of acute pulmonary embolism", { iss: ["ESC"], code: "ESC 2019", pub: 2019, recs: ["apix", "rivar", "enox"],
+        key: "Risk-stratify by haemodynamic status, then PESI or sPESI. Prefer a DOAC over a vitamin K antagonist for eligible patients.", topics: [tp("Pulmonary embolism", 1)] }),
+      ...[["p1", "2026-08-12", "Arterial blood gas", "ED", "Observed", "Successful", "Watched the registrar do an Allen's test first. Find out why it's often skipped."],
+        ["p2", "2026-08-19", "Cannulation", "AMU", "Supervised", "Unsuccessful", "Two attempts on a dehydrated patient. Next time warm the arm first and choose a forearm vein."],
+        ["p3", "2026-08-28", "Cannulation", "Ward", "Supervised", "Successful", ""],
+        ["p4", "2026-09-03", "Arterial blood gas", "ED", "Supervised", "Successful", ""],
+        ["p5", "2026-09-15", "Lumbar puncture", "AMU", "Observed", "Successful", "Positioning took longer than the procedure. Ask for help with it early."],
+        ["p6", "2026-09-24", "Cannulation", "ED", "Independent", "Successful", ""],
+        ["p7", "2026-10-06", "Arterial blood gas", "AMU", "Independent", "Successful", ""],
+        ["p8", "2026-10-17", "Pleural tap", "Ward", "Observed", "Successful", "Ultrasound-marked site; consent covered the risk of pneumothorax."]]
+        .map(([id, date, proc, set, sup, out, refl]) => ob(id, "procs", `${proc}, ${set}`, { date, proc: [proc], set: [set], sup: [sup], out: [out], refl })),
+      ob("tc1", "tcases", "Breathless after a long flight", { age: ["30–39"], set: ["ED"], pc: "Pleuritic chest pain and breathlessness two days after a 12-hour flight", guide: ["ng158"], topics: [tp("Pulmonary embolism", 1)],
+        lp: "Wells 4.5, so PE is likely: imaging before a D-dimer. The flight itself isn't a Wells criterion; immobilisation for three days or more is." }),
+      ob("tc2", "tcases", "An irregular pulse at a routine check", { age: ["70–79"], set: ["GP"], pc: "Irregularly irregular pulse found at a routine check, no symptoms", guide: ["ng196"], topics: [tp("Atrial fibrillation", 0)],
+        lp: "CHA₂DS₂-VASc first. Bleeding risk is assessed alongside it, never instead of it." }),
+      ob("tc3", "tcases", "Calf swelling after knee surgery", { age: ["50–59"], set: ["Ward"], pc: "One swollen calf nine days after a knee replacement", guide: ["ng158"], topics: [tp("Deep vein thrombosis", 0)],
+        lp: "Two-level DVT Wells; recent surgery counts. If DVT is likely, a proximal leg vein ultrasound within 4 hours." })
+    ]
+  };
+  return { architect, lawyer, doctor };
+}
+const DB = makeDB();
+
+/* ---------- state ---------- */
+const S = { field: "architect", type: "prec", obj: null, arrange: false, drawer: false, open: null, catalog: false, modal: null, slide: 0, pop: null, drag: null };
+const D = () => DB[S.field];
+const T = id => D().types.find(t => t.id === id);
+const O = id => D().objs.find(o => o.id === id);
+const objsOf = tid => D().objs.filter(o => o.t === tid);
+const F = (t, id) => t.fields.find(f => f.id === id);
+const arr = v => v == null ? [] : Array.isArray(v) ? v : [v];
+const invFor = tid => D().types.flatMap(t => t.fields.filter(f => f.t === "rel" && f.o.to === tid && !f.o.sym).map(f => ({ t, f })));
+const lower = s => s.charAt(0).toLowerCase() + s.slice(1);
+const countLabel = (t, n) => `${n} ${n === 1 ? lower(t.one) : lower(t.name)}`;
+
+/* ---------- formatting ---------- */
+function fmtDate(v) {
+  if (v == null || v === "") return "";
+  if (typeof v === "number") return String(v);
+  if (Array.isArray(v)) {
+    const [a, b] = v;
+    if (b == null) return `born ${a}`;
+    if (a === b) return String(a);
+    return Math.floor(a / 100) === Math.floor(b / 100) ? `${a}–${String(b).slice(2)}` : `${a}–${b}`;
+  }
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+  return m ? `${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}` : String(v);
+}
+function dateSpan(v) {
+  if (v == null || v === "") return null;
+  if (typeof v === "number") return { a: v, b: v, day: false };
+  if (Array.isArray(v)) return { a: v[0], b: v[1] == null ? NOW_YEAR : v[1], open: v[1] == null, day: false };
+  const t = Date.parse(v + "T00:00:00Z");
+  return isNaN(t) ? null : { a: t, b: t, day: true };
+}
+function parseDate(s) {
+  s = s.trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  let m = /^born\s+(\d{3,4})$/i.exec(s) || /^(\d{3,4})\s*[–-]\s*$/.exec(s);
+  if (m) return [+m[1], null];
+  m = /^(\d{3,4})\s*[–-]\s*(\d{2,4})$/.exec(s);
+  if (m) { const a = +m[1]; let b = m[2]; b = b.length < 4 ? +(String(a).slice(0, 4 - b.length) + b) : +b; return b >= a ? [a, b] : undefined; }
+  if (/^\d{3,4}$/.test(s)) return +s;
+  return undefined;
+}
+function plain(f, v) {
+  if (v == null || v === "" || (Array.isArray(v) && !v.length && f.t !== "date")) return "";
+  switch (f.t) {
+    case "rel": return arr(v).map(id => O(id)?.title).filter(Boolean).join(", ");
+    case "choice": return arr(v).join(", ");
+    case "date": return fmtDate(v);
+    case "number": return v.toLocaleString("en-GB") + (f.o.unit ? " " + f.o.unit : "");
+    case "check": return v ? f.name : "";
+    case "rating": return "★".repeat(v);
+    case "topics": return arr(v).map(x => x.n).join(", ");
+    case "link": try { return new URL(v).hostname.replace(/^www\./, ""); } catch { return v; }
+    default: return String(v);
+  }
+}
+const cardLine = (t, o) => t.card.map(id => F(t, id)).filter(Boolean).map(f => plain(f, o.v[f.id])).filter(Boolean).join(" · ");
+const subLine = (t, o) => t.sub.map(id => F(t, id)).filter(Boolean).map(f => plain(f, o.v[f.id])).filter(Boolean).join(" · ");
+const chipFor = (f, val) => { const op = f.o.opts.find(x => x.v === val); return `<span class="chip c${op ? op.c : 5}">${esc(val)}</span>`; };
+const relChips = (f, v) => arr(v).map(id => O(id)).filter(Boolean).map(x => `<button class="rchip" data-act="open" data-id="${x.id}">${icon(T(x.t).icon)}<span>${esc(x.title || "Untitled")}</span></button>`).join("");
+const topicPills = v => arr(v).map(x => `<span class="tp"><span class="tdot s${x.s}"></span>${esc(x.n)}</span>`).join("");
+
+/* ---------- pictures (generated stand-ins for photos) ---------- */
+const SKIES = [["#c9d6de", "#eef2f3"], ["#efc49b", "#f8e8d6"], ["#9db6cc", "#dde7ef"], ["#6e7c8b", "#b9c2ca"], ["#d9d4c7", "#f1eee6"]];
+const MASS = ["#d8d5cf", "#c4c0b8", "#e9e5dc", "#b9a58b", "#a7543f", "#cfc6b4"];
+function building(o, i) {
+  const r = rng(hash(o.id) + i * 977), id = `g${hash(o.id + i)}`;
+  if (i % 2 === 1) {
+    const cross = o.id === "light";
+    const x = 120 + r() * 160, w = cross ? 10 : 6 + r() * 14;
+    const beam = `<polygon points="${x},40 ${x + w},40 ${x + w + 120},260 ${x - 60},260" fill="url(#${id}b)"/>`;
+    const slot = cross ? `<rect x="${x}" y="50" width="${w}" height="150" fill="#fff6e4"/><rect x="${x - 45}" y="95" width="${w + 90}" height="10" fill="#fff6e4"/>`
+      : `<rect x="${x}" y="30" width="${w}" height="200" fill="#fff3dc"/>`;
+    return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1d6" stop-opacity=".55"/><stop offset="1" stop-color="#fff1d6" stop-opacity="0"/></linearGradient></defs>
+      <rect width="400" height="260" fill="#2a2724"/><rect y="200" width="400" height="60" fill="#36322d"/>${beam}${slot}<rect x="0" y="200" width="400" height="1" fill="#4a453e"/></svg>`;
+  }
+  const [s1, s2] = SKIES[Math.floor(r() * SKIES.length)];
+  const g = 180 + r() * 30;
+  let vols = "";
+  const n = 2 + Math.floor(r() * 3);
+  for (let k = 0; k < n; k++) {
+    const w = 70 + r() * 140, h = 40 + r() * 90, x = r() * (400 - w), y = g - h + (r() < .3 ? -18 : 0), c = MASS[Math.floor(r() * MASS.length)];
+    const piloti = y < g - h ? `<rect x="${x + 8}" y="${y + h}" width="4" height="${g - y - h}" fill="#7d776e"/><rect x="${x + w - 12}" y="${y + h}" width="4" height="${g - y - h}" fill="#7d776e"/>` : "";
+    const band = r() < .6 ? `<rect x="${x + 6}" y="${y + h * .35}" width="${w - 12}" height="${Math.max(5, h * .14)}" fill="#3a4148" opacity=".78"/>` : "";
+    vols += `${piloti}<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/><rect x="${x + w * .78}" y="${y}" width="${w * .22}" height="${h}" fill="#000" opacity=".14"/>${band}`;
+  }
+  const tree = r() < .6 ? `<circle cx="${30 + r() * 340}" cy="${g - 26}" r="${18 + r() * 10}" fill="#6f7f5c" opacity=".9"/>` : "";
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient></defs>
+    <rect width="400" height="260" fill="url(#${id})"/><rect y="${g}" width="400" height="${260 - g}" fill="#a9a493"/>${tree}${vols}<rect y="${g}" width="400" height="2" fill="#000" opacity=".12"/></svg>`;
+}
+function texture(o) {
+  const cat = arr(o.v.cat)[0], r = rng(hash(o.id));
+  let b = "";
+  if (cat === "Concrete") {
+    b = `<rect width="400" height="260" fill="#b9b6b0"/>`;
+    for (let y = 0; y < 260; y += 26) b += `<rect y="${y}" width="400" height="1.4" fill="#8f8b84" opacity=".6"/>`;
+    for (let y = 13; y < 260; y += 52) for (let x = 30; x < 400; x += 80) b += `<circle cx="${x}" cy="${y}" r="3.2" fill="#77736c"/>`;
+    for (let k = 0; k < 40; k++) b += `<rect x="${r() * 400}" y="${r() * 260}" width="${20 + r() * 60}" height="1" fill="#fff" opacity=".18"/>`;
+  } else if (cat === "Stone") {
+    b = `<rect width="400" height="260" fill="#e2d6bf"/>`;
+    for (let k = 0; k < 60; k++) b += `<rect x="${r() * 400 - 40}" y="${r() * 260}" width="${40 + r() * 160}" height="${1 + r() * 3}" rx="1.5" fill="#bfae8c" opacity="${.3 + r() * .5}"/>`;
+    b += `<rect y="129" width="400" height="1.5" fill="#cbbd9f"/><rect x="200" y="0" width="1.5" height="129" fill="#cbbd9f"/><rect x="110" y="130" width="1.5" height="130" fill="#cbbd9f"/>`;
+  } else if (cat === "Timber") {
+    b = `<rect width="400" height="260" fill="#8a5a36"/>`;
+    for (let x = 0; x < 400; x += 50) { b += `<rect x="${x}" width="1.5" height="260" fill="#5d3b22"/>`; for (let k = 0; k < 5; k++) b += `<path d="M${x + 6 + k * 9} 0 q ${r() * 8 - 4} 130 0 260" stroke="#6e4528" stroke-width="1" fill="none" opacity=".6"/>`; }
+  } else {
+    b = `<rect width="400" height="260" fill="#d8cfc0"/>`;
+    for (let y = 0, row = 0; y < 260; y += 22, row++) for (let x = (row % 2) * -30; x < 400; x += 60) b += `<rect x="${x + 1.5}" y="${y + 1.5}" width="57" height="19" fill="${["#a2513b", "#ad5c43", "#954834", "#b4664b"][Math.floor(r() * 4)]}"/>`;
+  }
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${b}</svg>`;
+}
+const hasPics = (t, o) => t.tex || (t.fields.some(f => f.t === "pics") && o.pics > 0);
+const picSvg = (t, o, i = 0) => t.tex ? texture(o) : building(o, i);
+const initials = s => (s || "?").replace(/^(Lord|Lady|Sir)\s+/, "").split(/\s+/).filter(w => /^[A-ZÀ-Ý]/.test(w)).slice(0, 2).map(w => w[0]).join("") || "?";
+const face = (o, px) => `<div class="face" style="width:${px}px;height:${px}px;font-size:${Math.round(px * .36)}px;background:hsl(${hash(o.id) % 360} 28% 46%)">${esc(initials(o.title))}</div>`;
+function thumb(t, o, size) {
+  if (hasPics(t, o)) return `<div class="pic">${picSvg(t, o, 0)}</div>`;
+  if (t.base === "person") return `<div class="por">${face(o, size === "s" ? 30 : 84)}</div>`;
+  if (size === "s") return `<div class="tile">${icon(t.icon)}</div>`;
+  const first = t.sub.map(id => F(t, id)).find(f => f && o.v[f.id] != null && o.v[f.id] !== "");
+  return `<div class="tile"><span class="sc">${first ? esc(plain(first, o.v[first.id])) : esc(t.one)}</span><span class="tt">${esc(o.title || "Untitled")}</span></div>`;
+}
+
+/* ---------- layout ---------- */
+function ensure(t) {
+  const L = t.layout, want = ["facts"];
+  t.fields.filter(f => f.t === "long").forEach(f => want.push("sec:" + f.id));
+  t.fields.filter(f => f.t === "rel" && f.o.cards).forEach(f => want.push("rel:" + f.id));
+  if (t.fields.some(f => f.t === "pics")) want.push("pics");
+  invFor(t.id).forEach(x => want.push(`inv:${x.t.id}.${x.f.id}`));
+  if (t.fields.some(f => f.t === "topics")) want.push("topics");
+  want.push("mentions");
+  L.blocks = L.blocks.filter(b => want.includes(b.k));
+  for (const k of want) {
+    if (L.blocks.some(b => b.k === k)) continue;
+    const at = L.blocks.findIndex(b => b.k === "topics" || b.k === "mentions");
+    const blk = { k, on: !(k === "pics" && L.hero === "pics") };
+    at < 0 || k === "topics" || k === "mentions" ? L.blocks.push(blk) : L.blocks.splice(at, 0, blk);
+  }
+  const ok = heroOptions(t);
+  if (!ok.includes(L.hero)) L.hero = "none";
+}
+function heroOptions(t) {
+  const o = [];
+  if (t.fields.some(f => f.t === "pics")) o.push("pics", "picture");
+  else if (t.tex) o.push("picture");
+  if (t.base === "person") o.push("portrait");
+  o.push("doc", "none");
+  return o;
+}
+const factFields = t => t.fields.filter(f => !["long", "topics", "pics"].includes(f.t) && !(f.t === "rel" && f.o.cards));
+
+/* ---------- side ---------- */
+function renderSide() {
+  $("#side").innerHTML = `
+    <p class="crumb">Commonplace › <b>Objects</b></p>
+    <div class="fsw" role="group" aria-label="Field">${Object.keys(DB).map(k => `<button data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
+    <p class="who">${esc(D().who)}</p>
+    <nav class="types" aria-label="Object types">${D().types.map(t => `<button class="tbtn" data-act="type" data-id="${t.id}" aria-current="${S.type === t.id}">${icon(t.icon)}<span>${esc(t.name)}</span>${t.sens !== "normal" ? `<em>${SENS[t.sens][0]}</em>` : "<i></i>"}<b>${objsOf(t.id).length}</b></button>`).join("")}</nav>
+    <button class="addtype" data-act="newtype">+ New type</button>
+    <p class="sidenote">One engine draws every type. Each type's base, fields, page and views are data you can change. All content is example data.</p>`;
+}
+
+/* ---------- list view ---------- */
+function curView(t) { return t.views.find(v => v.id === t.cur) || t.views[0]; }
+function renderList(t) {
+  const os = objsOf(t.id), v = curView(t);
+  let body;
+  if (!os.length) body = `<div class="empty">${icon(t.icon)}<p>No ${esc(lower(t.name))} yet.</p><button class="btn pri" data-act="newobj">+ New ${esc(lower(t.one))}</button></div>`;
+  else if (v.l === "table") body = table(t, os);
+  else if (v.l === "board") body = board(t, os, F(t, v.by));
+  else if (v.l === "timeline") body = timeline(t, os, F(t, v.by));
+  else body = `<div class="gal">${os.map(o => `<button class="card" data-act="open" data-id="${o.id}">${thumb(t, o)}<span class="cb"><b>${esc(o.title || "Untitled")}</b><small>${esc(cardLine(t, o))}</small></span></button>`).join("")}</div>`;
+  return `
+    <div class="thead"><div class="l"><div class="tico">${icon(t.icon)}</div><div><h1>${esc(t.name)}</h1>
+      <p class="meta">${BASES[t.base][0]}${t.ext ? ` · extends ${esc(t.ext)}` : ""} · ${countLabel(t, os.length)} · ${t.fields.length} fields</p></div></div>
+      <div class="acts"><button class="btn" data-act="newobj">+ New ${esc(lower(t.one))}</button><button class="btn${S.drawer ? " on" : ""}" data-act="edittype">Edit type</button></div></div>
+    ${sensBanner(t)}
+    <div class="tabs" role="group" aria-label="Views">${t.views.map(x => `<button class="tab" data-act="view" data-id="${x.id}" aria-pressed="${x.id === v.id}">${esc(x.name)}</button>`).join("")}<button class="tab" data-act="addview">+ View</button></div>
+    ${body}`;
+}
+function sensBanner(t) {
+  if (t.sens === "clinical") return `<div class="banner"><b>Clinical.</b><span>De-identified, for learning and reflection. Not a clinical record, not clinical advice. Keep bands, never names, dates of birth or record numbers.</span></div>`;
+  if (t.sens === "confidential") return `<div class="banner info"><b>Confidential.</b><span>Off the record: Loci remembers only the lessons you file here.</span></div>`;
+  return "";
+}
+function cell(t, f, o) {
+  const v = o.v[f.id];
+  if (f.t === "choice") return `<div class="chips">${arr(v).map(x => chipFor(f, x)).join("")}<button class="add" data-act="pick" data-o="${o.id}" data-f="${f.id}" aria-label="Set ${esc(f.name)}">${arr(v).length ? "▾" : "+"}</button></div>`;
+  if (f.t === "check") return `<button class="tick${v ? " y" : ""}" data-act="check" data-o="${o.id}" data-f="${f.id}" aria-label="${esc(f.name)}" aria-pressed="${!!v}">${v ? "✓" : ""}</button>`;
+  if (f.t === "rating") return dots(o, f);
+  if (f.t === "rel") return `<div class="chips">${relChips(f, v)}</div>`;
+  if (f.t === "topics") return `<div class="chips">${topicPills(v)}</div>`;
+  if (f.t === "link" && v) return `<a class="ext" href="${esc(v)}" target="_blank" rel="noopener">${esc(plain(f, v))} ↗</a>`;
+  const p = plain(f, v);
+  return p ? `<span class="${f.t === "number" || f.t === "date" ? "num" : ""}">${esc(p)}</span>` : `<span class="muted">—</span>`;
+}
+const dots = (o, f) => `<span class="dots">${[1, 2, 3, 4, 5].map(n => `<button class="${(o.v[f.id] || 0) >= n ? "f" : ""}" data-act="rate" data-o="${o.id}" data-f="${f.id}" data-n="${n}" aria-label="${n} of 5">${(o.v[f.id] || 0) >= n ? "★" : "☆"}</button>`).join("")}</span>`;
+function table(t, os) {
+  const cols = t.fields.filter(f => !["long", "pics"].includes(f.t)).slice(0, 8);
+  return `<div class="tbl"><table><thead><tr><th>${esc(t.one)}</th>${cols.map(f => `<th><i>${GLYPH[f.t]}</i>${esc(f.name)}</th>`).join("")}</tr></thead><tbody>
+    ${os.map(o => `<tr><td class="tt"><button data-act="open" data-id="${o.id}">${esc(o.title || "Untitled")}</button></td>${cols.map(f => `<td>${cell(t, f, o)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function board(t, os, f) {
+  if (!f) return `<div class="empty">This board's field was removed. Pick another view.</div>`;
+  const groups = f.o.opts.map(op => ({ v: op.v, c: op.c, items: os.filter(o => arr(o.v[f.id])[0] === op.v) }));
+  const none = os.filter(o => !arr(o.v[f.id]).length);
+  if (none.length) groups.push({ v: "", c: 5, items: none });
+  return `<div class="board">${groups.map(g => `<div class="bcol" data-drop="${esc(g.v)}" data-f="${f.id}"><h4>${g.v ? `<span class="chip c${g.c}">${esc(g.v)}</span>` : `<span class="muted">No ${esc(lower(f.name))}</span>`}<b>${g.items.length}</b></h4>
+    ${g.items.map(o => `<div class="bcard" role="button" tabindex="0" draggable="true" data-drag="${o.id}" data-act="open" data-id="${o.id}">${hasPics(t, o) ? `<span class="thumb">${picSvg(t, o, 0)}</span>` : ""}<b>${esc(o.title || "Untitled")}</b><small>${esc(cardLine(t, o))}</small></div>`).join("")}</div>`).join("")}</div>
+    <p class="meta">Drag a card to another column to change its ${esc(lower(f.name))}.</p>`;
+}
+function timeline(t, os, f) {
+  if (!f) return `<div class="empty">This timeline's field was removed. Pick another view.</div>`;
+  const rows = os.map(o => ({ o, s: dateSpan(o.v[f.id]) })).filter(x => x.s).sort((a, b) => a.s.a - b.s.a);
+  if (!rows.length) return `<div class="empty">Nothing has a ${esc(lower(f.name))} yet.</div>`;
+  const day = rows[0].s.day;
+  let lo = Math.min(...rows.map(r => r.s.a)), hi = Math.max(...rows.map(r => r.s.b));
+  let ticks = [];
+  if (day) {
+    const d0 = new Date(lo), d1 = new Date(hi);
+    lo = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), 1); hi = Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth() + 1, 1);
+    for (let d = new Date(lo); d.getTime() <= hi; d.setUTCMonth(d.getUTCMonth() + 1)) ticks.push({ x: d.getTime(), l: MONTHS[d.getUTCMonth()] + (d.getUTCMonth() === 0 ? " " + d.getUTCFullYear() : "") });
+  } else {
+    const span = Math.max(1, hi - lo), step = [1, 2, 5, 10, 20, 25, 50, 100].find(s => span / s <= 7) || 200;
+    lo = Math.floor(lo / step) * step; hi = Math.ceil((hi + (hi === lo ? 1 : 0)) / step) * step;
+    for (let y = lo; y <= hi; y += step) ticks.push({ x: y, l: String(y) });
+  }
+  const pct = x => ((x - lo) / (hi - lo)) * 100;
+  const colorF = t.fields.find(x => x.t === "choice" && x.id !== f.id && (t.views.find(v => v.l === "board")?.by === x.id)) || t.fields.find(x => x.t === "choice");
+  const col = o => { const op = colorF && colorF.o.opts.find(p => p.v === arr(o.v[colorF.id])[0]); return op ? `var(--c${op.c}-fg)` : "var(--status-2)"; };
+  const grid = ticks.map(k => `<span class="grid-l" style="left:${pct(k.x)}%"></span>`).join("");
+  return `<div class="tl"><div class="tlin">
+    ${colorF ? `<div class="tlleg">Colour: ${esc(colorF.name)} ${colorF.o.opts.map(p => `<span class="chip c${p.c}">${esc(p.v)}</span>`).join("")}</div>` : ""}
+    <div class="tlrow"><span></span><div class="track axis">${ticks.map(k => `<span class="tick-l" style="left:${pct(k.x)}%">${k.l}</span>`).join("")}</div></div>
+    ${rows.map(({ o, s }) => `<div class="tlrow"><span class="lab"><button data-act="open" data-id="${o.id}" title="${esc(o.title)}">${esc(o.title || "Untitled")}</button></span><div class="track">${grid}
+      ${s.a === s.b ? `<span class="pt" style="left:${pct(s.a)}%;background:${col(o)}" title="${esc(fmtDate(o.v[f.id]))}"></span>`
+        : `<span class="bar${s.open ? " open" : ""}" style="left:${pct(s.a)}%;width:${pct(s.b) - pct(s.a)}%;background:${col(o)}" title="${esc(fmtDate(o.v[f.id]))}"></span>`}</div></div>`).join("")}
+  </div></div>`;
+}
+
+/* ---------- object page ---------- */
+function editor(t, f, o) {
+  const v = o.v[f.id];
+  switch (f.t) {
+    case "choice": return cell(t, f, o);
+    case "check": return `<button class="tick${v ? " y" : ""}" data-act="check" data-o="${o.id}" data-f="${f.id}" aria-label="${esc(f.name)}" aria-pressed="${!!v}">${v ? "✓" : ""}</button>`;
+    case "rating": return dots(o, f);
+    case "rel": return `<div class="chips">${relChips(f, v)}<button class="add" data-act="pick" data-o="${o.id}" data-f="${f.id}" aria-label="${arr(v).length && !f.o.many ? "Change" : "Link"} ${esc(f.name)}">${arr(v).length && !f.o.many ? "▾" : "+ Link"}</button></div>`;
+    case "link": return `<span class="ed" contenteditable="true" spellcheck="false" data-o="${o.id}" data-f="${f.id}" data-ph="Add a link">${esc(v || "")}</span>${v ? `<a class="ext" href="${esc(v)}" target="_blank" rel="noopener" aria-label="Open link">↗</a>` : ""}`;
+    default: return `<span class="ed${f.t === "number" || f.t === "date" ? " num" : ""}" contenteditable="true" data-o="${o.id}" data-f="${f.id}" data-ph="${f.t === "date" ? "1931, 1959–65 or 2026-08-12" : "Add"}">${esc(f.t === "date" ? fmtDate(v) : f.t === "number" && v != null ? v : v || "")}</span>${f.t === "number" && f.o.unit ? ` <span class="muted">${esc(f.o.unit)}</span>` : ""}`;
+  }
+}
+function block(t, o, b) {
+  const [k, rest] = b.k.split(/:(.+)/);
+  let title = "", html = "", empty = false, note = "";
+  if (k === "facts") {
+    title = "Facts";
+    html = `<dl class="facts">${factFields(t).map(f => `<div class="fr"><dt>${esc(f.name)}</dt><dd>${editor(t, f, o)}</dd></div>`).join("")}</dl>`;
+    empty = !factFields(t).length;
+  } else if (k === "sec") {
+    const f = F(t, rest); title = f.name;
+    html = `<div class="prose" contenteditable="true" data-o="${o.id}" data-f="${f.id}" data-ph="Write ${esc(lower(f.name))}…">${esc(o.v[f.id] || "")}</div>`;
+    empty = !o.v[f.id];
+  } else if (k === "rel") {
+    const f = F(t, rest), ids = arr(o.v[f.id]); title = f.name;
+    html = `${minis(ids)}<div><button class="add" data-act="pick" data-o="${o.id}" data-f="${f.id}">+ Link ${esc(lower(T(f.o.to)?.one || "item"))}</button></div>`;
+    empty = !ids.length;
+  } else if (k === "inv") {
+    const [tid, fid] = rest.split("."), st = T(tid), f = st && F(st, fid);
+    if (!f) return null;
+    const ids = objsOf(tid).filter(x => arr(x.v[fid]).includes(o.id)).map(x => x.id);
+    title = f.o.inv || st.name; note = `from each ${esc(lower(st.one))}'s ${esc(f.name)}`;
+    html = minis(ids);
+    empty = !ids.length;
+  } else if (k === "pics") {
+    title = "Pictures"; empty = !o.pics;
+    html = `<div class="pgrid">${Array.from({ length: o.pics }, (_, i) => `<button class="pic" style="border:0;padding:0" data-act="slide" data-n="${i}" aria-label="Picture ${i + 1}">${building(o, i)}</button>`).join("")}</div>`;
+  } else if (k === "topics") {
+    const f = t.fields.find(x => x.t === "topics"); title = "On your map"; note = f && f.name !== "Topics" ? esc(f.name) : "";
+    html = `<div class="chips">${topicPills(o.v[f?.id])}</div>`; empty = !arr(o.v[f?.id]).length;
+  } else if (k === "mentions") {
+    title = "Mentioned in"; empty = !o.ments.length;
+    html = `<div class="ments">${o.ments.map(m => `<div class="ment ${m.k}"><small>${esc(m.by)}</small><p>${esc(m.text)}</p></div>`).join("")}</div>`;
+  }
+  const derived = ["inv", "pics", "topics", "mentions"].includes(k);
+  if (!S.arrange && (!b.on || (empty && derived))) return null;
+  const i = t.layout.blocks.indexOf(b);
+  const ctl = S.arrange ? `<div class="bctl"><button data-act="mv" data-i="${i}" data-d="-1" aria-label="Move up">↑</button><button data-act="mv" data-i="${i}" data-d="1" aria-label="Move down">↓</button><button data-act="hide" data-i="${i}">${b.on ? "Hide" : "Show"}</button></div>` : "";
+  return `<section class="blk${S.arrange ? " arr" : ""}${S.arrange && !b.on ? " off" : ""}">${ctl}<h3>${esc(title)}${note ? ` <small>${note}</small>` : ""}</h3>${empty && S.arrange && derived ? `<p class="emptyb">Empty for this ${esc(lower(t.one))}. Hidden until it has something.</p>` : html}</section>`;
+}
+function minis(ids) {
+  return `<div class="minis">${ids.map(id => O(id)).filter(Boolean).map(x => { const xt = T(x.t);
+    return `<button class="mini" data-act="open" data-id="${x.id}">${thumb(xt, x)}<span><b>${esc(x.title || "Untitled")}</b><small>${esc(cardLine(xt, x))}</small></span></button>`; }).join("")}</div>`;
+}
+function hero(t, o) {
+  const h = t.layout.hero;
+  if (h === "pics" && o.pics) {
+    const i = Math.min(S.slide, o.pics - 1);
+    return `<div class="hero">${building(o, i)}${o.pics > 1 ? `<button class="nav p" data-act="slide" data-n="${(i - 1 + o.pics) % o.pics}" aria-label="Previous picture">‹</button><button class="nav n" data-act="slide" data-n="${(i + 1) % o.pics}" aria-label="Next picture">›</button>` : ""}<span class="cnt">${i + 1} / ${o.pics}</span></div>
+      <div class="strip">${Array.from({ length: o.pics }, (_, k) => `<button data-act="slide" data-n="${k}" aria-pressed="${k === i}" aria-label="Picture ${k + 1}">${building(o, k)}</button>`).join("")}</div>`;
+  }
+  if ((h === "picture" || h === "pics") && hasPics(t, o)) return `<div class="hero">${picSvg(t, o, 0)}</div>`;
+  if (h === "doc") {
+    const subs = t.sub.map(id => F(t, id)).filter(Boolean).map(f => plain(f, o.v[f.id])).filter(Boolean);
+    const relLine = t.fields.filter(f => f.t === "rel" && !f.o.many).map(f => plain(f, o.v[f.id])).filter(Boolean).join(" · ");
+    const top = relLine || subs.shift() || t.one;
+    return `<div class="dochero"><span class="court">${esc(top)}</span><hr><span class="t">${esc(o.title || "Untitled")}</span><span class="cit">${esc(subs.join(" · "))}</span></div>`;
+  }
+  return "";
+}
+function renderPage(o) {
+  const t = T(o.t); ensure(t);
+  const L = t.layout, n = objsOf(t.id).length;
+  const portrait = L.hero === "portrait";
+  const blocks = L.blocks.map(b => ({ b, h: block(t, o, b) })).filter(x => x.h);
+  const asideKeys = ["facts", "topics"];
+  const main = blocks.filter(x => L.cols === 1 || !asideKeys.includes(x.b.k)).map(x => x.h).join("");
+  const aside = L.cols === 2 ? blocks.filter(x => asideKeys.includes(x.b.k)).map(x => x.h).join("") : "";
+  const chips = t.fields.filter(f => f.t === "choice" && !t.sub.includes(f.id)).slice(0, 2).flatMap(f => arr(o.v[f.id]).map(v => chipFor(f, v))).join("");
+  return `
+    <button class="back" data-act="backlist">← ${esc(t.name)}</button>
+    ${S.arrange ? `<div class="arrbar"><p>Arranging the <b>${esc(lower(t.one))}</b> page. Changes apply to all ${countLabel(t, n)}.</p>
+      <div class="grp">Top <div class="seg">${Object.keys(HEROES).map(k => `<button data-act="hero" data-k="${k}" aria-pressed="${L.hero === k}" ${heroOptions(t).includes(k) ? "" : "disabled"}>${HEROES[k]}</button>`).join("")}</div></div>
+      <div class="grp">Columns <div class="seg"><button data-act="cols" data-n="1" aria-pressed="${L.cols === 1}">One</button><button data-act="cols" data-n="2" aria-pressed="${L.cols === 2}">Two</button></div></div>
+      <button class="btn pri sm" data-act="arrange">Done</button></div>` : ""}
+    <div class="phead"><div class="l">${portrait ? `<div class="bigface">${face(o, 104)}</div>` : ""}<div class="tx">
+      <button class="tchip" data-act="backlist">${icon(t.icon)}${esc(t.one)}</button>
+      <h1 class="ptitle" contenteditable="true" data-title="${o.id}" data-ph="Untitled ${esc(lower(t.one))}">${esc(o.title)}</h1>
+      <p class="sub">${esc(subLine(t, o))}</p>${chips ? `<div class="chips">${chips}</div>` : ""}</div></div>
+      <div class="acts"><button class="btn${S.arrange ? " on" : ""}" data-act="arrange">Arrange page</button><button class="btn${S.drawer ? " on" : ""}" data-act="edittype">Edit type</button></div></div>
+    ${sensBanner(t)}
+    ${hero(t, o)}
+    <div class="cols${L.cols === 2 ? " two" : ""}"><div class="colm">${main}</div>${L.cols === 2 ? `<aside class="cola">${aside}</aside>` : ""}</div>`;
+}
+function renderMain() {
+  const m = $("#main");
+  if (S.obj && O(S.obj)) m.innerHTML = renderPage(O(S.obj));
+  else { S.obj = null; S.arrange = false; const t = T(S.type); t.layout && ensure(t); m.innerHTML = renderList(t); }
+}
+
+/* ---------- drawer: edit type ---------- */
+function renderDrawer() {
+  const el = $("#drawer");
+  document.body.classList.toggle("with-drawer", S.drawer);
+  if (!S.drawer) { el.innerHTML = ""; return; }
+  const t = T(S.type);
+  el.innerHTML = `<div class="drawer" role="dialog" aria-label="Edit type">
+    <div class="dh"><h2>Edit type</h2><button class="ghost" data-act="closedrawer">Close</button></div>
+    <div class="dsec"><label for="tname">Name</label><div class="two-in"><input class="inp" id="tname" data-tf="name" value="${esc(t.name)}" aria-label="Plural"><input class="inp" id="tone" data-tf="one" value="${esc(t.one)}" aria-label="Singular"></div></div>
+    <div class="dsec"><span class="lbl">Base</span><div class="segw">${Object.keys(BASES).map(k => `<button data-act="base" data-k="${k}" aria-pressed="${t.base === k}">${BASES[k][0]}</button>`).join("")}</div>
+      <p class="hint">${BASES[t.base][1]}${t.ext ? ` Extends ${esc(t.ext)}.` : ""}</p></div>
+    <div class="dsec"><span class="lbl">Fields <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink-3)">${t.fields.length} of 24</span></span>
+      <div class="flist">${t.fields.map(f => fieldRow(t, f)).join("")}</div>
+      ${S.catalog ? `<div class="cat">${KINDS.filter(([k]) => !((k === "pics" || k === "topics") && t.fields.some(f => f.t === k))).map(([k, n, d]) => `<button data-act="addfield" data-k="${k}"><span class="glyph">${GLYPH[k]}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>
+        <button class="ghost" data-act="catalog">Cancel</button>`
+        : `<button class="btn" data-act="catalog" ${t.fields.length >= 24 ? "disabled" : ""}>+ Add field</button>`}</div>
+    <div class="dsec"><span class="lbl">Sensitivity</span><div class="segw">${Object.keys(SENS).map(k => `<button data-act="sens" data-k="${k}" aria-pressed="${t.sens === k}">${SENS[k][0]}</button>`).join("")}</div><p class="hint">${SENS[t.sens][1]}</p></div>
+    <div class="dsec"><span class="lbl">Page</span><p class="hint">Top: ${HEROES[t.layout.hero]} · ${t.layout.cols === 2 ? "Two columns" : "One column"}. Open any ${esc(lower(t.one))} and choose <b>Arrange page</b> to change it.</p></div>
+  </div>`;
+}
+function fieldRow(t, f) {
+  const open = S.open === f.id;
+  let cfg = "";
+  if (open && f.t === "choice") cfg = `<label>Options, separated by commas<input class="inp" data-cfg="opts" data-f="${f.id}" value="${esc(f.o.opts.map(x => x.v).join(", "))}"></label>
+    <span class="rowl"><input type="checkbox" id="many-${f.id}" data-cfg="many" data-f="${f.id}" ${f.o.many ? "checked" : ""}><label for="many-${f.id}" style="display:inline">Allow several</label></span>`;
+  if (open && f.t === "rel") cfg = `<label>Links to<select class="inp" data-cfg="to" data-f="${f.id}">${D().types.map(x => `<option value="${x.id}" ${x.id === f.o.to ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+    <label>Name on the other side<input class="inp" data-cfg="inv" data-f="${f.id}" value="${esc(f.o.inv || "")}" placeholder="e.g. Cited by" ${f.o.sym ? "disabled" : ""}></label>
+    <span class="rowl"><input type="checkbox" id="many-${f.id}" data-cfg="many" data-f="${f.id}" ${f.o.many ? "checked" : ""}><label for="many-${f.id}" style="display:inline">Allow several</label>
+      <input type="checkbox" id="cards-${f.id}" data-cfg="cards" data-f="${f.id}" ${f.o.cards ? "checked" : ""}><label for="cards-${f.id}" style="display:inline">Show as cards</label></span>`;
+  if (open && f.t === "number") cfg = `<label>Unit<input class="inp" data-cfg="unit" data-f="${f.id}" value="${esc(f.o.unit || "")}" placeholder="m², days, £"></label>`;
+  if (open && f.t === "date") cfg = `<span>Write a year (1931), a range (1959–65), “born 1941”, or a day (2026-08-12).</span>`;
+  const configurable = ["choice", "rel", "number", "date"].includes(f.t);
+  return `<div class="frow"><span class="glyph" title="${KLABEL[f.t]}">${GLYPH[f.t]}</span><input class="inp" data-fname="${f.id}" value="${esc(f.name)}" aria-label="Field name">
+    <button class="kind" data-act="fcfg" data-f="${f.id}" ${configurable ? "" : "disabled"}>${KLABEL[f.t]}${configurable ? (open ? " ▴" : " ▾") : ""}</button>
+    <label class="oncard"><input type="checkbox" data-oncard="${f.id}" ${t.card.includes(f.id) ? "checked" : ""}>Card</label>
+    <button class="x" data-act="rmfield" data-f="${f.id}" aria-label="Remove ${esc(f.name)}">×</button></div>${cfg ? `<div class="fcfg">${cfg}</div>` : ""}`;
+}
+
+/* ---------- new type (Loci drafts it) ---------- */
+const SUGG = {
+  architect: ["Sites I visit with my students", "Recipes I cook", "Startups I follow"],
+  lawyer: ["Hearings I attend", "Experts I've instructed", "Recipes I cook"],
+  doctor: ["Teaching sessions I give", "Hospitals I've rotated through", "Recipes I cook"]
+};
+function draftFor(text) {
+  const s = text.toLowerCase();
+  const D0 = (d, views) => ({ ...d, views });
+  if (/site/.test(s)) return D0({ name: "Sites", one: "Site", icon: "pin", base: "place", fields: [fld("where", "Where", "place"), fld("vis", "Visited", "date"), fld("who", "Who came", "text"), choice("light", "Light", ["Bright sun", "Overcast", "Low sun"]), fld("pics", "Sketches", "pics"), fld("noticed", "What I noticed", "long"), fld("topics", "Teaches", "topics")], card: ["where", "vis"], sub: ["where", "vis"], hero: "pics", cols: 2 },
+    [["g", "Gallery", "gallery"], ["tl", "Timeline", "timeline", "vis"], ["t", "Table", "table"]]);
+  if (/hearing/.test(s)) return D0({ name: "Hearings", one: "Hearing", icon: "calendar", base: "event", sens: "confidential", fields: [fld("date", "Date", "date"), rel("court", "Court", "courts", { many: false, inv: "Hearings" }), choice("stage", "Stage", ["Directions", "Interim", "Trial", "Appeal"]), fld("well", "What went well", "long"), fld("next", "What I'd change", "long"), fld("topics", "Topics", "topics")], card: ["date", "stage"], sub: ["date", "court"], hero: "none", cols: 2 },
+    [["tl", "Timeline", "timeline", "date"], ["b", "By stage", "board", "stage"], ["t", "Table", "table"]]);
+  if (/expert/.test(s)) return D0({ name: "Experts", one: "Expert", icon: "person", base: "person", ext: "People", sens: "confidential", fields: [choice("disc", "Discipline", ["Delay", "Quantum", "Structural", "M&E"]), fld("firm", "Firm", "text"), fld("rate", "How they did", "rating"), fld("notes", "Notes", "long")], card: ["disc", "firm"], sub: ["disc", "firm"], hero: "portrait", cols: 1 },
+    [["g", "Gallery", "gallery"], ["b", "By discipline", "board", "disc"], ["t", "Table", "table"]]);
+  if (/teaching|session/.test(s)) return D0({ name: "Teaching sessions", one: "Teaching session", icon: "calendar", base: "event", fields: [fld("date", "Date", "date"), choice("aud", "Audience", ["Medical students", "Foundation doctors", "Nurses"]), fld("fb", "Feedback", "rating"), fld("topics", "Topic", "topics"), fld("refl", "Reflection", "long")], card: ["date", "aud"], sub: ["date", "aud"], hero: "none", cols: 2 },
+    [["tl", "Timeline", "timeline", "date"], ["t", "Table", "table"]]);
+  if (/hospital|rotat/.test(s)) return D0({ name: "Hospitals", one: "Hospital", icon: "columns", base: "group", fields: [fld("where", "Where", "place"), fld("when", "When", "date"), choice("spec", "Specialty", ["Medicine", "Surgery", "ED", "GP"], { many: true }), fld("learned", "What I learned there", "long")], card: ["where", "when"], sub: ["where", "when"], hero: "none", cols: 1 },
+    [["tl", "Timeline", "timeline", "when"], ["t", "Table", "table"]]);
+  if (/recipe|cook/.test(s)) return D0({ name: "Recipes", one: "Recipe", icon: "pot", fields: [choice("cui", "Cuisine", ["Levantine", "Italian", "Japanese", "Indian"]), fld("time", "Time", "number", { unit: "min" }), fld("serves", "Serves", "number"), fld("tried", "Cooked it", "check"), fld("rate", "Rating", "rating"), fld("pics", "Pictures", "pics"), fld("method", "Method", "long")], card: ["cui", "time"], sub: ["cui", "time", "serves"], hero: "pics", cols: 2 },
+    [["g", "Gallery", "gallery"], ["b", "By cuisine", "board", "cui"], ["t", "Table", "table"]]);
+  if (/startup|compan/.test(s)) return D0({ name: "Companies", one: "Company", icon: "case", base: "group", fields: [choice("sec", "Sector", ["Climate", "Health", "Fintech", "Tools"]), fld("founded", "Founded", "date"), choice("stage", "Stage", ["Seed", "Series A", "Series B+"]), fld("site", "Website", "link"), fld("why", "Why I follow it", "long"), fld("topics", "Topics", "topics")], card: ["sec", "stage"], sub: ["sec", "founded"], hero: "none", cols: 2 },
+    [["t", "Table", "table"], ["b", "By stage", "board", "stage"], ["g", "Gallery", "gallery"]]);
+  let noun = s.replace(/^(i|we)\s+(keep|track|collect|follow|save|log|record)\s+/, "").replace(/^(the|my|all the)\s+/, "").replace(/\s+(i|we)\s+.*$/, "").replace(/[^a-z\s-]/g, "").trim() || "things";
+  noun = noun.split(/\s+/).slice(0, 3).join(" ");
+  const name = noun.charAt(0).toUpperCase() + noun.slice(1);
+  const one = name.replace(/ies$/, "y").replace(/s$/, "");
+  return D0({ name, one, icon: "dot", fields: [choice("status", "Status", ["New", "Active", "Done"]), fld("date", "Date", "date"), fld("link", "Web link", "link"), fld("notes", "Notes", "long"), fld("topics", "Topics", "topics")], card: ["status", "date"], sub: ["status", "date"], hero: "none", cols: 1 },
+    [["t", "Table", "table"], ["b", "By status", "board", "status"], ["g", "Gallery", "gallery"]]);
+}
+function renderModal() {
+  const el = $("#modal"), M = S.modal;
+  if (!M) { el.innerHTML = ""; return; }
+  let inner;
+  if (M.step === "ask") inner = `<p class="loci">Loci</p><h2>What do you want to keep?</h2>
+    <p class="meta">Say it in a sentence. Loci drafts a type you can change before you keep it: its base, fields, page and views.</p>
+    <form data-form="draft" style="display:grid;gap:10px"><input class="inp" id="ntext" value="${esc(M.text || "")}" placeholder="I keep track of…" autocomplete="off">
+    <div class="sugg">${SUGG[S.field].map(x => `<button type="button" data-act="sugg" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+    <div class="mact"><button type="button" class="btn" data-act="closemodal">Cancel</button><button class="btn pri" type="submit">Draft it</button></div></form>`;
+  else {
+    const d = M.draft;
+    inner = `<p class="loci">Loci drafted this from “${esc(M.text)}”</p><h2>${esc(d.name)}</h2>
+      <div class="draft"><p class="meta">${BASES[d.base || "thing"][0]}${d.ext ? ` · extends ${esc(d.ext)}` : ""}${d.sens && d.sens !== "normal" ? ` · ${SENS[d.sens][0]}` : ""} · page: ${HEROES[d.hero]}, ${d.cols === 2 ? "two columns" : "one column"}</p>
+        <div class="dfl">${d.fields.map(f => `<div><span class="glyph">${GLYPH[f.t]}</span><span>${esc(f.name)}</span><em>${KLABEL[f.t]}${f.t === "choice" ? ": " + esc(f.o.opts.map(x => x.v).join(", ")) : f.t === "rel" ? " → " + esc(T(f.o.to)?.name || "") : ""}</em></div>`).join("")}</div>
+        <p class="meta">Views: ${d.views.map(v => esc(v[1])).join(" · ")}</p></div>
+      <p class="meta">Nothing is kept until you say so. You can change every part of it afterwards.</p>
+      <div class="mact"><button class="btn" data-act="redraft">Start over</button><button class="btn pri" data-act="keeptype">Keep type</button></div>`;
+  }
+  el.innerHTML = `<div class="mwrap" data-act="closemodal-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="New type">${inner}</div></div>`;
+  if (M.step === "ask") setTimeout(() => $("#ntext")?.focus(), 0);
+}
+
+/* ---------- popover ---------- */
+function openPop(anchor, kind, data) {
+  S.pop = { kind, ...data, anchor };
+  drawPop();
+  const p = $("#pop"), r = anchor.getBoundingClientRect();
+  p.hidden = false;
+  const w = p.offsetWidth, h = p.offsetHeight;
+  p.style.left = Math.max(16, Math.min(r.left, innerWidth - w - 16)) + "px";
+  p.style.top = (r.bottom + 6 + h > innerHeight - 16 ? Math.max(16, r.top - h - 6) : r.bottom + 6) + "px";
+}
+function closePop() { S.pop = null; $("#pop").hidden = true; }
+function drawPop() {
+  const P = S.pop, p = $("#pop");
+  if (!P) return;
+  if (P.kind === "pick") {
+    const o = O(P.o), t = T(o.t), f = F(t, P.f), cur = arr(o.v[f.id]);
+    if (f.t === "choice") p.innerHTML = `<h5>${esc(f.name)}${f.o.many ? " · several" : ""}</h5>${f.o.opts.map(op => `<button class="opt" data-act="popt" data-v="${esc(op.v)}"><i>${cur.includes(op.v) ? "✓" : ""}</i><span>${chipFor(f, op.v)}</span></button>`).join("")}${cur.length ? `<button class="opt" data-act="popclear"><i></i><span class="muted">Clear</span></button>` : ""}`;
+    else {
+      const q = (P.q || "").toLowerCase();
+      const list = objsOf(f.o.to).filter(x => x.id !== o.id && (x.title || "").toLowerCase().includes(q));
+      p.innerHTML = `<h5>${esc(f.name)} → ${esc(T(f.o.to).name)}</h5><input class="inp" id="popq" placeholder="Search ${esc(lower(T(f.o.to).name))}" value="${esc(P.q || "")}" autocomplete="off">
+        ${list.map(x => `<button class="opt" data-act="prel" data-v="${x.id}"><i>${cur.includes(x.id) ? "✓" : ""}</i><span>${esc(x.title || "Untitled")}</span></button>`).join("") || `<p class="muted" style="padding:6px 8px">No match.</p>`}`;
+    }
+  } else if (P.kind === "addview") {
+    const t = T(S.type);
+    const items = [["gallery", "Gallery", ""], ["table", "Table", ""],
+      ...t.fields.filter(f => f.t === "choice").map(f => ["board", `Board by ${f.name}`, f.id]),
+      ...t.fields.filter(f => f.t === "date").map(f => ["timeline", `Timeline by ${f.name}`, f.id])];
+    p.innerHTML = `<h5>New view of ${esc(lower(t.name))}</h5>${items.map(([l, n, by]) => `<button class="opt" data-act="mkview" data-l="${l}" data-by="${by}"><i></i><span>${esc(n)}</span></button>`).join("")}<p class="muted" style="padding:6px 8px;font-size:12px">Map view needs a Place field and map tiles; not in this prototype.</p>`;
+  }
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 3200); }
+
+/* ---------- mutations ---------- */
+function setRel(o, f, id) {
+  const cur = arr(o.v[f.id]);
+  const on = cur.includes(id);
+  o.v[f.id] = on ? cur.filter(x => x !== id) : f.o.many ? [...cur, id] : [id];
+  if (f.o.sym) {
+    const other = O(id), oc = arr(other.v[f.id]);
+    other.v[f.id] = on ? oc.filter(x => x !== o.id) : oc.includes(o.id) ? oc : [...oc, o.id];
+  }
+}
+const IDENT = [/\b\d{3}[ -]?\d{3}[ -]?\d{4}\b/, /\b\d{1,2}[\/.-]\d{1,2}[\/.-](19|20)?\d{2}\b/, /\b(Mr|Mrs|Ms|Miss)\.?\s+[A-Z][a-z]+/];
+function saveEdit(el) {
+  const o = O(el.dataset.o || el.dataset.title);
+  if (!o) return;
+  const t = T(o.t), text = el.textContent.replace(/\s+/g, " ").trim();
+  const f = el.dataset.title ? null : F(t, el.dataset.f);
+  const shown = () => f ? (f.t === "date" ? fmtDate(o.v[f.id]) : o.v[f.id] ?? "") : o.title;
+  if (t.sens === "clinical" && IDENT.some(r => r.test(text))) { toast("That looks like a name, a date of birth or a record number. Teaching cases keep bands, not identifiers."); el.textContent = shown(); return; }
+  if (!f) { if (o.title !== text) { o.title = text; renderSide(); refreshBits(t, o); } return; }
+  if (f.t === "number") { const n = parseFloat(text.replace(/[^\d.-]/g, "")); o.v[f.id] = isNaN(n) ? null : n; }
+  else if (f.t === "date") { const d = parseDate(text); if (d === undefined) toast("Write a year (1931), a range (1959–65), “born 1941” or a day (2026-08-12)."); else o.v[f.id] = d; }
+  else o.v[f.id] = el.classList.contains("prose") ? el.innerText.trim() : text;
+  if (!el.classList.contains("prose")) el.textContent = shown();
+  refreshBits(t, o);
+}
+/* update the parts of an open page that depend on a field, without redrawing what may hold focus */
+function refreshBits(t, o) {
+  const sub = $(".phead .sub"); if (sub) sub.textContent = subLine(t, o);
+  const doc = $(".dochero"); if (doc) doc.outerHTML = hero(t, o);
+}
+function newObj() {
+  const t = T(S.type), id = "n" + Date.now();
+  D().objs.push(ob(id, t.id, "", {}));
+  S.obj = id; S.slide = 0;
+  renderSide(); renderMain();
+  setTimeout(() => $(".ptitle")?.focus(), 0);
+}
+function addField(t, k) {
+  const id = "f" + Date.now();
+  const base = KLABEL[k];
+  let f;
+  if (k === "choice") f = choice(id, "New choice", ["First", "Second", "Third"]);
+  else if (k === "rel") { const to = (D().types.find(x => x.id !== t.id) || t).id; f = rel(id, "Related " + lower(T(to).name), to, { inv: t.name, cards: true }); }
+  else if (k === "topics") f = fld(id, "Topics", "topics");
+  else if (k === "pics") f = fld(id, "Pictures", "pics");
+  else f = fld(id, k === "long" ? "New section" : "New " + lower(base), k);
+  t.fields.push(f);
+  S.open = ["choice", "rel", "number"].includes(k) ? id : null;
+  S.catalog = false;
+  ensure(t);
+  renderDrawer(); renderMain();
+  setTimeout(() => { const i = document.querySelector(`[data-fname="${id}"]`); i?.focus(); i?.select(); }, 0);
+  toast(`Added ${base} field to every ${lower(t.one)}.`);
+}
+function removeField(t, id) {
+  const f = F(t, id);
+  t.fields = t.fields.filter(x => x.id !== id);
+  t.card = t.card.filter(x => x !== id); t.sub = t.sub.filter(x => x !== id);
+  t.views = t.views.filter(v => v.by !== id);
+  if (!t.views.length) t.views = [{ id: "g", name: "Gallery", l: "gallery" }];
+  objsOf(t.id).forEach(o => delete o.v[id]);
+  ensure(t);
+  renderDrawer(); renderMain();
+  toast(`Removed ${f.name}.`);
+}
+
+/* ---------- events ---------- */
+function go(fn) { fn(); renderAll(); }
+function renderAll() { renderSide(); renderMain(); renderDrawer(); renderModal(); }
+
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-act]");
+  if (!S.pop || !e.target.closest("#pop")) { if (S.pop && !(a && ["pick", "addview"].includes(a.dataset.act))) closePop(); }
+  if (!a) return;
+  const act = a.dataset.act, d = a.dataset;
+  const t = T(S.type);
+  switch (act) {
+    case "field": go(() => { S.field = d.k; S.type = D().types[0].id; S.obj = null; S.arrange = false; S.open = null; S.catalog = false; }); break;
+    case "type": go(() => { S.type = d.id; S.obj = null; S.arrange = false; S.open = null; S.catalog = false; }); break;
+    case "view": t.cur = d.id; renderMain(); break;
+    case "open": {
+      if (S.drag) return;
+      const o = O(d.id); if (!o) return;
+      S.obj = o.id; S.type = o.t; S.slide = 0; S.open = null; S.catalog = false;
+      renderAll(); window.scrollTo({ top: 0 }); break;
+    }
+    case "backlist": S.obj = null; S.arrange = false; renderAll(); break;
+    case "slide": S.slide = +d.n; renderMain(); break;
+    case "newobj": newObj(); break;
+    case "edittype": S.drawer = !S.drawer; S.catalog = false; renderAll(); break;
+    case "closedrawer": S.drawer = false; renderAll(); break;
+    case "arrange": S.arrange = !S.arrange; renderMain(); break;
+    case "hero": t.layout.hero = d.k; if (d.k === "pics") { const pb = t.layout.blocks.find(b => b.k === "pics"); if (pb) pb.on = false; } renderMain(); renderDrawer(); break;
+    case "cols": t.layout.cols = +d.n; renderMain(); renderDrawer(); break;
+    case "mv": {
+      const L = t.layout.blocks, i = +d.i, j = i + +d.d;
+      if (j < 0 || j >= L.length) return;
+      [L[i], L[j]] = [L[j], L[i]]; renderMain(); break;
+    }
+    case "hide": { const b = t.layout.blocks[+d.i]; b.on = !b.on; renderMain(); break; }
+    case "check": { const o = O(d.o); o.v[d.f] = !o.v[d.f]; renderMain(); break; }
+    case "rate": { const o = O(d.o); o.v[d.f] = o.v[d.f] === +d.n ? 0 : +d.n; renderMain(); break; }
+    case "pick": e.stopPropagation(); openPop(a, "pick", { o: d.o, f: d.f, q: "" }); setTimeout(() => $("#popq")?.focus(), 0); break;
+    case "popt": {
+      const o = O(S.pop.o), f = F(T(o.t), S.pop.f), cur = arr(o.v[f.id]);
+      if (f.o.many) o.v[f.id] = cur.includes(d.v) ? cur.filter(x => x !== d.v) : [...cur, d.v];
+      else { o.v[f.id] = cur[0] === d.v ? [] : [d.v]; closePop(); }
+      if (S.pop) drawPop();
+      renderMain(); break;
+    }
+    case "popclear": { const o = O(S.pop.o); o.v[S.pop.f] = []; closePop(); renderMain(); break; }
+    case "prel": { const o = O(S.pop.o), f = F(T(o.t), S.pop.f); setRel(o, f, d.v); if (!f.o.many) closePop(); else drawPop(); renderMain(); break; }
+    case "addview": e.stopPropagation(); openPop(a, "addview", {}); break;
+    case "mkview": {
+      const by = d.by || undefined, f = by && F(t, by);
+      const name = d.l === "gallery" ? "Gallery" : d.l === "table" ? "Table" : d.l === "board" ? `By ${lower(f.name)}` : `${f.name} timeline`;
+      const id = "v" + Date.now(); t.views.push({ id, name, l: d.l, by }); t.cur = id; closePop(); renderMain(); toast(`Saved “${name}” as a view of ${lower(t.name)}.`); break;
+    }
+    case "catalog": S.catalog = !S.catalog; renderDrawer(); break;
+    case "addfield": addField(t, d.k); break;
+    case "rmfield": removeField(t, d.f); break;
+    case "fcfg": S.open = S.open === d.f ? null : d.f; renderDrawer(); break;
+    case "base": t.base = d.k; if (d.k === "person" && t.layout.hero === "none") t.layout.hero = "portrait"; ensure(t); renderAll(); break;
+    case "sens": t.sens = d.k; renderAll(); break;
+    case "newtype": S.modal = { step: "ask", text: "" }; renderModal(); break;
+    case "sugg": S.modal.text = d.v; S.modal.draft = draftFor(d.v); S.modal.step = "draft"; renderModal(); break;
+    case "redraft": S.modal = { step: "ask", text: S.modal.text }; renderModal(); break;
+    case "closemodal": S.modal = null; renderModal(); break;
+    case "closemodal-bg": if (e.target === a) { S.modal = null; renderModal(); } break;
+    case "keeptype": {
+      const d0 = S.modal.draft, id = "u" + Date.now();
+      const nt = ty({ ...d0, id });
+      if (nt.fields.some(f => f.t === "rel" && !T(f.o.to))) nt.fields = nt.fields.filter(f => f.t !== "rel" || T(f.o.to));
+      D().types.push(nt); ensure(nt);
+      S.modal = null; S.type = id; S.obj = null; S.drawer = true; S.catalog = false;
+      renderAll(); toast(`Kept ${nt.name}. Change anything in Edit type.`); break;
+    }
+  }
+});
+document.addEventListener("submit", e => {
+  if (e.target.dataset.form === "draft") {
+    e.preventDefault();
+    const v = $("#ntext").value.trim();
+    if (!v) { toast("Write what you want to keep, for example “Hearings I attend”."); return; }
+    S.modal = { step: "draft", text: v, draft: draftFor(v) }; renderModal();
+  }
+});
+document.addEventListener("input", e => {
+  const el = e.target, t = T(S.type);
+  if (el.id === "popq") { S.pop.q = el.value; const pos = el.selectionStart; drawPop(); const n = $("#popq"); n.focus(); n.setSelectionRange(pos, pos); return; }
+  if (el.dataset.tf) { t[el.dataset.tf] = el.value || (el.dataset.tf === "name" ? "Untitled" : "Item"); renderSide(); renderMain(); return; }
+  if (el.dataset.fname) { const f = F(t, el.dataset.fname); f.name = el.value; renderMain(); return; }
+  if (el.dataset.cfg === "inv" || el.dataset.cfg === "unit") { F(t, el.dataset.f).o[el.dataset.cfg] = el.value; renderMain(); }
+});
+document.addEventListener("change", e => {
+  const el = e.target, t = T(S.type);
+  if (el.dataset.oncard) { const id = el.dataset.oncard; t.card = el.checked ? [...t.card, id] : t.card.filter(x => x !== id); renderMain(); return; }
+  if (!el.dataset.cfg) return;
+  const f = F(t, el.dataset.f), k = el.dataset.cfg;
+  if (k === "opts") {
+    const vals = [...new Set(el.value.split(",").map(s => s.trim()).filter(Boolean))];
+    const old = Object.fromEntries(f.o.opts.map(x => [x.v, x.c]));
+    f.o.opts = vals.map((v, i) => ({ v, c: old[v] ?? i % 6 }));
+    objsOf(t.id).forEach(o => { if (o.v[f.id]) o.v[f.id] = arr(o.v[f.id]).filter(v => vals.includes(v)); });
+  } else if (k === "many") f.o.many = el.checked;
+  else if (k === "cards") f.o.cards = el.checked;
+  else if (k === "to") { f.o.to = el.value; objsOf(t.id).forEach(o => delete o.v[f.id]); }
+  ensure(t); renderDrawer(); renderMain();
+});
+document.addEventListener("focusout", e => {
+  const el = e.target;
+  if (el.isContentEditable && (el.dataset.f || el.dataset.title)) saveEdit(el);
+});
+document.addEventListener("keydown", e => {
+  const el = e.target;
+  if ((e.key === "Enter" || e.key === " ") && el.getAttribute?.("role") === "button" && el.dataset.act) { e.preventDefault(); el.click(); return; }
+  if (e.key === "Enter" && el.isContentEditable && !el.classList.contains("prose")) { e.preventDefault(); el.blur(); }
+  if (e.key === "Escape") { if (S.pop) closePop(); else if (S.modal) { S.modal = null; renderModal(); } else if (S.arrange) { S.arrange = false; renderMain(); } else if (S.drawer) { S.drawer = false; renderAll(); } }
+});
+document.addEventListener("paste", e => {
+  if (e.target.isContentEditable) { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain")); }
+});
+window.addEventListener("scroll", e => { if (S.pop && !e.target.closest?.("#pop")) closePop(); }, true);
+
+/* drag cards between board columns */
+document.addEventListener("dragstart", e => { const c = e.target.closest?.("[data-drag]"); if (!c) return; S.drag = c.dataset.drag; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", S.drag); });
+document.addEventListener("dragover", e => { const col = e.target.closest?.(".bcol"); if (!col || !S.drag) return; e.preventDefault(); document.querySelectorAll(".bcol.over").forEach(c => c !== col && c.classList.remove("over")); col.classList.add("over"); });
+document.addEventListener("drop", e => {
+  const col = e.target.closest?.(".bcol"); if (!col || !S.drag) return; e.preventDefault();
+  const o = O(S.drag), f = col.dataset.f, v = col.dataset.drop;
+  o.v[f] = v ? [v] : [];
+  S.drag = null; renderMain(); renderSide();
+  toast(v ? `${o.title} → ${v}` : `Cleared ${o.title}`);
+});
+document.addEventListener("dragend", () => { setTimeout(() => S.drag = null, 0); document.querySelectorAll(".bcol.over").forEach(c => c.classList.remove("over")); });
+
+D().types.forEach(ensure);
+renderAll();
+</script>

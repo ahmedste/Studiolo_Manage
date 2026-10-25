@@ -1,0 +1,1097 @@
+<meta charset="utf-8">
+<title>Objects Build Phases</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the real Commonplace (58 px icon rail, destination header, type row, collection wall, the D15 item page with its
+   properties rail, the collection customizer with its live preview), drawn with studiolo's own CSS at b5eeee2
+   (src/styles/tokens.css, shell.css, library.css). A prototype band on top switches Today / Phase 1 / 2 / 3. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --surface-float: #fbfbf9; --scrim-blur: rgba(243, 243, 239, 0.72); --shade: rgb(34, 48, 58);
+  --accent-soft: #e6ebf8; --accent-strong: #142b73; --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a;
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5; --hover-fill: #ecece6;
+  --myfocus-ink: #8a5a00; --myfocus-paper: #fbf3df; --myfocus-rule: #ecd9a8;
+  --on-ink: #ffffff; --on-accent: #ffffff; --surface-mat: #e4e4de;
+  --cover-paper: #202e38; --cover-ink: #edeff6; --on-media: #ffffff; --media-badge: rgba(0, 0, 0, 0.68);
+  /* Proposed (F1): three more choice accents beside s1–s3, in the same family. */
+  --c0-bg: #e6ebf8; --c0-fg: #23408f; --c1-bg: #e2efe7; --c1-fg: #2d6544; --c2-bg: #fbf3df; --c2-fg: #8a5a00;
+  --c3-bg: #f6e4df; --c3-fg: #93392f; --c4-bg: #ece5f5; --c4-fg: #5b3f8a; --c5-bg: #ebebe6; --c5-fg: #44535e;
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, 0.07), 0 8px 22px rgba(34, 48, 58, 0.09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, 0.08), 0 16px 36px rgba(34, 48, 58, 0.15);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, 0.06), 0 18px 48px rgba(34, 48, 58, 0.16);
+  --surface-panel: var(--panel); --surface-board: var(--board); --surface-page: var(--paper); --rule: var(--line);
+  --text: var(--ink); --text-muted: var(--ink-2); --text-decor: var(--ink-3);
+  --ui: "Instrument Sans", system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --focus-ring: 2px solid var(--accent);
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1); --dur-instant: 80ms; --dur-quick: 130ms; --dur-standard: 220ms;
+  --lift: 2px; --press-scale: 0.985; --rail-w: 58px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --surface-float: #232e37; --scrim-blur: rgba(19, 26, 32, 0.8); --shade: rgb(0, 0, 0);
+    --accent-soft: #263156; --accent-strong: #c3cff8; --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2;
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c; --hover-fill: #2a353f;
+    --myfocus-ink: #e8c27a; --myfocus-paper: #33291a; --myfocus-rule: #5a4824;
+    --on-ink: #131a20; --on-accent: #131a20; --surface-mat: #0d1317;
+    --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad; --c2-bg: #33291a; --c2-fg: #e8c27a;
+    --c3-bg: #3a2521; --c3-fg: #eea597; --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --surface-float: #232e37; --scrim-blur: rgba(19, 26, 32, 0.8); --shade: rgb(0, 0, 0);
+  --accent-soft: #263156; --accent-strong: #c3cff8; --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2;
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c; --hover-fill: #2a353f;
+  --myfocus-ink: #e8c27a; --myfocus-paper: #33291a; --myfocus-rule: #5a4824;
+  --on-ink: #131a20; --on-accent: #131a20; --surface-mat: #0d1317;
+  --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad; --c2-bg: #33291a; --c2-fg: #e8c27a;
+  --c3-bg: #3a2521; --c3-fg: #eea597; --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-instant: 1ms; --dur-quick: 1ms; --dur-standard: 1ms; } }
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--board); }
+body { background: var(--paper); color: var(--ink); font: 14px/1.5 var(--ui); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; }
+
+/* ---- prototype band (not app UI) ---- */
+.band { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--board); border-bottom: 1px solid var(--line); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 12.5px; }
+.band b.tag { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.seg { display: inline-flex; background: var(--paper); border-radius: 7px; padding: 2px; gap: 2px; box-shadow: inset 0 0 0 1px var(--line); }
+.seg button { border: 0; background: transparent; border-radius: 5px; padding: 3px 10px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.band .adds { flex: 1 1 320px; color: var(--ink-2); min-width: 0; }
+.band .adds b { color: var(--ink); font-weight: 500; }
+.band label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); cursor: pointer; }
+.new { position: relative; }
+.marks .new::after { content: attr(data-new); position: absolute; top: -9px; right: -6px; z-index: 4; font: 600 9.5px/1 var(--ui); letter-spacing: .04em; text-transform: uppercase; padding: 3px 5px; border-radius: 3px; background: var(--myfocus-paper); color: var(--myfocus-ink); box-shadow: inset 0 0 0 1px var(--myfocus-rule); pointer-events: none; white-space: nowrap; }
+.marks .new { box-shadow: 0 0 0 1.5px var(--myfocus-rule); border-radius: 3px; }
+
+/* ---- shell (shell.css) ---- */
+.app { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: calc(100% - var(--band-h, 46px)); }
+.rail { border-right: 1px solid var(--line); background: var(--paper); padding: 14px 9px; display: flex; flex-direction: column; gap: 2px; padding-left: max(9px, env(safe-area-inset-left, 0px)); }
+.rail .brand { width: 40px; height: 40px; display: grid; place-items: center; font: 500 21px/1 var(--read); color: var(--ink); margin-bottom: 10px; }
+.rail a { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; color: var(--ink-2); }
+.rail a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-strong); }
+.rail svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.stage { min-width: 0; padding: 30px max(16px, env(safe-area-inset-right, 0px)) 80px 36px; }
+.wrap { max-width: 1180px; margin-inline: auto; }
+.destination-header { margin: -4px 0 26px; border-bottom: 1px solid var(--line); }
+.destination-crumb { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-height: 16px; margin: 0 0 12px; color: var(--ink-2); font-size: 12.5px; }
+.destination-crumb strong { color: var(--ink); font-weight: 500; }
+.destination-crumb i { font-style: normal; font-size: 11px; color: var(--text-muted); }
+.destination-crumb button { all: unset; cursor: pointer; } .destination-crumb button:hover { color: var(--accent); }
+.destination-tabs { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; margin-bottom: -1px; }
+.destination-tab { flex: 0 0 auto; padding: 7px 12px 9px; border-bottom: 2px solid transparent; color: var(--ink-2); font-size: 13.5px; text-decoration: none; white-space: nowrap; background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
+.destination-tab[aria-current="page"] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 500; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; gap: 8px; padding: 8px 14px; border: 0; border-radius: 2px; background: var(--accent); color: var(--on-accent); font-weight: 500; cursor: pointer; white-space: nowrap; }
+.button-quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.button-link { min-height: 0; padding: 8px 2px; background: transparent; color: var(--ink-2); font-weight: 400; }
+.button.sm { min-height: 30px; padding: 4px 10px; font-size: 13px; }
+.button:disabled { cursor: not-allowed; opacity: .56; }
+.small { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+
+/* ---- header type row (library.css .cph) ---- */
+.cph-types { display: flex; align-items: center; gap: 4px; min-width: 0; margin: 0 0 18px; padding: 2px; overflow-x: auto; scrollbar-width: none; }
+.cph-type, .cph-coll { flex: none; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px 0 12px; border: 0; border-radius: 17px; background: none; font-size: 14px; color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.cph-type:hover, .cph-coll:hover { background: var(--hover-fill); color: var(--ink); }
+.cph-type[aria-current="true"] { background: var(--ink); color: var(--paper); }
+.cph-coll[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+.cph-type .n, .cph-coll .n { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.cph-type[aria-current="true"] .n { color: inherit; opacity: .6; }
+.cph-chev { color: var(--ink-3); padding: 0 2px; }
+.cph-type svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* ---- collection head ---- */
+.chead { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: space-between; margin: 0 0 18px; }
+.chead .t { min-width: 0; flex: 1 1 380px; }
+.ip-kicker, .kicker { margin: 0 0 6px; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.chead h1 { margin: 0; font: 400 clamp(30px, 4.2vw, 40px)/1.08 var(--read); letter-spacing: -0.012em; }
+.chead p.lead { margin: 10px 0 0; max-width: 62ch; font: 17px/1.55 var(--read); color: var(--ink-2); }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.shelf-tabs { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; border-bottom: 1px solid var(--line); padding-bottom: 8px; align-items: center; }
+.shelf-tabs button { all: unset; font-size: 13px; cursor: pointer; color: var(--ink-2); padding: 4px 6px; }
+.shelf-tabs button[aria-selected="true"] { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--accent); }
+.shelf-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 18px; align-items: center; }
+.chip { all: unset; font-size: 12.5px; padding: 4px 10px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.chip:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 3px; font-size: 13px; background: var(--warn-soft); color: var(--warn); margin: 0 0 18px; }
+.banner.info { background: var(--accent-soft); color: var(--accent-strong); }
+
+/* ---- cards (library.css .mcard) ---- */
+.wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 22px 16px; align-items: start; }
+.mcard { background: var(--surface-panel); box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; position: relative; margin: 0; display: block; width: 100%; min-width: 0; box-sizing: border-box; border-radius: 2px; transition: box-shadow var(--dur-quick) var(--ease-standard), transform var(--dur-quick) var(--ease-standard); text-align: left; border: 0; padding: 0; color: inherit; }
+.mcard:hover { box-shadow: inset 0 0 0 1px var(--text-decor); }
+.mcard .body { padding: 14px 15px 12px; }
+.mcard .mcard-title { font-size: 14px; font-weight: 500; line-height: 1.35; margin: 0 0 4px; overflow-wrap: anywhere; }
+.mcard p { margin: 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.45; overflow-wrap: anywhere; }
+.mcard .mcard-kind { font-size: 11.5px; color: var(--ink-2); margin: 0 0 6px; }
+.mcard .ft { display: flex; align-items: center; gap: 6px; padding: 8px 14px 10px; font-size: 11.5px; color: var(--ink-2); line-height: 1; border-top: 1px solid color-mix(in srgb, var(--rule) 50%, transparent); }
+.mcard .ft .dot, .tdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--ink-3); background: var(--paper); display: inline-block; }
+.dot.s1, .tdot.s1 { background: var(--status-1); border-color: var(--status-1); }
+.dot.s2, .tdot.s2 { background: var(--status-2); border-color: var(--status-2); }
+.mcard[data-frame="paper"] { background: none; box-shadow: none; }
+.mcard[data-frame="paper"] > .ci { background: var(--surface-panel); box-shadow: inset 0 0 0 1px var(--rule); border-radius: 2px; transition: transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard); }
+.mcard[data-frame="paper"]:hover > .ci { transform: translateY(calc(var(--lift) * -1)); box-shadow: inset 0 0 0 1px var(--text-decor), var(--shadow-pic); }
+.mcard[data-frame="picture"] { background: none; box-shadow: none; }
+.mcard[data-frame="picture"] .pic { border-radius: 6px; overflow: hidden; box-shadow: var(--shadow-pic); aspect-ratio: 4 / 3; background: var(--surface-mat); transition: transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard); }
+.mcard[data-frame="picture"]:hover .pic { transform: translateY(calc(var(--lift) * -1)); box-shadow: var(--shadow-lift); }
+.mcard .pic svg { width: 100%; height: 100%; display: block; }
+.mcard .cap-line { padding: 9px 2px 0; }
+.mcard .cap-line .mcard-title { font-size: 13.5px; margin: 0; }
+.mcard .cap-line p { margin: 3px 0 0; font-size: 12px; }
+.mcard .person-head { display: flex; gap: 12px; align-items: center; margin: 0 0 6px; }
+.mcard .person-name p { margin: 3px 0 0; }
+.person-mark { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; flex: none; display: grid; place-items: center; background: var(--surface-board); box-shadow: inset 0 0 0 1px var(--rule); font-family: var(--read); font-size: 16px; color: var(--text-muted); }
+.mcard .mcard-title.per { font-family: var(--read); font-size: 19px; font-weight: 400; line-height: 1.2; }
+.mcard .kicker { margin: 0 0 5px; }
+.mcard .cv { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; }
+
+/* proposed: choice chips (F1) */
+.cc { display: inline-flex; align-items: center; padding: 0 7px; border-radius: 9px; font-size: 11.5px; line-height: 19px; white-space: nowrap; }
+.c0 { background: var(--c0-bg); color: var(--c0-fg); } .c1 { background: var(--c1-bg); color: var(--c1-fg); } .c2 { background: var(--c2-bg); color: var(--c2-fg); }
+.c3 { background: var(--c3-bg); color: var(--c3-fg); } .c4 { background: var(--c4-bg); color: var(--c4-fg); } .c5 { background: var(--c5-bg); color: var(--c5-fg); }
+
+/* ---- item page (library.css .ipage) ---- */
+.ipage { width: 100%; max-width: 1180px; margin-inline: auto; }
+.ip-top { position: sticky; top: calc(var(--band-h, 46px) + env(safe-area-inset-top, 0px)); z-index: 6; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px 0; background: var(--surface-page); }
+.ip-back { all: unset; cursor: pointer; display: inline-flex; align-items: center; padding: 6px 9px; margin-left: -9px; border-radius: 3px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.ip-back:hover { color: var(--ink); background: var(--hover-fill); }
+.ip-crumb { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.ip-saved { margin-left: auto; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.ip-more { all: unset; box-sizing: border-box; cursor: pointer; width: 30px; height: 28px; display: grid; place-items: center; border-radius: 3px; color: var(--ink-2); flex-shrink: 0; }
+.ip-more:hover { background: var(--hover-fill); color: var(--ink); }
+.ip-grid { display: grid; grid-template-columns: minmax(0, 820px) 290px; gap: 48px; justify-content: space-between; align-items: start; margin-top: 14px; }
+.ip-grid.top { grid-template-columns: minmax(0, 820px); }
+.ip-main { min-width: 0; }
+.ip-rail { position: sticky; top: calc(var(--band-h, 46px) + 64px); align-self: start; min-width: 0; font-size: 13px; }
+.ip-rh { margin: 0 0 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.prop { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.props .prop:last-of-type { border-bottom: 1px solid var(--line); }
+.prop > span { color: var(--ink-2); }
+.prop-value { color: var(--ink); line-height: 1.45; min-width: 0; overflow-wrap: anywhere; }
+.prop-group { margin: 14px 0 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.props.inline { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); column-gap: 28px; margin: 22px 0 0; }
+.props.inline .prop { border-bottom: 0; }
+.rail-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn-open-graph { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+.chip-rel { all: unset; cursor: pointer; font-size: 12px; padding: 3px 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink-2); display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-rel:hover { background: var(--surface-panel); border-color: var(--accent); color: var(--accent); }
+.rel-row { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.addv { all: unset; cursor: pointer; font-size: 12px; color: var(--ink-3); padding: 2px 6px; border: 1px dashed var(--line); border-radius: 2px; }
+.addv:hover { color: var(--accent); border-color: var(--accent); }
+.ed { outline: none; border-radius: 2px; display: inline-block; min-width: 30px; }
+.ed:hover { background: var(--hover-fill); box-shadow: 0 0 0 3px var(--hover-fill); }
+.ed:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+.ed:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.muted { color: var(--ink-3); }
+.tick { all: unset; cursor: pointer; width: 16px; height: 16px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--ink-3); display: inline-grid; place-items: center; font-size: 11px; color: var(--on-ink); }
+.tick.y { background: var(--ok); box-shadow: none; }
+.ip-title { margin: 0; font: 400 clamp(30px, 4.2vw, 42px)/1.08 var(--read); letter-spacing: -0.012em; outline: none; border-radius: 2px; }
+.ip-title:hover { background: var(--hover-fill); box-shadow: 0 0 0 4px var(--hover-fill); }
+.ip-title:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+p.ip-line { margin: 10px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.ip-lead { margin: 22px 0 0; max-width: 62ch; font: 18px/1.6 var(--read); color: var(--ink); outline: none; }
+.ip-lead:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.ip-wide { max-width: 820px; margin: 0 0 22px; }
+.ip-pic { display: block; width: 100%; overflow: hidden; border-radius: 2px; box-shadow: var(--shadow-pic); aspect-ratio: 3 / 2; background: var(--surface-mat); position: relative; }
+.ip-pic svg { width: 100%; height: 100%; display: block; }
+.ip-side { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 30px; align-items: end; }
+.ip-portrait { aspect-ratio: 3 / 4; border-radius: 2px; background: var(--surface-board); box-shadow: inset 0 0 0 1px var(--rule); display: grid; place-items: center; font: 400 64px/1 var(--read); color: var(--ink-3); }
+.ip-strip { display: flex; gap: 6px; margin: 8px 0 0; overflow-x: auto; }
+.ip-strip button { flex: none; width: 70px; aspect-ratio: 4 / 3; padding: 0; border: 2px solid transparent; border-radius: 2px; overflow: hidden; background: var(--surface-mat); cursor: pointer; }
+.ip-strip button[aria-pressed="true"] { border-color: var(--ink); }
+.ip-strip svg { width: 100%; height: 100%; display: block; }
+.ip-pic .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--media-badge); color: var(--on-media); font-size: 19px; display: grid; place-items: center; cursor: pointer; }
+.ip-pic .nav.p { left: 12px; } .ip-pic .nav.n { right: 12px; }
+.ip-pic .cnt { position: absolute; right: 12px; bottom: 12px; background: var(--media-badge); color: var(--on-media); font-size: 11.5px; padding: 2px 8px; border-radius: 9px; font-variant-numeric: tabular-nums; }
+.dochead { background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); border-radius: 3px; padding: 28px 24px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; margin: 0 0 22px; }
+.dochead .court { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.dochead hr { width: 44px; border: 0; border-top: 1px solid var(--quote-rule); margin: 0; }
+.dochead .t { font: italic 400 clamp(22px, 3vw, 30px)/1.2 var(--read); max-width: 30ch; }
+.dochead .cit { font: 15px/1.4 var(--read); color: var(--ink-2); }
+.ip-writing { margin-top: 30px; max-width: 64ch; position: relative; }
+.ip-writing h2 { margin: 0 0 8px; font: 400 21px/1.2 var(--read); }
+.ip-writing .md { font: 16.5px/1.62 var(--read); color: var(--ink); outline: none; border-radius: 2px; min-height: 1.6em; }
+.ip-writing .md:hover { background: var(--hover-fill); box-shadow: 0 0 0 4px var(--hover-fill); }
+.ip-writing .md:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+.ip-writing .md:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.ip-shelf { margin-top: 38px; position: relative; }
+.ip-shelf-h { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; }
+.ip-shelf-h h2 { margin: 0; font: 400 21px/1.2 var(--read); }
+.ip-shelf-h span { font-size: 12px; color: var(--ink-2); }
+.ip-shelf-h small { font-size: 12px; color: var(--ink-3); }
+.ip-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 14px; align-items: start; }
+.mnote { background: var(--note-paper); border-left: 3px solid var(--status-2); padding: 12px 14px; font: 15px/1.52 var(--read); }
+.mnote small { display: block; font: 11.5px var(--ui); color: var(--ink-2); margin-top: 6px; }
+.blk-ctl { position: absolute; top: -4px; right: 0; display: flex; gap: 2px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 4px; padding: 2px; z-index: 3; }
+.blk-ctl button { border: 0; background: none; border-radius: 3px; padding: 2px 7px; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+.blk-ctl button:hover { background: var(--hover-fill); color: var(--ink); }
+.arr .blk { outline: 1px dashed var(--status-2); outline-offset: 8px; border-radius: 1px; }
+.arr .blk.off > :not(.blk-ctl) { opacity: .38; }
+.arrbar { position: sticky; top: calc(var(--band-h, 46px) + 52px + env(safe-area-inset-top, 0px)); z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 14px; margin: 6px 0 0; border-radius: 3px; background: var(--accent-soft); color: var(--accent-strong); box-shadow: var(--shadow-pic); font-size: 13px; }
+.arrbar p { margin: 0; flex: 1 1 240px; }
+.arrbar .g { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+.arrbar .seg button:disabled { opacity: .35; cursor: not-allowed; }
+.emptyb { font-size: 13px; color: var(--ink-3); font-style: italic; margin: 0; }
+
+/* ---- table, board, timeline (proposed V1, V2) ---- */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+th { text-align: left; font-weight: 500; font-size: 12px; color: var(--ink-2); padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; max-width: 240px; }
+tr:last-child td { border-bottom: 0; }
+td .tt { all: unset; cursor: pointer; font-weight: 500; }
+td .tt:hover { color: var(--accent); text-decoration: underline; }
+.num { font-variant-numeric: tabular-nums; }
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+.bcol { background: var(--board); border-radius: 3px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 200px; }
+.bcol.over { box-shadow: inset 0 0 0 2px var(--status-2); }
+.bcol h3 { margin: 0 0 2px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; }
+.bcol h3 b { font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bcard { background: var(--panel); box-shadow: inset 0 0 0 1px var(--rule); border-radius: 2px; padding: 9px 11px; display: grid; gap: 2px; cursor: grab; }
+.bcard b { font-weight: 500; font-size: 13px; } .bcard small { color: var(--ink-2); font-size: 12px; }
+.tl { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); }
+.tlin { min-width: 680px; padding: 8px 0 14px; }
+.tlrow { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: center; min-height: 32px; }
+.tlrow .lab { padding: 0 14px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tlrow .lab button { all: unset; cursor: pointer; } .tlrow .lab button:hover { color: var(--accent); }
+.track { position: relative; height: 32px; margin-right: 24px; }
+.axis { height: 26px; border-bottom: 1px solid var(--line); }
+.tick-l { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; padding-bottom: 5px; white-space: nowrap; }
+.grid-l { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); opacity: .6; }
+.bar { position: absolute; top: 11px; height: 10px; border-radius: 5px; min-width: 10px; }
+.bar.open { -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent); mask-image: linear-gradient(90deg, #000 72%, transparent); }
+.pt { position: absolute; top: 10px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 2px var(--panel); }
+.tlleg { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-2); padding: 0 14px 8px; }
+
+/* ---- customizer (library.css) ---- */
+.library-crumb { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 12.5px; color: var(--ink-2); margin: 0 0 14px; }
+.library-crumb button { all: unset; cursor: pointer; } .library-crumb button:hover { color: var(--accent); }
+.library-crumb b { color: var(--ink); font-weight: 500; }
+.customizer-layout { display: grid; grid-template-columns: minmax(0, 860px) minmax(300px, 400px); gap: clamp(28px, 3vw, 44px); align-items: start; }
+.customizer-editor { background: var(--panel); border: 1px solid var(--line); padding: 24px 28px; border-radius: 3px; min-width: 0; }
+.customizer-editor h2 { font: 400 26px/1.2 var(--read); margin: 0 0 6px; }
+.coll-select-pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin: 16px 0 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.coll-select-pills.inline { border: 0; padding: 0; margin: 0; }
+.coll-select-pills button { all: unset; font-size: 12.5px; padding: 5px 11px; border-radius: 2px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; white-space: nowrap; color: var(--ink-2); position: relative; }
+.coll-select-pills button.on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); font-weight: 500; }
+.coll-select-pills button.add-new { border-style: dashed; color: var(--accent); border-color: var(--accent); }
+.coll-select-pills button:disabled { cursor: default; opacity: .55; }
+.coll-select-pills .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; vertical-align: middle; margin-right: 4px; background: var(--status-2); }
+.coll-select-pills .dot.s1 { background: var(--status-1); } .coll-select-pills .dot.s3 { background: var(--accent); }
+.cf-section { padding: 18px 0 4px; border-top: 1px solid var(--line); position: relative; }
+.cf-section:first-of-type { border-top: 0; padding-top: 4px; }
+.cf-section-head { margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.form-row { margin-bottom: 16px; }
+.form-row label, .form-row .form-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+.form-row input[type="text"], .form-row select, .form-row textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--line); background: var(--paper); font-size: 13.5px; border-radius: 2px; color: var(--ink); }
+.cf-note { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.customizer-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 4px 0 8px; }
+.customizer-section-head .form-label { margin: 0; font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+.preset-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+.preset-chip { all: unset; font-size: 11.5px; padding: 3px 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; cursor: pointer; color: var(--ink-2); }
+.preset-chip:hover { color: var(--accent); border-color: var(--status-1); }
+.fields-list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.field-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) 150px auto 26px; gap: 8px; align-items: center; position: relative; }
+.field-row input[type="text"], .field-row select { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); background: var(--paper); font-size: 13px; border-radius: 2px; color: var(--ink); }
+.field-row.over { opacity: .5; }
+.field-num { font-size: 11.5px; color: var(--ink-2); text-align: center; }
+.field-card { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.field-del { all: unset; text-align: center; cursor: pointer; color: var(--ink-2); font-size: 14px; }
+.field-del:hover { color: var(--warn); }
+.field-cfg { margin: 0 0 4px 34px; padding: 10px 12px; background: var(--board); border-radius: 2px; display: grid; gap: 8px; font-size: 12.5px; color: var(--ink-2); position: relative; }
+.field-cfg label { display: grid; gap: 4px; }
+.field-cfg input[type="text"], .field-cfg select { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--line); background: var(--paper); font-size: 13px; border-radius: 2px; color: var(--ink); }
+.field-cfg .rowl { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.customizer-note { font-size: 12px; color: var(--ink-2); margin: 10px 0 0; }
+.over-note { margin: 10px 0 0; padding: 8px 10px; border-radius: 2px; background: var(--myfocus-paper); color: var(--myfocus-ink); font-size: 12.5px; }
+.customizer-actions { margin-top: 22px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.preview-sticky { position: sticky; top: calc(var(--band-h, 46px) + 24px); }
+.preview-sticky > h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 12px; font-weight: 600; }
+.preview-box { background: var(--panel); border: 1px solid var(--line); padding: 16px; border-radius: 3px; }
+.preview-box + .preview-box { margin-top: 16px; }
+.preview-box .lab { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); margin: 0 0 10px; }
+.props-preview { display: grid; gap: 8px; font-size: 13px; margin: 0; }
+.prop-item { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+.prop-item dt { color: var(--ink-2); } .prop-item dd { margin: 0; font-weight: 500; color: var(--ink); text-align: right; overflow-wrap: anywhere; }
+.loci { display: grid; gap: 10px; padding: 14px; border-radius: 3px; background: var(--accent-soft); color: var(--accent-strong); margin: 0 0 18px; position: relative; }
+.loci b { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+.loci form { display: flex; gap: 8px; flex-wrap: wrap; }
+.loci input { flex: 1 1 220px; min-width: 0; padding: 8px 10px; border: 1px solid var(--status-1); background: var(--panel); border-radius: 2px; color: var(--ink); }
+.loci .sugg { display: flex; gap: 6px; flex-wrap: wrap; }
+.loci .sugg button { all: unset; cursor: pointer; font-size: 12px; padding: 2px 9px; border-radius: 10px; background: var(--panel); color: var(--ink-2); }
+
+/* menus, toast */
+.menu { position: fixed; z-index: 60; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 6px; padding: 5px; min-width: 210px; max-width: min(300px, calc(100vw - 32px)); max-height: 340px; overflow: auto; display: grid; gap: 1px; }
+.menu button { border: 0; background: none; border-radius: 4px; padding: 7px 9px; text-align: left; font-size: 13px; cursor: pointer; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; align-items: center; color: var(--ink); }
+.menu button:hover { background: var(--hover-fill); }
+.menu button i { font-style: normal; color: var(--accent); font-size: 12px; }
+.menu h5 { margin: 4px 9px; font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.menu input { margin: 2px 4px 4px; padding: 6px 8px; border: 1px solid var(--line); background: var(--paper); border-radius: 2px; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--on-ink); padding: 8px 14px; border-radius: 16px; font-size: 13px; z-index: 70; box-shadow: var(--shadow-float); max-width: calc(100% - 32px); }
+
+@media (max-width: 1100px) { .customizer-layout { grid-template-columns: minmax(0, 1fr); } .preview-sticky { position: static; } }
+@media (max-width: 900px) { .ip-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; } .ip-rail { position: static; } }
+@media (max-width: 640px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; justify-content: center; border-right: 0; border-bottom: 1px solid var(--line); padding: 6px; }
+  .rail .brand { display: none; }
+  .stage { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); }
+  .ip-side { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
+  .ip-top { top: calc(var(--band-h, 46px) + env(safe-area-inset-top, 0px)); }
+  .customizer-editor { padding: 18px 16px; }
+  .field-row { grid-template-columns: 22px minmax(0, 1fr) 110px 22px; }
+  .field-row .field-card { grid-column: 2 / -1; }
+  .band .adds { flex-basis: 100%; }
+}
+</style>
+
+<div class="band" id="band"></div>
+<div class="app">
+  <nav class="rail" aria-label="Destinations">
+    <span class="brand" aria-hidden="true">S</span>
+    <a href="#" title="Today" aria-label="Today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></a>
+    <a href="#" title="Learn" aria-label="Learn"><svg viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></a>
+    <a href="#" title="Commonplace" aria-label="Commonplace" aria-current="page"><svg viewBox="0 0 24 24"><path d="M16 6l4 14M12 6v14M8 8v12M4 4v16"/></svg></a>
+    <a href="#" title="Loci" aria-label="Loci"><svg viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg></a>
+  </nav>
+  <main class="stage"><div class="wrap" id="main"></div></main>
+</div>
+<div id="menu" class="menu" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const arr = v => v == null ? [] : Array.isArray(v) ? v : [v];
+const lower = s => s.charAt(0).toLowerCase() + s.slice(1);
+const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/* ---------- phases ---------- */
+const PHASES = [
+  { n: 0, name: "Today", adds: "<b>As built at b5eeee2.</b> Person or Thing base; Portrait, Picture or Text layout; 8 fields of Text, Number, Date, Link to item, Web link; cards only." },
+  { n: 1, name: "Phase 1", adds: "<b>F1</b> Choice, Long text, Checkbox, year dates and ranges, units · <b>P1</b> long text as sections · <b>V1</b> Table view · <b>T1</b> starter types per field. One migration." },
+  { n: 2, name: "Phase 2", adds: "<b>F2</b> relation fields on both sides, 24 fields in groups · <b>P2</b> Arrange page, Slideshow and Document tops · <b>V2</b> Board, Timeline, saved views · <b>T2</b> Objects filter. Three migrations." },
+  { n: 3, name: "Phase 3", adds: "<b>F3</b> Group, Place, Event bases · <b>T3</b> Confidential and Clinical collections, Loci drafts a collection. Two migrations." }
+];
+/* The phase a value type, or an ability, arrives in. */
+const TYPE_PHASE = { text: 0, number: 0, date: 0, item: 0, url: 0, choice: 1, long: 1, check: 1, rel: 2 };
+const TYPE_LABEL = { text: "Text", number: "Number", date: "Date", item: "Link to item", url: "Web link", choice: "Choice", long: "Long text", check: "Checkbox", rel: "Relation" };
+const BASES = { person: "Person", thing: "Thing", group: "Group", place: "Place", event: "Event" };
+const LAYOUTS = { portrait: "Portrait", picture: "Picture", text: "Text" };
+const HEROES = { portrait: "Portrait", picture: "Picture", slideshow: "Slideshow", doc: "Document", title: "Title only" };
+
+/* ---------- sample data (example only) ---------- */
+const opts = list => list.map((v, i) => ({ v, c: i % 6 }));
+const F = (id, label, t, o = {}) => ({ id, label, t, o });
+const CH = (id, label, list, o = {}) => F(id, label, "choice", { ...o, opts: opts(list) });
+const R = (id, label, to, o = {}) => F(id, label, "rel", { to, many: true, ...o });
+const tp = (n, s) => ({ n, s });
+const ob = (id, c, title, v, x = {}) => ({ id, c, title, v, desc: x.desc || "", body: x.body || "", pics: x.pics || 0, topics: x.topics || [], notes: x.notes || [], linked: x.linked || [] });
+const col = d => ({ accent: "s3", base: "thing", sens: "normal", card: [], hero: null, rail: "side", blocks: null, view: "cards", filter: null, views: [], ...d });
+
+function makeDB() {
+  const architect = {
+    label: "Architect", who: "an architect who teaches studio",
+    cols: [
+      col({ id: "bld", name: "Buildings", label: "Building", layout: "picture", accent: "s3", desc: "Buildings I study for their light, section and material. The ones I take to crits.",
+        fields: [R("arch", "Architect", "archs", { many: false, inv: "Works" }), F("built", "Built", "date", { prec: "year" }), F("where", "Where", "text"),
+          CH("typ", "Typology", ["House", "Museum", "Laboratory", "Civic", "Religious"], { group: "About" }), CH("stat", "My status", ["To study", "Studied", "Visited"], { group: "Mine" }),
+          F("why", "Why it matters", "long"), R("mat", "Materials", "mats", { inv: "Used in", cards: true }), F("page", "Project page", "url"), F("been", "Been there", "check", { group: "Mine" })],
+        card: ["arch", "built"], hero: "slideshow", tl: "built" }),
+      col({ id: "archs", name: "Architects", label: "Architect", base: "person", layout: "portrait", accent: "s2", desc: "People whose work I follow.",
+        fields: [F("lived", "Lived", "date", { prec: "year" }), F("nat", "Nationality", "text"), CH("mov", "Movement", ["Modernism", "Late modernism", "Critical regionalism", "Contemporary"])],
+        card: ["lived", "nat"], hero: "portrait" }),
+      col({ id: "mats", name: "Materials", label: "Material", layout: "picture", accent: "s1", tex: true, desc: "Materials and how they age.",
+        fields: [CH("cat", "Category", ["Concrete", "Stone", "Masonry", "Timber"]), F("fin", "Typical finish", "text"), F("note", "Notes", "long")],
+        card: ["cat", "fin"], hero: "picture" })
+    ],
+    objs: [
+      ob("salk", "bld", "Salk Institute", { arch: ["kahn"], built: { y: 1959, y2: 1965 }, where: "La Jolla, California", typ: ["Laboratory"], stat: ["Visited"], been: true, mat: ["conc", "teak", "trav"], page: "https://www.salk.edu/about/history-of-salk/",
+        why: "Two laboratory blocks frame a travertine court open to the Pacific, with one channel of water running to the horizon. The labs are clear spans; the services live in floors between them." },
+        { pics: 5, desc: "Kahn's laboratory for Jonas Salk, set around a court that opens to the ocean.", body: "The court is a room with the sky as its ceiling. Bring the section through it to Thursday's crit.", topics: [tp("Light & threshold", 1), tp("Served and servant spaces", 2)], notes: [{ text: "The study towers turn their windows to the sea at 45°.", by: "Margin note · photo 3" }], linked: [{ rel: "Analyzed in", title: "Louis Kahn: Silence and Light" }] }),
+      ob("kimbell", "bld", "Kimbell Art Museum", { arch: ["kahn"], built: { y: 1966, y2: 1972 }, where: "Fort Worth, Texas", typ: ["Museum"], stat: ["To study"], mat: ["conc", "trav"],
+        why: "Cycloid concrete vaults split at the crown let daylight in along a slot; a pierced aluminium reflector spreads it across the vault." },
+        { pics: 4, desc: "Daylight for paintings without direct sun.", topics: [tp("Light & threshold", 1), tp("Daylighting", 0)] }),
+      ob("savoye", "bld", "Villa Savoye", { arch: ["corb"], built: { y: 1928, y2: 1931 }, where: "Poissy, France", typ: ["House"], stat: ["Studied"], mat: ["conc"],
+        why: "The five points in one house: pilotis, free plan, free façade, ribbon windows and a roof garden. The ramp turns the section into a walk." },
+        { pics: 4, desc: "A house lifted off the meadow.", topics: [tp("Promenade architecturale", 1)] }),
+      ob("saynatsalo", "bld", "Säynätsalo Town Hall", { arch: ["aalto"], built: { y: 1949, y2: 1952 }, where: "Säynätsalo, Finland", typ: ["Civic"], stat: ["Studied"], mat: ["brick"],
+        why: "A raised courtyard reached by grass steps; the council chamber is the tallest room, under timber fan trusses." }, { pics: 4, topics: [tp("Civic courtyards", 0)] }),
+      ob("light", "bld", "Church of the Light", { arch: ["ando"], built: { y: 1987, y2: 1989 }, where: "Ibaraki, Osaka", typ: ["Religious"], stat: ["To study"], mat: ["conc"],
+        why: "A cross cut through the concrete wall behind the altar is the only ornament. The room stays dark enough for it to read." }, { pics: 3, topics: [tp("Light & threshold", 1)] }),
+      ob("sancaklar", "bld", "Sancaklar Mosque", { arch: ["arolat"], built: { y: 2011, y2: 2012 }, where: "Büyükçekmece, Istanbul", typ: ["Religious"], stat: ["Studied"], been: true, mat: ["conc"],
+        why: "The prayer hall is dug into the slope. Daylight through fissures along the qibla wall takes the place of a dome." }, { pics: 4, topics: [tp("Light & threshold", 1), tp("Qibla wall", 0)] }),
+      ob("kahn", "archs", "Louis Kahn", { lived: { y: 1901, y2: 1974 }, nat: "American, born in Estonia", mov: ["Late modernism"] }, { desc: "Architect of served and servant spaces, and of light as a material.", linked: [{ rel: "Said", title: "“The sun never knew how great it was until it struck the side of a building.”" }] }),
+      ob("corb", "archs", "Le Corbusier", { lived: { y: 1887, y2: 1965 }, nat: "Swiss-French", mov: ["Modernism"] }),
+      ob("aalto", "archs", "Alvar Aalto", { lived: { y: 1898, y2: 1976 }, nat: "Finnish", mov: ["Modernism"] }),
+      ob("ando", "archs", "Tadao Ando", { lived: { y: 1941, open: true }, nat: "Japanese", mov: ["Critical regionalism"] }),
+      ob("arolat", "archs", "Emre Arolat", { lived: { y: 1963, open: true }, nat: "Turkish", mov: ["Contemporary"] }),
+      ob("conc", "mats", "Board-formed concrete", { cat: ["Concrete"], fin: "Board-marked, sealed", note: "The boards leave their grain and the tie holes stay as a grid." }),
+      ob("trav", "mats", "Travertine", { cat: ["Stone"], fin: "Honed, unfilled" }),
+      ob("teak", "mats", "Teak", { cat: ["Timber"], fin: "Oiled; weathers to silver" }),
+      ob("brick", "mats", "Red brick", { cat: ["Masonry"], fin: "Irregular coursing, lime mortar" })
+    ]
+  };
+  const lawyer = {
+    label: "Lawyer", who: "a construction lawyer in London",
+    cols: [
+      col({ id: "cases", name: "Cases", label: "Case", layout: "text", accent: "s3", desc: "Authorities I rely on, distinguish or keep for background.",
+        fields: [F("cit", "Citation", "text"), R("court", "Court", "courts", { many: false, inv: "Decisions" }), F("year", "Year", "date", { prec: "year" }),
+          R("judge", "Leading judgment", "judges", { many: false, inv: "Judgments" }), CH("area", "Area of law", ["Tort", "Contract", "Construction"]),
+          F("hold", "Holding", "long"), F("ratio", "Ratio", "long"), CH("use", "How I use it", ["Rely on", "Distinguish", "Background"], { group: "Mine" }),
+          R("cites", "Cites", "cases", { inv: "Cited by", cards: true }), F("link", "Judgment", "url")],
+        card: ["cit", "court"], hero: "doc", tl: "year", view: "cards" }),
+      col({ id: "courts", name: "Courts", label: "Court", layout: "text", accent: "s1", base3: "group", desc: "Where the authorities come from.",
+        fields: [F("jur", "Jurisdiction", "text"), CH("lvl", "Level", ["Final appeal", "High Court", "Historic"])], card: ["jur"], hero: "title" }),
+      col({ id: "judges", name: "Judges", label: "Judge", base: "person", layout: "portrait", accent: "s2", desc: "Judges whose reasoning I quote.",
+        fields: [F("role", "Known as", "text")], card: ["role"], hero: "portrait" }),
+      col({ id: "clauses", name: "Clauses", label: "Clause", layout: "text", accent: "s1", desc: "Contract clauses and sections of statutes.",
+        fields: [F("inst", "Instrument", "text"), F("sec", "Section", "text"), F("txt", "What it says", "long"), R("cons", "Considered in", "cases", { inv: "Clauses", cards: true })],
+        card: ["inst", "sec"], hero: "doc" })
+    ],
+    objs: [
+      ob("donoghue", "cases", "Donoghue v Stevenson", { cit: "[1932] AC 562", court: ["hl"], year: { y: 1932 }, judge: ["atkin"], area: ["Tort"], use: ["Background"],
+        hold: "A manufacturer of products sold in a form the consumer can't inspect owes that consumer a duty to take reasonable care.", ratio: "The neighbour principle: take reasonable care to avoid acts or omissions you can reasonably foresee would injure your neighbour." },
+        { desc: "The snail in the ginger beer bottle.", topics: [tp("Duty of care", 2)], linked: [{ rel: "Quoted in", title: "“You must take reasonable care to avoid acts or omissions…”" }] }),
+      ob("caparo", "cases", "Caparo Industries plc v Dickman", { cit: "[1990] 2 AC 605", court: ["hl"], year: { y: 1990 }, judge: ["bridge"], area: ["Tort"], use: ["Distinguish"], cites: ["donoghue"],
+        hold: "Auditors preparing statutory accounts owed no duty of care to investors who bought shares relying on them.", ratio: "Foreseeability, proximity, and whether it is fair, just and reasonable to impose a duty." },
+        { topics: [tp("Duty of care", 2), tp("Pure economic loss", 1)] }),
+      ob("robinson", "cases", "Robinson v Chief Constable of West Yorkshire Police", { cit: "[2018] UKSC 4", court: ["uksc"], year: { y: 2018 }, judge: ["reed"], area: ["Tort"], use: ["Rely on"], cites: ["caparo", "donoghue"],
+        hold: "Officers making an arrest owed a duty of care to a passer-by injured in the struggle: a positive act, not an omission.", ratio: "Caparo is not a universal three-stage test. In established categories, follow precedent; develop novel ones by analogy." },
+        { desc: "Duty of care after Caparo.", topics: [tp("Duty of care", 2)], notes: [{ text: "Para 21: the three stages are not a test to apply to every case.", by: "Margin note · para 21" }] }),
+      ob("hadley", "cases", "Hadley v Baxendale", { cit: "(1854) 9 Exch 341", court: ["exch"], year: { y: 1854 }, judge: ["alderson"], area: ["Contract"], use: ["Rely on"],
+        hold: "A carrier who delayed a broken crankshaft was not liable for the mill's lost profits, which it hadn't been told of.", ratio: "Damages for losses arising naturally, or that both parties contemplated when contracting." }, { topics: [tp("Remoteness of damage", 1)] }),
+      ob("multiplex", "cases", "Multiplex v Honeywell (No 2)", { cit: "[2007] EWHC 447 (TCC)", court: ["tcc"], year: { y: 2007 }, judge: ["jackson"], area: ["Construction"], use: ["Rely on"],
+        hold: "Where the contract lets time be extended for the employer's acts, the prevention principle doesn't defeat a notice condition the contractor failed to meet.", ratio: "Use the contract's own mechanism for extending time, notice provisions included." },
+        { topics: [tp("Extensions of time", 1)] }),
+      ob("triple", "cases", "Triple Point Technology v PTT", { cit: "[2021] UKSC 29", court: ["uksc"], year: { y: 2021 }, judge: ["arden"], area: ["Construction"], use: ["Rely on"],
+        hold: "Liquidated damages for delay accrue up to termination even when the contractor never completes.", ratio: "Unless the clause clearly says otherwise, accrued liquidated damages survive termination." }, { topics: [tp("Liquidated damages", 1)] }),
+      ob("hl", "courts", "House of Lords", { jur: "United Kingdom, until 2009", lvl: ["Final appeal"] }),
+      ob("uksc", "courts", "UK Supreme Court", { jur: "United Kingdom", lvl: ["Final appeal"] }),
+      ob("tcc", "courts", "Technology and Construction Court", { jur: "England & Wales", lvl: ["High Court"] }),
+      ob("exch", "courts", "Court of Exchequer", { jur: "England & Wales", lvl: ["Historic"] }),
+      ob("atkin", "judges", "Lord Atkin", { role: "Lord of Appeal in Ordinary" }),
+      ob("bridge", "judges", "Lord Bridge of Harwich", { role: "Lord of Appeal in Ordinary" }),
+      ob("reed", "judges", "Lord Reed", { role: "President of the Supreme Court since 2020" }),
+      ob("alderson", "judges", "Alderson B", { role: "Baron of the Exchequer" }),
+      ob("jackson", "judges", "Jackson J", { role: "TCC judge, later Jackson LJ" }),
+      ob("arden", "judges", "Lady Arden", { role: "Justice of the Supreme Court" }),
+      ob("fidic85", "clauses", "Extension of Time for Completion", { inst: "FIDIC Red Book 2017", sec: "Sub-Clause 8.5", cons: ["multiplex"], txt: "The contractor is entitled, subject to Sub-Clause 20.2, to an extension of time if completion is delayed by a listed cause." }),
+      ob("fidic202", "clauses", "Claims for payment and/or EOT", { inst: "FIDIC Red Book 2017", sec: "Sub-Clause 20.2", cons: ["multiplex"], txt: "Notice within 28 days of becoming aware of the event, then a fully detailed claim within 84 days." }),
+      ob("hgcra108", "clauses", "Right to refer disputes to adjudication", { inst: "Housing Grants, Construction and Regeneration Act 1996", sec: "s.108", txt: "A party to a construction contract may refer a dispute to adjudication." })
+    ]
+  };
+  const procs = [["p1", "2026-08-12", "Arterial blood gas", "ED", "Observed", "Successful", 15, "Watched the registrar do an Allen's test first."],
+    ["p2", "2026-08-19", "Cannulation", "AMU", "Supervised", "Unsuccessful", 20, "Two attempts on a dehydrated patient. Warm the arm first next time."],
+    ["p3", "2026-08-28", "Cannulation", "Ward", "Supervised", "Successful", 10, ""], ["p4", "2026-09-03", "Arterial blood gas", "ED", "Supervised", "Successful", 10, ""],
+    ["p5", "2026-09-15", "Lumbar puncture", "AMU", "Observed", "Successful", 40, "Positioning took longer than the procedure."], ["p6", "2026-09-24", "Cannulation", "ED", "Independent", "Successful", 5, ""],
+    ["p7", "2026-10-06", "Arterial blood gas", "AMU", "Independent", "Successful", 8, ""], ["p8", "2026-10-17", "Pleural tap", "Ward", "Observed", "Successful", 35, "Ultrasound-marked site."]];
+  const doctor = {
+    label: "Doctor", who: "a foundation doctor in the UK (de-identified, for learning)",
+    cols: [
+      col({ id: "drugs", name: "Drugs", label: "Drug", layout: "text", accent: "s3", desc: "Drugs I prescribe on the ward, with what I need to check.",
+        fields: [CH("cls", "Class", ["DOAC", "Vitamin K antagonist", "LMWH"]), CH("route", "Route", ["Oral", "Subcutaneous", "IV"], { many: true }), F("mon", "Monitoring", "text"),
+          F("renal", "Renal adjustment", "check"), R("alt", "Alternatives", "drugs", { sym: true, cards: true }), F("note", "My notes", "long"), F("bnf", "BNF", "url")],
+        card: ["cls", "route"], hero: "title" }),
+      col({ id: "guides", name: "Guidelines", label: "Guideline", layout: "text", accent: "s1", desc: "Guidelines I work to.",
+        fields: [CH("iss", "Issuer", ["NICE", "ESC", "BTS"]), F("code", "Code", "text"), F("pub", "Published", "date", { prec: "year" }), R("recs", "Recommends", "drugs", { inv: "Recommended in", cards: true }), F("key", "Key points", "long")],
+        card: ["iss", "code"], hero: "doc", tl: "pub" }),
+      col({ id: "procs", name: "Procedures", label: "Procedure", layout: "text", accent: "s2", base3: "event", desc: "My procedures logbook for the portfolio.",
+        fields: [F("date", "Date", "date", { prec: "day" }), CH("proc", "Procedure", ["Arterial blood gas", "Cannulation", "Lumbar puncture", "Pleural tap"]), CH("set", "Setting", ["ED", "AMU", "Ward"]),
+          CH("sup", "Supervision", ["Observed", "Supervised", "Independent"]), CH("out", "Outcome", ["Successful", "Unsuccessful"]), F("mins", "Time taken", "number", { unit: "min" }), F("refl", "Reflection", "long")],
+        card: ["date", "sup"], hero: "title", tl: "date" }),
+      col({ id: "tcases", name: "Teaching cases", label: "Teaching case", layout: "text", accent: "s3", sens3: "clinical", desc: "De-identified cases I learned from.",
+        fields: [CH("age", "Age band", ["20–29", "30–39", "40–49", "50–59", "60–69", "70–79"]), CH("set", "Setting", ["ED", "AMU", "Ward", "GP"]), F("pc", "Presenting complaint", "text"),
+          R("guide", "Guideline", "guides", { many: false, inv: "Teaching cases" }), F("lp", "Learning points", "long")], card: ["age", "set"], hero: "title" })
+    ],
+    objs: [
+      ob("apix", "drugs", "Apixaban", { cls: ["DOAC"], route: ["Oral"], mon: "Renal function, bleeding", renal: true, alt: ["rivar", "warf"], note: "Ask pharmacy when renal function is borderline.", bnf: "https://bnf.nice.org.uk/drugs/apixaban/" }, { topics: [tp("Pulmonary embolism", 1), tp("Atrial fibrillation", 0)] }),
+      ob("rivar", "drugs", "Rivaroxaban", { cls: ["DOAC"], route: ["Oral"], mon: "Renal function, bleeding", renal: true, alt: ["apix", "warf"] }, { topics: [tp("Pulmonary embolism", 1)] }),
+      ob("warf", "drugs", "Warfarin", { cls: ["Vitamin K antagonist"], route: ["Oral"], mon: "INR", renal: false, alt: ["apix", "rivar"] }, { topics: [tp("Atrial fibrillation", 0)] }),
+      ob("enox", "drugs", "Enoxaparin", { cls: ["LMWH"], route: ["Subcutaneous"], mon: "Platelets; anti-Xa in selected patients", renal: true }, { topics: [tp("Pulmonary embolism", 1)] }),
+      ob("ng158", "guides", "Venous thromboembolic diseases", { iss: ["NICE"], code: "NG158", pub: { y: 2020 }, recs: ["apix", "rivar"], key: "Two-level Wells score decides imaging or D-dimer. Apixaban or rivaroxaban first for confirmed PE or DVT." }, { desc: "Diagnosis, management and thrombophilia testing.", topics: [tp("Pulmonary embolism", 1)] }),
+      ob("ng196", "guides", "Atrial fibrillation: diagnosis and management", { iss: ["NICE"], code: "NG196", pub: { y: 2021 }, recs: ["apix", "rivar"], key: "CHA₂DS₂-VASc and bleeding risk before anticoagulation; a DOAC first." }, { topics: [tp("Atrial fibrillation", 0)] }),
+      ob("esc19", "guides", "Acute pulmonary embolism", { iss: ["ESC"], code: "ESC 2019", pub: { y: 2019 }, recs: ["apix", "rivar", "enox"], key: "Risk-stratify by haemodynamic status, then PESI or sPESI." }, { topics: [tp("Pulmonary embolism", 1)] }),
+      ...procs.map(([id, date, proc, set, sup, out, mins, refl]) => ob(id, "procs", `${proc}, ${set}`, { date, proc: [proc], set: [set], sup: [sup], out: [out], mins, refl })),
+      ob("tc1", "tcases", "Breathless after a long flight", { age: ["30–39"], set: ["ED"], pc: "Pleuritic chest pain two days after a 12-hour flight", guide: ["ng158"], lp: "Wells 4.5, so PE is likely: imaging before D-dimer. The flight isn't a Wells criterion." }, { topics: [tp("Pulmonary embolism", 1)] }),
+      ob("tc2", "tcases", "An irregular pulse at a routine check", { age: ["70–79"], set: ["GP"], pc: "Irregularly irregular pulse, no symptoms", guide: ["ng196"], lp: "CHA₂DS₂-VASc first; bleeding risk alongside, never instead." }, { topics: [tp("Atrial fibrillation", 0)] }),
+      ob("tc3", "tcases", "Calf swelling after knee surgery", { age: ["50–59"], set: ["Ward"], pc: "One swollen calf nine days after a knee replacement", guide: ["ng158"], lp: "Two-level DVT Wells; recent surgery counts." }, { topics: [tp("Deep vein thrombosis", 0)] })
+    ]
+  };
+  return { architect, lawyer, doctor };
+}
+const DB = makeDB();
+
+/* ---------- state ---------- */
+const S = { P: 0, field: "architect", screen: "collection", col: "bld", obj: null, arrange: false, marks: true, slide: 0, open: null, drag: null, loci: false };
+const D = () => DB[S.field];
+const C = id => D().cols.find(c => c.id === id);
+const O = id => D().objs.find(o => o.id === id);
+const objsOf = cid => D().objs.filter(o => o.c === cid);
+const at = n => S.P >= n;
+const cap = () => at(2) ? 24 : 8;
+const newTag = n => S.P === n ? ` new" data-new="Phase ${n}` : "";
+const NEWA = n => S.P === n ? ` class="new" data-new="Phase ${n}"` : "";
+
+/** The type a field is drawn as in the current phase: before its phase it falls back to what exists today. */
+function eff(f) {
+  if (f.t === "date" && f.o.prec !== "day" && !at(1)) return "text";
+  if (at(TYPE_PHASE[f.t])) return f.t;
+  return f.t === "rel" ? (f.o.many || f.o.sym ? "text" : "item") : "text";
+}
+const activeFields = c => c.fields.slice(0, cap());
+const F_ = (c, id) => c.fields.find(f => f.id === id);
+const baseOf = c => at(3) && c.base3 ? c.base3 : c.base;
+const sensOf = c => at(3) && c.sens3 ? c.sens3 : (at(3) ? c.sens : "normal");
+const heroOf = c => at(2) ? c.hero || (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title") : (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title");
+
+/* ---------- value text ---------- */
+function fmtDate(v) {
+  if (v == null || v === "") return "";
+  if (typeof v === "string") { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v); return m ? `${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}` : v; }
+  if (v.open) return `born ${v.y}`;
+  if (v.y2 == null || v.y2 === v.y) return String(v.y);
+  return Math.floor(v.y / 100) === Math.floor(v.y2 / 100) ? `${v.y}–${String(v.y2).slice(2)}` : `${v.y}–${v.y2}`;
+}
+function text(f, v) {
+  if (v == null || v === "" || (Array.isArray(v) && !v.length)) return "";
+  if (f.t === "rel") return arr(v).map(id => O(id)?.title).filter(Boolean).join(", ");
+  if (f.t === "choice") return arr(v).join(", ");
+  if (f.t === "date") return fmtDate(v);
+  if (f.t === "check") return v ? (at(1) ? f.label : "Yes") : (at(1) ? "" : "No");
+  if (f.t === "number") return v.toLocaleString("en-GB") + (at(1) && f.o.unit ? " " + f.o.unit : "");
+  if (f.t === "url") { try { return new URL(v).hostname.replace(/^www\./, ""); } catch { return v; } }
+  return String(v);
+}
+const chipOf = (f, val) => { const op = f.o.opts?.find(x => x.v === val); return `<span class="cc c${op ? op.c : 5}">${esc(val)}</span>`; };
+function cardFields(c, o) {
+  return c.card.map(id => F_(c, id)).filter(f => f && activeFields(c).includes(f)).map(f => ({ f, v: o.v[f.id] })).filter(x => text(x.f, x.v));
+}
+function cardSummary(c, o) {
+  return cardFields(c, o).map(({ f, v }) => eff(f) === "item" ? O(arr(v)[0])?.title || "" : text(f, v)).filter(Boolean).join(" · ");
+}
+
+/* ---------- generated stand-in pictures ---------- */
+const SKIES = [["#c9d6de", "#eef2f3"], ["#efc49b", "#f8e8d6"], ["#9db6cc", "#dde7ef"], ["#6e7c8b", "#b9c2ca"], ["#d9d4c7", "#f1eee6"]];
+const MASS = ["#d8d5cf", "#c4c0b8", "#e9e5dc", "#b9a58b", "#a7543f", "#cfc6b4"];
+function building(o, i) {
+  const r = rng(hash(o.id) + i * 977), gid = `g${hash(o.id + i)}`;
+  if (i % 2 === 1) {
+    const x = 120 + r() * 160, w = 6 + r() * 14;
+    return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1d6" stop-opacity=".55"/><stop offset="1" stop-color="#fff1d6" stop-opacity="0"/></linearGradient></defs><rect width="400" height="260" fill="#2a2724"/><rect y="200" width="400" height="60" fill="#36322d"/><polygon points="${x},40 ${x + w},40 ${x + w + 120},260 ${x - 60},260" fill="url(#${gid})"/>${o.id === "light" ? `<rect x="${x}" y="50" width="10" height="150" fill="#fff6e4"/><rect x="${x - 45}" y="95" width="100" height="10" fill="#fff6e4"/>` : `<rect x="${x}" y="30" width="${w}" height="200" fill="#fff3dc"/>`}</svg>`;
+  }
+  const [s1, s2] = SKIES[Math.floor(r() * SKIES.length)], g = 180 + r() * 30;
+  let vols = "";
+  for (let k = 0, n = 2 + Math.floor(r() * 3); k < n; k++) {
+    const w = 70 + r() * 140, h = 40 + r() * 90, x = r() * (400 - w), y = g - h + (r() < .3 ? -18 : 0), c = MASS[Math.floor(r() * MASS.length)];
+    vols += `${y < g - h ? `<rect x="${x + 8}" y="${y + h}" width="4" height="${g - y - h}" fill="#7d776e"/><rect x="${x + w - 12}" y="${y + h}" width="4" height="${g - y - h}" fill="#7d776e"/>` : ""}<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/><rect x="${x + w * .78}" y="${y}" width="${w * .22}" height="${h}" fill="#000" opacity=".14"/>${r() < .6 ? `<rect x="${x + 6}" y="${y + h * .35}" width="${w - 12}" height="${Math.max(5, h * .14)}" fill="#3a4148" opacity=".78"/>` : ""}`;
+  }
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient></defs><rect width="400" height="260" fill="url(#${gid})"/><rect y="${g}" width="400" height="${260 - g}" fill="#a9a493"/>${r() < .6 ? `<circle cx="${30 + r() * 340}" cy="${g - 26}" r="${18 + r() * 10}" fill="#6f7f5c"/>` : ""}${vols}</svg>`;
+}
+function texture(o) {
+  const cat = arr(o.v.cat)[0], r = rng(hash(o.id));
+  let b = "";
+  if (cat === "Concrete") { b = `<rect width="400" height="260" fill="#b9b6b0"/>`; for (let y = 0; y < 260; y += 26) b += `<rect y="${y}" width="400" height="1.4" fill="#8f8b84" opacity=".6"/>`; for (let y = 13; y < 260; y += 52) for (let x = 30; x < 400; x += 80) b += `<circle cx="${x}" cy="${y}" r="3.2" fill="#77736c"/>`; }
+  else if (cat === "Stone") { b = `<rect width="400" height="260" fill="#e2d6bf"/>`; for (let k = 0; k < 60; k++) b += `<rect x="${r() * 400 - 40}" y="${r() * 260}" width="${40 + r() * 160}" height="${1 + r() * 3}" rx="1.5" fill="#bfae8c" opacity="${.3 + r() * .5}"/>`; }
+  else if (cat === "Timber") { b = `<rect width="400" height="260" fill="#8a5a36"/>`; for (let x = 0; x < 400; x += 50) { b += `<rect x="${x}" width="1.5" height="260" fill="#5d3b22"/>`; for (let k = 0; k < 5; k++) b += `<path d="M${x + 6 + k * 9} 0 q ${r() * 8 - 4} 130 0 260" stroke="#6e4528" fill="none" opacity=".6"/>`; } }
+  else { b = `<rect width="400" height="260" fill="#d8cfc0"/>`; for (let y = 0, row = 0; y < 260; y += 22, row++) for (let x = (row % 2) * -30; x < 400; x += 60) b += `<rect x="${x + 1.5}" y="${y + 1.5}" width="57" height="19" fill="${["#a2513b", "#ad5c43", "#954834", "#b4664b"][Math.floor(r() * 4)]}"/>`; }
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${b}</svg>`;
+}
+const hasPic = (c, o) => c.tex || o.pics > 0;
+const pic = (c, o, i = 0) => c.tex ? texture(o) : building(o, i);
+const initials = s => (s || "?").replace(/^(Lord|Lady)\s+/, "").split(/\s+/).filter(w => /^[A-ZÀ-Ý]/.test(w)).slice(0, 2).map(w => w[0]).join("") || "?";
+
+/* ---------- cards (item-card.tsx objectCardBody) ---------- */
+function topicFt(o) { const t = o.topics[0]; return t ? `<div class="ft"><span class="dot s${t.s}"></span>${esc(t.n)}${o.topics.length > 1 ? ` <span>+${o.topics.length - 1}</span>` : ""}</div>` : ""; }
+function choiceLine(c, o) {
+  if (!at(1)) return "";
+  const chips = cardFields(c, o).filter(x => x.f.t === "choice").flatMap(x => arr(x.v).map(v => chipOf(x.f, v)));
+  return chips.length ? `<div class="cv${newTag(1)}">${chips.join("")}</div>` : "";
+}
+function card(c, o) {
+  const layout = c.layout;
+  if (layout === "portrait") {
+    const texts = cardFields(c, o).map(x => text(x.f, x.v));
+    return `<button class="mcard" data-frame="paper" data-act="open" data-id="${o.id}"><div class="ci"><div class="body"><div class="person-head"><span class="person-mark">${esc(initials(o.title))}</span><div class="person-name"><h3 class="mcard-title per">${esc(o.title)}</h3>${texts.length ? `<p>${esc(texts.slice(0, 2).join(" · "))}</p>` : ""}</div></div>${texts[2] ? `<p>${esc(texts[2])}</p>` : ""}${o.desc ? `<p>${esc(o.desc)}</p>` : ""}</div>${topicFt(o)}</div></button>`;
+  }
+  const summary = cardSummary(c, o);
+  if (layout === "picture" && hasPic(c, o)) {
+    return `<button class="mcard" data-frame="picture" data-act="open" data-id="${o.id}"><div class="pic">${pic(c, o)}</div><div class="cap-line"><h3 class="mcard-title">${esc(o.title)}</h3><p>${esc(summary ? `${c.label} · ${summary}` : c.label)}</p></div></button>`;
+  }
+  return `<button class="mcard" data-act="open" data-id="${o.id}"><div class="body"><p class="kicker">${esc(c.name)}</p><h3 class="mcard-title">${esc(o.title)}</h3><p class="mcard-kind">${esc(summary ? `${c.label} · ${summary}` : c.label)}</p>${o.desc ? `<p>${esc(o.desc)}</p>` : ""}${choiceLine(c, o)}</div>${topicFt(o)}</button>`;
+}
+
+/* ---------- band ---------- */
+function renderBand() {
+  const ph = PHASES[S.P];
+  $("#band").innerHTML = `<b class="tag">Prototype</b>
+    <div class="seg" role="group" aria-label="Phase">${PHASES.map(p => `<button data-act="phase" data-n="${p.n}" aria-pressed="${S.P === p.n}">${p.name}</button>`).join("")}</div>
+    <span class="adds">${ph.adds}</span>
+    <div class="seg" role="group" aria-label="Sample learner">${Object.keys(DB).map(k => `<button data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
+    <label><input type="checkbox" id="marks" ${S.marks ? "checked" : ""}> Mark what's new</label>`;
+  document.body.classList.toggle("marks", S.marks);
+}
+
+/* ---------- collection page ---------- */
+function header(sub) {
+  return `<header class="destination-header"><div class="destination-crumb"><strong>Commonplace</strong>${sub ? `<i>/</i><span>${sub}</span>` : ""}</div>
+    <nav class="destination-tabs" aria-label="Commonplace sections">${["Everything", "Collections", "To read", "Templates"].map(t => `<button class="destination-tab" ${t === "Collections" ? 'aria-current="page"' : ""}>${t}</button>`).join("")}</nav></header>`;
+}
+function typeRow() {
+  const n = D().objs.length;
+  const ico = `<svg viewBox="0 0 16 16"><path d="M8 2l5.5 3v6L8 14l-5.5-3V5z"/><path d="M2.5 5L8 8l5.5-3M8 8v6"/></svg>`;
+  return `<nav class="cph-types" aria-label="Types">${["All", "Notes", "Sources", "Photos"].map(t => `<button class="cph-type">${t}</button>`).join("")}<button class="cph-type" aria-current="true">${ico}Objects<span class="n">${n}</span></button>
+    <span class="cph-chev" aria-hidden="true">›</span>${D().cols.map(c => `<button class="cph-coll" data-act="col" data-id="${c.id}" aria-pressed="${S.col === c.id}">${esc(c.name)}<span class="n">${objsOf(c.id).length}</span></button>`).join("")}</nav>`;
+}
+function sensBanner(c) {
+  const s = sensOf(c);
+  if (s === "clinical") return `<div class="banner${newTag(3)}"><b>Clinical.</b><span>De-identified, for learning and reflection. Not a clinical record. Keep bands, never names, dates of birth or record numbers. Loci remembers only the lessons you file.</span></div>`;
+  if (s === "confidential") return `<div class="banner info${newTag(3)}"><b>Confidential.</b><span>Off the record: Loci remembers only the lessons you file here.</span></div>`;
+  return "";
+}
+function viewsOf(c) {
+  const v = [{ id: "cards", name: "Cards", ph: 0 }];
+  if (at(1)) v.push({ id: "table", name: "Table", ph: 1 });
+  if (at(2)) {
+    const ch = c.fields.find(f => f.t === "choice"), dt = c.fields.find(f => f.t === "date");
+    if (ch) v.push({ id: "board", name: `By ${lower(ch.label)}`, by: ch.id, ph: 2 });
+    if (dt) v.push({ id: "timeline", name: "Timeline", by: dt.id, ph: 2 });
+    c.views.forEach(x => v.push({ ...x, ph: 2 }));
+  }
+  return v;
+}
+function renderCollection() {
+  const c = C(S.col), os = objsOf(c.id), views = viewsOf(c);
+  let view = views.find(v => v.id === c.view) || views[0];
+  const filterF = at(2) ? c.fields.find(f => f.t === "choice") : null;
+  const shown = filterF && c.filter ? os.filter(o => arr(o.v[filterF.id]).includes(c.filter)) : os;
+  let body;
+  if (view.id === "table") body = table(c, shown);
+  else if (view.l === "board" || view.id === "board" || view.id.startsWith("vb")) body = board(c, shown, F_(c, view.by));
+  else if (view.id === "timeline" || view.id.startsWith("vt")) body = timeline(c, shown, F_(c, view.by));
+  else body = `<div class="wall">${shown.map(o => card(c, o)).join("")}</div>`;
+  if (!shown.length) body = `<p class="small">No ${esc(lower(c.name))} yet. Choose New ${esc(lower(c.label))} to add the first.</p>`;
+  return `${header("Collections")}${typeRow()}
+    <div class="chead"><div class="t"><p class="ip-kicker">Objects collection · <span${NEWA(3)}>${BASES[baseOf(c)]}</span> · ${LAYOUTS[c.layout]} cards · ${os.length} ${os.length === 1 ? lower(c.label) : lower(c.name)}</p><h1>${esc(c.name)}</h1>${c.desc ? `<p class="lead">${esc(c.desc)}</p>` : ""}</div>
+      <div class="acts"><button class="button button-quiet" data-act="customize">Customize</button><button class="button" data-act="newobj">New ${esc(lower(c.label))}</button></div></div>
+    ${sensBanner(c)}
+    ${at(1) ? `<div class="shelf-tabs" role="tablist" aria-label="Views">${views.map(v => `<button role="tab" aria-selected="${v.id === view.id}" data-act="view" data-id="${v.id}"${v.ph === S.P && v.ph > 0 ? ` class="new" data-new="Phase ${v.ph}"` : ""}>${esc(v.name)}</button>`).join("")}${at(2) ? `<button data-act="addview"${NEWA(2)}>+ Save view</button>` : ""}</div>` : ""}
+    ${filterF ? `<div class="chips${newTag(2)}" role="group" aria-label="${esc(filterF.label)}"><button class="chip" data-act="filter" data-v="" aria-pressed="${!c.filter}">All</button>${filterF.o.opts.map(op => `<button class="chip" data-act="filter" data-v="${esc(op.v)}" aria-pressed="${c.filter === op.v}">${esc(op.v)}</button>`).join("")}</div>` : ""}
+    ${body}`;
+}
+function cell(c, f, o) {
+  const v = o.v[f.id], e = eff(f);
+  if (e === "choice") return `<div class="rel-row">${arr(v).map(x => chipOf(f, x)).join("")}<button class="addv" data-act="pick" data-o="${o.id}" data-f="${f.id}" aria-label="Set ${esc(f.label)}">${arr(v).length ? "▾" : "+"}</button></div>`;
+  if (e === "check") return `<button class="tick${v ? " y" : ""}" data-act="check" data-o="${o.id}" data-f="${f.id}" aria-label="${esc(f.label)}" aria-pressed="${!!v}">${v ? "✓" : ""}</button>`;
+  if (e === "rel" || e === "item") return `<div class="rel-row">${(e === "item" ? arr(v).slice(0, 1) : arr(v)).map(id => O(id)).filter(Boolean).map(x => `<button class="chip-rel" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("")}</div>`;
+  const t = text(f, v);
+  return t ? `<span class="${f.t === "number" || f.t === "date" ? "num" : ""}">${esc(t)}</span>` : `<span class="muted">—</span>`;
+}
+function table(c, os) {
+  const cols = activeFields(c).filter(f => eff(f) !== "long").slice(0, 7);
+  return `<div class="tbl${newTag(1)}"><table><thead><tr><th>${esc(c.label)}</th>${cols.map(f => `<th>${esc(f.label)}</th>`).join("")}</tr></thead><tbody>
+    ${os.map(o => `<tr><td><button class="tt" data-act="open" data-id="${o.id}">${esc(o.title)}</button></td>${cols.map(f => `<td>${cell(c, f, o)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function board(c, os, f) {
+  if (!f) return `<p class="small">This view's field was removed.</p>`;
+  const groups = f.o.opts.map(op => ({ v: op.v, c: op.c, items: os.filter(o => arr(o.v[f.id])[0] === op.v) }));
+  const none = os.filter(o => !arr(o.v[f.id]).length);
+  if (none.length) groups.push({ v: "", c: 5, items: none });
+  return `<div class="board${newTag(2)}">${groups.map(g => `<div class="bcol" data-drop="${esc(g.v)}" data-f="${f.id}"><h3>${g.v ? `<span class="cc c${g.c}">${esc(g.v)}</span>` : `<span class="muted">No ${esc(lower(f.label))}</span>`}<b>${g.items.length}</b></h3>
+    ${g.items.map(o => `<div class="bcard" draggable="true" data-drag="${o.id}" data-act="open" data-id="${o.id}" role="button" tabindex="0"><b>${esc(o.title)}</b><small>${esc(cardSummary(c, o))}</small></div>`).join("")}</div>`).join("")}</div>
+    <p class="small" style="margin-top:10px">Drag a card to another column to change its ${esc(lower(f.label))}.</p>`;
+}
+function span(v) {
+  if (v == null || v === "") return null;
+  if (typeof v === "string") { const t = Date.parse(v + "T00:00:00Z"); return isNaN(t) ? null : { a: t, b: t, day: true }; }
+  return { a: v.y, b: v.open ? 2026 : (v.y2 ?? v.y), open: !!v.open };
+}
+function timeline(c, os, f) {
+  if (!f) return `<p class="small">This view's field was removed.</p>`;
+  const rows = os.map(o => ({ o, s: span(o.v[f.id]) })).filter(x => x.s).sort((a, b) => a.s.a - b.s.a);
+  if (!rows.length) return `<p class="small">Nothing has a ${esc(lower(f.label))} yet.</p>`;
+  const day = rows[0].s.day;
+  let lo = Math.min(...rows.map(r => r.s.a)), hi = Math.max(...rows.map(r => r.s.b));
+  const ticks = [];
+  if (day) {
+    const d0 = new Date(lo), d1 = new Date(hi);
+    lo = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), 1); hi = Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth() + 1, 1);
+    for (const d = new Date(lo); d.getTime() <= hi; d.setUTCMonth(d.getUTCMonth() + 1)) ticks.push({ x: d.getTime(), l: MONTHS[d.getUTCMonth()].slice(0, 3) });
+  } else {
+    const step = [1, 2, 5, 10, 20, 25, 50, 100].find(s => Math.max(1, hi - lo) / s <= 7) || 200;
+    lo = Math.floor(lo / step) * step; hi = Math.ceil((hi === lo ? hi + 1 : hi) / step) * step;
+    for (let y = lo; y <= hi; y += step) ticks.push({ x: y, l: String(y) });
+  }
+  const pct = x => ((x - lo) / (hi - lo)) * 100;
+  const cf = c.fields.find(x => x.t === "choice" && x.id !== f.id);
+  const colr = o => { const op = cf && cf.o.opts.find(p => p.v === arr(o.v[cf.id])[0]); return op ? `var(--c${op.c}-fg)` : "var(--status-2)"; };
+  const grid = ticks.map(k => `<span class="grid-l" style="left:${pct(k.x)}%"></span>`).join("");
+  return `<div class="tl${newTag(2)}"><div class="tlin">${cf ? `<div class="tlleg">Colour: ${esc(cf.label)} ${cf.o.opts.map(p => `<span class="cc c${p.c}">${esc(p.v)}</span>`).join("")}</div>` : ""}
+    <div class="tlrow"><span></span><div class="track axis">${ticks.map(k => `<span class="tick-l" style="left:${pct(k.x)}%">${k.l}</span>`).join("")}</div></div>
+    ${rows.map(({ o, s }) => `<div class="tlrow"><span class="lab"><button data-act="open" data-id="${o.id}" title="${esc(o.title)}">${esc(o.title)}</button></span><div class="track">${grid}${s.a === s.b ? `<span class="pt" style="left:${pct(s.a)}%;background:${colr(o)}" title="${esc(fmtDate(o.v[f.id]))}"></span>` : `<span class="bar${s.open ? " open" : ""}" style="left:${pct(s.a)}%;width:${pct(s.b) - pct(s.a)}%;background:${colr(o)}" title="${esc(fmtDate(o.v[f.id]))}"></span>`}</div></div>`).join("")}</div></div>`;
+}
+
+/* ---------- item page ---------- */
+function editor(c, f, o) {
+  const v = o.v[f.id], e = eff(f);
+  if (e === "choice" || e === "check") return cell(c, f, o);
+  if (e === "rel") return `<div class="rel-row">${arr(v).map(id => O(id)).filter(Boolean).map(x => `<button class="chip-rel" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("")}<button class="addv" data-act="pick" data-o="${o.id}" data-f="${f.id}">${!f.o.many && arr(v).length ? "▾" : "+ Link"}</button></div>`;
+  if (e === "item") { const x = O(arr(v)[0]); return `<div class="rel-row">${x ? `<button class="chip-rel" data-act="open" data-id="${x.id}">${esc(x.title)}</button>` : `<span class="muted">Not recorded</span>`}</div>`; }
+  const shown = f.t === "date" ? fmtDate(v) : f.t === "rel" ? text(f, v) : f.t === "choice" ? arr(v).join(", ") : f.t === "check" ? (v ? "Yes" : "No") : f.t === "number" && v != null ? String(v) : (v ?? "");
+  return `<span class="ed" contenteditable="true" data-o="${o.id}" data-f="${f.id}" data-ph="Not recorded">${esc(shown)}</span>${at(1) && f.t === "number" && f.o.unit ? ` <span class="muted">${esc(f.o.unit)}</span>` : ""}${f.t === "url" && v ? ` <a class="btn-open-graph" href="${esc(v)}" target="_blank" rel="noopener">↗</a>` : ""}`;
+}
+function railFields(c, o) {
+  const list = activeFields(c).filter(f => !(at(1) && eff(f) === "long") && !(at(2) && f.t === "rel" && f.o.cards));
+  let out = "", group = null;
+  for (const f of list) {
+    if (at(2) && (f.o.group || "") !== group) { group = f.o.group || ""; if (group) out += `<p class="prop-group${newTag(2)}">${esc(group)}</p>`; }
+    const tnew = TYPE_PHASE[f.t] && at(TYPE_PHASE[f.t]) && S.P === TYPE_PHASE[f.t];
+    out += `<div class="prop${tnew ? ` new" data-new="Phase ${S.P}` : ""}"><span>${esc(f.label)}</span><div class="prop-value">${editor(c, f, o)}</div></div>`;
+  }
+  return out;
+}
+/** Today and Phase 1 draw the fixed Work and Person pages; from Phase 2 the collection's arranged list (P2) is used. */
+function blocksFor(c) {
+  if (!at(2)) return defaultBlocks(c, false);
+  if (!c.blocks) c.blocks = defaultBlocks(c, true);
+  return c.blocks;
+}
+function defaultBlocks(c, arranged) {
+  const b = [{ k: "lead", on: true }, { k: "body", on: true }];
+  c.fields.filter(f => f.t === "long").forEach(f => b.push({ k: "sec:" + f.id, on: true }));
+  c.fields.filter(f => f.t === "rel" && f.o.cards).forEach(f => b.push({ k: "rel:" + f.id, on: true }));
+  D().cols.forEach(sc => sc.fields.filter(f => f.t === "rel" && f.o.to === c.id && !f.o.sym).forEach(f => b.push({ k: `inv:${sc.id}.${f.id}`, on: true })));
+  b.push({ k: "notes", on: true }, { k: "linked", on: true });
+  // A starter type can ship with its own order (here: the facts first, your own writing last).
+  if (arranged && (c.id === "cases" || c.id === "clauses" || c.id === "guides")) { const i = b.findIndex(x => x.k === "body"); b.push(b.splice(i, 1)[0]); }
+  return b;
+}
+function miniCards(ids) { return `<div class="ip-cards">${ids.map(O).filter(Boolean).map(x => card(C(x.c), x)).join("")}</div>`; }
+function block(c, o, b, i) {
+  const [k, rest] = b.k.split(/:(.+)/);
+  let html = "", empty = false, derived = false, ph = 0;
+  if (k === "lead") { html = `<div class="ip-lead" contenteditable="true" data-o="${o.id}" data-desc="1" data-ph="Add a short description…">${esc(o.desc)}</div>`; }
+  else if (k === "body") { html = `<section class="ip-writing"><h2>What I took from it</h2><div class="md" contenteditable="true" data-o="${o.id}" data-body="1" data-ph="Type / for a heading, quote or link">${esc(o.body)}</div></section>`; }
+  else if (k === "sec") {
+    const f = F_(c, rest); if (!f || !at(1) || !activeFields(c).includes(f)) return "";
+    ph = 1; html = `<section class="ip-writing"><h2>${esc(f.label)}</h2><div class="md" contenteditable="true" data-o="${o.id}" data-f="${f.id}" data-ph="Write ${esc(lower(f.label))}…">${esc(o.v[f.id] || "")}</div></section>`;
+  } else if (k === "rel") {
+    const f = F_(c, rest); if (!f || !at(2)) return ""; ph = 2;
+    const ids = arr(o.v[f.id]); empty = !ids.length;
+    html = `<section class="ip-shelf"><div class="ip-shelf-h"><h2>${esc(f.label)}</h2>${ids.length ? `<span>${ids.length}</span>` : ""}<button class="addv" data-act="pick" data-o="${o.id}" data-f="${f.id}">+ Link</button></div>${miniCards(ids)}</section>`;
+  } else if (k === "inv") {
+    if (!at(2)) return ""; ph = 2; derived = true;
+    const [cid, fid] = rest.split("."), sc = C(cid), f = sc && F_(sc, fid); if (!f) return "";
+    const ids = objsOf(cid).filter(x => arr(x.v[fid]).includes(o.id)).map(x => x.id); empty = !ids.length;
+    html = `<section class="ip-shelf"><div class="ip-shelf-h"><h2>${esc(f.o.inv || sc.name)}</h2>${ids.length ? `<span>${ids.length}</span>` : ""}<small>from each ${esc(lower(sc.label))}'s ${esc(f.label)}</small></div>${miniCards(ids)}</section>`;
+  } else if (k === "notes") {
+    derived = true; empty = !o.notes.length;
+    html = `<section class="ip-shelf"><div class="ip-shelf-h"><h2>Margin notes</h2>${o.notes.length ? `<span>${o.notes.length}</span>` : ""}</div><div class="ip-cards">${o.notes.map(n => `<div class="mnote">${esc(n.text)}<small>${esc(n.by)}</small></div>`).join("")}</div></section>`;
+  } else if (k === "linked") {
+    derived = true; empty = !o.linked.length;
+    html = `<section class="ip-shelf"><div class="ip-shelf-h"><h2>Linked</h2>${o.linked.length ? `<span>${o.linked.length}</span>` : ""}</div><div class="rel-row">${o.linked.map(l => `<span class="chip-rel">${esc(l.rel)}: ${esc(l.title)}</span>`).join("")}</div></section>`;
+  }
+  if (!S.arrange && (!b.on || (empty && derived))) return "";
+  const ctl = S.arrange ? `<div class="blk-ctl"><button data-act="mv" data-i="${i}" data-d="-1" aria-label="Move up">↑</button><button data-act="mv" data-i="${i}" data-d="1" aria-label="Move down">↓</button><button data-act="hide" data-i="${i}">${b.on ? "Hide" : "Show"}</button></div>` : "";
+  const isNew = ph && S.P === ph;
+  return `<div class="blk${S.arrange && !b.on ? " off" : ""}${isNew ? ` new" data-new="Phase ${ph}` : ""}">${ctl}${empty && S.arrange && derived ? `<p class="emptyb">${esc(html.match(/<h2>(.*?)<\/h2>/)?.[1] || "")}: empty for this ${esc(lower(c.label))}, hidden until it has something.</p>` : html}</div>`;
+}
+function hero(c, o) {
+  const h = heroOf(c);
+  const line = cardFields(c, o).map(x => eff(x.f) === "item" ? O(arr(x.v)[0])?.title || "" : text(x.f, x.v)).filter(Boolean).join(" · ");
+  const title = `<p class="ip-kicker">${esc(c.label)}</p><h1 class="ip-title" contenteditable="true" data-o="${o.id}" data-title="1">${esc(o.title)}</h1>`;
+  if (h === "portrait") return `<div class="ip-side"><div class="ip-portrait" aria-hidden="true">${esc(initials(o.title))}</div><div>${title}${line ? `<p class="ip-line">${esc(line)}</p>` : ""}</div></div>`;
+  if (h === "slideshow" && o.pics) {
+    const i = Math.min(S.slide, o.pics - 1);
+    return `<figure class="ip-wide${newTag(2)}"><div class="ip-pic">${building(o, i)}${o.pics > 1 ? `<button class="nav p" data-act="slide" data-n="${(i - 1 + o.pics) % o.pics}" aria-label="Previous photo">‹</button><button class="nav n" data-act="slide" data-n="${(i + 1) % o.pics}" aria-label="Next photo">›</button>` : ""}<span class="cnt">${i + 1} / ${o.pics}</span></div><div class="ip-strip">${Array.from({ length: o.pics }, (_, k) => `<button data-act="slide" data-n="${k}" aria-pressed="${k === i}" aria-label="Photo ${k + 1}">${building(o, k)}</button>`).join("")}</div></figure>${title}${line ? `<p class="ip-line">${esc(line)}</p>` : ""}`;
+  }
+  if ((h === "picture" || h === "slideshow") && hasPic(c, o)) return `<figure class="ip-wide"><div class="ip-pic">${pic(c, o)}</div></figure>${title}${line ? `<p class="ip-line">${esc(line)}</p>` : ""}`;
+  if (h === "doc") {
+    const top = c.fields.filter(f => f.t === "rel" && !f.o.many).map(f => text(f, o.v[f.id])).filter(Boolean).join(" · ") || cardFields(c, o).map(x => text(x.f, x.v))[0] || c.label;
+    const cit = cardFields(c, o).filter(x => x.f.t !== "rel").map(x => text(x.f, x.v)).filter(t => t !== top).join(" · ");
+    return `<div class="dochead${newTag(2)}"><span class="court">${esc(top)}</span><hr><span class="t">${esc(o.title)}</span>${cit ? `<span class="cit">${esc(cit)}</span>` : ""}</div><p class="ip-kicker">${esc(c.label)}</p><h1 class="visually-hidden" style="position:absolute;left:-9999px">${esc(o.title)}</h1>`;
+  }
+  return `${title}${line ? `<p class="ip-line">${esc(line)}</p>` : ""}`;
+}
+function renderItem() {
+  const o = O(S.obj), c = C(o.c), n = objsOf(c.id).length;
+  const blocks = blocksFor(c);
+  const railSide = !(at(2) && c.rail === "top");
+  const rail = `<p class="ip-rh">Properties</p>
+    <div class="prop"><span>${c.layout === "portrait" ? "Template" : "Type"}</span><div class="prop-value">${esc(c.label)}</div></div>
+    ${railFields(c, o)}
+    ${c.fields.length > cap() ? `<div class="prop"><span class="muted">+${c.fields.length - cap()}</span><div class="prop-value muted">more field${c.fields.length - cap() > 1 ? "s" : ""} don't fit: 8 at most today</div></div>` : ""}
+    ${hasPic(c, o) && !c.tex ? `<div class="prop"><span>Photos</span><div class="prop-value">${o.pics} photos</div></div>` : ""}
+    <div class="prop"><span>${c.layout === "portrait" ? "Strongest on" : "In Loci"}</span><div class="prop-value"><div class="rel-row">${o.topics.map(t => `<span class="chip-rel"><span class="tdot s${t.s}"></span> ${esc(t.n)}</span>`).join("") || `<span class="muted">No topics</span>`}</div></div></div>
+    <div class="prop"><span>Collection</span><div class="prop-value">${esc(c.name)} <button class="button button-link" style="padding:0 4px" data-act="noop">Move to…</button></div></div>
+    <div class="rail-actions"><button class="button button-quiet sm" data-act="customize">Add a property</button><a class="btn-open-graph" href="#">Open in Loci →</a></div>`;
+  const main = blocks.map((b, i) => block(c, o, b, i)).join("");
+  return `<div class="ipage${S.arrange ? " arr" : ""}">
+    <div class="ip-top"><button class="ip-back" data-act="back">← ${esc(c.name)}</button><span class="ip-crumb">${esc(c.label)}</span><span class="ip-saved">Saved</span>
+      <button class="ip-more" data-act="more" aria-label="Actions for this item"><svg aria-hidden="true" height="17" viewBox="0 0 24 24" width="17"><circle cx="5" cy="12" fill="currentColor" r="1.7"/><circle cx="12" cy="12" fill="currentColor" r="1.7"/><circle cx="19" cy="12" fill="currentColor" r="1.7"/></svg></button></div>
+    ${S.arrange ? `<div class="arrbar${newTag(2)}"><p>Arranging the <b>${esc(lower(c.label))}</b> page. Changes apply to every ${esc(lower(c.label))} (${n}).</p>
+      <div class="g">Top <div class="seg">${Object.keys(HEROES).map(k => `<button data-act="hero" data-k="${k}" aria-pressed="${heroOf(c) === k}" ${heroAllowed(c, k) ? "" : "disabled"}>${HEROES[k]}</button>`).join("")}</div></div>
+      <div class="g">Properties <div class="seg"><button data-act="rail" data-k="side" aria-pressed="${c.rail === "side"}">Side rail</button><button data-act="rail" data-k="top" aria-pressed="${c.rail === "top"}">Under the title</button></div></div>
+      <button class="button sm" data-act="arrange">Done</button></div>` : ""}
+    ${sensBanner(c)}
+    <div class="ip-grid${railSide ? "" : " top"}"><article class="ip-main">${hero(c, o)}${railSide ? "" : `<div class="props inline">${rail}</div>`}${main}</article>${railSide ? `<aside class="props ip-rail" aria-label="Properties">${rail}</aside>` : ""}</div></div>`;
+}
+function heroAllowed(c, k) {
+  if (k === "portrait") return baseOf(c) === "person";
+  if (k === "slideshow") return !c.tex && objsOf(c.id).some(o => o.pics);
+  if (k === "picture") return c.tex || objsOf(c.id).some(o => o.pics);
+  return true;
+}
+
+/* ---------- customizer ---------- */
+const PRESETS0 = ["Buildings", "Cases", "Conditions", "Companies", "Experiments", "Pieces"];
+const STARTERS = { architect: ["Buildings", "Architects", "Materials"], lawyer: ["Cases", "Courts", "Judges", "Clauses"], doctor: ["Drugs", "Guidelines", "Procedures", "Teaching cases"] };
+function typeOptions(f) {
+  const ts = Object.keys(TYPE_PHASE).filter(t => at(TYPE_PHASE[t]) && !(t === "item" && at(2)));
+  const cur = eff(f);
+  if (!ts.includes(cur)) ts.push(cur);
+  return ts.map(t => `<option value="${t}" ${t === cur ? "selected" : ""}>${TYPE_LABEL[t]}</option>`).join("");
+}
+function fieldCfg(c, f) {
+  const e = eff(f);
+  let h = "";
+  if (e === "choice") h = `<label>Options, separated by commas<input type="text" data-cfg="opts" data-f="${f.id}" value="${esc(f.o.opts.map(x => x.v).join(", "))}"></label><span class="rowl"><label style="display:flex;gap:6px"><input type="checkbox" data-cfg="many" data-f="${f.id}" ${f.o.many ? "checked" : ""}> Allow several</label></span>`;
+  if (e === "rel") h = `<label>Links to<select data-cfg="to" data-f="${f.id}">${D().cols.map(x => `<option value="${x.id}" ${x.id === f.o.to ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+    <label>Name on the other side<input type="text" data-cfg="inv" data-f="${f.id}" value="${esc(f.o.inv || "")}" placeholder="e.g. Cited by" ${f.o.sym ? "disabled" : ""}></label>
+    <span class="rowl"><label style="display:flex;gap:6px"><input type="checkbox" data-cfg="many" data-f="${f.id}" ${f.o.many ? "checked" : ""}> Allow several</label><label style="display:flex;gap:6px"><input type="checkbox" data-cfg="cards" data-f="${f.id}" ${f.o.cards ? "checked" : ""}> Show as cards on the page</label></span>`;
+  if (e === "number" && at(1)) h = `<label>Unit<input type="text" data-cfg="unit" data-f="${f.id}" value="${esc(f.o.unit || "")}" placeholder="m², days, min"></label>`;
+  if (e === "date" && at(1)) h = `<label>Precision<select data-cfg="prec" data-f="${f.id}"><option value="day" ${f.o.prec === "day" ? "selected" : ""}>Day (12 March 1932)</option><option value="year" ${f.o.prec !== "day" ? "selected" : ""}>Year or range (1932, 1959–65, born 1941)</option></select></label>`;
+  if (at(2)) h += `<label>Group<input type="text" data-cfg="group" data-f="${f.id}" value="${esc(f.o.group || "")}" placeholder="e.g. Mine"></label>`;
+  return h ? `<div class="field-cfg${newTag(TYPE_PHASE[f.t] > 0 && S.P === TYPE_PHASE[f.t] ? S.P : -1)}">${h}</div>` : "";
+}
+function renderCustomize() {
+  const c = C(S.col), n = objsOf(c.id).length, fs = c.fields;
+  const rows = fs.map((f, i) => {
+    const over = i >= cap(), onCard = c.card.includes(f.id);
+    return `<li><div class="field-row${over ? " over" : ""}"><span class="field-num">${i + 1}.</span><input type="text" data-fname="${f.id}" value="${esc(f.label)}" aria-label="Field ${i + 1} name"><select data-ftype="${f.id}" aria-label="Field ${i + 1} type" ${over ? "disabled" : ""}>${typeOptions(f)}</select>
+      <label class="field-card"><input type="checkbox" data-card="${f.id}" ${onCard ? "checked" : ""} ${!onCard && c.card.length >= 3 ? "disabled" : ""}> Card</label><button class="field-del" data-act="rmfield" data-f="${f.id}" aria-label="Remove ${esc(f.label)}">✕</button></div>
+      ${S.open === f.id || (!over && ["choice", "rel"].includes(eff(f)) && S.open === "all") ? fieldCfg(c, f) : ""}</li>`;
+  }).join("");
+  const preview = card(c, objsOf(c.id)[0] || { id: "x", c: c.id, title: `Untitled ${lower(c.label)}`, v: {}, pics: 0, topics: [], desc: "" });
+  const o0 = objsOf(c.id)[0];
+  const props = activeFields(c).map(f => `<div class="prop-item"><dt>${esc(f.label)}</dt><dd>${o0 ? esc(text(f, o0.v[f.id]) || "—") : "—"}</dd></div>`).join("");
+  return `<div class="collection-customizer">
+    <nav class="library-crumb" aria-label="Breadcrumb"><button data-act="back">Collections</button><i>/</i><b>${esc(c.name)}</b></nav>
+    <div class="customizer-layout"><div class="customizer-editor">
+      <h2>Edit collection</h2><p class="small">Changes apply to every ${esc(lower(c.label))} (${n} objects). Removing a field keeps its values hidden; renaming keeps them.</p>
+      <div class="coll-select-pills" role="group" aria-label="Collections">${D().cols.map(x => `<button class="${x.id === c.id ? "on" : ""}" data-act="ccol" data-id="${x.id}"><span class="dot ${x.accent}"></span>${esc(x.name)}</button>`).join("")}<button class="add-new" data-act="newcol">+ New collection</button></div>
+      ${S.loci ? lociBox() : ""}
+      <section class="cf-section"><h3 class="cf-section-head">About</h3>
+        <div class="form-row"><label for="cf-name">Name</label><input type="text" id="cf-name" data-cf="name" value="${esc(c.name)}"></div>
+        <div class="form-row"><label for="cf-desc">Description</label><textarea id="cf-desc" rows="2" data-cf="desc">${esc(c.desc)}</textarea></div></section>
+      <section class="cf-section"><h3 class="cf-section-head">Card</h3>
+        <div class="form-row"><span class="form-label">Base</span><div class="coll-select-pills inline${newTag(3)}">${Object.keys(BASES).filter(b => at(3) || b === "person" || b === "thing").map(b => `<button class="${baseOf(c) === b ? "on" : ""}" disabled>${BASES[b]}</button>`).join("")}</div><p class="cf-note">A collection's base is chosen when it is created and does not change.</p></div>
+        <div class="form-row"><span class="form-label">Layout</span><div class="coll-select-pills inline">${Object.keys(LAYOUTS).map(l => `<button class="${c.layout === l ? "on" : ""}" data-act="layout" data-k="${l}">${LAYOUTS[l]}</button>`).join("")}</div></div>
+        <div class="form-row"><label for="cf-label">One item is called</label><input type="text" id="cf-label" data-cf="label" value="${esc(c.label)}"></div></section>
+      <section class="cf-section"><h3 class="cf-section-head">Fields</h3>
+        <div class="customizer-section-head"><span class="form-label"><span${NEWA(2)}>Up to ${cap()}</span></span><span class="small">${Math.min(fs.length, cap())} of ${cap()} fields</span></div>
+        <div class="preset-bar${newTag(1)}">Start from: ${(at(1) ? STARTERS[S.field] : PRESETS0).map(p => `<button class="preset-chip" data-act="preset" data-k="${esc(p)}">${esc(p)}</button>`).join("")}</div>
+        <ol class="fields-list">${rows}</ol>
+        ${fs.length > cap() ? `<p class="over-note">${fs.length - cap()} field${fs.length - cap() > 1 ? "s don't" : " doesn't"} fit today (8 at most). Phase 2 raises the limit to 24, in groups.</p>` : ""}
+        <div class="customizer-actions" style="margin-top:12px"><button class="button button-quiet sm" data-act="addfield" ${fs.length >= cap() ? "disabled" : ""}>+ Add a field</button>${at(1) ? `<button class="button button-link" data-act="cfgall">${S.open === "all" ? "Hide settings" : "Show field settings"}</button>` : ""}</div></section>
+      ${at(2) ? `<section class="cf-section${newTag(2)}"><h3 class="cf-section-head">Page</h3>
+        <div class="form-row"><span class="form-label">Top of the page</span><div class="coll-select-pills inline">${Object.keys(HEROES).map(k => `<button class="${heroOf(c) === k ? "on" : ""}" data-act="hero" data-k="${k}" ${heroAllowed(c, k) ? "" : "disabled"}>${HEROES[k]}</button>`).join("")}</div></div>
+        <div class="form-row"><span class="form-label">Properties</span><div class="coll-select-pills inline"><button class="${c.rail === "side" ? "on" : ""}" data-act="rail" data-k="side">Side rail</button><button class="${c.rail === "top" ? "on" : ""}" data-act="rail" data-k="top">Under the title</button></div><p class="cf-note">To move or hide blocks, open any ${esc(lower(c.label))} and choose Arrange page in its ⋯ menu.</p></div></section>` : ""}
+      ${at(3) ? `<section class="cf-section${newTag(3)}"><h3 class="cf-section-head">Sensitivity</h3><div class="form-row"><div class="coll-select-pills inline">${["normal", "confidential", "clinical"].map(s => `<button class="${sensOf(c) === s ? "on" : ""}" data-act="sens" data-k="${s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join("")}</div><p class="cf-note">Confidential and Clinical keep this collection off the record: Loci remembers only the lessons you file.</p></div></section>` : ""}
+      <div class="customizer-actions"><button class="button" data-act="save">Save</button><button class="button button-quiet" data-act="back">Cancel</button></div>
+    </div>
+    <aside class="customizer-preview" aria-label="Live preview"><div class="preview-sticky"><h3>Preview</h3>
+      <div class="preview-box"><p class="lab">Card on the wall</p>${preview}</div>
+      <div class="preview-box"><p class="lab">Item page</p><dl class="props-preview">${props}</dl></div></div></aside></div></div>`;
+}
+function lociBox() {
+  return `<div class="loci${newTag(3)}"><b>Loci</b><span>Say what you want to keep. Loci fills in this form: base, fields, choices, page and views. Nothing is kept until you Save.</span>
+    <form data-form="loci"><input id="loci-q" placeholder="I keep track of…" autocomplete="off"><button class="button sm">Draft it</button></form>
+    <div class="sugg">${["Hearings I attend", "Sites I visit with students", "Teaching sessions I give"].map(s => `<button data-act="lsugg" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
+}
+function draft(textIn) {
+  const s = textIn.toLowerCase();
+  if (/hearing/.test(s)) return col({ id: "u" + Date.now(), name: "Hearings", label: "Hearing", base: "event", layout: "text", sens: "confidential", desc: "Hearings I attend and what I'd do differently.",
+    fields: [F("date", "Date", "date", { prec: "day" }), R("court", "Court", "courts", { many: false, inv: "Hearings" }), CH("stage", "Stage", ["Directions", "Interim", "Trial", "Appeal"]), F("well", "What went well", "long"), F("next", "What I'd change", "long")], card: ["date", "stage"], hero: "title", tl: "date" });
+  if (/site/.test(s)) return col({ id: "u" + Date.now(), name: "Sites", label: "Site", base: "place", layout: "picture", desc: "Sites I visit with students.",
+    fields: [F("where", "Where", "text"), F("vis", "Visited", "date", { prec: "day" }), CH("light", "Light", ["Bright sun", "Overcast", "Low sun"]), F("noticed", "What we noticed", "long")], card: ["where", "vis"], hero: "picture" });
+  return col({ id: "u" + Date.now(), name: "Teaching sessions", label: "Teaching session", base: "event", layout: "text", desc: "Sessions I teach, with feedback.",
+    fields: [F("date", "Date", "date", { prec: "day" }), CH("aud", "Audience", ["Students", "Foundation doctors", "Nurses"]), F("fb", "Feedback", "number", { unit: "/ 5" }), F("refl", "Reflection", "long")], card: ["date", "aud"], hero: "title", tl: "date" });
+}
+
+/** A draft keeps only relation fields whose collection exists for this learner. */
+function keepable(nc) { nc.fields = nc.fields.filter(f => f.t !== "rel" || C(f.o.to)); return nc; }
+
+/* ---------- render ---------- */
+function bandHeight() { document.documentElement.style.setProperty("--band-h", $("#band").offsetHeight + "px"); }
+window.addEventListener("resize", bandHeight);
+function render() {
+  renderBand();
+  bandHeight();
+  const m = $("#main");
+  if (S.screen === "item" && O(S.obj)) m.innerHTML = renderItem();
+  else if (S.screen === "customize") m.innerHTML = renderCustomize();
+  else { S.screen = "collection"; m.innerHTML = renderCollection(); }
+}
+
+/* ---------- menus, toast ---------- */
+let menuState = null;
+function openMenu(anchor, html, state) {
+  menuState = state; const m = $("#menu"); m.innerHTML = html; m.hidden = false;
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(16, Math.min(r.right - w, innerWidth - w - 16)) + "px";
+  m.style.top = (r.bottom + 6 + h > innerHeight - 16 ? Math.max(16, r.top - h - 6) : r.bottom + 6) + "px";
+}
+function closeMenu() { menuState = null; $("#menu").hidden = true; }
+function pickMenu() {
+  const o = O(menuState.o), c = C(o.c), f = F_(c, menuState.f), cur = arr(o.v[f.id]);
+  if (eff(f) === "choice") return `<h5>${esc(f.label)}${f.o.many ? " · several" : ""}</h5>${f.o.opts.map(op => `<button data-act="popt" data-v="${esc(op.v)}"><i>${cur.includes(op.v) ? "✓" : ""}</i><span>${chipOf(f, op.v)}</span></button>`).join("")}`;
+  const list = objsOf(f.o.to).filter(x => x.id !== o.id);
+  return `<h5>${esc(f.label)} → ${esc(C(f.o.to).name)}</h5>${list.map(x => `<button data-act="prel" data-v="${x.id}"><i>${cur.includes(x.id) ? "✓" : ""}</i><span>${esc(x.title)}</span></button>`).join("")}`;
+}
+let tT;
+function toast(s) { const t = $("#toast"); t.textContent = s; t.hidden = false; clearTimeout(tT); tT = setTimeout(() => t.hidden = true, 3000); }
+function setRel(o, f, id) {
+  const cur = arr(o.v[f.id]), on = cur.includes(id);
+  o.v[f.id] = on ? cur.filter(x => x !== id) : f.o.many || f.o.sym ? [...cur, id] : [id];
+  if (f.o.sym) { const x = O(id), oc = arr(x.v[f.id]); x.v[f.id] = on ? oc.filter(y => y !== o.id) : oc.includes(o.id) ? oc : [...oc, o.id]; }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-act]");
+  if (!e.target.closest("#menu") && menuState && !(a && ["pick", "more", "addview"].includes(a.dataset.act))) closeMenu();
+  if (!a) return;
+  const d = a.dataset, c = C(S.col);
+  switch (d.act) {
+    case "phase": S.P = +d.n; S.arrange = false; S.open = null; S.loci = false; if (!at(2)) D().cols.forEach(x => { x.filter = null; }); render(); break;
+    case "field": S.field = d.k; S.col = D().cols[0].id; S.screen = "collection"; S.obj = null; S.arrange = false; S.loci = false; render(); break;
+    case "col": S.col = d.id; S.screen = "collection"; render(); break;
+    case "view": c.view = d.id; render(); break;
+    case "filter": c.filter = d.v || null; render(); break;
+    case "open": { if (S.drag) return; const o = O(d.id); if (!o) return; S.obj = o.id; S.col = o.c; S.screen = "item"; S.slide = 0; S.arrange = false; render(); window.scrollTo({ top: 0 }); break; }
+    case "back": S.screen = "collection"; S.arrange = false; S.loci = false; render(); break;
+    case "customize": S.screen = "customize"; S.arrange = false; render(); window.scrollTo({ top: 0 }); break;
+    case "ccol": S.col = d.id; S.open = null; render(); break;
+    case "newobj": { const id = "n" + Date.now(); D().objs.push(ob(id, c.id, `Untitled ${lower(c.label)}`, {})); S.obj = id; S.screen = "item"; render(); setTimeout(() => { const t = document.querySelector(".ip-title"); t?.focus(); document.getSelection().selectAllChildren(t); }, 0); break; }
+    case "slide": S.slide = +d.n; render(); break;
+    case "more": e.stopPropagation(); openMenu(a, `<button data-act="m-tab"><i></i><span>Open in new tab</span></button><button data-act="m-topic"><i></i><span>Add topic…</span></button><button data-act="noop"><i></i><span>Move to…</span></button>${at(2) ? `<button data-act="arrange"${NEWA(2)}><i></i><span>Arrange page</span></button>` : ""}<button data-act="customize"><i></i><span>Edit collection</span></button><button data-act="noop"><i></i><span>Copy link</span></button>`, { kind: "more" }); break;
+    case "arrange": closeMenu(); S.arrange = !S.arrange; render(); break;
+    case "hero": c.hero = d.k; render(); break;
+    case "rail": c.rail = d.k; render(); break;
+    case "mv": { const L = blocksFor(c), i = +d.i, j = i + +d.d; if (j < 0 || j >= L.length) return; [L[i], L[j]] = [L[j], L[i]]; render(); break; }
+    case "hide": { const b = blocksFor(c)[+d.i]; b.on = !b.on; render(); break; }
+    case "check": { const o = O(d.o); o.v[d.f] = !o.v[d.f]; render(); break; }
+    case "pick": e.stopPropagation(); menuState = { kind: "pick", o: d.o, f: d.f }; openMenu(a, pickMenu(), menuState); break;
+    case "popt": { const o = O(menuState.o), f = F_(C(o.c), menuState.f), cur = arr(o.v[f.id]); o.v[f.id] = f.o.many ? (cur.includes(d.v) ? cur.filter(x => x !== d.v) : [...cur, d.v]) : (cur[0] === d.v ? [] : [d.v]); if (f.o.many) $("#menu").innerHTML = pickMenu(); else closeMenu(); render(); break; }
+    case "prel": { const o = O(menuState.o), f = F_(C(o.c), menuState.f); setRel(o, f, d.v); if (f.o.many || f.o.sym) $("#menu").innerHTML = pickMenu(); else closeMenu(); render(); break; }
+    case "addview": {
+      e.stopPropagation();
+      const items = [...c.fields.filter(f => f.t === "choice").map(f => [`vb${f.id}`, `Board by ${f.label}`, "board", f.id]), ...c.fields.filter(f => f.t === "date").map(f => [`vt${f.id}`, `Timeline by ${f.label}`, "timeline", f.id])];
+      openMenu(a, `<h5>Save a view of ${esc(lower(c.name))}</h5>${items.map(([id, n, l, by]) => `<button data-act="mkview" data-id="${id}" data-n="${esc(n)}" data-l="${l}" data-by="${by}"><i></i><span>${esc(n)}</span></button>`).join("")}`, { kind: "addview" }); break;
+    }
+    case "mkview": { const id = d.id + Date.now() % 1000; c.views.push({ id, name: d.n, l: d.l, by: d.by }); c.view = id; closeMenu(); render(); toast(`Saved “${d.n}”. Pin it to the header from its ⋯ menu.`); break; }
+    case "layout": c.layout = d.k; render(); break;
+    case "sens": c.sens = d.k; c.sens3 = d.k; render(); break;
+    case "addfield": { const f = F("f" + Date.now(), "New field", "text"); c.fields.push(f); c.blocks = null; S.open = f.id; render(); setTimeout(() => { const i = document.querySelector(`[data-fname="${f.id}"]`); i?.focus(); i?.select(); }, 0); break; }
+    case "rmfield": { c.fields = c.fields.filter(f => f.id !== d.f); c.card = c.card.filter(x => x !== d.f); c.blocks = null; render(); break; }
+    case "cfgall": S.open = S.open === "all" ? null : "all"; render(); break;
+    case "preset": toast(at(1) ? `${d.k}: fields with choices, sections and card fields (T1).` : `${d.k} adds Text fields (today's preset).`); break;
+    case "newcol": if (at(3)) { S.loci = true; render(); setTimeout(() => $("#loci-q")?.focus(), 0); } else toast("Today: a blank form with presets. Phase 3 lets Loci draft it from a sentence."); break;
+    case "lsugg": { const nc = keepable(draft(d.v)); D().cols.push(nc); S.col = nc.id; S.loci = false; S.open = "all"; render(); toast(`Loci drafted ${nc.name}. Change anything, then Save.`); break; }
+    case "save": toast("Saved. Every object in this collection now uses it."); break;
+    case "m-tab": case "m-topic": case "noop": closeMenu(); break;
+  }
+});
+document.addEventListener("submit", e => {
+  if (e.target.dataset.form !== "loci") return;
+  e.preventDefault();
+  const v = $("#loci-q").value.trim();
+  if (!v) { toast("Write what you keep track of, for example “Hearings I attend”."); return; }
+  const nc = keepable(draft(v)); D().cols.push(nc); S.col = nc.id; S.loci = false; S.open = "all"; render(); toast(`Loci drafted ${nc.name}. Change anything, then Save.`);
+});
+document.addEventListener("change", e => {
+  const el = e.target, c = C(S.col);
+  if (el.id === "marks") { S.marks = el.checked; renderBand(); return; }
+  if (el.dataset.ftype) {
+    const f = F_(c, el.dataset.ftype), t = el.value;
+    if (t === f.t || (eff(f) === t)) return;
+    f.t = t; if (t === "choice" && !f.o.opts) f.o.opts = opts(["First", "Second", "Third"]);
+    if (t === "rel" && !f.o.to) Object.assign(f.o, { to: D().cols.find(x => x.id !== c.id)?.id || c.id, many: true, inv: c.name });
+    if (t === "date") f.o.prec = f.o.prec || "year";
+    S.open = f.id; c.blocks = null; render(); return;
+  }
+  if (el.dataset.card) { const id = el.dataset.card; c.card = el.checked ? [...c.card, id] : c.card.filter(x => x !== id); render(); return; }
+  if (el.dataset.cfg) {
+    const f = F_(c, el.dataset.f), k = el.dataset.cfg;
+    if (k === "opts") { const vals = [...new Set(el.value.split(",").map(s => s.trim()).filter(Boolean))]; const old = Object.fromEntries(f.o.opts.map(x => [x.v, x.c])); f.o.opts = vals.map((v, i) => ({ v, c: old[v] ?? i % 6 })); }
+    else if (k === "many" || k === "cards") f.o[k] = el.checked;
+    else f.o[k] = el.value;
+    if (k === "cards" || k === "to") c.blocks = null;
+    render();
+  }
+});
+document.addEventListener("input", e => {
+  const el = e.target, c = C(S.col);
+  if (el.dataset.fname) { F_(c, el.dataset.fname).label = el.value; return; }
+  if (el.dataset.cf) { c[el.dataset.cf] = el.value; }
+});
+document.addEventListener("focusout", e => {
+  const el = e.target;
+  if (!el.isContentEditable) return;
+  const o = O(el.dataset.o); if (!o) return;
+  const t = el.textContent.replace(/\s+/g, " ").trim();
+  if (sensOf(C(o.c)) === "clinical" && [/\b\d{3}[ -]?\d{3}[ -]?\d{4}\b/, /\b\d{1,2}[\/.-]\d{1,2}[\/.-](19|20)?\d{2}\b/, /\b(Mr|Mrs|Ms|Miss)\.?\s+[A-Z][a-z]+/].some(r => r.test(t))) { toast("That looks like a name, a date of birth or a record number. Clinical collections keep bands, not identifiers."); render(); return; }
+  if (el.dataset.title) o.title = t || o.title;
+  else if (el.dataset.desc) o.desc = t;
+  else if (el.dataset.body) o.body = el.innerText.trim();
+  else if (el.dataset.f) {
+    const f = F_(C(o.c), el.dataset.f);
+    if (f.t === "number") { const n = parseFloat(t.replace(/[^\d.-]/g, "")); o.v[f.id] = isNaN(n) ? null : n; }
+    else if (f.t === "date") { const m = /^(\d{4})\s*[–-]\s*(\d{2,4})$/.exec(t); o.v[f.id] = /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : m ? { y: +m[1], y2: +(m[2].length === 2 ? m[1].slice(0, 2) + m[2] : m[2]) } : /^\d{4}$/.test(t) ? { y: +t } : /^born \d{4}$/i.test(t) ? { y: +t.slice(5), open: true } : o.v[f.id]; }
+    else if (f.t === "text" || f.t === "url" || f.t === "long") o.v[f.id] = eff(f) === "long" ? el.innerText.trim() : t;
+  }
+  const sub = document.querySelector(".ip-line"); if (sub && el.dataset.f) sub.textContent = cardFields(C(o.c), o).map(x => eff(x.f) === "item" ? O(arr(x.v)[0])?.title || "" : text(x.f, x.v)).filter(Boolean).join(" · ");
+});
+document.addEventListener("keydown", e => {
+  const el = e.target;
+  if ((e.key === "Enter" || e.key === " ") && el.getAttribute?.("role") === "button" && el.dataset.act) { e.preventDefault(); el.click(); return; }
+  if (e.key === "Enter" && el.isContentEditable && !el.classList.contains("md") && !el.classList.contains("ip-lead")) { e.preventDefault(); el.blur(); }
+  if (e.key === "Escape") { if (menuState) closeMenu(); else if (S.arrange) { S.arrange = false; render(); } }
+});
+document.addEventListener("paste", e => { if (e.target.isContentEditable) { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain")); } });
+window.addEventListener("scroll", e => { if (menuState && !e.target.closest?.("#menu")) closeMenu(); }, true);
+document.addEventListener("dragstart", e => { const c = e.target.closest?.("[data-drag]"); if (!c) return; S.drag = c.dataset.drag; e.dataTransfer.setData("text/plain", S.drag); });
+document.addEventListener("dragover", e => { const col = e.target.closest?.(".bcol"); if (!col || !S.drag) return; e.preventDefault(); document.querySelectorAll(".bcol.over").forEach(x => x !== col && x.classList.remove("over")); col.classList.add("over"); });
+document.addEventListener("drop", e => { const col = e.target.closest?.(".bcol"); if (!col || !S.drag) return; e.preventDefault(); const o = O(S.drag); o.v[col.dataset.f] = col.dataset.drop ? [col.dataset.drop] : []; S.drag = null; render(); toast(col.dataset.drop ? `${o.title} → ${col.dataset.drop}` : `Cleared for ${o.title}`); });
+document.addEventListener("dragend", () => { setTimeout(() => S.drag = null, 0); document.querySelectorAll(".bcol.over").forEach(x => x.classList.remove("over")); });
+
+render();
+</script>
