@@ -5,6 +5,7 @@ HIGH (a new layer in Commonplace, a migration, and changes to the Boards, Work a
 **For:** the owner, to react to and decide, and the agent who later builds it in `studiolo`.
 **Status:** Proposed. Claude, 25 October 2026. Written from the owner's idea in the conversation of 25 October. Nothing here is approved until the owner says so.
 **Checked against:** `studiolo` main @ `b5eeee2` (25 Oct 2026), read only. Paths exist on that commit unless marked *new*.
+**Build order:** [`2026-10-25-questions-and-goals-roadmap-design.md`](2026-10-25-questions-and-goals-roadmap-design.md) replaces the phase table below for order and scope (notes, long notes and margin notes first; boards and projects later).
 **Changes, if agreed:** the owner's choice of 16 Oct, "goals as Library notes the copilot recognises, plus Settings" (`studiolo` `docs/superpowers/specs/2026-10-16-today-design.md:178`). It also changes, in this repo: Boards (`2026-10-24-boards-design.md` rules 2–3, line 37: "a note or question written on a board becomes a Note"), Work (`2026-10-24-work-design.md` §2, `project_questions`) and learner memory (`2026-10-24-learner-memory-and-settings-design.md:557`, goal notes as evidence for `why`).
 
 ## 0. In short
