@@ -1,0 +1,1151 @@
+<meta charset="utf-8">
+<title>Objects, Boards and Questions</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: the real Commonplace (studiolo's own CSS at b5eeee2, as in prototypes/objects-phases) with three views that
+   share one store: a board canvas with its Inside panel, an item page (Object, note, Source) and the Questions and
+   goals list. Questions in --pick, goals in --accent-soft, as the Boards and Questions designs chose. */
+
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --board: #ebebe6; --line: #dbdbd3;
+  --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --status-1: #c9d4f1; --status-2: #6e86d0; --status-3: #1e3e9e; --accent: #1e3e9e;
+  --surface-float: #fbfbf9; --scrim-blur: rgba(243, 243, 239, 0.72); --shade: rgb(34, 48, 58);
+  --accent-soft: #e6ebf8; --accent-strong: #142b73; --warn: #9a3b2e; --warn-soft: #f6e4df; --ok: #2f6b4a;
+  --quote-paper: #faf8f2; --quote-rule: #eae5d9; --note-paper: #faf9f5; --hover-fill: #ecece6;
+  --myfocus-ink: #8a5a00; --myfocus-paper: #fbf3df; --myfocus-rule: #ecd9a8;
+  --on-ink: #ffffff; --on-accent: #ffffff; --surface-mat: #e4e4de;
+  --cover-paper: #202e38; --cover-ink: #edeff6; --on-media: #ffffff; --media-badge: rgba(0, 0, 0, 0.68);
+  /* Proposed (F1): three more choice accents beside s1–s3, in the same family. */
+  --c0-bg: #e6ebf8; --c0-fg: #23408f; --c1-bg: #e2efe7; --c1-fg: #2d6544; --c2-bg: #fbf3df; --c2-fg: #8a5a00;
+  --c3-bg: #f6e4df; --c3-fg: #93392f; --c4-bg: #ece5f5; --c4-fg: #5b3f8a; --c5-bg: #ebebe6; --c5-fg: #44535e;
+  --shadow-pic: 0 1px 2px rgba(34, 48, 58, 0.07), 0 8px 22px rgba(34, 48, 58, 0.09);
+  --shadow-lift: 0 2px 4px rgba(34, 48, 58, 0.08), 0 16px 36px rgba(34, 48, 58, 0.15);
+  --shadow-float: 0 0 0 1px transparent, 0 1px 2px rgba(34, 48, 58, 0.06), 0 18px 48px rgba(34, 48, 58, 0.16);
+  --surface-panel: var(--panel); --surface-board: var(--board); --surface-page: var(--paper); --rule: var(--line);
+  --text: var(--ink); --text-muted: var(--ink-2); --text-decor: var(--ink-3);
+  --ui: "Instrument Sans", system-ui, sans-serif; --read: "Newsreader", Georgia, serif; --focus-ring: 2px solid var(--accent);
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1); --dur-instant: 80ms; --dur-quick: 130ms; --dur-standard: 220ms;
+  --lift: 2px; --press-scale: 0.985; --rail-w: 58px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+    --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+    --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+    --surface-float: #232e37; --scrim-blur: rgba(19, 26, 32, 0.8); --shade: rgb(0, 0, 0);
+    --accent-soft: #263156; --accent-strong: #c3cff8; --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2;
+    --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c; --hover-fill: #2a353f;
+    --myfocus-ink: #e8c27a; --myfocus-paper: #33291a; --myfocus-rule: #5a4824;
+    --on-ink: #131a20; --on-accent: #131a20; --surface-mat: #0d1317;
+    --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad; --c2-bg: #33291a; --c2-fg: #e8c27a;
+    --c3-bg: #3a2521; --c3-fg: #eea597; --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+    --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+    --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a20; --panel: #1d272f; --board: #182128; --line: #313d47;
+  --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984;
+  --status-1: #4f64a3; --status-2: #7189d8; --status-3: #a9bbf6; --accent: #9db0f3;
+  --surface-float: #232e37; --scrim-blur: rgba(19, 26, 32, 0.8); --shade: rgb(0, 0, 0);
+  --accent-soft: #263156; --accent-strong: #c3cff8; --warn: #ec9c8d; --warn-soft: #3a2521; --ok: #84c9a2;
+  --quote-paper: #29271f; --quote-rule: #3f3a2e; --note-paper: #21282c; --hover-fill: #2a353f;
+  --myfocus-ink: #e8c27a; --myfocus-paper: #33291a; --myfocus-rule: #5a4824;
+  --on-ink: #131a20; --on-accent: #131a20; --surface-mat: #0d1317;
+  --c0-bg: #263156; --c0-fg: #b7c6f7; --c1-bg: #1f3329; --c1-fg: #94d0ad; --c2-bg: #33291a; --c2-fg: #e8c27a;
+  --c3-bg: #3a2521; --c3-fg: #eea597; --c4-bg: #2e2640; --c4-fg: #c7b2ec; --c5-bg: #2a353f; --c5-fg: #b3bec6;
+  --shadow-pic: 0 1px 2px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.26);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 16px 36px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px transparent, 0 18px 48px rgba(0, 0, 0, 0.42);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-instant: 1ms; --dur-quick: 1ms; --dur-standard: 1ms; } }
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--board); }
+body { background: var(--paper); color: var(--ink); font: 14px/1.5 var(--ui); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; }
+
+/* ---- prototype band (not app UI) ---- */
+.band { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--board); border-bottom: 1px solid var(--line); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: 12.5px; }
+.band b.tag { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.seg { display: inline-flex; background: var(--paper); border-radius: 7px; padding: 2px; gap: 2px; box-shadow: inset 0 0 0 1px var(--line); }
+.seg button { border: 0; background: transparent; border-radius: 5px; padding: 3px 10px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.band .adds { flex: 1 1 320px; color: var(--ink-2); min-width: 0; }
+.band .adds b { color: var(--ink); font-weight: 500; }
+.band label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); cursor: pointer; }
+.new { position: relative; }
+.marks .new::after { content: attr(data-new); position: absolute; top: -9px; right: -6px; z-index: 4; font: 600 9.5px/1 var(--ui); letter-spacing: .04em; text-transform: uppercase; padding: 3px 5px; border-radius: 3px; background: var(--myfocus-paper); color: var(--myfocus-ink); box-shadow: inset 0 0 0 1px var(--myfocus-rule); pointer-events: none; white-space: nowrap; }
+.marks .new { box-shadow: 0 0 0 1.5px var(--myfocus-rule); border-radius: 3px; }
+
+/* ---- shell (shell.css) ---- */
+.app { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); min-height: calc(100% - var(--band-h, 46px)); }
+.rail { border-right: 1px solid var(--line); background: var(--paper); padding: 14px 9px; display: flex; flex-direction: column; gap: 2px; padding-left: max(9px, env(safe-area-inset-left, 0px)); }
+.rail .brand { width: 40px; height: 40px; display: grid; place-items: center; font: 500 21px/1 var(--read); color: var(--ink); margin-bottom: 10px; }
+.rail a { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; color: var(--ink-2); }
+.rail a[aria-current="page"] { background: var(--accent-soft); color: var(--accent-strong); }
+.rail svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.stage { min-width: 0; padding: 30px max(16px, env(safe-area-inset-right, 0px)) 80px 36px; }
+.wrap { max-width: 1180px; margin-inline: auto; }
+.destination-header { margin: -4px 0 26px; border-bottom: 1px solid var(--line); }
+.destination-crumb { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-height: 16px; margin: 0 0 12px; color: var(--ink-2); font-size: 12.5px; }
+.destination-crumb strong { color: var(--ink); font-weight: 500; }
+.destination-crumb i { font-style: normal; font-size: 11px; color: var(--text-muted); }
+.destination-crumb button { all: unset; cursor: pointer; } .destination-crumb button:hover { color: var(--accent); }
+.destination-tabs { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; margin-bottom: -1px; }
+.destination-tab { flex: 0 0 auto; padding: 7px 12px 9px; border-bottom: 2px solid transparent; color: var(--ink-2); font-size: 13.5px; text-decoration: none; white-space: nowrap; background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
+.destination-tab[aria-current="page"] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 500; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; gap: 8px; padding: 8px 14px; border: 0; border-radius: 2px; background: var(--accent); color: var(--on-accent); font-weight: 500; cursor: pointer; white-space: nowrap; }
+.button-quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+.button-link { min-height: 0; padding: 8px 2px; background: transparent; color: var(--ink-2); font-weight: 400; }
+.button.sm { min-height: 30px; padding: 4px 10px; font-size: 13px; }
+.button:disabled { cursor: not-allowed; opacity: .56; }
+.small { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+
+/* ---- header type row (library.css .cph) ---- */
+.cph-types { display: flex; align-items: center; gap: 4px; min-width: 0; margin: 0 0 18px; padding: 2px; overflow-x: auto; scrollbar-width: none; }
+.cph-type, .cph-coll { flex: none; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px 0 12px; border: 0; border-radius: 17px; background: none; font-size: 14px; color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.cph-type:hover, .cph-coll:hover { background: var(--hover-fill); color: var(--ink); }
+.cph-type[aria-current="true"] { background: var(--ink); color: var(--paper); }
+.cph-coll[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+.cph-type .n, .cph-coll .n { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.cph-type[aria-current="true"] .n { color: inherit; opacity: .6; }
+.cph-chev { color: var(--ink-3); padding: 0 2px; }
+.cph-type svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* ---- collection head ---- */
+.chead { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: space-between; margin: 0 0 18px; }
+.chead .t { min-width: 0; flex: 1 1 380px; }
+.ip-kicker, .kicker { margin: 0 0 6px; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.chead h1 { margin: 0; font: 400 clamp(30px, 4.2vw, 40px)/1.08 var(--read); letter-spacing: -0.012em; }
+.chead p.lead { margin: 10px 0 0; max-width: 62ch; font: 17px/1.55 var(--read); color: var(--ink-2); }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.shelf-tabs { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; border-bottom: 1px solid var(--line); padding-bottom: 8px; align-items: center; }
+.shelf-tabs button { all: unset; font-size: 13px; cursor: pointer; color: var(--ink-2); padding: 4px 6px; }
+.shelf-tabs button[aria-selected="true"] { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--accent); }
+.shelf-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 18px; align-items: center; }
+.chip { all: unset; font-size: 12.5px; padding: 4px 10px; border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.chip:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 3px; font-size: 13px; background: var(--warn-soft); color: var(--warn); margin: 0 0 18px; }
+.banner.info { background: var(--accent-soft); color: var(--accent-strong); }
+
+/* ---- cards (library.css .mcard) ---- */
+.wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 22px 16px; align-items: start; }
+.mcard { background: var(--surface-panel); box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; position: relative; margin: 0; display: block; width: 100%; min-width: 0; box-sizing: border-box; border-radius: 2px; transition: box-shadow var(--dur-quick) var(--ease-standard), transform var(--dur-quick) var(--ease-standard); text-align: left; border: 0; padding: 0; color: inherit; }
+.mcard:hover { box-shadow: inset 0 0 0 1px var(--text-decor); }
+.mcard .body { padding: 14px 15px 12px; }
+.mcard .mcard-title { font-size: 14px; font-weight: 500; line-height: 1.35; margin: 0 0 4px; overflow-wrap: anywhere; }
+.mcard p { margin: 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.45; overflow-wrap: anywhere; }
+.mcard .mcard-kind { font-size: 11.5px; color: var(--ink-2); margin: 0 0 6px; }
+.mcard .ft { display: flex; align-items: center; gap: 6px; padding: 8px 14px 10px; font-size: 11.5px; color: var(--ink-2); line-height: 1; border-top: 1px solid color-mix(in srgb, var(--rule) 50%, transparent); }
+.mcard .ft .dot, .tdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--ink-3); background: var(--paper); display: inline-block; }
+.dot.s1, .tdot.s1 { background: var(--status-1); border-color: var(--status-1); }
+.dot.s2, .tdot.s2 { background: var(--status-2); border-color: var(--status-2); }
+.mcard[data-frame="paper"] { background: none; box-shadow: none; }
+.mcard[data-frame="paper"] > .ci { background: var(--surface-panel); box-shadow: inset 0 0 0 1px var(--rule); border-radius: 2px; transition: transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard); }
+.mcard[data-frame="paper"]:hover > .ci { transform: translateY(calc(var(--lift) * -1)); box-shadow: inset 0 0 0 1px var(--text-decor), var(--shadow-pic); }
+.mcard[data-frame="picture"] { background: none; box-shadow: none; }
+.mcard[data-frame="picture"] .pic { border-radius: 6px; overflow: hidden; box-shadow: var(--shadow-pic); aspect-ratio: 4 / 3; background: var(--surface-mat); transition: transform var(--dur-quick) var(--ease-standard), box-shadow var(--dur-quick) var(--ease-standard); }
+.mcard[data-frame="picture"]:hover .pic { transform: translateY(calc(var(--lift) * -1)); box-shadow: var(--shadow-lift); }
+.mcard .pic svg { width: 100%; height: 100%; display: block; }
+.mcard .cap-line { padding: 9px 2px 0; }
+.mcard .cap-line .mcard-title { font-size: 13.5px; margin: 0; }
+.mcard .cap-line p { margin: 3px 0 0; font-size: 12px; }
+.mcard .person-head { display: flex; gap: 12px; align-items: center; margin: 0 0 6px; }
+.mcard .person-name p { margin: 3px 0 0; }
+.person-mark { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; flex: none; display: grid; place-items: center; background: var(--surface-board); box-shadow: inset 0 0 0 1px var(--rule); font-family: var(--read); font-size: 16px; color: var(--text-muted); }
+.mcard .mcard-title.per { font-family: var(--read); font-size: 19px; font-weight: 400; line-height: 1.2; }
+.mcard .kicker { margin: 0 0 5px; }
+.mcard .cv { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; }
+
+/* proposed: choice chips (F1) */
+.cc { display: inline-flex; align-items: center; padding: 0 7px; border-radius: 9px; font-size: 11.5px; line-height: 19px; white-space: nowrap; }
+.c0 { background: var(--c0-bg); color: var(--c0-fg); } .c1 { background: var(--c1-bg); color: var(--c1-fg); } .c2 { background: var(--c2-bg); color: var(--c2-fg); }
+.c3 { background: var(--c3-bg); color: var(--c3-fg); } .c4 { background: var(--c4-bg); color: var(--c4-fg); } .c5 { background: var(--c5-bg); color: var(--c5-fg); }
+
+/* ---- item page (library.css .ipage) ---- */
+.ipage { width: 100%; max-width: 1180px; margin-inline: auto; }
+.ip-top { position: sticky; top: calc(var(--band-h, 46px) + env(safe-area-inset-top, 0px)); z-index: 6; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px 0; background: var(--surface-page); }
+.ip-back { all: unset; cursor: pointer; display: inline-flex; align-items: center; padding: 6px 9px; margin-left: -9px; border-radius: 3px; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.ip-back:hover { color: var(--ink); background: var(--hover-fill); }
+.ip-crumb { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.ip-saved { margin-left: auto; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.ip-more { all: unset; box-sizing: border-box; cursor: pointer; width: 30px; height: 28px; display: grid; place-items: center; border-radius: 3px; color: var(--ink-2); flex-shrink: 0; }
+.ip-more:hover { background: var(--hover-fill); color: var(--ink); }
+.ip-grid { display: grid; grid-template-columns: minmax(0, 820px) 290px; gap: 48px; justify-content: space-between; align-items: start; margin-top: 14px; }
+.ip-grid.top { grid-template-columns: minmax(0, 820px); }
+.ip-main { min-width: 0; }
+.ip-rail { position: sticky; top: calc(var(--band-h, 46px) + 64px); align-self: start; min-width: 0; font-size: 13px; }
+.ip-rh { margin: 0 0 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.prop { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.props .prop:last-of-type { border-bottom: 1px solid var(--line); }
+.prop > span { color: var(--ink-2); }
+.prop-value { color: var(--ink); line-height: 1.45; min-width: 0; overflow-wrap: anywhere; }
+.prop-group { margin: 14px 0 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.props.inline { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); column-gap: 28px; margin: 22px 0 0; }
+.props.inline .prop { border-bottom: 0; }
+.rail-actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn-open-graph { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+.chip-rel { all: unset; cursor: pointer; font-size: 12px; padding: 3px 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink-2); display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-rel:hover { background: var(--surface-panel); border-color: var(--accent); color: var(--accent); }
+.rel-row { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.addv { all: unset; cursor: pointer; font-size: 12px; color: var(--ink-3); padding: 2px 6px; border: 1px dashed var(--line); border-radius: 2px; }
+.addv:hover { color: var(--accent); border-color: var(--accent); }
+.ed { outline: none; border-radius: 2px; display: inline-block; min-width: 30px; }
+.ed:hover { background: var(--hover-fill); box-shadow: 0 0 0 3px var(--hover-fill); }
+.ed:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+.ed:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.muted { color: var(--ink-3); }
+.tick { all: unset; cursor: pointer; width: 16px; height: 16px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--ink-3); display: inline-grid; place-items: center; font-size: 11px; color: var(--on-ink); }
+.tick.y { background: var(--ok); box-shadow: none; }
+.ip-title { margin: 0; font: 400 clamp(30px, 4.2vw, 42px)/1.08 var(--read); letter-spacing: -0.012em; outline: none; border-radius: 2px; }
+.ip-title:hover { background: var(--hover-fill); box-shadow: 0 0 0 4px var(--hover-fill); }
+.ip-title:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+p.ip-line { margin: 10px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.ip-lead { margin: 22px 0 0; max-width: 62ch; font: 18px/1.6 var(--read); color: var(--ink); outline: none; }
+.ip-lead:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.ip-wide { max-width: 820px; margin: 0 0 22px; }
+.ip-pic { display: block; width: 100%; overflow: hidden; border-radius: 2px; box-shadow: var(--shadow-pic); aspect-ratio: 3 / 2; background: var(--surface-mat); position: relative; }
+.ip-pic svg { width: 100%; height: 100%; display: block; }
+.ip-side { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 30px; align-items: end; }
+.ip-portrait { aspect-ratio: 3 / 4; border-radius: 2px; background: var(--surface-board); box-shadow: inset 0 0 0 1px var(--rule); display: grid; place-items: center; font: 400 64px/1 var(--read); color: var(--ink-3); }
+.ip-strip { display: flex; gap: 6px; margin: 8px 0 0; overflow-x: auto; }
+.ip-strip button { flex: none; width: 70px; aspect-ratio: 4 / 3; padding: 0; border: 2px solid transparent; border-radius: 2px; overflow: hidden; background: var(--surface-mat); cursor: pointer; }
+.ip-strip button[aria-pressed="true"] { border-color: var(--ink); }
+.ip-strip svg { width: 100%; height: 100%; display: block; }
+.ip-pic .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--media-badge); color: var(--on-media); font-size: 19px; display: grid; place-items: center; cursor: pointer; }
+.ip-pic .nav.p { left: 12px; } .ip-pic .nav.n { right: 12px; }
+.ip-pic .cnt { position: absolute; right: 12px; bottom: 12px; background: var(--media-badge); color: var(--on-media); font-size: 11.5px; padding: 2px 8px; border-radius: 9px; font-variant-numeric: tabular-nums; }
+.dochead { background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); border-radius: 3px; padding: 28px 24px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; margin: 0 0 22px; }
+.dochead .court { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.dochead hr { width: 44px; border: 0; border-top: 1px solid var(--quote-rule); margin: 0; }
+.dochead .t { font: italic 400 clamp(22px, 3vw, 30px)/1.2 var(--read); max-width: 30ch; }
+.dochead .cit { font: 15px/1.4 var(--read); color: var(--ink-2); }
+.ip-writing { margin-top: 30px; max-width: 64ch; position: relative; }
+.ip-writing h2 { margin: 0 0 8px; font: 400 21px/1.2 var(--read); }
+.ip-writing .md { font: 16.5px/1.62 var(--read); color: var(--ink); outline: none; border-radius: 2px; min-height: 1.6em; }
+.ip-writing .md:hover { background: var(--hover-fill); box-shadow: 0 0 0 4px var(--hover-fill); }
+.ip-writing .md:focus { background: transparent; box-shadow: 0 2px 0 var(--accent); }
+.ip-writing .md:empty::before { content: attr(data-ph); color: var(--ink-3); }
+.ip-shelf { margin-top: 38px; position: relative; }
+.ip-shelf-h { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; }
+.ip-shelf-h h2 { margin: 0; font: 400 21px/1.2 var(--read); }
+.ip-shelf-h span { font-size: 12px; color: var(--ink-2); }
+.ip-shelf-h small { font-size: 12px; color: var(--ink-3); }
+.ip-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 14px; align-items: start; }
+.mnote { background: var(--note-paper); border-left: 3px solid var(--status-2); padding: 12px 14px; font: 15px/1.52 var(--read); }
+.mnote small { display: block; font: 11.5px var(--ui); color: var(--ink-2); margin-top: 6px; }
+.blk-ctl { position: absolute; top: -4px; right: 0; display: flex; gap: 2px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 4px; padding: 2px; z-index: 3; }
+.blk-ctl button { border: 0; background: none; border-radius: 3px; padding: 2px 7px; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+.blk-ctl button:hover { background: var(--hover-fill); color: var(--ink); }
+.arr .blk { outline: 1px dashed var(--status-2); outline-offset: 8px; border-radius: 1px; }
+.arr .blk.off > :not(.blk-ctl) { opacity: .38; }
+.arrbar { position: sticky; top: calc(var(--band-h, 46px) + 52px + env(safe-area-inset-top, 0px)); z-index: 5; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 14px; margin: 6px 0 0; border-radius: 3px; background: var(--accent-soft); color: var(--accent-strong); box-shadow: var(--shadow-pic); font-size: 13px; }
+.arrbar p { margin: 0; flex: 1 1 240px; }
+.arrbar .g { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+.arrbar .seg button:disabled { opacity: .35; cursor: not-allowed; }
+.emptyb { font-size: 13px; color: var(--ink-3); font-style: italic; margin: 0; }
+
+/* ---- table, board, timeline (proposed V1, V2) ---- */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+th { text-align: left; font-weight: 500; font-size: 12px; color: var(--ink-2); padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; max-width: 240px; }
+tr:last-child td { border-bottom: 0; }
+td .tt { all: unset; cursor: pointer; font-weight: 500; }
+td .tt:hover { color: var(--accent); text-decoration: underline; }
+.num { font-variant-numeric: tabular-nums; }
+.board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+.bcol { background: var(--board); border-radius: 3px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 200px; }
+.bcol.over { box-shadow: inset 0 0 0 2px var(--status-2); }
+.bcol h3 { margin: 0 0 2px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; }
+.bcol h3 b { font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bcard { background: var(--panel); box-shadow: inset 0 0 0 1px var(--rule); border-radius: 2px; padding: 9px 11px; display: grid; gap: 2px; cursor: grab; }
+.bcard b { font-weight: 500; font-size: 13px; } .bcard small { color: var(--ink-2); font-size: 12px; }
+.tl { overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); }
+.tlin { min-width: 680px; padding: 8px 0 14px; }
+.tlrow { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: center; min-height: 32px; }
+.tlrow .lab { padding: 0 14px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tlrow .lab button { all: unset; cursor: pointer; } .tlrow .lab button:hover { color: var(--accent); }
+.track { position: relative; height: 32px; margin-right: 24px; }
+.axis { height: 26px; border-bottom: 1px solid var(--line); }
+.tick-l { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; padding-bottom: 5px; white-space: nowrap; }
+.grid-l { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); opacity: .6; }
+.bar { position: absolute; top: 11px; height: 10px; border-radius: 5px; min-width: 10px; }
+.bar.open { -webkit-mask-image: linear-gradient(90deg, #000 72%, transparent); mask-image: linear-gradient(90deg, #000 72%, transparent); }
+.pt { position: absolute; top: 10px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 2px var(--panel); }
+.tlleg { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-2); padding: 0 14px 8px; }
+
+/* ---- customizer (library.css) ---- */
+.library-crumb { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 12.5px; color: var(--ink-2); margin: 0 0 14px; }
+.library-crumb button { all: unset; cursor: pointer; } .library-crumb button:hover { color: var(--accent); }
+.library-crumb b { color: var(--ink); font-weight: 500; }
+.customizer-layout { display: grid; grid-template-columns: minmax(0, 860px) minmax(300px, 400px); gap: clamp(28px, 3vw, 44px); align-items: start; }
+.customizer-editor { background: var(--panel); border: 1px solid var(--line); padding: 24px 28px; border-radius: 3px; min-width: 0; }
+.customizer-editor h2 { font: 400 26px/1.2 var(--read); margin: 0 0 6px; }
+.coll-select-pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin: 16px 0 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.coll-select-pills.inline { border: 0; padding: 0; margin: 0; }
+.coll-select-pills button { all: unset; font-size: 12.5px; padding: 5px 11px; border-radius: 2px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; white-space: nowrap; color: var(--ink-2); position: relative; }
+.coll-select-pills button.on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); font-weight: 500; }
+.coll-select-pills button.add-new { border-style: dashed; color: var(--accent); border-color: var(--accent); }
+.coll-select-pills button:disabled { cursor: default; opacity: .55; }
+.coll-select-pills .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; vertical-align: middle; margin-right: 4px; background: var(--status-2); }
+.coll-select-pills .dot.s1 { background: var(--status-1); } .coll-select-pills .dot.s3 { background: var(--accent); }
+.cf-section { padding: 18px 0 4px; border-top: 1px solid var(--line); position: relative; }
+.cf-section:first-of-type { border-top: 0; padding-top: 4px; }
+.cf-section-head { margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.form-row { margin-bottom: 16px; }
+.form-row label, .form-row .form-label { display: block; font-size: 12.5px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+.form-row input[type="text"], .form-row select, .form-row textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--line); background: var(--paper); font-size: 13.5px; border-radius: 2px; color: var(--ink); }
+.cf-note { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.customizer-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 4px 0 8px; }
+.customizer-section-head .form-label { margin: 0; font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+.preset-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+.preset-chip { all: unset; font-size: 11.5px; padding: 3px 8px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; cursor: pointer; color: var(--ink-2); }
+.preset-chip:hover { color: var(--accent); border-color: var(--status-1); }
+.fields-list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.field-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) 150px auto 26px; gap: 8px; align-items: center; position: relative; }
+.field-row input[type="text"], .field-row select { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); background: var(--paper); font-size: 13px; border-radius: 2px; color: var(--ink); }
+.field-row.over { opacity: .5; }
+.field-num { font-size: 11.5px; color: var(--ink-2); text-align: center; }
+.field-card { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.field-del { all: unset; text-align: center; cursor: pointer; color: var(--ink-2); font-size: 14px; }
+.field-del:hover { color: var(--warn); }
+.field-cfg { margin: 0 0 4px 34px; padding: 10px 12px; background: var(--board); border-radius: 2px; display: grid; gap: 8px; font-size: 12.5px; color: var(--ink-2); position: relative; }
+.field-cfg label { display: grid; gap: 4px; }
+.field-cfg input[type="text"], .field-cfg select { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--line); background: var(--paper); font-size: 13px; border-radius: 2px; color: var(--ink); }
+.field-cfg .rowl { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.customizer-note { font-size: 12px; color: var(--ink-2); margin: 10px 0 0; }
+.over-note { margin: 10px 0 0; padding: 8px 10px; border-radius: 2px; background: var(--myfocus-paper); color: var(--myfocus-ink); font-size: 12.5px; }
+.customizer-actions { margin-top: 22px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.preview-sticky { position: sticky; top: calc(var(--band-h, 46px) + 24px); }
+.preview-sticky > h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 12px; font-weight: 600; }
+.preview-box { background: var(--panel); border: 1px solid var(--line); padding: 16px; border-radius: 3px; }
+.preview-box + .preview-box { margin-top: 16px; }
+.preview-box .lab { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); margin: 0 0 10px; }
+.props-preview { display: grid; gap: 8px; font-size: 13px; margin: 0; }
+.prop-item { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+.prop-item dt { color: var(--ink-2); } .prop-item dd { margin: 0; font-weight: 500; color: var(--ink); text-align: right; overflow-wrap: anywhere; }
+.loci { display: grid; gap: 10px; padding: 14px; border-radius: 3px; background: var(--accent-soft); color: var(--accent-strong); margin: 0 0 18px; position: relative; }
+.loci b { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+.loci form { display: flex; gap: 8px; flex-wrap: wrap; }
+.loci input { flex: 1 1 220px; min-width: 0; padding: 8px 10px; border: 1px solid var(--status-1); background: var(--panel); border-radius: 2px; color: var(--ink); }
+.loci .sugg { display: flex; gap: 6px; flex-wrap: wrap; }
+.loci .sugg button { all: unset; cursor: pointer; font-size: 12px; padding: 2px 9px; border-radius: 10px; background: var(--panel); color: var(--ink-2); }
+
+/* menus, toast */
+.menu { position: fixed; z-index: 60; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 6px; padding: 5px; min-width: 210px; max-width: min(300px, calc(100vw - 32px)); max-height: 340px; overflow: auto; display: grid; gap: 1px; }
+.menu button { border: 0; background: none; border-radius: 4px; padding: 7px 9px; text-align: left; font-size: 13px; cursor: pointer; display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; align-items: center; color: var(--ink); }
+.menu button:hover { background: var(--hover-fill); }
+.menu button i { font-style: normal; color: var(--accent); font-size: 12px; }
+.menu h5 { margin: 4px 9px; font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.menu input { margin: 2px 4px 4px; padding: 6px 8px; border: 1px solid var(--line); background: var(--paper); border-radius: 2px; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--on-ink); padding: 8px 14px; border-radius: 16px; font-size: 13px; z-index: 70; box-shadow: var(--shadow-float); max-width: calc(100% - 32px); }
+
+@media (max-width: 1100px) { .customizer-layout { grid-template-columns: minmax(0, 1fr); } .preview-sticky { position: static; } }
+@media (max-width: 900px) { .ip-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; } .ip-rail { position: static; } }
+@media (max-width: 640px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; justify-content: center; border-right: 0; border-bottom: 1px solid var(--line); padding: 6px; }
+  .rail .brand { display: none; }
+  .stage { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); }
+  .ip-side { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
+  .ip-top { top: calc(var(--band-h, 46px) + env(safe-area-inset-top, 0px)); }
+  .customizer-editor { padding: 18px 16px; }
+  .field-row { grid-template-columns: 22px minmax(0, 1fr) 110px 22px; }
+  .field-row .field-card { grid-column: 2 / -1; }
+  .band .adds { flex-basis: 100%; }
+}
+
+:root { --pick: #b7791f; --pick-soft: #fbf3df; --pick-rule: #ecd9a8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pick: #e8c27a; --pick-soft: #33291a; --pick-rule: #5a4824; } }
+:root[data-theme="dark"] { --pick: #e8c27a; --pick-soft: #33291a; --pick-rule: #5a4824; }
+
+/* phase labels (prototype only) */
+.phases [data-ph] { position: relative; }
+.phases [data-ph]::after { content: attr(data-ph); position: absolute; top: -8px; right: -6px; z-index: 4; font: 600 9.5px/1 var(--ui); letter-spacing: .04em; padding: 3px 5px; border-radius: 3px; background: var(--myfocus-paper); color: var(--myfocus-ink); box-shadow: inset 0 0 0 1px var(--myfocus-rule); pointer-events: none; white-space: nowrap; }
+
+/* inline chips: a question or a goal written inside something */
+.inl { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; margin: 8px 0; padding: 6px 8px; border-radius: 3px; }
+.inl.q { background: var(--pick-soft); }
+.inl.g { background: var(--accent-soft); }
+.inl .gl { font: 600 14px/1 var(--ui); text-align: center; }
+.inl.q .gl { color: var(--pick); } .inl.g .gl { color: var(--accent); }
+.inl .tx { font-family: var(--read); font-size: 16.5px; line-height: 1.45; color: var(--ink); }
+.inl.g .tx { font-size: 18px; }
+.inl .ans { grid-column: 2 / -1; font: 13px/1.45 var(--ui); color: var(--ink-2); }
+.inl .ans button { all: unset; cursor: pointer; color: var(--accent); }
+.inl.child { margin-left: 26px; }
+.inl.done .tx { color: var(--ink-2); }
+.st { all: unset; cursor: pointer; font: 500 11.5px/1 var(--ui); padding: 4px 8px; border-radius: 10px; white-space: nowrap; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); color: var(--ink-2); }
+.st:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink-3); }
+.st.open { color: var(--pick); box-shadow: inset 0 0 0 1px var(--pick-rule); }
+.st.answered, .st.reached { color: var(--ok); }
+.st.active { color: var(--accent); box-shadow: inset 0 0 0 1px var(--status-1); }
+.counts { display: inline-flex; gap: 8px; margin-left: auto; color: var(--ink-3); font-size: 11.5px; white-space: nowrap; }
+.counts .cq { color: var(--pick); } .counts .cg { color: var(--accent); }
+.prose-v { font: 16.5px/1.62 var(--read); color: var(--ink); max-width: 64ch; }
+.prose-v p { margin: 0 0 10px; }
+.mdedit { width: 100%; min-height: 200px; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); font: 14px/1.6 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); resize: vertical; }
+.edrow { display: flex; gap: 8px; align-items: center; margin: 8px 0 0; flex-wrap: wrap; }
+.edrow .hint { font-size: 12px; color: var(--ink-2); }
+.atmenu { position: fixed; z-index: 65; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 6px; padding: 5px; min-width: 240px; }
+.atmenu button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 2px 8px; width: 100%; padding: 7px 9px; border-radius: 4px; }
+.atmenu button:hover, .atmenu button.on { background: var(--hover-fill); }
+.atmenu b { font-weight: 500; font-size: 13px; } .atmenu small { grid-column: 2; font-size: 11.5px; color: var(--ink-2); }
+.atmenu .gl { grid-row: span 2; font-weight: 600; }
+
+/* ---------- board ---------- */
+.bwrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 0; height: calc(100dvh - var(--band-h, 46px) - 150px); min-height: 520px; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; background: var(--board); position: relative; }
+.bhead { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: flex-end; justify-content: space-between; margin: 0 0 14px; }
+.bhead h1 { margin: 0; font: 400 clamp(26px, 3.4vw, 34px)/1.1 var(--read); }
+.place { all: unset; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--ink-2); padding: 3px 9px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); margin-top: 8px; }
+.place::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--status-3); }
+.viewport { position: relative; overflow: hidden; touch-action: none; cursor: grab; background-color: var(--board); background-image: radial-gradient(var(--line) 1px, transparent 1.2px); background-size: 22px 22px; }
+.viewport.panning { cursor: grabbing; }
+.canvas { position: absolute; left: 0; top: 0; width: 2200px; height: 1400px; transform-origin: 0 0; }
+.arrows { position: absolute; inset: 0; width: 2200px; height: 1400px; overflow: visible; pointer-events: none; }
+.arrows .a { stroke: var(--ink-3); stroke-width: 1.6; fill: none; pointer-events: stroke; cursor: pointer; }
+.arrows .a:hover, .arrows .a.sel { stroke: var(--accent); stroke-width: 2.4; }
+.arrows .hit { stroke: transparent; stroke-width: 14; fill: none; pointer-events: stroke; cursor: pointer; }
+.arrows .fl { stroke: var(--status-2); stroke-width: 1.2; stroke-dasharray: 4 5; fill: none; opacity: .75; }
+.arrows text { font: 500 11px var(--ui); fill: var(--ink-2); paint-order: stroke; stroke: var(--board); stroke-width: 4px; }
+.arrows text.flt { fill: var(--status-2); font-weight: 400; font-style: italic; }
+.arrows .ghost { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+.bc { position: absolute; width: 220px; box-sizing: border-box; background: var(--panel); box-shadow: inset 0 0 0 1px var(--rule), var(--shadow-pic); border-radius: 2px; cursor: default; user-select: none; }
+.bc.sel { box-shadow: inset 0 0 0 1.5px var(--accent), var(--shadow-lift); }
+.bc .in { padding: 11px 13px 10px; display: grid; gap: 3px; }
+.bc .k { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 6px; align-items: center; }
+.bc .t { font-size: 13.5px; font-weight: 500; line-height: 1.3; color: var(--ink); }
+.bc .l { font-size: 12px; color: var(--ink-2); line-height: 1.4; }
+.bc .ft { display: flex; gap: 8px; align-items: center; padding: 6px 13px 8px; border-top: 1px solid color-mix(in srgb, var(--rule) 60%, transparent); font-size: 11.5px; color: var(--ink-2); }
+.bc .ft button { all: unset; cursor: pointer; color: var(--accent); }
+.bc.note { background: var(--note-paper); border-left: 3px solid var(--status-2); }
+.bc.note .body { font: 14px/1.5 var(--read); color: var(--ink); }
+.bc.note .inl { margin: 5px 0 0; padding: 4px 6px; grid-template-columns: 14px minmax(0, 1fr); }
+.bc.note .inl .tx { font-size: 13.5px; } .bc.note .inl .st { display: none; }
+.bc.q { background: var(--pick-soft); box-shadow: inset 0 0 0 1px var(--pick-rule), var(--shadow-pic); }
+.bc.q .k { color: var(--pick); }
+.bc.q .t { font: 400 16px/1.35 var(--read); }
+.bc.g { width: 320px; background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--status-1), var(--shadow-pic); }
+.bc.g .k { color: var(--accent-strong); }
+.bc.g .t { font: 400 19px/1.35 var(--read); color: var(--accent-strong); }
+.bc.obj .pic { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 2px 2px 0 0; background: var(--surface-mat); }
+.bc.obj .pic svg { width: 100%; height: 100%; display: block; }
+.bc .pm { display: flex; gap: 10px; align-items: center; }
+.bc .pm .person-mark { width: 34px; height: 34px; font-size: 14px; }
+.bc .pm .t { font: 400 17px/1.2 var(--read); }
+.bc .clin { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--warn); }
+.dot-c::before { content: ""; position: absolute; inset: -10px; }
+.dot-c { position: absolute; right: -8px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 2px var(--accent); cursor: crosshair; opacity: 0; transition: opacity var(--dur-quick); }
+.bc:hover .dot-c, .bc.sel .dot-c, .connecting .dot-c { opacity: 1; }
+.bc textarea { width: 100%; box-sizing: border-box; min-height: 80px; border: 1px solid var(--status-1); border-radius: 2px; padding: 6px 8px; background: var(--panel); font: 13.5px/1.5 var(--ui); color: var(--ink); resize: vertical; }
+.tools { position: absolute; left: 12px; top: 12px; z-index: 5; display: grid; gap: 2px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 8px; padding: 4px; }
+.tools button { all: unset; cursor: pointer; width: 34px; height: 32px; display: grid; place-items: center; border-radius: 5px; font: 600 13px var(--ui); color: var(--ink-2); }
+.tools button:hover { background: var(--hover-fill); color: var(--ink); }
+.tools button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.zoom { position: absolute; left: 12px; bottom: 12px; z-index: 5; display: flex; gap: 2px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 8px; padding: 4px; font-size: 12px; align-items: center; }
+.zoom button { all: unset; cursor: pointer; min-width: 28px; height: 28px; display: grid; place-items: center; border-radius: 5px; color: var(--ink-2); padding: 0 4px; }
+.zoom button:hover { background: var(--hover-fill); color: var(--ink); }
+.hintbar { position: absolute; left: 150px; right: 12px; bottom: 12px; z-index: 4; pointer-events: none; display: flex; justify-content: center; }
+.hintbar span { pointer-events: auto; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 14px; padding: 5px 12px; font-size: 12.5px; color: var(--ink-2); max-width: 100%; }
+.inside { border-left: 1px solid var(--line); background: var(--panel); overflow: auto; padding: 14px 14px 20px; display: grid; gap: 14px; align-content: start; }
+.inside h2 { margin: 0; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); display: flex; justify-content: space-between; }
+.inside .row { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 6px 8px; align-items: start; padding: 7px 8px; border-radius: 3px; cursor: pointer; }
+.inside .row:hover { background: var(--hover-fill); }
+.inside .row .gl { font-weight: 600; font-size: 12px; padding-top: 2px; }
+.inside .row.q .gl { color: var(--pick); } .inside .row.g .gl { color: var(--accent); }
+.inside .row .tx { font: 14px/1.4 var(--read); color: var(--ink); }
+.inside .row .meta { grid-column: 2; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-2); }
+.inside .row.done .tx { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+.inside .prog { font-size: 12px; color: var(--ink-2); }
+.drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(340px, 100%); z-index: 8; background: var(--surface-float); box-shadow: var(--shadow-float); display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+.drawer .dh { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 6px; }
+.drawer .dh b { font: 400 18px var(--read); }
+.drawer .shelf-tabs { margin: 0 14px; }
+.drawer .list { overflow: auto; padding: 8px 14px 16px; display: grid; gap: 6px; align-content: start; }
+.drawer .grp { margin: 10px 0 2px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.drawer .it { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 1px; padding: 8px 10px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--line); background: var(--panel); }
+.drawer .it:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+.drawer .it b { font-weight: 500; font-size: 13px; } .drawer .it small { font-size: 11.5px; color: var(--ink-2); }
+.drawer .it.on { opacity: .5; }
+.apop { position: fixed; z-index: 62; width: min(320px, calc(100vw - 32px)); background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 8px; padding: 12px; display: grid; gap: 10px; }
+.apop .words { display: flex; flex-wrap: wrap; gap: 4px; }
+.apop .words button { all: unset; cursor: pointer; font-size: 12px; padding: 3px 9px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); }
+.apop .words button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.apop input { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); color: var(--ink); }
+.apop .sent { font: 14px/1.45 var(--read); color: var(--ink); }
+.offer { display: grid; gap: 6px; padding: 9px 10px; border-radius: 3px; background: var(--accent-soft); color: var(--accent-strong); font-size: 12.5px; }
+.offer .row2 { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini-cover { aspect-ratio: 4 / 3; background-color: var(--board); background-image: radial-gradient(var(--line) 1px, transparent 1.2px); background-size: 10px 10px; position: relative; overflow: hidden; border-radius: 6px; box-shadow: var(--shadow-pic); }
+.mini-cover i { position: absolute; background: var(--panel); box-shadow: inset 0 0 0 1px var(--rule); border-radius: 1px; }
+.mini-cover i.q { background: var(--pick-soft); } .mini-cover i.g { background: var(--accent-soft); }
+.qglist { display: grid; gap: 22px; max-width: 900px; }
+.qgsec h2 { margin: 0 0 8px; font: 400 21px/1.2 var(--read); }
+.qgrow { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 4px 10px; align-items: baseline; padding: 10px 12px; border-top: 1px solid var(--line); }
+.qgrow .gl { font-weight: 600; } .qgrow.q .gl { color: var(--pick); } .qgrow.g .gl { color: var(--accent); }
+.qgrow .tx { font: 16px/1.45 var(--read); }
+.qgrow.g .tx { font-size: 18px; }
+.qgrow .host { grid-column: 2 / -1; font-size: 12.5px; color: var(--ink-2); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.qgrow .host button { all: unset; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); }
+.qgrow .host button:hover { color: var(--accent); }
+.qgrow.child { margin-left: 28px; }
+.qgrow.done .tx { color: var(--ink-2); }
+.answers .ans-it { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 2px 8px; padding: 10px 12px; background: var(--pick-soft); border-radius: 3px; margin-bottom: 8px; }
+.answers .ans-it .gl { color: var(--ok); font-weight: 600; }
+.answers .ans-it .tx { font: 15.5px/1.45 var(--read); } .answers .ans-it small { grid-column: 2; font-size: 12px; color: var(--ink-2); }
+.answers .ans-it small button { all: unset; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); }
+.answers .ans-it small button:hover { color: var(--accent); }
+.mnote .inl { margin: 4px 0 0; }
+.tc-time { font: 400 11px/1.5 var(--ui); color: var(--accent); background: var(--accent-soft); padding: 1px 7px; border-radius: 9px; white-space: nowrap; }
+.mn-add { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 10px 0 0; }
+@media (max-width: 860px) {
+  .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
+  .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 360px; }
+  .drawer { right: 0; }
+}
+</style>
+
+<div class="band" id="band"></div>
+<div class="app">
+  <nav class="rail" aria-label="Destinations">
+    <span class="brand" aria-hidden="true">S</span>
+    <a href="#" title="Today" aria-label="Today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></a>
+    <a href="#" title="Learn" aria-label="Learn"><svg viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></a>
+    <a href="#" title="Commonplace" aria-label="Commonplace" aria-current="page"><svg viewBox="0 0 24 24"><path d="M16 6l4 14M12 6v14M8 8v12M4 4v16"/></svg></a>
+    <a href="#" title="Loci" aria-label="Loci"><svg viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></svg></a>
+  </nav>
+  <main class="stage"><div class="wrap" id="main"></div></main>
+</div>
+<div id="menu" class="menu" hidden></div>
+<div id="apop" class="apop" hidden></div>
+<div id="atmenu" class="atmenu" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const arr = v => v == null ? [] : Array.isArray(v) ? v : [v];
+const lower = s => s.charAt(0).toLowerCase() + s.slice(1);
+const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const WORDS = ["leads to", "explains", "example of", "contrasts with", "causes", "raises", "part of"];
+
+/* ---------- sample data (example only) ---------- */
+const F = (id, label, t, o = {}) => ({ id, label, t, o });
+const CH = (id, label, list) => F(id, label, "choice", { opts: list });
+const R = (id, label, to, o = {}) => F(id, label, "rel", { to, many: true, ...o });
+const obj = (id, col, title, v, x = {}) => ({ id, type: "object", col, title, v, desc: x.desc || "", body: x.body || "", pics: x.pics || 0, margin: x.margin || [] });
+const note = (id, title, body, x = {}) => ({ id, type: "note", title, body, margin: [], topic: x.topic || "" });
+const src = (id, title, kind, margin, x = {}) => ({ id, type: "source", title, kind, desc: x.desc || "", margin, body: "" });
+const board = (id, title, place, goal, qs, pl, arrows) => ({ id, type: "board", title, place, inl: [{ id: "g", kind: "goal", text: goal }, ...qs.map((t, i) => ({ id: "q" + (i + 1), kind: "question", text: t }))], pl, arrows, body: "", margin: [] });
+
+function makeDB() {
+  const architect = {
+    label: "Architect", who: "an architect who teaches studio", start: "court",
+    cols: [
+      { id: "bld", name: "Buildings", label: "Building", layout: "picture", fields: [R("arch", "Architect", "archs", { many: false }), F("built", "Built", "text"), F("where", "Where", "text"), CH("typ", "Typology", ["Village", "Religious", "Laboratory"]), F("why", "Why it matters", "long")], card: ["arch", "built"] },
+      { id: "archs", name: "Architects", label: "Architect", layout: "portrait", fields: [F("lived", "Lived", "text"), F("nat", "Nationality", "text")], card: ["lived", "nat"] }
+    ],
+    items: [
+      obj("gourna", "bld", "New Gourna Village", { built: "1946–52", where: "Luxor, Egypt", typ: ["Village"], why: "Mud-brick courts, domes and wind catchers cool the houses without machines." },
+        { pics: 4, desc: "Hassan Fathy's village for the people of Gourna.", body: "Courts and malqaf wind catchers do the cooling, not machines.\n\n@question Does a malqaf still work when the night air is humid?" }),
+      obj("sancaklar", "bld", "Sancaklar Mosque", { arch: ["arolat"], built: "2011–12", where: "Büyükçekmece, Istanbul", typ: ["Religious"], why: "The prayer hall is dug into the slope; daylight comes through fissures along the qibla wall." },
+        { pics: 4, desc: "A prayer hall dug into the hillside.", body: "@question Could the qibla-wall fissures work at Dubai's sun angle?" }),
+      obj("salk", "bld", "Salk Institute", { arch: ["kahn"], built: "1959–65", where: "La Jolla, California", typ: ["Laboratory"] }, { pics: 5, desc: "A court open to the ocean." }),
+      obj("fathy", "archs", "Hassan Fathy", { lived: "1900–89", nat: "Egyptian" }, { desc: "Architect of mud brick and passive cooling." }),
+      obj("arolat", "archs", "Emre Arolat", { lived: "born 1963", nat: "Turkish" }),
+      obj("kahn", "archs", "Louis Kahn", { lived: "1901–74", nat: "American" }),
+      note("lecnotes", "Lecture notes: passive cooling, week 3", "The court at Sultan Hassan stays shaded most of the day.\n\n@goal Read Fathy's Natural Energy and Vernacular Architecture by December\n\n@question Does depth matter more than width?\n\n@question How much does evaporative cooling help in humid air?"),
+      note("shade", "", "Shade the court before you try to move the air."),
+      src("lecture", "Passive cooling in hot climates", "Lecture · video", [{ at: "12:40", body: "@question Why does the air move at night?" }, { at: "31:05", body: "Stack effect: warm air leaves at the top and draws cool air in low." }]),
+      board("court", "Cooling the prayer-hall courtyard", "Architecture › Climate-responsive design",
+        "Understand how to keep the prayer hall's courtyard cool without machines, well enough to brief the engineer, by March",
+        ["Where does the cool night air come from?", "Shade first, or air movement first?"],
+        [{ id: "p0", ref: "b:g", x: 40, y: 40 }, { id: "p1", ref: "i:gourna", x: 420, y: 40 }, { id: "p2", ref: "i:fathy", x: 730, y: 40 }, { id: "p3", ref: "i:sancaklar", x: 420, y: 360 },
+          { id: "p4", ref: "i:arolat", x: 730, y: 400 }, { id: "p5", ref: "i:shade", x: 70, y: 300 }, { id: "p6", ref: "b:q2", x: 70, y: 500 }, { id: "p7", ref: "i:lecture", x: 1010, y: 40 },
+          { id: "p8", ref: "b:q1", x: 1010, y: 260 }, { id: "p9", ref: "i:lecnotes", x: 1010, y: 470 }],
+        [{ id: "a1", from: "p1", to: "p5", word: "example of", why: "deep courts keep the floor in shade most of the day" },
+          { id: "a2", from: "p2", to: "p1", word: "explains", why: "his book explains how the village keeps cool" },
+          { id: "a3", from: "p3", to: "p1", word: "contrasts with", why: "light through fissures, not wind through towers" },
+          { id: "a4", from: "p5", to: "p6", word: "raises", why: "" },
+          { id: "a5", from: "p7", to: "p8", word: "explains", why: "the stack effect at 31:05" }])
+    ]
+  };
+  const lawyer = {
+    label: "Lawyer", who: "a construction lawyer in London", start: "duty",
+    cols: [
+      { id: "cases", name: "Cases", label: "Case", layout: "text", fields: [F("cit", "Citation", "text"), F("court", "Court", "text"), CH("area", "Area of law", ["Tort", "Contract", "Construction"]), R("cites", "Cites", "cases"), F("hold", "Holding", "long")], card: ["cit", "court"] }
+    ],
+    items: [
+      obj("donoghue", "cases", "Donoghue v Stevenson", { cit: "[1932] AC 562", court: "House of Lords", area: ["Tort"], hold: "A manufacturer owes the consumer a duty to take reasonable care." }, { desc: "The snail in the ginger beer bottle." }),
+      obj("caparo", "cases", "Caparo Industries plc v Dickman", { cit: "[1990] 2 AC 605", court: "House of Lords", area: ["Tort"], cites: ["donoghue"], hold: "Auditors owed no duty of care to investors who bought shares relying on the accounts." },
+        { body: "@question Is the three-stage test still used for novel cases?" }),
+      obj("robinson", "cases", "Robinson v Chief Constable of West Yorkshire Police", { cit: "[2018] UKSC 4", court: "UK Supreme Court", area: ["Tort"], cites: ["caparo", "donoghue"], hold: "Officers making an arrest owed a duty of care to a passer-by injured in the struggle: a positive act, not an omission." },
+        { desc: "Duty of care after Caparo.", body: "Positive acts against omissions is the real line.\n\n@question Does Robinson change pure economic loss cases?" }),
+      obj("multiplex", "cases", "Multiplex v Honeywell (No 2)", { cit: "[2007] EWHC 447 (TCC)", court: "Technology and Construction Court", area: ["Construction"] }),
+      note("seminar", "Seminar notes: negligence after Robinson", "@goal Be able to explain when a duty of care arises, well enough to advise on the fit-out claim, by the end of term\n\n@question Is Caparo still a test?\n\n@question Does an omission ever create a duty?"),
+      note("incr", "", "Novel cases: reason by analogy from the established categories."),
+      src("judgment", "Robinson [2018] UKSC 4: judgment", "Source · PDF", [{ at: "p. 21", body: "@question Para 21: what counts as an established category?" }]),
+      board("duty", "Duty of care after Caparo", "Law › Tort › Negligence",
+        "Understand how a court decides whether a duty of care exists, well enough to brief the client",
+        ["Which category does a contractor's duty to a neighbour fall in?"],
+        [{ id: "p0", ref: "b:g", x: 60, y: 60 }, { id: "p1", ref: "i:donoghue", x: 470, y: 60 }, { id: "p2", ref: "i:caparo", x: 470, y: 330 }, { id: "p3", ref: "i:robinson", x: 860, y: 200 },
+          { id: "p4", ref: "q:seminar:question:0", x: 1250, y: 90 }, { id: "p5", ref: "i:incr", x: 1250, y: 380 }, { id: "p6", ref: "b:q1", x: 120, y: 420 }, { id: "p7", ref: "i:judgment", x: 860, y: 560 }],
+        [{ id: "a1", from: "p2", to: "p3", word: "contrasts with", why: "three stages against reasoning by analogy" },
+          { id: "a2", from: "p3", to: "p4", word: "explains", why: "para 21: Caparo is not a universal test" },
+          { id: "a3", from: "p3", to: "p5", word: "leads to", why: "" },
+          { id: "a4", from: "p5", to: "p6", word: "raises", why: "" }])
+    ]
+  };
+  const doctor = {
+    label: "Doctor", who: "a foundation doctor in the UK (de-identified, for learning)", start: "pe",
+    cols: [
+      { id: "guides", name: "Guidelines", label: "Guideline", layout: "text", fields: [CH("iss", "Issuer", ["NICE", "ESC"]), F("code", "Code", "text"), R("recs", "Recommends", "drugs"), F("key", "Key points", "long")], card: ["iss", "code"] },
+      { id: "drugs", name: "Drugs", label: "Drug", layout: "text", fields: [CH("cls", "Class", ["DOAC", "LMWH", "Vitamin K antagonist"]), F("mon", "Monitoring", "text")], card: ["cls", "mon"] },
+      { id: "tcases", name: "Teaching cases", label: "Teaching case", layout: "text", clinical: true, fields: [CH("age", "Age band", ["30–39", "50–59", "70–79"]), F("pc", "Presenting complaint", "text"), F("lp", "Learning points", "long")], card: ["age", "pc"] }
+    ],
+    items: [
+      obj("ng158", "guides", "Venous thromboembolic diseases", { iss: ["NICE"], code: "NG158", recs: ["apix", "rivar"], key: "Two-level Wells score decides imaging or D-dimer. Apixaban or rivaroxaban first for confirmed PE or DVT." }, { desc: "Diagnosis, management and thrombophilia testing." }),
+      obj("apix", "drugs", "Apixaban", { cls: ["DOAC"], mon: "Renal function, bleeding" }),
+      obj("rivar", "drugs", "Rivaroxaban", { cls: ["DOAC"], mon: "Renal function, bleeding" }),
+      obj("enox", "drugs", "Enoxaparin", { cls: ["LMWH"], mon: "Platelets" }),
+      obj("tc1", "tcases", "Breathless after a long flight", { age: ["30–39"], pc: "Pleuritic chest pain two days after a 12-hour flight", lp: "Wells 4.5, so PE is likely: imaging before a D-dimer." },
+        { body: "@question Would a D-dimer have been enough here?" }),
+      note("rotation", "Respiratory rotation: week 2", "@goal Be able to work up a suspected PE on my own by the end of the rotation\n\n@question When is a D-dimer enough on its own?\n\n@question Which DOAC when renal function is borderline?"),
+      src("wells", "Wells score walkthrough", "Lecture · video", [{ at: "04:10", body: "@question Why does a 12-hour flight not score?" }]),
+      board("pe", "Suspected PE: what to do first", "Medicine › Respiratory › Pulmonary embolism",
+        "Work up a suspected PE in the right order, well enough to present it on the ward round",
+        ["What changes if the patient is pregnant?"],
+        [{ id: "p0", ref: "b:g", x: 60, y: 60 }, { id: "p1", ref: "i:ng158", x: 480, y: 70 }, { id: "p2", ref: "i:apix", x: 880, y: 40 }, { id: "p3", ref: "i:rivar", x: 880, y: 250 },
+          { id: "p4", ref: "q:rotation:question:0", x: 480, y: 400 }, { id: "p5", ref: "i:tc1", x: 100, y: 380 }, { id: "p6", ref: "b:q1", x: 900, y: 480 }, { id: "p7", ref: "i:wells", x: 1250, y: 120 }],
+        [{ id: "a1", from: "p1", to: "p4", word: "explains", why: "D-dimer only when PE is unlikely (Wells 4 or less)" },
+          { id: "a2", from: "p5", to: "p1", word: "example of", why: "Wells 4.5: imaging first" },
+          { id: "a3", from: "p7", to: "p5", word: "explains", why: "why the flight itself doesn't score" }])
+    ]
+  };
+  return { architect, lawyer, doctor };
+}
+const DB = makeDB();
+
+/* ---------- state ---------- */
+const S = { field: "architect", screen: "board", board: null, item: null, type: "all", qf: "open", phases: false, sel: null, tool: "select", drawer: false, dtab: "objects", editing: null, view: { x: 20, y: 10, z: 0.82 }, fieldLinks: true };
+const D = () => DB[S.field];
+const I = id => D().items.find(x => x.id === id);
+const COL = id => D().cols.find(c => c.id === id);
+const FLD = (c, id) => c.fields.find(f => f.id === id);
+const boards = () => D().items.filter(x => x.type === "board");
+const ST = {};
+
+/* ---------- questions and goals (the inside layer) ---------- */
+/** One parser: a paragraph whose first word is @question or @goal is one inline. */
+function parse(body) {
+  const out = [], n = { question: 0, goal: 0 };
+  String(body || "").split(/\n\s*\n/).forEach(p => {
+    const m = /^@(question|goal)\s+([\s\S]+)$/i.exec(p.trim());
+    if (m) { const kind = m[1].toLowerCase(); out.push({ kind, text: m[2].replace(/\s+/g, " ").trim(), n: n[kind]++ }); }
+  });
+  return out;
+}
+const hostKey = (item, mi) => mi == null ? item.id : `${item.id}/m${mi}`;
+/** Every inline in the account: notes, Objects, margin notes and boards. */
+function allInlines() {
+  const out = [];
+  for (const it of D().items) {
+    const add = (list, hk, at) => { let goal = null; list.forEach(x => { const key = `${hk}:${x.kind}:${x.n ?? x.id}`; const row = { key, kind: x.kind, text: x.text, item: it, at, goalKey: x.kind === "question" ? goal : null }; if (x.kind === "goal") goal = key; out.push(row); }); };
+    if (it.type === "board") add(it.inl.map(x => ({ ...x, n: x.id })), it.id, null);
+    else {
+      add(parse(it.body), it.id, null);
+      it.margin.forEach((m, i) => add(parse(m.body), hostKey(it, i), m.at));
+    }
+  }
+  return out;
+}
+const INL = key => allInlines().find(x => x.key === key);
+function st(key, kind) { if (!ST[key]) ST[key] = { status: kind === "goal" ? "active" : "open", answer: "", ans: [] }; return ST[key]; }
+function counts(it) {
+  const list = allInlines().filter(x => x.item === it);
+  const q = list.filter(x => x.kind === "question" && st(x.key, x.kind).status === "open").length;
+  const g = list.filter(x => x.kind === "goal" && st(x.key, x.kind).status === "active").length;
+  return q || g ? `<span class="counts" data-ph="Q1">${q ? `<span class="cq">? ${q}</span>` : ""}${g ? `<span class="cg">◎ ${g}</span>` : ""}</span>` : "";
+}
+const STATUS = { question: ["open", "answered", "parked"], goal: ["active", "reached", "paused", "dropped"] };
+const cap = s => s[0].toUpperCase() + s.slice(1);
+function stBtn(r) { const s = st(r.key, r.kind); return `<button class="st ${s.status}" data-act="stmenu" data-k="${esc(r.key)}" data-ph="Q2">${cap(s.status)} ▾</button>`; }
+function ansLine(r) {
+  const s = st(r.key, r.kind);
+  if (r.kind !== "question" || (!s.answer && !s.ans.length)) return "";
+  return `<div class="ans">${s.answer ? esc(s.answer) : ""}${s.ans.length ? `${s.answer ? " · " : ""}Answered in ${s.ans.map(id => I(id)).filter(Boolean).map(x => `<button data-act="open" data-id="${x.id}">${esc(x.title || "a note")}</button>`).join(", ")}` : ""}</div>`;
+}
+function inlRow(r, child) {
+  const s = st(r.key, r.kind), done = ["answered", "reached", "parked", "dropped"].includes(s.status);
+  return `<div class="inl ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done ? " done" : ""}" id="inl-${esc(r.key)}"><span class="gl" aria-hidden="true">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx"><span style="position:absolute;left:-9999px">${r.kind === "goal" ? "Learning goal: " : "Question: "}</span>${esc(r.text)}</span>${stBtn(r)}${ansLine(r)}</div>`;
+}
+/** A body drawn with its inlines as marked lines; questions after a goal sit under it. */
+function renderBody(it, mi) {
+  const body = mi == null ? it.body : it.margin[mi].body, hk = mi == null ? it.id : hostKey(it, mi);
+  const rows = allInlines().filter(x => x.item === it && x.key.startsWith(hk + ":"));
+  const n = { question: 0, goal: 0 };
+  return String(body || "").split(/\n\s*\n/).map(p => {
+    const m = /^@(question|goal)\s+/i.exec(p.trim());
+    if (!m) return p.trim() ? `<p>${esc(p.trim())}</p>` : "";
+    const kind = m[1].toLowerCase(), r = rows.find(x => x.key === `${hk}:${kind}:${n[kind]}`); n[kind]++;
+    return r ? inlRow(r, !!r.goalKey) : "";
+  }).join("");
+}
+
+/* ---------- pictures ---------- */
+const SKIES = [["#c9d6de", "#eef2f3"], ["#efc49b", "#f8e8d6"], ["#9db6cc", "#dde7ef"], ["#d9d4c7", "#f1eee6"]];
+const MASS = ["#d8d5cf", "#c4c0b8", "#e9e5dc", "#b9a58b", "#a7543f", "#cfc6b4"];
+function building(o, i = 0) {
+  const r = rng(hash(o.id) + i * 977), gid = `g${hash(o.id + i)}`, [s1, s2] = SKIES[Math.floor(r() * SKIES.length)], g = 180 + r() * 30;
+  let vols = "";
+  for (let k = 0, n = 2 + Math.floor(r() * 3); k < n; k++) { const w = 70 + r() * 140, h = 40 + r() * 90, x = r() * (400 - w), y = g - h; vols += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${MASS[Math.floor(r() * MASS.length)]}"/><rect x="${x + w * .78}" y="${y}" width="${w * .22}" height="${h}" fill="#000" opacity=".14"/>${r() < .6 ? `<rect x="${x + 6}" y="${y + h * .35}" width="${w - 12}" height="${Math.max(5, h * .14)}" fill="#3a4148" opacity=".78"/>` : ""}`; }
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient></defs><rect width="400" height="260" fill="url(#${gid})"/><rect y="${g}" width="400" height="${260 - g}" fill="#a9a493"/>${vols}</svg>`;
+}
+const initials = s => (s || "?").split(/\s+/).filter(w => /^[A-ZÀ-Ý]/.test(w)).slice(0, 2).map(w => w[0]).join("") || "?";
+
+/* ---------- object text ---------- */
+function fieldText(c, f, v) {
+  if (v == null || v === "" || (Array.isArray(v) && !v.length)) return "";
+  if (f.t === "rel") return arr(v).map(id => I(id)?.title).filter(Boolean).join(", ");
+  if (f.t === "choice") return arr(v).join(", ");
+  return String(v);
+}
+const cardLine = o => { const c = COL(o.col); return c.card.map(id => fieldText(c, FLD(c, id), o.v[id])).filter(Boolean).join(" · "); };
+const onBoards = it => boards().filter(b => b.pl.some(p => p.ref === "i:" + it.id));
+const typeLabel = it => it.type === "object" ? COL(it.col).label : it.type === "note" ? (it.title ? "Long note" : "Note") : it.type === "source" ? it.kind : "Board";
+
+/* ---------- band ---------- */
+function bandHeight() { document.documentElement.style.setProperty("--band-h", $("#band").offsetHeight + "px"); }
+window.addEventListener("resize", bandHeight);
+function renderBand() {
+  $("#band").innerHTML = `<b class="tag">Prototype</b>
+    <div class="seg" role="group" aria-label="Sample learner">${Object.keys(DB).map(k => `<button data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
+    <span class="adds">Objects, questions and goals, and a board, sharing one Commonplace. Change a question's status anywhere and it changes everywhere.</span>
+    <div class="seg" role="group" aria-label="Go to"><button data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions and goals</button><button data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button></div>
+    <label><input type="checkbox" id="phases" ${S.phases ? "checked" : ""}> Show phases</label>`;
+  document.body.classList.toggle("phases", S.phases);
+}
+function header(active, sub) {
+  return `<header class="destination-header"><div class="destination-crumb"><strong>Commonplace</strong>${sub ? `<i>/</i><span>${sub}</span>` : ""}</div>
+    <nav class="destination-tabs" aria-label="Commonplace sections">${[["wall", "Everything"], ["cols", "Collections"], ["read", "To read"], ["qg", "Questions and goals"], ["tpl", "Templates"]].map(([k, t]) => `<button class="destination-tab" data-act="go" data-k="${k === "cols" || k === "read" || k === "tpl" ? "wall" : k}" ${k === active ? 'aria-current="page"' : ""}${k === "qg" ? ' data-ph="Q2"' : ""}>${t}</button>`).join("")}</nav></header>`;
+}
+
+/* ---------- Everything wall ---------- */
+function wallCard(it) {
+  if (it.type === "board") {
+    const pc = it.pl.map(p => { const r = refOf(p.ref, it); return `<i class="${r?.kind === "goal" ? "g" : r?.kind === "question" ? "q" : ""}" style="left:${p.x / 22}%;top:${p.y / 9}%;width:${(r?.kind === "goal" ? 320 : 220) / 22}%;height:12%"></i>`; }).join("");
+    return `<button class="mcard" data-frame="picture" data-act="openboard" data-id="${it.id}"><div class="mini-cover">${pc}</div><div class="cap-line"><p class="kicker" style="margin-top:6px">Board · ${it.pl.length} entries · ${it.arrows.length} arrows</p><h3 class="mcard-title">${esc(it.title)}</h3><p>${esc(it.inl[0].text)}</p><p style="display:flex">${esc(it.place)}${counts(it)}</p></div></button>`;
+  }
+  if (it.type === "object") {
+    const c = COL(it.col);
+    if (c.layout === "portrait") return `<button class="mcard" data-frame="paper" data-act="open" data-id="${it.id}"><div class="ci"><div class="body"><div class="person-head"><span class="person-mark">${esc(initials(it.title))}</span><div class="person-name"><h3 class="mcard-title per">${esc(it.title)}</h3><p>${esc(cardLine(it))}</p></div></div></div><div class="ft">${esc(c.name)}${counts(it)}</div></div></button>`;
+    if (c.layout === "picture" && it.pics) return `<button class="mcard" data-frame="picture" data-act="open" data-id="${it.id}"><div class="pic">${building(it)}</div><div class="cap-line"><h3 class="mcard-title">${esc(it.title)}</h3><p style="display:flex">${esc(c.label)} · ${esc(cardLine(it))}${counts(it)}</p></div></button>`;
+    return `<button class="mcard" data-act="open" data-id="${it.id}"><div class="body"><p class="kicker">${esc(c.name)}${c.clinical ? ` · <span style="color:var(--warn)">Clinical</span>` : ""}</p><h3 class="mcard-title">${esc(it.title)}</h3><p class="mcard-kind">${esc(c.label)} · ${esc(cardLine(it))}</p>${it.desc ? `<p>${esc(it.desc)}</p>` : ""}</div><div class="ft">${onBoards(it).length ? `▦ on ${onBoards(it).length} board` : ""}${counts(it)}</div></button>`;
+  }
+  if (it.type === "note") {
+    const first = String(it.body).split(/\n\s*\n/)[0].replace(/^@(question|goal)\s+/i, "");
+    return `<button class="mcard note" data-act="open" data-id="${it.id}"><div class="body">${it.title ? `<h3 class="mcard-title">${esc(it.title)}</h3>` : ""}<p class="nt" style="font-family:var(--read);font-size:15px;color:var(--ink)">${esc(first.slice(0, 140))}</p></div><div class="ft">${it.title ? "Long note" : "Note"}${counts(it)}</div></button>`;
+  }
+  return `<button class="mcard" data-act="open" data-id="${it.id}"><div class="body"><p class="kicker">${esc(it.kind)}</p><h3 class="mcard-title">${esc(it.title)}</h3><p>${it.margin.length} margin notes</p></div><div class="ft">Source${counts(it)}</div></button>`;
+}
+function renderWall() {
+  const T = [["all", "All"], ["note", "Notes"], ["source", "Sources"], ["object", "Objects"], ["board", "Boards"]];
+  const list = D().items.filter(it => S.type === "all" || it.type === S.type).filter(it => !(it.type === "note" && !it.title && S.type === "all" && false));
+  return `${header("wall")}<nav class="cph-types" aria-label="Types">${T.map(([k, t]) => `<button class="cph-type" data-act="type" data-k="${k}" aria-current="${S.type === k}"${k === "board" ? ' data-ph="B1"' : ""}>${t}<span class="n">${k === "all" ? D().items.length : D().items.filter(x => x.type === k).length}</span></button>`).join("")}</nav>
+    <p class="small" style="margin:0 0 16px">A card's foot counts what's open inside it: <b style="color:var(--pick)">?</b> questions, <b style="color:var(--accent)">◎</b> goals. They never become cards of their own.</p>
+    <div class="wall">${list.map(wallCard).join("")}</div>`;
+}
+
+/* ---------- Questions and goals page ---------- */
+function hostLink(r) {
+  const it = r.item, glyph = it.type === "board" ? "▦" : it.type === "object" ? "◆" : it.type === "source" ? "▶" : "✎";
+  const what = it.type === "board" ? `board <button data-act="openboard" data-id="${it.id}">${esc(it.title)}</button>` : r.at ? `margin note on <button data-act="open" data-id="${it.id}">${esc(it.title)}</button>, ${esc(r.at)}` : `${lower(typeLabel(it))} <button data-act="open" data-id="${it.id}">${esc(it.title || "Note")}</button>`;
+  const ob = onBoards(it).length && it.type !== "board" ? "" : "";
+  const placed = boards().filter(b => b.pl.some(p => p.ref === "q:" + r.key));
+  return `<span>${glyph} in ${what}</span>${placed.map(b => `<span>· placed on <button data-act="openboard" data-id="${b.id}">${esc(b.title)}</button></span>`).join("")}${ob}`;
+}
+function qgRow(r, child) {
+  const s = st(r.key, r.kind), done = ["answered", "reached", "parked", "dropped"].includes(s.status);
+  return `<div class="qgrow ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done ? " done" : ""}"><span class="gl">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx">${esc(r.text)}</span>${stBtn(r)}<div class="host">${hostLink(r)}</div>${s.answer || s.ans.length ? `<div class="host" style="color:var(--ok)">${ansLine(r).replace('<div class="ans">', "").replace(/<\/div>$/, "")}</div>` : ""}</div>`;
+}
+function renderQG() {
+  const all = allInlines(), want = s => S.qf === "all" || (S.qf === "open" ? ["open", "active"].includes(s) : S.qf === "answered" ? ["answered", "reached"].includes(s) : ["parked", "paused", "dropped"].includes(s));
+  const goals = all.filter(r => r.kind === "goal");
+  const loose = all.filter(r => r.kind === "question" && !r.goalKey && want(st(r.key, r.kind).status));
+  const byHost = {};
+  loose.forEach(r => { (byHost[r.item.id] ||= []).push(r); });
+  return `${header("qg", "Questions and goals")}
+    <div class="chead"><div class="t"><h1>Questions and goals</h1><p class="lead">Everything you're asking and aiming for, wherever you wrote it: in notes, in Objects, in margin notes and on boards. Each one stays in the thing it was written in.</p></div></div>
+    <div class="chips" role="group" aria-label="Status">${[["open", "Open"], ["answered", "Answered"], ["parked", "Parked"], ["all", "All"]].map(([k, t]) => `<button class="chip" data-act="qf" data-k="${k}" aria-pressed="${S.qf === k}">${t}</button>`).join("")}</div>
+    <div class="qglist">
+      <section class="qgsec"><h2>Goals</h2>${goals.map(g => { const qs = all.filter(r => r.goalKey === g.key); const done = qs.filter(r => st(r.key, r.kind).status === "answered").length; const shown = qs.filter(r => want(st(r.key, r.kind).status)); return (want(st(g.key, "goal").status) || shown.length) ? qgRow(g) + `<div class="small" style="margin:-4px 0 4px 40px">${done} of ${qs.length} answered</div>` + shown.map(r => qgRow(r, true)).join("") : ""; }).join("") || `<p class="small">No goals here.</p>`}</section>
+      <section class="qgsec"><h2>Other questions</h2>${Object.values(byHost).flat().map(r => qgRow(r)).join("") || `<p class="small">Nothing here.</p>`}</section>
+    </div>`;
+}
+
+/* ---------- item page ---------- */
+function renderItem() {
+  const it = I(S.item);
+  if (it.type === "board") { S.board = it.id; S.screen = "board"; return renderBoard(); }
+  const c = it.type === "object" ? COL(it.col) : null;
+  const rows = allInlines().filter(r => r.item === it);
+  const oq = rows.filter(r => r.kind === "question").length, og = rows.filter(r => r.kind === "goal").length;
+  const answered = allInlines().filter(r => st(r.key, r.kind).ans.includes(it.id));
+  const ob = onBoards(it);
+  const editing = S.editing === it.id;
+  const hero = c && c.layout === "picture" && it.pics ? `<figure class="ip-wide"><div class="ip-pic">${building(it)}</div></figure>` : "";
+  const line = c ? cardLine(it) : it.type === "source" ? it.kind : typeLabel(it);
+  const rail = `<p class="ip-rh">Properties</p>
+    <div class="prop"><span>Type</span><div class="prop-value">${esc(c ? c.label : typeLabel(it))}</div></div>
+    ${c ? c.fields.filter(f => f.t !== "long").map(f => `<div class="prop"><span>${esc(f.label)}</span><div class="prop-value">${f.t === "rel" ? `<div class="rel-row">${arr(it.v[f.id]).map(id => I(id)).filter(Boolean).map(x => `<button class="chip-rel" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("") || `<span class="muted">Not recorded</span>`}</div>` : f.t === "choice" ? arr(it.v[f.id]).map(v => `<span class="cc c0">${esc(v)}</span>`).join(" ") : esc(fieldText(c, f, it.v[f.id])) || `<span class="muted">Not recorded</span>`}</div></div>`).join("") : ""}
+    <div class="prop" data-ph="Q1"><span>Inside</span><div class="prop-value">${oq || og ? `${og ? `<span style="color:var(--accent)">◎ ${og} goal${og > 1 ? "s" : ""}</span> ` : ""}${oq ? `<span style="color:var(--pick)">? ${oq} question${oq > 1 ? "s" : ""}</span>` : ""}` : `<span class="muted">Type @ to add a question or goal</span>`}</div></div>
+    <div class="prop" data-ph="B2"><span>On boards</span><div class="prop-value">${ob.length ? `<div class="rel-row">${ob.map(b => `<button class="chip-rel" data-act="openboard" data-id="${b.id}">▦ ${esc(b.title)}</button>`).join("")}</div>` : `<span class="muted">None</span>`}</div></div>
+    <div class="rail-actions"><a class="btn-open-graph" href="#">Open in Loci →</a></div>`;
+  const writing = it.type === "source" ? "" : `<section class="ip-writing" data-ph="${it.type === "object" ? "Q-O" : "Q1"}"><h2>${it.type === "object" ? "What I took from it" : "The note"}</h2>
+    ${editing ? `<textarea class="mdedit" id="mdedit" spellcheck="true">${esc(it.body)}</textarea><div class="edrow"><button class="button sm" data-act="saveedit">Save</button><button class="button button-quiet sm" data-act="canceledit">Cancel</button><span class="hint">Type <b>@</b> at the start of a paragraph for a question or a learning goal. Ctrl/⌘ Enter saves.</span></div>`
+      : `<div class="prose-v">${renderBody(it) || `<p class="muted">Nothing written yet.</p>`}</div><div class="edrow"><button class="button button-quiet sm" data-act="edit">Edit</button></div>`}</section>`;
+  const longs = c ? c.fields.filter(f => f.t === "long" && it.v[f.id]).map(f => `<section class="ip-writing"><h2>${esc(f.label)}</h2><div class="prose-v"><p>${esc(it.v[f.id])}</p></div></section>`).join("") : "";
+  const margin = it.margin.length || it.type === "source" ? `<section class="ip-shelf" data-ph="Q3"><div class="ip-shelf-h"><h2>Margin notes</h2><span>${it.margin.length}</span></div><div class="ip-cards" style="grid-template-columns:1fr">${it.margin.map((m, i) => `<div class="mnote">${m.at ? `<span class="tc-time">${esc(m.at)}</span> ` : ""}${parse(m.body).length ? renderBody(it, i) : esc(m.body)}</div>`).join("")}</div>
+    ${it.type === "source" ? `<div class="mn-add"><span class="small">While watching, at ${it.kind.includes("PDF") ? "p. 22" : "18:20"}:</span><button class="button button-quiet sm" data-act="mq" data-id="${it.id}" data-k="question">? Question</button><button class="button button-quiet sm" data-act="mq" data-id="${it.id}" data-k="goal">◎ Goal</button><span class="small">(Q and G keys)</span></div>` : ""}</section>` : "";
+  const ans = answered.length ? `<section class="ip-shelf answers" data-ph="Q-O"><div class="ip-shelf-h"><h2>Answers</h2><span>${answered.length}</span><small>questions you marked as answered here</small></div>${answered.map(r => `<div class="ans-it"><span class="gl">✓</span><span class="tx">${esc(r.text)}</span><small>${hostLink(r).replace(/<\/?span>/g, "")}</small></div>`).join("")}</section>` : "";
+  return `<div class="ipage"><div class="ip-top"><button class="ip-back" data-act="back">← ${S.from === "board" ? esc(I(S.board)?.title || "Board") : S.from === "qg" ? "Questions and goals" : "Commonplace"}</button><span class="ip-crumb">${esc(c ? c.label : typeLabel(it))}</span><span class="ip-saved">Saved</span></div>
+    ${c?.clinical ? `<div class="banner"><b>Clinical.</b><span>De-identified, for learning. Keep bands, never names, dates of birth or record numbers.</span></div>` : ""}
+    <div class="ip-grid"><article class="ip-main">${hero}<p class="ip-kicker">${esc(c ? c.label : typeLabel(it))}</p><h1 class="ip-title">${esc(it.title || "Note")}</h1>${line && c ? `<p class="ip-line">${esc(line)}</p>` : ""}${it.desc ? `<p class="ip-lead">${esc(it.desc)}</p>` : ""}
+      ${writing}${longs}${margin}${ans}</article><aside class="props ip-rail" aria-label="Properties">${rail}</aside></div></div>`;
+}
+
+/* ---------- board ---------- */
+/** What a placement points at: an item, the board's own inline, or another host's inline. */
+function refOf(ref, b = I(S.board)) {
+  if (ref.startsWith("i:")) { const it = I(ref.slice(2)); return it ? { type: "item", it } : null; }
+  if (ref.startsWith("b:")) { const x = b?.inl.find(y => y.id === ref.slice(2)); return x ? { type: "inline", kind: x.kind, key: `${b.id}:${x.kind}:${x.id}`, own: true } : null; }
+  if (ref.startsWith("q:")) { const r = INL(ref.slice(2)); return r ? { type: "inline", kind: r.kind, key: r.key, own: false, r } : null; }
+  return null;
+}
+function cardHTML(p, b) {
+  const r = refOf(p.ref, b); if (!r) return "";
+  const sel = S.sel === p.id ? " sel" : "", dot = `<span class="dot-c" data-dot="${p.id}" title="Drag onto another card to connect"></span>`;
+  if (r.type === "inline") {
+    const row = INL(r.key), s = st(r.key, r.kind);
+    if (r.kind === "goal") {
+      const qs = allInlines().filter(x => x.goalKey === r.key || (x.item === b && x.kind === "question")), done = qs.filter(x => st(x.key, x.kind).status === "answered").length;
+      return `<div class="bc g${sel}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px" data-ph="Q-B"><div class="in"><span class="k">◎ Goal · this board's</span><span class="t">${esc(row.text)}</span></div><div class="ft"><span>${done} of ${qs.length} questions answered</span>${stBtn(row)}</div>${dot}</div>`;
+    }
+    const editing = S.editing === "inl:" + r.key;
+    return `<div class="bc q${sel}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px" data-ph="Q-B"><div class="in"><span class="k">? Question${r.own ? "" : ` · from ${esc(row.item.title || "a note")}`}</span>${editing ? `<textarea data-qedit="${esc(r.key)}">${esc(row.text)}</textarea>` : `<span class="t">${esc(row.text)}</span>`}${ansLine(row).replace('class="ans"', 'class="l"')}</div><div class="ft">${stBtn(row)}</div>${dot}</div>`;
+  }
+  const it = r.it;
+  if (it.type === "object") {
+    const c = COL(it.col);
+    const head = c.layout === "portrait" ? `<div class="pm"><span class="person-mark">${esc(initials(it.title))}</span><span class="t">${esc(it.title)}</span></div><span class="l">${esc(cardLine(it))}</span>`
+      : `<span class="k">${esc(c.name)}${c.clinical ? ` <span class="clin">Clinical</span>` : ""}</span><span class="t">${esc(it.title)}</span><span class="l">${esc(c.label)} · ${esc(cardLine(it))}</span>`;
+    return `<div class="bc obj${sel}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${c.layout === "picture" && it.pics ? `<div class="pic">${building(it)}</div>` : ""}<div class="in">${head}</div><div class="ft"><button data-act="open" data-id="${it.id}">Open</button>${counts(it)}</div>${dot}</div>`;
+  }
+  if (it.type === "note") {
+    const editing = S.editing === "note:" + it.id;
+    return `<div class="bc note${sel}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><div class="in">${it.title ? `<span class="k">Long note</span><span class="t">${esc(it.title)}</span>` : `<span class="k">Note</span>`}${editing ? `<textarea data-nedit="${it.id}" placeholder="Write… start a paragraph with @question or @goal">${esc(it.body)}</textarea>` : `<div class="body">${renderBody(it) || `<span class="l">Empty note</span>`}</div>`}</div><div class="ft"><button data-act="open" data-id="${it.id}">Open</button>${counts(it)}</div>${dot}</div>`;
+  }
+  return `<div class="bc${sel}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><div class="in"><span class="k">${esc(it.kind)}</span><span class="t">${esc(it.title)}</span><span class="l">${it.margin.length} margin notes${it.margin.some(m => /^@question/i.test(m.body)) ? " · questions inside" : ""}</span></div><div class="ft"><button data-act="open" data-id="${it.id}">Open</button>${counts(it)}</div>${dot}</div>`;
+}
+function insidePanel(b) {
+  const own = allInlines().filter(r => r.item === b);
+  const goal = own.find(r => r.kind === "goal");
+  const placedKeys = b.pl.map(p => refOf(p.ref, b)).filter(r => r?.type === "inline" && !r.own).map(r => r.key);
+  const fromCards = b.pl.map(p => refOf(p.ref, b)).filter(r => r?.type === "item").flatMap(r => allInlines().filter(x => x.item === r.it));
+  const qs = [...own.filter(r => r.kind === "question"), ...allInlines().filter(r => placedKeys.includes(r.key))];
+  const done = qs.filter(r => st(r.key, r.kind).status === "answered").length;
+  const row = (r, extra = "") => { const s = st(r.key, r.kind); const d = ["answered", "reached", "parked", "dropped"].includes(s.status); const p = b.pl.find(x => refOf(x.ref, b)?.key === r.key || x.ref === "i:" + r.item.id); return `<div class="row ${r.kind === "goal" ? "g" : "q"}${d ? " done" : ""}" data-act="focuscard" data-pid="${p?.id || ""}"><span class="gl">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx">${esc(r.text)}</span><span class="meta">${stBtn(r)}${extra}</span></div>`; };
+  return `<aside class="inside" aria-label="Inside this board" data-ph="Q-B">
+    <h2>Goal</h2>${goal ? row(goal) : ""}<p class="prog">${done} of ${qs.length} questions answered</p>
+    <h2>Questions on this board <span>${qs.length}</span></h2>${qs.map(r => row(r, r.item !== b ? `<span>from ${esc(r.item.title || "a note")}</span>` : "")).join("") || `<p class="small">Press Q and click the canvas to ask one.</p>`}
+    <h2>Inside the cards <span>${fromCards.length}</span></h2>${fromCards.map(r => row(r, `<span>in ${esc(r.item.title || "a note")}${r.at ? `, ${esc(r.at)}` : ""}</span>`)).join("") || `<p class="small">None.</p>`}
+    <p class="small">Every question here also shows in Questions and goals, named by where it was written.</p></aside>`;
+}
+function drawerHTML(b) {
+  const placed = new Set(b.pl.map(p => p.ref));
+  const tabs = [["objects", "Objects"], ["notes", "Notes"], ["sources", "Sources"], ["questions", "Questions"]];
+  let list = "";
+  if (S.dtab === "objects") list = D().cols.map(c => `<p class="grp">${esc(c.name)}</p>${D().items.filter(x => x.col === c.id).map(x => `<button class="it${placed.has("i:" + x.id) ? " on" : ""}" data-act="place" data-ref="i:${x.id}"><b>${esc(x.title)}</b><small>${esc(cardLine(x))}${placed.has("i:" + x.id) ? " · on board" : ""}</small></button>`).join("")}`).join("");
+  if (S.dtab === "notes") list = D().items.filter(x => x.type === "note").map(x => `<button class="it${placed.has("i:" + x.id) ? " on" : ""}" data-act="place" data-ref="i:${x.id}"><b>${esc(x.title || x.body.slice(0, 50))}</b><small>${parse(x.body).length} questions and goals inside</small></button>`).join("");
+  if (S.dtab === "sources") list = D().items.filter(x => x.type === "source").map(x => `<button class="it${placed.has("i:" + x.id) ? " on" : ""}" data-act="place" data-ref="i:${x.id}"><b>${esc(x.title)}</b><small>${esc(x.kind)}</small></button>`).join("");
+  if (S.dtab === "questions") list = `<p class="small">Open questions written elsewhere. Placing one shows it here; it stays in its note.</p>` + allInlines().filter(r => r.kind === "question" && r.item.type !== "board" && st(r.key, r.kind).status === "open").map(r => `<button class="it${placed.has("q:" + r.key) ? " on" : ""}" data-act="place" data-ref="q:${esc(r.key)}"><b>? ${esc(r.text)}</b><small>in ${esc(r.item.title || "a note")}${r.at ? `, ${esc(r.at)}` : ""}</small></button>`).join("");
+  return `<div class="drawer" data-ph="B1"><div class="dh"><b>Place from your Commonplace</b><button class="ghost button-link" data-act="drawer">Close</button></div>
+    <div class="shelf-tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" aria-selected="${S.dtab === k}" data-act="dtab" data-k="${k}">${t}</button>`).join("")}</div><div class="list">${list}</div></div>`;
+}
+function renderBoard() {
+  const b = I(S.board) || boards()[0]; S.board = b.id;
+  const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : S.connect ? "Now click the card to connect to." : "Drag a card's blue dot onto another card to connect them. Click an arrow to see its word and why.";
+  return `${header("wall", `Boards / ${esc(b.title)}`)}
+    <div class="bhead"><div><p class="ip-kicker" data-ph="B1">Board</p><h1>${esc(b.title)}</h1><button class="place" data-ph="B4">${esc(b.place)}</button></div>
+      <div class="acts"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" data-act="drawer">+ Place</button>${boards().length > 1 ? "" : ""}</div></div>
+    <div class="bwrap"><div class="viewport${S.connect ? " connecting" : ""}" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => cardHTML(p, b)).join("")}</div>
+      <div class="tools" role="toolbar" aria-label="Tools">${[["select", "V", "Select and move"], ["note", "N", "Note"], ["question", "Q", "Question"]].map(([k, l, t]) => `<button data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t} (${l})">${l === "Q" ? "?" : l === "N" ? "✎" : "↖"}</button>`).join("")}<button data-act="drawer" title="Place from Commonplace (+)">+</button></div>
+      <div class="hintbar"><span>${hint}</span></div>
+      <div class="zoom"><button data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button data-act="fit">Fit</button></div>
+      ${S.drawer ? drawerHTML(b) : ""}</div>${insidePanel(b)}</div>`;
+}
+/** Arrows and field links, measured from the cards as drawn. */
+function drawArrows() {
+  const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
+  const box = pid => { const el = document.querySelector(`[data-pid="${pid}"]`); if (!el) return null; return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; };
+  const edge = (a, c) => { const cx = a.x + a.w / 2, cy = a.y + a.h / 2, dx = c.x - cx, dy = c.y - cy; const s = Math.min(Math.abs((a.w / 2) / (dx || 1e-6)), Math.abs((a.h / 2) / (dy || 1e-6))); return { x: cx + dx * s, y: cy + dy * s }; };
+  const center = a => ({ x: a.x + a.w / 2, y: a.y + a.h / 2 });
+  let out = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--ink-3)"/></marker></defs>`;
+  if (S.fieldLinks) {
+    const objs = b.pl.map(p => ({ p, r: refOf(p.ref, b) })).filter(x => x.r?.type === "item" && x.r.it.type === "object");
+    for (const A of objs) { const c = COL(A.r.it.col); for (const f of c.fields.filter(f => f.t === "rel")) for (const id of arr(A.r.it.v[f.id])) { const B = objs.find(x => x.r.it.id === id); if (!B) continue; const a = box(A.p.id), bb = box(B.p.id); if (!a || !bb) continue; const s = edge(a, center(bb)), e = edge(bb, center(a)); out += `<line class="fl" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><text class="flt" x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 + 14}" text-anchor="middle">${esc(f.label)} (field)</text>`; } }
+  }
+  for (const a of b.arrows) {
+    const A = box(a.from), B = box(a.to); if (!A || !B) continue;
+    const s = edge(A, center(B)), e = edge(B, center(A)), mx = (s.x + e.x) / 2, my = (s.y + e.y) / 2;
+    out += `<line class="hit" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><line class="a${S.selArrow === a.id ? " sel" : ""}" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" marker-end="url(#ah)"/><text x="${mx}" y="${my - 6}" text-anchor="middle">${esc(a.word)}</text>`;
+  }
+  if (S.ghost) out += `<line class="ghost" x1="${S.ghost.x1}" y1="${S.ghost.y1}" x2="${S.ghost.x2}" y2="${S.ghost.y2}"/>`;
+  svg.innerHTML = out;
+}
+
+/* ---------- integration offers on an arrow ---------- */
+function offersFor(a, b) {
+  const A = refOf(b.pl.find(p => p.id === a.from)?.ref || "", b), B = refOf(b.pl.find(p => p.id === a.to)?.ref || "", b);
+  const out = [];
+  if (A?.type === "item" && B?.type === "item" && A.it.type === "object" && B.it.type === "object") {
+    for (const [X, Y] of [[A.it, B.it], [B.it, A.it]]) {
+      const f = COL(X.col).fields.find(f => f.t === "rel" && f.o.to === Y.col);
+      if (f && !arr(X.v[f.id]).includes(Y.id)) out.push({ kind: "field", x: X.id, f: f.id, y: Y.id, label: f.o.many ? `Add ${Y.title} to ${X.title}'s ${f.label}` : `Set ${X.title}'s ${f.label} to ${Y.title}`, why: "Keep as a field: it becomes a fact on the Object, everywhere. The arrow stays this board's." });
+    }
+  }
+  if (a.word === "explains" && A?.type === "item" && B?.type === "inline" && B.kind === "question") {
+    const s = st(B.key, "question");
+    if (!s.ans.includes(A.it.id)) out.push({ kind: "answer", key: B.key, id: A.it.id, label: `Mark answered in ${A.it.title}`, why: "This arrow says it explains the question." });
+  }
+  return out;
+}
+function openArrow(aid, x, y) {
+  const b = I(S.board), a = b.arrows.find(z => z.id === aid); if (!a) return;
+  S.selArrow = aid; drawArrows();
+  const nm = pid => { const r = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); return r ? (r.type === "item" ? r.it.title || "the note" : INL(r.key).text) : "?"; };
+  const off = offersFor(a, b);
+  const pop = $("#apop");
+  pop.innerHTML = `<div class="sent"><i>${esc(nm(a.from))}</i> <b>${esc(a.word)}</b> <i>${esc(nm(a.to))}</i>${a.why ? `, because ${esc(a.why)}` : ""}</div>
+    <div class="words" role="group" aria-label="Word">${WORDS.map(w => `<button data-act="aword" data-w="${w}" aria-pressed="${a.word === w}">${w}</button>`).join("")}</div>
+    <input id="awhy" placeholder="Why? One line, in your words" value="${esc(a.why)}">
+    ${off.map((o, i) => `<div class="offer" data-ph="${o.kind === "field" ? "B1 + F2" : "B3 + Q2"}"><span>${esc(o.why)}</span><div class="row2"><button class="button sm" data-act="offer" data-i="${i}">${esc(o.label)}</button><button class="button button-quiet sm" data-act="closeapop">Not now</button></div></div>`).join("")}
+    <div class="row2" style="display:flex;justify-content:space-between"><button class="button button-link" data-act="delarrow" style="color:var(--warn)">Remove arrow</button><button class="button button-quiet sm" data-act="closeapop">Done</button></div>`;
+  pop.hidden = false; pop._a = aid; pop._off = off;
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  pop.style.left = Math.max(16, Math.min(x - w / 2, innerWidth - w - 16)) + "px";
+  pop.style.top = Math.max(16, Math.min(y + 12, innerHeight - h - 16)) + "px";
+}
+function closeApop() { const pop = $("#apop"); if (!pop.hidden && pop._a) { const b = I(S.board), a = b?.arrows.find(z => z.id === pop._a); const w = $("#awhy"); if (a && w) a.why = w.value.trim(); } pop.hidden = true; S.selArrow = null; drawArrows(); }
+
+/* ---------- render ---------- */
+function render() {
+  renderBand(); bandHeight();
+  const m = $("#main");
+  if (S.screen === "item" && I(S.item)) m.innerHTML = renderItem();
+  else if (S.screen === "qg") m.innerHTML = renderQG();
+  else if (S.screen === "wall") m.innerHTML = renderWall();
+  else { S.screen = "board"; m.innerHTML = renderBoard(); requestAnimationFrame(drawArrows); }
+  const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
+}
+let tT;
+function toast(s) { const t = $("#toast"); t.textContent = s; t.hidden = false; clearTimeout(tT); tT = setTimeout(() => t.hidden = true, 3400); }
+let menuKey = null;
+function openMenu(anchor, html) {
+  const m = $("#menu"); m.innerHTML = html; m.hidden = false;
+  const r = anchor.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(16, Math.min(r.right - w, innerWidth - w - 16)) + "px";
+  m.style.top = (r.bottom + 6 + h > innerHeight - 16 ? Math.max(16, r.top - h - 6) : r.bottom + 6) + "px";
+}
+function closeMenu() { $("#menu").hidden = true; menuKey = null; }
+function stMenu(key) {
+  const r = INL(key), s = st(key, r.kind);
+  if (r.kind === "goal") return `<h5>Learning goal</h5>${STATUS.goal.map(v => `<button data-act="setst" data-v="${v}"><i>${s.status === v ? "✓" : ""}</i><span>${cap(v)}</span></button>`).join("")}<button data-act="toast" data-msg="Phase 3 (Q5): Loci plans a course or a reading path for this goal."><i></i><span>Plan a course for this…</span></button>`;
+  const objs = D().items.filter(x => x.type === "object" || x.type === "board");
+  return `<h5>Question · ${cap(s.status)}</h5><button data-act="setst" data-v="answered"><i>${s.status === "answered" ? "✓" : ""}</i><span>Mark answered</span></button><button data-act="setst" data-v="parked"><i>${s.status === "parked" ? "✓" : ""}</i><span>Park</span></button><button data-act="setst" data-v="open"><i>${s.status === "open" ? "✓" : ""}</i><span>Reopen</span></button>
+    <h5>Answer in a line</h5><input id="ansline" placeholder="Your answer…" value="${esc(s.answer)}">
+    <h5>Answered in</h5>${D().cols.map(c => `${objs.filter(x => x.col === c.id).map(x => `<button data-act="ansin" data-id="${x.id}"><i>${s.ans.includes(x.id) ? "✓" : ""}</i><span>${esc(x.title)} <small style="color:var(--ink-3)">${esc(c.label)}</small></span></button>`).join("")}`).join("")}${boards().map(x => `<button data-act="ansin" data-id="${x.id}"><i>${s.ans.includes(x.id) ? "✓" : ""}</i><span>▦ ${esc(x.title)}</span></button>`).join("")}
+    <h5>Loci (later)</h5><button data-act="toast" data-msg="Phase 3 (Q5): Explain this starts a Lumen whose brief is the question; its end asks “Did this answer it?”."><i></i><span>Explain this</span></button><button data-act="toast" data-msg="Phase 3 (Q5): Find resources searches for books, videos and papers that answer it."><i></i><span>Find resources</span></button>`;
+}
+
+/* ---------- board pointer handling: pan, move, connect ---------- */
+let drag = null;
+const toCanvas = (cx, cy) => { const r = $("#vp").getBoundingClientRect(); return { x: (cx - r.left - S.view.x) / S.view.z, y: (cy - r.top - S.view.y) / S.view.z }; };
+function applyView() { const cv = $("#cv"); if (cv) cv.style.transform = `translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})`; const z = document.querySelector(".zoom span"); if (z) z.textContent = Math.round(S.view.z * 100) + "%"; }
+document.addEventListener("pointerdown", e => {
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".tools,.zoom,.drawer,.hintbar,button,textarea,input,.st")) return;
+  const dot = e.target.closest("[data-dot]"), card = e.target.closest("[data-pid]"), line = e.target.closest("[data-arrow]");
+  if (line) return;
+  if (dot) { const p = I(S.board).pl.find(x => x.id === dot.dataset.dot), el = dot.parentElement; drag = { kind: "connect", from: p.id, sx: el.offsetLeft + el.offsetWidth, sy: el.offsetTop + el.offsetHeight / 2 }; e.preventDefault(); return; }
+  if (card) { const p = I(S.board).pl.find(x => x.id === card.dataset.pid), c = toCanvas(e.clientX, e.clientY); drag = { kind: "move", p, ox: c.x - p.x, oy: c.y - p.y, moved: false, el: card }; return; }
+  if (S.tool === "note" || S.tool === "question") { const c = toCanvas(e.clientX, e.clientY); addOnCanvas(S.tool, c.x - 110, c.y - 30); return; }
+  drag = { kind: "pan", sx: e.clientX, sy: e.clientY, vx: S.view.x, vy: S.view.y }; $("#vp").classList.add("panning");
+});
+document.addEventListener("pointermove", e => {
+  if (!drag) return;
+  if (drag.kind === "pan") { S.view.x = drag.vx + e.clientX - drag.sx; S.view.y = drag.vy + e.clientY - drag.sy; applyView(); }
+  else if (drag.kind === "move") { const c = toCanvas(e.clientX, e.clientY); const nx = Math.round(c.x - drag.ox), ny = Math.round(c.y - drag.oy); if (Math.abs(nx - drag.p.x) + Math.abs(ny - drag.p.y) > 2) drag.moved = true; drag.p.x = nx; drag.p.y = ny; drag.el.style.left = nx + "px"; drag.el.style.top = ny + "px"; drawArrows(); }
+  else if (drag.kind === "connect") { const c = toCanvas(e.clientX, e.clientY); S.ghost = { x1: drag.sx, y1: drag.sy, x2: c.x, y2: c.y }; drawArrows(); }
+});
+document.addEventListener("pointerup", e => {
+  if (!drag) return;
+  const d = drag; drag = null; $("#vp")?.classList.remove("panning");
+  if (d.kind === "connect" || d.moved || (d.kind === "pan" && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) > 3)) S.skipClick = true;
+  if (d.kind === "connect") {
+    S.ghost = null;
+    const tgt = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest?.("[data-pid]")).find(Boolean);
+    const b = I(S.board);
+    if (tgt && tgt.dataset.pid !== d.from) { const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, word: "leads to", why: "" }; b.arrows.push(a); drawArrows(); openArrow(a.id, e.clientX, e.clientY); }
+    else drawArrows();
+  } else if (d.kind === "move" && !d.moved) { S.sel = d.p.id; document.querySelectorAll(".bc.sel").forEach(x => x.classList.remove("sel")); d.el.classList.add("sel"); }
+});
+document.addEventListener("wheel", e => {
+  if (S.screen !== "board" || !e.target.closest("#vp")) return;
+  e.preventDefault();
+  if (e.ctrlKey || e.metaKey) zoomAt(e.deltaY < 0 ? 1.1 : 1 / 1.1, e.clientX, e.clientY);
+  else { S.view.x -= e.deltaX; S.view.y -= e.deltaY; applyView(); }
+}, { passive: false });
+function zoomAt(f, cx, cy) {
+  const r = $("#vp").getBoundingClientRect(); cx ??= r.left + r.width / 2; cy ??= r.top + r.height / 2;
+  const z = Math.min(1.6, Math.max(.35, S.view.z * f)), px = cx - r.left, py = cy - r.top;
+  S.view.x = px - (px - S.view.x) * z / S.view.z; S.view.y = py - (py - S.view.y) * z / S.view.z; S.view.z = z; applyView();
+}
+function fit() {
+  const b = I(S.board), vp = $("#vp"); if (!b || !vp) return;
+  const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 40, y0 = Math.min(...ys) - 40, x1 = Math.max(...xs) + 380, y1 = Math.max(...ys) + 260;
+  const z = Math.min(1, Math.max(vp.clientWidth < 600 ? .5 : .7, Math.min(vp.clientWidth / (x1 - x0), vp.clientHeight / (y1 - y0))));
+  S.view = { z, x: -x0 * z + Math.max(56, (vp.clientWidth - (x1 - x0) * z) / 2), y: -y0 * z + 10 };
+  applyView();
+}
+function addOnCanvas(tool, x, y) {
+  const b = I(S.board);
+  if (tool === "question") { const id = "q" + (b.inl.length + 1) + "x" + (Date.now() % 1000); b.inl.push({ id, kind: "question", text: "New question" }); b.pl.push({ id: "p" + Date.now(), ref: "b:" + id, x, y }); S.editing = `inl:${b.id}:question:${id}`; }
+  else { const nid = "n" + Date.now(); D().items.push(note(nid, "", "")); b.pl.push({ id: "p" + Date.now(), ref: "i:" + nid, x, y }); S.editing = "note:" + nid; }
+  S.tool = "select"; S.focusEdit = true; render();
+}
+
+/* ---------- clicks ---------- */
+document.addEventListener("click", e => {
+  if (S.skipClick) { S.skipClick = false; return; }
+  const a = e.target.closest("[data-act]");
+  if (!e.target.closest("#menu") && !(a && a.dataset.act === "stmenu")) closeMenu();
+  const line = e.target.closest("[data-arrow]");
+  if (line && S.screen === "board") { openArrow(line.dataset.arrow, e.clientX, e.clientY); return; }
+  if (!e.target.closest("#apop") && !$("#apop").hidden) closeApop();
+  if (!a) return;
+  const d = a.dataset;
+  switch (d.act) {
+    case "field": S.field = d.k; S.board = DB[d.k].start; S.screen = "board"; S.sel = null; S.drawer = false; S.view = { x: 20, y: 10, z: .82 }; render(); requestAnimationFrame(fit); break;
+    case "go": S.screen = d.k; S.drawer = false; render(); if (d.k === "board") requestAnimationFrame(fit); window.scrollTo({ top: 0 }); break;
+    case "type": S.type = d.k; render(); break;
+    case "qf": S.qf = d.k; render(); break;
+    case "open": S.from = S.screen === "board" ? "board" : S.screen === "qg" ? "qg" : "wall"; S.item = d.id; S.screen = "item"; S.editing = null; render(); window.scrollTo({ top: 0 }); break;
+    case "openboard": S.board = d.id; S.screen = "board"; render(); requestAnimationFrame(fit); window.scrollTo({ top: 0 }); break;
+    case "back": S.screen = S.from === "board" ? "board" : S.from === "qg" ? "qg" : "wall"; render(); break;
+    case "stmenu": e.stopPropagation(); menuKey = d.k; openMenu(a, stMenu(d.k)); break;
+    case "setst": { const r = INL(menuKey), s = st(menuKey, r.kind); s.status = d.v; closeMenu(); render(); toast(`${r.kind === "goal" ? "Goal" : "Question"} marked ${d.v}, everywhere it shows.`); break; }
+    case "ansin": { const s = st(menuKey, "question"); s.ans = s.ans.includes(d.id) ? s.ans.filter(x => x !== d.id) : [...s.ans, d.id]; if (s.ans.length) s.status = "answered"; const k = menuKey; render(); menuKey = k; const anchor = document.querySelector(`[data-act="stmenu"][data-k="${CSS.escape(k)}"]`); if (anchor) openMenu(anchor, stMenu(k)); else closeMenu(); break; }
+    case "toast": closeMenu(); toast(d.msg); break;
+    case "edit": S.editing = S.item; S.focusEdit = true; render(); break;
+    case "canceledit": S.editing = null; render(); break;
+    case "saveedit": saveBody(); break;
+    case "mq": { const it = I(d.id); it.margin.push({ at: it.kind.includes("PDF") ? "p. 22" : "18:20", body: `@${d.k} ${d.k === "goal" ? "Be able to explain the stack effect to a client" : "What sets the size of the opening at the top?"}` }); render(); toast(`A margin note at ${it.margin.at(-1).at}, with @${d.k} typed for you. It shows in Questions and goals.`); break; }
+    case "tool": S.tool = d.k; render(); break;
+    case "drawer": S.drawer = !S.drawer; render(); break;
+    case "dtab": S.dtab = d.k; render(); break;
+    case "place": { const b = I(S.board); if (b.pl.some(p => p.ref === d.ref)) { toast("Already on this board."); break; } const vp = $("#vp"), c = toCanvas(vp.getBoundingClientRect().left + vp.clientWidth / 2, vp.getBoundingClientRect().top + vp.clientHeight / 2); b.pl.push({ id: "p" + Date.now(), ref: d.ref, x: Math.round(c.x - 110 + (b.pl.length % 4) * 24), y: Math.round(c.y - 60) }); render(); toast(d.ref.startsWith("q:") ? "Placed. The question still belongs to its note; its status is the same everywhere." : "Placed, not copied: it's the same entry as in Commonplace."); break; }
+    case "zoom": zoomAt(+d.d > 0 ? 1.15 : 1 / 1.15); break;
+    case "fit": fit(); break;
+    case "focuscard": { if (!d.pid) break; const p = I(S.board).pl.find(x => x.id === d.pid); if (!p) break; const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 110) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); document.querySelectorAll(".bc.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${p.id}"]`)?.classList.add("sel"); break; }
+    case "aword": { const b = I(S.board), ar = b.arrows.find(z => z.id === $("#apop")._a); ar.why = $("#awhy").value.trim(); ar.word = d.w; const r = a.getBoundingClientRect(); const pop = $("#apop"); const x = pop.offsetLeft + pop.offsetWidth / 2, y = pop.offsetTop - 12; openArrow(ar.id, x, y); drawArrows(); break; }
+    case "offer": { const o = $("#apop")._off[+d.i]; if (o.kind === "field") { const X = I(o.x), f = COL(X.col).fields.find(z => z.id === o.f); X.v[f.id] = f.o.many ? [...arr(X.v[f.id]), o.y] : [o.y]; toast(`${X.title}: ${f.label} is now ${I(o.y).title}. It shows on the Object's page and as a field link here.`); } else { const s = st(o.key, "question"); s.ans.push(o.id); s.status = "answered"; toast(`Answered in ${I(o.id).title}. The Object's page now lists it under Answers.`); } closeApop(); render(); break; }
+    case "delarrow": { const b = I(S.board); b.arrows = b.arrows.filter(z => z.id !== $("#apop")._a); $("#apop").hidden = true; drawArrows(); break; }
+    case "closeapop": closeApop(); break;
+  }
+});
+document.addEventListener("dblclick", e => {
+  if (S.screen !== "board") return;
+  const card = e.target.closest("[data-pid]"); if (!card) return;
+  const b = I(S.board), p = b.pl.find(x => x.id === card.dataset.pid), r = refOf(p.ref, b);
+  if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
+  else if (r.type === "item" && r.it.type === "note") { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
+  else if (r.type === "item") { S.from = "board"; S.item = r.it.id; S.screen = "item"; render(); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "phases") { S.phases = e.target.checked; renderBand(); }
+  if (e.target.id === "fl") { S.fieldLinks = e.target.checked; drawArrows(); }
+  if (e.target.id === "ansline") { const s = st(menuKey, "question"); s.answer = e.target.value.trim(); if (s.answer) s.status = "answered"; closeMenu(); render(); }
+});
+document.addEventListener("focusout", e => {
+  const t = e.target;
+  if (t.dataset?.qedit) { const [bid, , id] = t.dataset.qedit.split(":"); const b = I(bid), x = b.inl.find(y => y.id === id); x.text = t.value.trim() || x.text; S.editing = null; setTimeout(render, 0); }
+  if (t.dataset?.nedit) { const it = I(t.dataset.nedit); it.body = t.value.trim(); S.editing = null; const n = parse(it.body); setTimeout(render, 0); if (n.length) toast(`Saved to Commonplace with ${n.length} ${n.length > 1 ? "questions and goals" : n[0].kind} inside.`); else toast("Saved to Commonplace as a note."); }
+});
+function saveBody() {
+  const ta = $("#mdedit"), it = I(S.item); if (!ta) return;
+  const before = parse(it.body).length; it.body = ta.value; S.editing = null; render();
+  const after = parse(it.body).length; if (after !== before) toast(`${after} question${after === 1 ? "" : "s"} and goals inside. Each shows in Questions and goals.`);
+}
+
+/* ---------- the @ menu (Q1) ---------- */
+let atState = null;
+document.addEventListener("input", e => {
+  const ta = e.target; if (!(ta.id === "mdedit" || ta.dataset?.nedit)) return;
+  const pos = ta.selectionStart, before = ta.value.slice(0, pos);
+  if (/(^|\s)@$/.test(before)) { atState = { ta, pos }; const r = ta.getBoundingClientRect(), m = $("#atmenu");
+    m.innerHTML = `<button class="on" data-at="question"><span class="gl" style="color:var(--pick)">?</span><b>Question</b><small>Something you want to find out</small></button><button data-at="goal"><span class="gl" style="color:var(--accent)">◎</span><b>Learning goal</b><small>Something you want to be able to do or understand</small></button>`;
+    m.hidden = false; m.style.left = Math.min(r.left + 20, innerWidth - 260) + "px"; m.style.top = Math.min(r.top + 40, innerHeight - 120) + "px"; }
+  else hideAt();
+});
+function hideAt() { $("#atmenu").hidden = true; atState = null; }
+function chooseAt(kind) {
+  const { ta, pos } = atState; const v = ta.value;
+  const i = v.lastIndexOf("\n\n", pos - 1), ps = i < 0 ? 0 : i + 2;
+  const without = v.slice(0, pos - 1) + v.slice(pos);
+  const typed = without.slice(ps, pos - 1).replace(/^\s+/, "").length;
+  ta.value = without.slice(0, ps) + `@${kind} ` + without.slice(ps).replace(/^\s+/, "");
+  const caret = ps + kind.length + 2 + typed;
+  ta.focus(); ta.setSelectionRange(Math.min(caret, ta.value.length), Math.min(caret, ta.value.length)); hideAt();
+}
+$("#atmenu").addEventListener("mousedown", e => { const b = e.target.closest("[data-at]"); if (b && atState) { e.preventDefault(); chooseAt(b.dataset.at); } });
+document.addEventListener("keydown", e => {
+  if (atState && !$("#atmenu").hidden) {
+    const items = [...document.querySelectorAll("#atmenu [data-at]")], i = items.findIndex(x => x.classList.contains("on"));
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); items[i].classList.remove("on"); items[(i + (e.key === "ArrowDown" ? 1 : items.length - 1)) % items.length].classList.add("on"); return; }
+    if (e.key === "Enter") { e.preventDefault(); chooseAt(items[i].dataset.at); return; }
+    if (e.key === "q" || e.key === "g") { e.preventDefault(); chooseAt(e.key === "q" ? "question" : "goal"); return; }
+    if (e.key === "Escape") { hideAt(); return; }
+  }
+  const t = e.target;
+  if (t.id === "mdedit" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveBody(); return; }
+  if (t.dataset?.qedit && e.key === "Enter") { e.preventDefault(); t.blur(); return; }
+  if (/INPUT|TEXTAREA/.test(t.tagName)) return;
+  if (e.key === "Escape") { closeMenu(); if (!$("#apop").hidden) closeApop(); if (S.drawer) { S.drawer = false; render(); } }
+  if (S.screen === "board") {
+    const k = e.key.toLowerCase();
+    if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
+    else if (e.key === "+") { S.drawer = !S.drawer; render(); } else if (k === "0") fit();
+    else if ((e.key === "Delete" || e.key === "Backspace") && S.sel) { const b = I(S.board); b.pl = b.pl.filter(p => p.id !== S.sel); b.arrows = b.arrows.filter(a => a.from !== S.sel && a.to !== S.sel); S.sel = null; render(); toast("Removed from the board. It's still in your Commonplace."); }
+  }
+});
+window.addEventListener("resize", () => { if (S.screen === "board") drawArrows(); });
+
+S.board = DB[S.field].start;
+render();
+requestAnimationFrame(fit);
+</script>
