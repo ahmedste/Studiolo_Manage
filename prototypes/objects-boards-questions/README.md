@@ -1,8 +1,8 @@
 # Objects, boards, and questions and goals
 
-An interactive prototype of [`docs/superpowers/specs/2026-10-28-objects-questions-boards-programme.md`](../../docs/superpowers/specs/2026-10-28-objects-questions-boards-programme.md): the end state of the programme, where Objects, questions and goals, and a board share one Commonplace. It's drawn with `studiolo`'s own CSS (copied from [`../objects-phases`](../objects-phases) by `build.mjs`).
+An interactive prototype of [`docs/superpowers/specs/2026-10-28-objects-questions-boards-programme.md`](../../docs/superpowers/specs/2026-10-28-objects-questions-boards-programme.md): the end state of the programme, where Objects, questions and goals, and a board share one Commonplace. It's drawn in `studiolo`'s current Commonplace: `app.css` is the app's own stylesheet at `main` 7c0e8732 (28 October 2026), and the markup follows the real rail, destination header, search, type row, slim bar, masonry wall, item page and Edit collection screen. The architect's sample data and photos are the app's own (`src/dev/library-sample.ts`).
 
-Three sample learners, each opening on a board: an **architect** (*Cooling the prayer-hall courtyard*), a **lawyer** (*Duty of care after Caparo*) and a **doctor** (*Suspected PE: what to do first*). **Show phases** labels each part with the phase that builds it.
+It opens on **Everything**. Three sample learners, each with a board: an **architect** (*Cooling the prayer-hall courtyard*), a **lawyer** (*Duty of care after Caparo*) and a **doctor** (*Suspected PE: what to do first*). **Show phases** labels each part with the phase that builds it.
 
 ## Try this
 
@@ -20,12 +20,14 @@ Three sample learners, each opening on a board: an **architect** (*Cooling the p
 | **An Object's page** | Double-click an Object card. **What I took from it** shows its questions as marked lines; **Edit** and type `@` for the menu; **Inside** and **On boards** in the rail; **Answers** at the end |
 | **A Source** | Open the lecture or the judgment: a question in a margin note at 12:40 or p. 21. **? Question** adds one at the current moment (phase Q3) |
 | **Questions and goals** | The list: goals with their questions under them, then other questions, each naming where it was written and which boards it's placed on |
-| **Everything** | The wall: cards count what's open inside them; **Boards** is a type |
+| **Everything** | The real wall: cards count what's open inside them (? and ◎); **Boards** is a type; **Has ▾** filters to open questions or goals |
+| **Collection views** | **Objects › Buildings** (or Cases, Guidelines): **Cards, Table, Columns, Timeline**. Drag a card between columns to change its Choice field |
+| **Customize** | Edit collection with the new field types (Choice, Relation, Long text…), up to 24 fields, the page's top, and Sensitivity |
 
 All content is example data; the legal and clinical content is for illustration only and isn't legal or clinical advice. Nothing calls a model; Loci's actions (Explain this, Find resources, Plan a course) say which phase builds them. Changes last until you reload.
 
 ## Build
 
 ```sh
-node build.mjs   # index.html from index.src.html, with studiolo's CSS from ../objects-phases/index.html
+node build.mjs   # index.html from index.src.html, with app.css and media/*.webp inlined
 ```

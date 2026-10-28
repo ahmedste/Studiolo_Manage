@@ -11,7 +11,7 @@ Read the plan first, then test the prototypes against it.
 1. **The plan (read first):** https://claude.ai/artifact/Hc7B9N1X7kmCELnew6qbNi
    The build order for three features. It starts with the programme (the order, and where the features meet), then has each design in full: Objects, Questions and goals (roadmap, then design), and Boards last.
 2. **Main prototype, Objects + boards + questions and goals:** https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b
-   The end state. Switch Architect, Lawyer and Doctor at the top. Each opens on a board.
+   The end state, drawn in the current real Commonplace screens. Switch Architect, Lawyer and Doctor in the bar at the bottom; **Board**, **Questions** and **Customize** jump between screens.
 3. **Objects, phase by phase:** https://claude.ai/artifact/3sJpPHVcPMUJiDgA7MpCTH
    The real Commonplace with a switch from Today through Phase 3.
 4. **Boards, the original concept:** https://claude.ai/artifact/CVVpm4kM6pshfmURATKXvi
@@ -24,6 +24,7 @@ Read the plan first, then test the prototypes against it.
 - Use **?** to ask a question on the canvas, and **✎** to write a note that contains `@question …`. Do both appear on **Questions and goals**, named by where they were written?
 - Open an Object's page, choose **Edit**, and type `@` at the start of a paragraph. Does the menu insert a question or goal correctly?
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
+- On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
 - Turn on **Show phases**. Does each part's phase label match the plan?
 
 **In the phases prototype (3):** step from Today to Phase 3 with **Mark what's new** on. Does each phase add what the plan says it adds?
