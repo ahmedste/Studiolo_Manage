@@ -4752,6 +4752,111 @@ body { background: var(--surface-page); }
 .field-cfg .rowl label { display: flex; gap: 6px; align-items: center; }
 .cf-pills { display: flex; gap: 6px; flex-wrap: wrap; }
 
+/* the long note page and the block editor (N1–N4): Craft's calm column, on the app's tokens and faces */
+.np .ip-top { align-items: center; }
+.np-dbtn[aria-pressed="true"] { background: var(--hover-fill); }
+.np-grid { display: grid; grid-template-columns: 190px minmax(0, 700px) minmax(0, 1fr); gap: 0 48px; margin-top: 18px; }
+.np.with-details .np-grid { grid-template-columns: 170px minmax(0, 660px) 300px; }
+.np-outline { position: sticky; top: 24px; align-self: start; padding-top: 96px; display: grid; gap: 1px; }
+.np-outline button { all: unset; cursor: pointer; font-size: 13px; line-height: 1.35; color: var(--ink-2); padding: 4px 0 4px 10px; border-left: 1px solid var(--line); }
+.np-outline button.h3 { padding-left: 22px; font-size: 12.5px; }
+.np-outline button:hover { color: var(--accent); border-left-color: var(--accent); }
+.np-ol-h { margin: 0 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.np-details { display: none; }
+.np.with-details .np-details { display: block; }
+.np-doc { min-width: 0; }
+.np-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin: 8px 0 26px; padding-bottom: 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+.np-about { display: inline-flex; gap: 6px; align-items: center; }
+.np-topic { display: inline-flex; gap: 6px; align-items: center; }
+.np-count { color: var(--ink-3); margin-left: auto; }
+.np-tail { min-height: 90px; cursor: text; }
+.nbs > .nb:first-child .nb-h2, .nbs > .nb:first-child .nb-h3 { margin-top: 0; }
+body:has(#kbar:not([hidden])) .proto { display: none; }
+.ip-writing .nbs { margin-top: 4px; }
+.nbs { display: grid; gap: 1px; }
+.nb { position: relative; border-radius: 3px; }
+.nb.dragging { opacity: .4; }
+.nb.drop-above { box-shadow: 0 -2px 0 var(--accent); } .nb.drop-below { box-shadow: 0 2px 0 var(--accent); }
+.nb-h { position: absolute; left: -56px; top: 4px; display: flex; gap: 1px; opacity: 0; transition: opacity var(--dur-quick); }
+.nb:hover > .nb-h, .nb:focus-within > .nb-h { opacity: 1; }
+.nb-h button { all: unset; cursor: pointer; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-3); font: 500 15px/1 var(--ui); }
+.nb-h .nb-grip { cursor: grab; font-size: 11px; letter-spacing: -2px; }
+.nb-h button:hover { background: var(--hover-fill); color: var(--ink); }
+.nb-h button:focus-visible { outline: var(--focus-ring); opacity: 1; }
+.nb-c { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.nb-t { flex: 1; min-width: 0; outline: none; padding: 3px 0; font: 16.5px/1.7 var(--ui); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.nb-t:empty:focus::before, .nb:only-child .nb-t:empty::before, .nb-h2:empty::before, .nb-h3:empty::before, .nb-inl .tx:empty::before, .nb-cap:empty:focus::before { content: attr(data-ph-text); color: var(--ink-3); pointer-events: none; }
+.nb-h2 { font: 400 27px/1.25 var(--read); letter-spacing: -.005em; margin-top: 26px; }
+.nb-h3 { font: 500 20px/1.3 var(--read); margin-top: 14px; }
+.nb-q { font: 19px/1.55 var(--read); border-left: 2px solid var(--accent); padding: 2px 0 2px 18px; margin: 8px 0; }
+.nb-bul { flex: 0 0 18px; text-align: right; font: 16.5px/1.7 var(--ui); color: var(--ink-2); }
+.nb-hr { flex: 1; border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+.nb-fig { flex: 1; margin: 14px 0 8px; }
+.nb-fig img { display: block; width: 100%; max-height: 460px; object-fit: cover; border-radius: 4px; box-shadow: var(--shadow-pic); }
+.nb-cap { display: block; padding-top: 8px; text-align: center; font: 13px/1.45 var(--ui); color: var(--ink-2); }
+.nb-inl { flex: 1; margin: 6px 0; }
+.nb-inl .tx { outline: none; padding: 0; }
+.nb-new { font-size: 11px; color: var(--ink-3); }
+.nb-embed { flex: 1; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 14px; align-items: center; margin: 8px 0; padding: 10px; border-radius: 4px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); user-select: none; }
+.nb-embed:hover { box-shadow: inset 0 0 0 1px var(--ink-3), var(--shadow-pic); }
+.nb-embed.gone { display: block; color: var(--ink-3); font-size: 13px; }
+.nb-em-pic { width: 72px; height: 72px; border-radius: 3px; overflow: hidden; background: var(--board); display: grid; place-items: center; font: 400 24px var(--read); color: var(--ink-3); }
+.nb-em-pic.round { border-radius: 50%; } .nb-em-pic img { width: 100%; height: 100%; object-fit: cover; }
+.nb-em-k { margin: 0 0 2px; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.nb-em-k .ft-in { letter-spacing: 0; }
+.nb-em-title { all: unset; cursor: pointer; font: 500 16px/1.3 var(--ui); color: var(--ink); }
+.nb-em-title:hover { color: var(--accent); text-decoration: underline; }
+.nb-embed dl { display: flex; flex-wrap: wrap; gap: 2px 18px; margin: 5px 0 0; font-size: 12.5px; }
+.nb-embed dt { color: var(--ink-3); } .nb-embed dd { margin: 0; color: var(--ink); }
+.nb-em-d { margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.nb-em-open { all: unset; cursor: pointer; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-2); }
+.nb-em-open:hover { background: var(--hover-fill); color: var(--ink); }
+.mention { color: var(--accent-strong); background: var(--accent-soft); border-radius: 3px; padding: 0 4px; cursor: pointer; font-weight: 500; white-space: nowrap; }
+.mention:hover { text-decoration: underline; }
+.mention.gone { color: var(--ink-3); background: none; text-decoration: line-through; }
+.nb-offer { all: unset; cursor: pointer; display: none; flex: 0 0 auto; font-size: 12px; color: var(--accent); white-space: nowrap; }
+.nb:hover .nb-offer, .nb:focus-within .nb-offer { display: inline; }
+.nb-mn { all: unset; position: absolute; right: -52px; top: 6px; cursor: pointer; font-size: 12px; color: var(--pick); padding: 2px 6px; border-radius: 10px; background: var(--pick-soft); }
+.mn-body p { margin: 0 0 6px; font: 15px/1.5 var(--read); }
+.pick { max-height: 340px; overflow: auto; }
+.pick .pk-h, .mpop + * { margin: 4px 9px 4px; }
+.pick .pk-h { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.pick .gl { color: var(--ink-2); text-align: center; }
+.pk-img { display: grid !important; grid-template-columns: 44px minmax(0, 1fr) !important; align-items: center; }
+.pk-img img { width: 44px; height: 32px; object-fit: cover; border-radius: 2px; }
+.mpop { padding: 4px; width: 280px; } .mpop .mcard { margin: 0; }
+.selbar { position: fixed; z-index: 76; display: flex; align-items: center; gap: 1px; padding: 4px; border-radius: 8px; background: var(--ink); box-shadow: var(--shadow-float); }
+.selbar button { all: unset; cursor: pointer; color: var(--on-ink); font-size: 12.5px; padding: 5px 8px; border-radius: 5px; white-space: nowrap; }
+.selbar button:hover { background: color-mix(in srgb, var(--on-ink) 16%, transparent); }
+.selbar .sep { width: 1px; height: 18px; margin: 0 3px; background: color-mix(in srgb, var(--on-ink) 30%, transparent); }
+.kbar { position: fixed; z-index: 92; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 4px; padding: 6px; border-radius: 12px; background: var(--surface-float); box-shadow: var(--shadow-float); }
+.kbar button { all: unset; flex: 1; text-align: center; min-height: 40px; border-radius: 8px; font: 500 15px var(--ui); color: var(--ink); }
+.kbar button:active { background: var(--hover-fill); }
+.conn-note { margin: -6px 0 6px; }
+.conn-h { margin: 18px 0 4px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.conn-h span { color: var(--ink-3); font-weight: 400; }
+.conn-row { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 14px; width: 100%; max-width: 720px; padding: 10px 10px; border-top: 1px solid var(--line); }
+.conn-row.ans { cursor: default; }
+.conn-row:hover:not(.ans) { background: var(--hover-fill); }
+.conn-k { grid-row: span 2; padding-top: 2px; font-size: 12px; color: var(--ink-3); }
+.conn-row b { font-weight: 500; font-size: 14px; } .conn-s { font: 14.5px/1.45 var(--read); color: var(--ink-2); }
+@media (max-width: 1180px) {
+  .np-grid, .np.with-details .np-grid { grid-template-columns: minmax(0, 1fr); }
+  .np-outline { display: none; }
+  .np-doc { padding-left: 56px; max-width: 760px; }
+  .np.with-details .np-details { margin-top: 30px; }
+  .nb-mn { right: 0; top: -14px; }
+}
+@media (max-width: 699.98px) {
+  .np-doc { padding-left: 0; }
+  .nb-h { display: none; }
+  .ip-title .inline-heading { font-size: 30px; }
+  .nb-offer { display: inline; }
+  .np-count { margin-left: 0; }
+  .conn-row { grid-template-columns: minmax(0, 1fr); } .conn-k { grid-row: auto; }
+  .nb-embed { grid-template-columns: 52px minmax(0, 1fr) auto; } .nb-em-pic { width: 52px; height: 52px; }
+}
+
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
   .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 380px; }
@@ -4785,6 +4890,9 @@ body { background: var(--surface-page); }
 <div id="menu" class="menu-pop" hidden></div>
 <div id="apop" class="apop" hidden></div>
 <div id="atmenu" class="atmenu" hidden></div>
+<div id="pick" class="atmenu pick" role="listbox" aria-label="Insert" hidden></div>
+<div id="selbar" class="selbar" role="toolbar" aria-label="Selected text" hidden><button type="button" data-act="selfmt" data-k="bold" aria-label="Bold"><b>B</b></button><button type="button" data-act="selfmt" data-k="italic" aria-label="Italic"><i>I</i></button><span class="sep"></span><button type="button" data-act="sellink" data-ph="N2">↗ Link to entry</button><button type="button" data-act="selask">? Ask about this</button><button type="button" data-act="selmargin" data-ph="N3">✎ Margin note</button><span class="sep"></span><button type="button" data-act="selexplain" data-ph="N4">Explain</button></div>
+<div id="kbar" class="kbar" role="toolbar" aria-label="Writing" hidden><button type="button" data-act="kb" data-k="slash">+ Block</button><button type="button" data-act="kb" data-k="question">?</button><button type="button" data-act="kb" data-k="goal">◎</button><button type="button" data-act="kb" data-k="at">@</button><button type="button" data-act="kb" data-k="menu">⋮⋮</button><button type="button" data-act="kb" data-k="done">Done</button></div>
 <div id="toast" hidden></div>
 
 <script>
@@ -4817,22 +4925,23 @@ const CH = (id, label, list) => F(id, label, "choice", { opts: list });
 const R = (id, label, to, o = {}) => F(id, label, "rel", { to, many: true, ...o });
 const tp = (n, s = 0) => ({ n, s });
 const obj = (id, col, title, v, x = {}) => ({ id, type: "object", col, title, v, desc: x.desc || "", body: x.body || "", media: x.media || null, topics: x.topics || [], margin: x.margin || [], linked: x.linked || [] });
-const note = (id, col, title, body, x = {}) => ({ id, type: "note", col, title, body, topics: x.topics || [], margin: [] });
+const note = (id, col, title, body, x = {}) => ({ id, type: "note", col, title, body, about: x.about || null, topics: x.topics || [], margin: [] });
 const quote = (id, body, src, x = {}) => ({ id, type: "quote", col: x.col || null, title: "", body, src, topics: x.topics || [], margin: [] });
 const src = (id, col, kind, title, x = {}) => ({ id, type: "source", col, kind, title, desc: x.desc || "", creator: x.creator || "", meta: x.meta || "", body: "", topics: x.topics || [], margin: x.margin || [] });
 const img = (id, col, media, title, desc, x = {}) => ({ id, type: "image", col, media, title, desc, body: "", topics: x.topics || [], margin: [] });
 const board = (id, title, place, goal, qs, pl, arrows, x = {}) => ({ id, type: "board", title, place, inl: [{ id: "g", kind: "goal", text: goal }, ...qs.map((t, i) => ({ id: "q" + (i + 1), kind: "question", text: t }))], pl, arrows, body: "", topics: x.topics || [], margin: [] });
-const C = (id, name, shape, x = {}) => ({ id, name, shape, label: x.label || name, layout: x.layout || null, base: x.base || null, fields: x.fields || [], card: x.card || [], desc: x.desc || "", clinical: !!x.clinical, accent: x.accent || "s3", hero: x.hero || null, view: "cards" });
+const C = (id, name, shape, x = {}) => ({ id, name, shape, label: x.label || name, layout: x.layout || null, base: x.base || null, fields: x.fields || [], card: x.card || [], desc: x.desc || "", clinical: !!x.clinical, accent: x.accent || "s3", hero: x.hero || null, write: x.write || [], view: "cards" });
 
 function makeDB() {
   const architect = {
-    label: "Architect", start: "court",
+    label: "Architect", start: "court", page: "hall",
     cols: [
-      C("bld", "Buildings", "object", { label: "Building", layout: "picture", base: "thing", desc: "Buildings I study for their light, section and climate.", fields: [F("built", "Built", "text", { year: true }), F("where", "Where", "text"), R("arch", "Architect", "people", { many: false, inv: "Works" }), CH("typ", "Typology", ["Mosque", "Village", "Madrasa"]), F("why", "Why it matters", "long"), F("page", "Project page", "url")], card: ["built", "where"] }),
-      C("people", "People", "object", { label: "Person", layout: "portrait", base: "person", accent: "s2", fields: [F("role", "Role", "text"), F("loc", "Location", "text"), F("dates", "Dates", "text")], card: ["role", "loc", "dates"] }),
+      C("bld", "Buildings", "object", { label: "Building", layout: "picture", base: "thing", desc: "Buildings I study for their light, section and climate.", write: ["Site and climate", "Plan and section", "What I'd take from it"], fields: [F("built", "Built", "text", { year: true }), F("where", "Where", "text"), R("arch", "Architect", "people", { many: false, inv: "Works" }), CH("typ", "Typology", ["Mosque", "Village", "Madrasa"]), F("why", "Why it matters", "long"), F("page", "Project page", "url")], card: ["built", "where"] }),
+      C("people", "People", "object", { label: "Person", layout: "portrait", base: "person", accent: "s2", write: ["Ideas", "Works I know", "What I'd borrow"], fields: [F("role", "Role", "text"), F("loc", "Location", "text"), F("dates", "Dates", "text")], card: ["role", "loc", "dates"] }),
       C("notes", "Notes", "note"), C("essays", "Essays", "note"), C("quotes", "Quotes", "note"), C("pdfs", "PDFs", "source"), C("books", "Books", "source"), C("videos", "Videos", "source"), C("site", "Site visits", "image")
     ],
     items: [
+      note("hall", "essays", "Two ways to stretch a hall", "Kairouan and Córdoba both start from a field of columns. What differs is how each one makes the field *mean* something.\n\n::card[](item:kairouan)\n\n## Kairouan: emphasis without new structure\n\nThe T-plan keeps the same columns and widens the central aisle and the aisle along the qibla wall. @[Hassan Fathy](item:fathy) would call this **economy**: the hierarchy comes from proportion, not from a new system.\n\n![Arcade and bay rhythm: the wider bay reads without a change of column](media:arcade)\n\n> Shade first, then mass, then air.\n\n## Córdoba: one grid, extended three times\n\n::card[](item:cordoba)\n\nThe Great Mosque of Córdoba grows by repeating the same bay, so the hall never gets a centre. The eye never quite finds the end of the field.\n\n- Kairouan: a centre made by proportion\n- Córdoba: no centre, only extent\n\n@goal Be able to explain how a hypostyle hall gets a hierarchy, well enough to defend the plan at the crit\n\n@question Where does the light come from in each hall?\n\n@question Is Córdoba's lack of a centre a choice, or an accident of growth?", { about: "kairouan", topics: [tp("Islamic architecture"), tp("Typologies")] }),
       obj("kairouan", "bld", "Great Mosque of Kairouan", { built: "836, rebuilt under the Aghlabids", where: "Kairouan, Tunisia", typ: ["Mosque"], why: "The T-plan: emphasis without a change of structure." },
         { media: "arcade", desc: "Rebuilt 836, Tunisia. The T-plan: a wider aisle and a taller bay, no change of structure.", topics: [tp("Islamic architecture"), tp("Typologies")],
           body: "The T-plan is emphasis without a change of structure: the same columns, a wider aisle, a taller bay.\n\n@question Does the wider central aisle change how the hall is lit?",
@@ -4846,13 +4955,13 @@ function makeDB() {
       quote("q-climate", "We have to design for the climate, not against it.", { b: "Hassan Fathy", em: "Natural Energy and Vernacular Architecture", loc: "p. 41" }, { col: "quotes", topics: [tp("Climate-responsive design")] }),
       note("sultan", "notes", "", "The mausoleum at Sultan Hassan faces the Citadel, not the city. Mentions Hassan Fathy.", { topics: [tp("Islamic architecture")] }),
       note("malqaf", "notes", "", "Fathy's courtyard malqaf (windcatcher) relies on diurnal thermal mass lag. A lightweight screen alone won't work in high Gulf humidity without air movement.", { topics: [tp("Climate-responsive design")] }),
-      note("lecnotes", "essays", "Lecture notes: passive cooling, week 3", "The court at Sultan Hassan stays shaded most of the day.\n\n@goal Read Fathy's Natural Energy and Vernacular Architecture by December\n\n@question Does depth matter more than width?\n\n@question How much does evaporative cooling help in humid air?", { topics: [tp("Climate-responsive design")] }),
+      note("lecnotes", "essays", "Lecture notes: passive cooling, week 3", "The court at Sultan Hassan stays shaded most of the day. @[Hassan Fathy](item:fathy) explains why in his book.\n\n@goal Read Fathy's Natural Energy and Vernacular Architecture by December\n\n@question Does depth matter more than width?\n\n@question How much does evaporative cooling help in humid air?", { topics: [tp("Climate-responsive design")] }),
       src("pdf", "pdfs", "pdf", "Climate and Architecture: lecture notes", { meta: "PDF · 12 MB", desc: "Course reader, chapters 1–3.", topics: [tp("Climate-responsive design")], margin: [{ at: "p. 2", body: "@question Why does mass alone fail in humid climates?" }, { at: "p. 3", body: "Shade first, then mass, then air." }] }),
       img("img-arcade", "site", "arcade", "Arcade and bay rhythm", "The repeated arcade makes the wider central bay legible without changing the whole field.", { topics: [tp("Islamic architecture")] }),
       src("book", "books", "book", "Natural Energy and Vernacular Architecture", { creator: "Hassan Fathy, 1986", topics: [tp("Climate-responsive design")] }),
       src("video", "videos", "video", "Passive cooling in hot climates", { meta: "Video · youtube.com", desc: "A lecture on courts, towers and night flushing.", topics: [tp("Climate-responsive design")], margin: [{ at: "12:40", body: "@question Why does the air move at night?" }, { at: "31:05", body: "Stack effect: warm air leaves at the top and draws cool air in low." }] }),
       img("img-court", "site", "courtyard", "Courtyard toward prayer hall", "Courtyard looking toward the prayer hall and the central axial bay.", { topics: [tp("Islamic architecture")] }),
-      note("essay", "essays", "What I took from Sultan Hassan", "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.", { topics: [tp("Islamic architecture")] }),
+      note("essay", "essays", "What I took from Sultan Hassan", "The four iwans turn the courtyard into a room with four deep openings rather than an open field of columns.\n\n![Courtyard toward the prayer hall](media:courtyard)\n\nCompare @[Great Mosque of Kairouan](item:kairouan), where the court is an open field and the hall does the work.\n\n@question Why four iwans and not two?", { topics: [tp("Islamic architecture")] }),
       board("court", "Cooling the prayer-hall courtyard", "Architecture › Climate-responsive design",
         "Understand how to keep the prayer hall's courtyard cool without machines, well enough to brief the engineer, by March",
         ["Where does the cool night air come from?", "Shade first, or air movement first?"],
@@ -4866,9 +4975,9 @@ function makeDB() {
     ]
   };
   const lawyer = {
-    label: "Lawyer", start: "duty",
+    label: "Lawyer", start: "duty", page: "seminar",
     cols: [
-      C("cases", "Cases", "object", { label: "Case", layout: "text", base: "thing", desc: "Authorities I rely on, distinguish or keep for background.", hero: "doc", fields: [F("cit", "Citation", "text"), F("court", "Court", "text"), F("year", "Year", "text", { year: true }), CH("area", "Area of law", ["Tort", "Contract", "Construction"]), R("cites", "Cites", "cases", { inv: "Cited by" }), F("hold", "Holding", "long")], card: ["cit", "court"] }),
+      C("cases", "Cases", "object", { label: "Case", layout: "text", base: "thing", desc: "Authorities I rely on, distinguish or keep for background.", hero: "doc", write: ["Facts", "Held", "Why it matters for the client"], fields: [F("cit", "Citation", "text"), F("court", "Court", "text"), F("year", "Year", "text", { year: true }), CH("area", "Area of law", ["Tort", "Contract", "Construction"]), R("cites", "Cites", "cases", { inv: "Cited by" }), F("hold", "Holding", "long")], card: ["cit", "court"] }),
       C("notes", "Notes", "note"), C("essays", "Seminar notes", "note"), C("pdfs", "Judgments", "source")
     ],
     items: [
@@ -4876,7 +4985,7 @@ function makeDB() {
       obj("caparo", "cases", "Caparo Industries plc v Dickman", { cit: "[1990] 2 AC 605", court: "House of Lords", year: "1990", area: ["Tort"], cites: ["donoghue"], hold: "Auditors owed no duty of care to investors who bought shares relying on the accounts." }, { desc: "The three-stage test.", topics: [tp("Duty of care", 2)], body: "@question Is the three-stage test still used for novel cases?" }),
       obj("robinson", "cases", "Robinson v Chief Constable of West Yorkshire Police", { cit: "[2018] UKSC 4", court: "UK Supreme Court", year: "2018", area: ["Tort"], cites: ["caparo", "donoghue"], hold: "Officers making an arrest owed a duty of care to a passer-by injured in the struggle: a positive act, not an omission." }, { desc: "Duty of care after Caparo.", topics: [tp("Duty of care", 2)], body: "Positive acts against omissions is the real line.\n\n@question Does Robinson change pure economic loss cases?" }),
       obj("multiplex", "cases", "Multiplex v Honeywell (No 2)", { cit: "[2007] EWHC 447 (TCC)", court: "TCC", year: "2007", area: ["Construction"] }, { desc: "Time bars and the prevention principle.", topics: [tp("Extensions of time", 1)] }),
-      note("seminar", "essays", "Seminar notes: negligence after Robinson", "@goal Be able to explain when a duty of care arises, well enough to advise on the fit-out claim, by the end of term\n\n@question Is Caparo still a test?\n\n@question Does an omission ever create a duty?", { topics: [tp("Duty of care", 2)] }),
+      note("seminar", "essays", "Seminar notes: negligence after Robinson", "## The question after Robinson\n\n::card[](item:robinson)\n\n@[Robinson](item:robinson) says **Caparo is not a universal test**: established categories first, then reasoning by analogy from them.\n\n@goal Be able to explain when a duty of care arises, well enough to advise on the fit-out claim, by the end of term\n\n@question Is Caparo still a test?\n\n@question Does an omission ever create a duty?\n\n## Authorities\n\n::card[](item:caparo)\n\n::card[](item:donoghue)", { topics: [tp("Duty of care", 2)] }),
       note("incr", "notes", "", "Novel cases: reason by analogy from the established categories.", { topics: [tp("Duty of care", 2)] }),
       src("judgment", "pdfs", "pdf", "Robinson [2018] UKSC 4: judgment", { meta: "PDF · 0.6 MB", desc: "The Supreme Court's judgment.", topics: [tp("Duty of care", 2)], margin: [{ at: "p. 21", body: "@question Para 21: what counts as an established category?" }] }),
       board("duty", "Duty of care after Caparo", "Law › Tort › Negligence", "Understand how a court decides whether a duty of care exists, well enough to brief the client",
@@ -4890,11 +4999,11 @@ function makeDB() {
     ]
   };
   const doctor = {
-    label: "Doctor", start: "pe",
+    label: "Doctor", start: "pe", page: "rotation",
     cols: [
-      C("guides", "Guidelines", "object", { label: "Guideline", layout: "text", base: "thing", hero: "doc", fields: [CH("iss", "Issuer", ["NICE", "ESC"]), F("code", "Code", "text"), F("pub", "Published", "text", { year: true }), R("recs", "Recommends", "drugs", { inv: "Recommended in" }), F("key", "Key points", "long")], card: ["iss", "code"] }),
-      C("drugs", "Drugs", "object", { label: "Drug", layout: "text", base: "thing", accent: "s2", fields: [CH("cls", "Class", ["DOAC", "LMWH", "Vitamin K antagonist"]), F("mon", "Monitoring", "text")], card: ["cls", "mon"] }),
-      C("tcases", "Teaching cases", "object", { label: "Teaching case", layout: "text", base: "thing", clinical: true, accent: "s1", fields: [CH("age", "Age band", ["30–39", "50–59", "70–79"]), F("pc", "Presenting complaint", "text"), F("lp", "Learning points", "long")], card: ["age", "pc"] }),
+      C("guides", "Guidelines", "object", { label: "Guideline", layout: "text", base: "thing", hero: "doc", write: ["Key recommendations", "On the ward"], fields: [CH("iss", "Issuer", ["NICE", "ESC"]), F("code", "Code", "text"), F("pub", "Published", "text", { year: true }), R("recs", "Recommends", "drugs", { inv: "Recommended in" }), F("key", "Key points", "long")], card: ["iss", "code"] }),
+      C("drugs", "Drugs", "object", { label: "Drug", layout: "text", base: "thing", accent: "s2", write: ["When I'd use it", "Watch for"], fields: [CH("cls", "Class", ["DOAC", "LMWH", "Vitamin K antagonist"]), F("mon", "Monitoring", "text")], card: ["cls", "mon"] }),
+      C("tcases", "Teaching cases", "object", { label: "Teaching case", layout: "text", base: "thing", clinical: true, accent: "s1", write: ["What happened", "What I'd do differently"], fields: [CH("age", "Age band", ["30–39", "50–59", "70–79"]), F("pc", "Presenting complaint", "text"), F("lp", "Learning points", "long")], card: ["age", "pc"] }),
       C("notes", "Notes", "note"), C("essays", "Rotation notes", "note"), C("videos", "Videos", "source")
     ],
     items: [
@@ -4903,7 +5012,7 @@ function makeDB() {
       obj("rivar", "drugs", "Rivaroxaban", { cls: ["DOAC"], mon: "Renal function, bleeding" }, { topics: [tp("Pulmonary embolism", 1)] }),
       obj("enox", "drugs", "Enoxaparin", { cls: ["LMWH"], mon: "Platelets" }, { topics: [tp("Pulmonary embolism", 1)] }),
       obj("tc1", "tcases", "Breathless after a long flight", { age: ["30–39"], pc: "Pleuritic chest pain two days after a 12-hour flight", lp: "Wells 4.5, so PE is likely: imaging before a D-dimer." }, { topics: [tp("Pulmonary embolism", 1)], body: "@question Would a D-dimer have been enough here?" }),
-      note("rotation", "essays", "Respiratory rotation: week 2", "@goal Be able to work up a suspected PE on my own by the end of the rotation\n\n@question When is a D-dimer enough on its own?\n\n@question Which DOAC when renal function is borderline?", { topics: [tp("Pulmonary embolism", 1)] }),
+      note("rotation", "essays", "Respiratory rotation: week 2", "## Working up a suspected PE\n\nStart from @[NG158](item:ng158): the two-level Wells score decides imaging or a D-dimer.\n\n::card[](item:ng158)\n\n@goal Be able to work up a suspected PE on my own by the end of the rotation\n\n@question When is a D-dimer enough on its own?\n\n@question Which DOAC when renal function is borderline?\n\n## Drugs\n\n::card[](item:apix)\n\n1. Apixaban first for most\n\n2. Rivaroxaban when once a day matters", { topics: [tp("Pulmonary embolism", 1)] }),
       src("wells", "videos", "video", "Wells score walkthrough", { meta: "Video · youtube.com", desc: "Each criterion, with examples.", topics: [tp("Pulmonary embolism", 1)], margin: [{ at: "04:10", body: "@question Why does a 12-hour flight not score?" }] }),
       board("pe", "Suspected PE: what to do first", "Medicine › Respiratory › Pulmonary embolism", "Work up a suspected PE in the right order, well enough to present it on the ward round",
         ["What changes if the patient is pregnant?"],
@@ -4919,7 +5028,7 @@ function makeDB() {
 const DB = makeDB();
 
 /* ---------- state ---------- */
-const S = { field: "architect", screen: "wall", type: "all", col: null, has: null, q: "", board: null, item: null, from: "wall", qf: "open", phases: false, sel: null, tool: "select", drawer: false, dtab: "objects", editing: null, view: { x: 20, y: 10, z: .8 }, fieldLinks: true, cfgOpen: "all" };
+const S = { field: "architect", screen: "wall", type: "all", col: null, has: null, q: "", board: null, item: null, from: "wall", qf: "open", phases: false, sel: null, tool: "select", drawer: false, dtab: "objects", editing: null, view: { x: 20, y: 10, z: .8 }, fieldLinks: true, cfgOpen: "all", hist: [], details: false, ed: null };
 const D = () => DB[S.field];
 const I = id => D().items.find(x => x.id === id);
 const COL = id => D().cols.find(c => c.id === id);
@@ -4957,17 +5066,8 @@ function inlRow(r, child) {
   const s = st(r.key, r.kind);
   return `<div class="inl ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done(s.status) ? " done" : ""}"><span class="gl" aria-hidden="true">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx"><span class="visually-hidden">${r.kind === "goal" ? "Learning goal: " : "Question: "}</span>${esc(r.text)}</span>${stBtn(r)}${ansLine(r)}</div>`;
 }
-function renderBody(it, mi) {
-  const body = mi == null ? it.body : it.margin[mi].body, hk = mi == null ? it.id : `${it.id}/m${mi}`;
-  const rows = allInlines().filter(x => x.item === it && x.key.startsWith(hk + ":")), n = { question: 0, goal: 0 };
-  return String(body || "").split(/\n\s*\n/).map(p => {
-    const m = /^@(question|goal)\s+/i.exec(p.trim());
-    if (!m) return p.trim() ? `<p>${esc(p.trim())}</p>` : "";
-    const kind = m[1].toLowerCase(), r = rows.find(x => x.key === `${hk}:${kind}:${n[kind]}`); n[kind]++;
-    return r ? inlRow(r, !!r.goalKey) : "";
-  }).join("");
-}
-const plainBody = it => String(it.body || "").split(/\n\s*\n/).map(p => p.trim().replace(/^@(question|goal)\s+/i, (_, k) => k.toLowerCase() === "goal" ? "◎ " : "? ")).filter(Boolean).join(" ");
+function renderBody(it, mi) { return readHTML(mi == null ? it.body : it.margin[mi].body, mi == null ? it.id : `${it.id}/m${mi}`); }
+const plainBody = it => String(it.body || "").split(/\n\s*\n/).map(p => { const t = p.trim(), m = /^@(question|goal)\s+/i.exec(t); return (m ? (m[1].toLowerCase() === "goal" ? "◎ " : "? ") : "") + plainText(m ? t.slice(m[0].length) : t); }).filter(x => x.trim()).join(" ");
 
 /* ---------- object text ---------- */
 function fieldText(f, v) {
@@ -5094,16 +5194,9 @@ function renderItem() {
   else if (c && c.hero === "doc") hero = `<div data-ph="P2" style="background:var(--quote-paper);box-shadow:inset 0 0 0 1px var(--quote-rule);border-radius:3px;padding:28px 24px 24px;text-align:center;margin:0 0 22px"><p style="margin:0 0 10px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)">${esc(fieldText(c.fields[1], it.v[c.fields[1].id]) || c.label)}</p><p style="margin:0;font:italic 400 clamp(22px,3vw,30px)/1.2 var(--read)">${esc(it.title)}</p><p style="margin:10px 0 0;font:15px/1.4 var(--read);color:var(--ink-2)">${esc(fieldText(c.fields[0], it.v[c.fields[0].id]))}</p></div><div class="ip-head"><p class="ip-kicker">${esc(c.label)}</p><div class="ip-title" data-page-title=""><h1 class="ip-title-static" style="font-size:24px">${esc(it.title)}</h1></div></div>`;
   else hero = `${it.media && c?.hero === "picture" || it.type === "image" ? `<figure class="ip-wide"><div class="ip-pic has-photo"><img alt="" src="${MEDIA[it.media]}"></div></figure>` : ""}<div class="ip-head"><p class="ip-kicker">${esc(kindLabel(it))}</p>${ipTitle(it.title || plainBody(it).slice(0, 60))}${it.type === "source" ? `<p class="ip-line">${esc([it.creator, it.meta].filter(Boolean).join(" · "))}</p>` : ""}</div>`;
   const lead = it.desc ? `<div class="inline-edit-wrap"><textarea aria-label="Lead" class="inline-edit ip-lead" maxlength="1000" placeholder="Add a short description…" rows="1">${esc(it.desc)}</textarea></div>` : "";
-  const writingTitle = it.type === "object" ? "What I took from it" : it.type === "note" ? (it.title ? "" : "") : "";
-  const writing = it.type === "source" || it.type === "image" || it.type === "quote" ? "" : `<section class="ip-writing doc" data-ph="${it.type === "object" ? "Q-O" : "Q1"}">${writingTitle ? `<h2>${writingTitle}</h2>` : ""}
-    ${editing ? `<textarea class="mdedit" id="mdedit">${esc(it.body)}</textarea><div class="edrow"><button class="button" type="button" data-act="saveedit">Save</button><button class="button button-quiet" type="button" data-act="canceledit">Cancel</button><span class="hint">Type <b>@</b> at the start of a paragraph for a question or a learning goal. Ctrl/⌘ Enter saves.</span></div>`
-      : `<div class="markdown-body">${renderBody(it) || ""}<button class="ph" type="button" data-act="edit">${it.body ? "Edit · type @ for a question or goal" : "Type / for a heading, quote or link · @ for a question"}</button></div>`}</section>`;
+  const writing = it.type === "source" || it.type === "image" || it.type === "quote" ? "" : `<section class="ip-writing doc" data-ph="${it.type === "object" ? "Q-O · N1" : "Q1 · N1"}">${it.type === "object" ? `<h2>What I took from it</h2>` : ""}${editorHTML(it, { empty: it.type === "object" ? "What you took from it. / for blocks, @ for a question or an entry" : undefined })}</section>`;
   const longs = c ? c.fields.filter(f => f.t === "long" && it.v[f.id]).map(f => `<section class="ip-writing doc" data-ph="P1"><h2>${esc(f.label)}</h2><div class="markdown-body"><p>${esc(it.v[f.id])}</p></div></section>`).join("") : "";
-  const margin = it.margin.length || it.type === "source" ? `<section class="notes-about ip-shelf" data-ph="Q3"><div class="ip-shelf-h"><h2>Margin notes</h2><span>${it.margin.length}</span></div><div class="notes-about-list ip-cards">${it.margin.map((m, i) => `<article class="mcard note" data-frame="paper" data-kind="note"><div class="ci"><div class="body">${m.at ? `<button class="note-time" type="button">${esc(m.at)}</button>` : ""}${parse(m.body).length ? renderBody(it, i) : `<p class="nt">${esc(m.body)}</p>`}</div><div class="ft"><div class="ft-meta"><span class="ft-shape">Note</span></div></div></div></article>`).join("")}</div>
-    ${it.type === "source" ? `<div class="mn-add"><button class="button button-quiet" type="button">Add a note</button><button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="question" data-ph="Q3">? Question here</button><button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="goal">◎ Goal here</button><span class="small">Keys Q and G, at ${it.kind === "pdf" ? "the current page" : "the playhead"}</span></div>` : `<button class="button button-quiet" type="button">Add a note</button>`}</section>` : "";
-  const inv = c ? D().cols.flatMap(sc => sc.fields.filter(f => f.t === "rel" && f.o.to === c.id).map(f => ({ sc, f }))).map(({ sc, f }) => { const ids = D().items.filter(x => x.col === sc.id && arr(x.v[f.id]).includes(it.id)); return ids.length ? `<section class="ip-shelf" data-ph="F2"><div class="ip-shelf-h"><h2>${esc(f.o.inv || sc.name)}</h2><span>${ids.length}</span></div><div class="ip-cards">${ids.map(x => card(x)).join("")}</div></section>` : ""; }).join("") : "";
-  const linked = it.linked?.length ? `<section class="ip-shelf"><div class="ip-shelf-h"><h2>Linked</h2><span>${it.linked.length}</span></div><div class="ip-cards">${it.linked.map(l => I(l.id)).filter(Boolean).map(x => card(x)).join("")}</div></section>` : "";
-  const ans = answered.length ? `<section class="ip-shelf answers" data-ph="Q-O"><div class="ip-shelf-h"><h2>Answers</h2><span>${answered.length}</span></div><p class="small" style="margin:-6px 0 12px">Questions you marked as answered here.</p>${answered.map(r => `<div class="ans-it"><span class="gl">✓</span><span class="tx">${esc(r.text)}</span><small>${hostLink(r)}</small></div>`).join("")}</section>` : "";
+  const inv = c ? D().cols.flatMap(sc => sc.fields.filter(f => f.t === "rel" && f.o.to === c.id).map(f => ({ sc, f }))).map(({ sc, f }) => { const ids = D().items.filter(x => x.col === sc.id && arr(x.v[f.id]).includes(it.id)); return ids.length ? prop(f.o.inv || sc.name, `<div class="rel-row">${ids.map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("")}</div>`, "F2") : ""; }).join("") : "";
   const ob = onBoards(it);
   const rail = `<p class="ip-rh">Properties</p>
     ${prop(person ? "Template" : "Type", esc(c ? c.label : kindLabel(it)))}
@@ -5113,13 +5206,13 @@ function renderItem() {
     ${prop("Inside", nq || ng ? `${ng ? `<span style="color:var(--accent)">◎ ${ng} goal${ng > 1 ? "s" : ""}</span> ` : ""}${nq ? `<span style="color:var(--pick)">? ${nq} question${nq > 1 ? "s" : ""}</span>` : ""}` : `<span style="color:var(--ink-3)">None yet</span>`, "Q1")}
     ${it.type === "object" && !person ? prop("Photos", `<div class="photos-property"><div class="ip-strip"><button class="ip-thumb ip-thumb-add" type="button"><span>+</span></button></div></div>`) : ""}
     ${prop(person ? "Strongest on" : "In Loci", topicRail(it))}
-    ${prop("On boards", ob.length ? `<div class="rel-row">${ob.map(b => `<button class="entity-pill obj" type="button" data-act="openboard" data-id="${b.id}">▦ ${esc(b.title)}</button>`).join("")}</div>` : `<span style="color:var(--ink-3)">None</span>`, "B2")}
+    ${inv}
     ${it.linked?.length ? prop("Linked", `<div class="linked-block"><div class="linked-groups">${it.linked.map(l => `<div class="linked-group"><p class="linked-label">${esc(l.rel)}</p><ul class="linked-list"><li class="linked-row"><a class="entity-pill work" href="#" data-act="open" data-id="${l.id}">${esc(I(l.id)?.title)} · ${esc(kindLabel(I(l.id)))} ↗</a><p class="linked-note">${esc(l.note)}</p></li></ul></div>`).join("")}</div><button class="button button-link" type="button">Link…</button></div>`) : ""}
     ${it.col ? prop("Collection", `<a class="entity-link" href="#" data-act="col" data-id="${it.col}">${esc(COL(it.col).name)}</a> <button class="button button-link" type="button">Move to collection</button>`) : ""}
     <div class="row rail-actions">${c ? `<button class="button button-quiet" type="button" data-act="customize">Add a property</button>` : ""}<a class="btn-open-graph" href="#">Open in Loci →</a></div><div class="rail-delete-row"><button class="button button-link rail-delete" type="button">Delete…</button></div>`;
-  return `<div class="ipage"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(back)}</a><span class="ip-crumb">${esc(c ? c.label : kindLabel(it))}</span><span class="ip-saved"></span><button class="ip-more" type="button" aria-label="Actions for this item">${SVG.ipmore}</button></div>
+  return `<div class="ipage"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">${esc(c ? c.label : kindLabel(it))}</span><span class="ip-saved" id="saved" aria-live="polite"></span><button class="ip-more" type="button" aria-label="Actions for this item">${SVG.ipmore}</button></div>
     ${c?.clinical ? `<div class="library-notice urgent" role="note" data-ph="T3"><span><b>Clinical collection.</b> De-identified, for learning and reflection. Keep bands, never names, dates of birth or record numbers. Loci remembers only the lessons you file.</span></div>` : ""}
-    <div class="ip-grid"><article class="ip-main"><div class="ip-hero">${hero}${lead}</div>${writing}${longs}${margin}${inv}${linked}${ans}</article><aside class="props ip-rail" aria-label="Properties">${rail}</aside></div></div>`;
+    <div class="ip-grid"><article class="ip-main"><div class="ip-hero">${hero}${lead}</div>${writing}${longs}${connections(it)}</article><aside class="props ip-rail" aria-label="Properties">${rail}</aside></div></div>`;
 }
 
 /* ---------- Questions and goals page ---------- */
@@ -5163,7 +5256,7 @@ function renderCustomize() {
         <div class="preset-bar" data-ph="T1"><span class="small">Start from:</span>${(S.field === "lawyer" ? ["Cases", "Courts", "Judges", "Clauses"] : S.field === "doctor" ? ["Drugs", "Guidelines", "Procedures", "Teaching cases"] : ["Buildings", "Architects", "Materials"]).map(p => `<button class="preset-chip" type="button" data-act="toast" data-msg="${p}: fields with choices, sections and card fields.">${p}</button>`).join("")}</div>
         <ol class="fields-list" style="list-style:none;margin:0;padding:0">${rows}</ol>
         <div class="row" style="margin-top:10px;display:flex;gap:10px"><button class="button button-quiet" type="button" data-act="addfield">+ Add a field</button><button class="button button-link" type="button" data-act="cfgall">${S.cfgOpen === "all" ? "Hide field settings" : "Show field settings"}</button></div></section>
-      <section class="cf-section" data-ph="P2"><h3 class="cf-section-head">Page</h3><div class="form-row"><span class="form-label">Top of the page</span><div class="coll-select-pills" role="group">${[["portrait", "Portrait"], ["picture", "Picture"], ["slideshow", "Slideshow"], ["doc", "Document"], ["title", "Title only"]].map(([k, t]) => `<button type="button" class="${(c.hero || (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title")) === k ? "on" : ""}" data-act="hero" data-k="${k}">${t}</button>`).join("")}</div><p class="small cf-note">To move or hide blocks, open any ${esc(lower(c.label))} and choose Arrange page in its ⋯ menu.</p></div></section>
+      <section class="cf-section" data-ph="P2"><h3 class="cf-section-head">Page</h3><div class="form-row"><span class="form-label">Top of the page</span><div class="coll-select-pills" role="group">${[["portrait", "Portrait"], ["picture", "Picture"], ["slideshow", "Slideshow"], ["doc", "Document"], ["title", "Title only"]].map(([k, t]) => `<button type="button" class="${(c.hero || (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title")) === k ? "on" : ""}" data-act="hero" data-k="${k}">${t}</button>`).join("")}</div><div class="form-row" data-ph="N3" style="margin-top:14px"><label for="cf-write">Write about it starts with</label><input id="cf-write" type="text" value="${esc(c.write.join(", "))}" data-cfw="1"><p class="small cf-note">Headings, separated by commas. <b>Write about it</b> on any ${esc(lower(c.label))} starts a long note with its card and these headings.</p></div><p class="small cf-note">To move or hide blocks, open any ${esc(lower(c.label))} and choose Arrange page in its ⋯ menu.</p></div></section>
       <section class="cf-section" data-ph="T3"><h3 class="cf-section-head">Sensitivity</h3><div class="form-row"><div class="coll-select-pills" role="group">${["Normal", "Confidential", "Clinical"].map(s => `<button type="button" class="${(c.clinical ? "Clinical" : "Normal") === s ? "on" : ""}" data-act="sens" data-k="${s}">${s}</button>`).join("")}</div><p class="small cf-note">Confidential and Clinical keep this collection off the record: Loci remembers only the lessons you file.</p></div></section>
       <div class="customizer-actions"><button class="button" type="button" data-act="toast" data-msg="Saved. Every ${esc(lower(c.label))} now uses it.">Save</button><button class="button button-quiet" type="button" data-act="col" data-id="${c.id}">Cancel</button></div></div>
     <aside aria-label="Live preview" class="customizer-preview"><div class="preview-sticky"><h3>Preview</h3><div class="preview-box"><p class="lab">Card on the wall</p>${sample ? card(sample, { noMore: true }) : ""}</div>
@@ -5197,7 +5290,7 @@ function placed(p, b) {
   }
   const it = r.it;
   if (it.type === "note" && S.editing === "note:" + it.id) return wrap("", `<article class="mcard note" data-frame="paper"><div class="ci"><div class="body"><textarea data-nedit="${it.id}" placeholder="Write… start a paragraph with @question or @goal">${esc(it.body)}</textarea></div></div></article>`);
-  if (it.type === "note" && parse(it.body).length) return wrap("", `<article class="mcard note" data-frame="paper" data-kind="${it.title ? "long" : "note"}"><div class="ci"><div class="body">${it.title ? `<h2 class="mcard-title">${esc(it.title)}</h2>` : ""}${renderBody(it)}</div><div class="ft"><div class="ft-meta">${topicFt(it)}${ftIn(it)}</div></div></div></article>`);
+  if (it.type === "note" && !it.title && parse(it.body).length) return wrap("", `<article class="mcard note" data-frame="paper" data-kind="${it.title ? "long" : "note"}"><div class="ci"><div class="body">${it.title ? `<h2 class="mcard-title">${esc(it.title)}</h2>` : ""}${renderBody(it)}</div><div class="ft"><div class="ft-meta">${topicFt(it)}${ftIn(it)}</div></div></div></article>`);
   return wrap("", card(it, { noMore: true }));
 }
 function insidePanel(b) {
@@ -5268,18 +5361,334 @@ function openArrow(aid, x, y) {
 }
 function closeApop() { const pop = $("#apop"); if (!pop.hidden && pop._a) { const a = I(S.board)?.arrows.find(z => z.id === pop._a), w = $("#awhy"); if (a && w) a.why = w.value.trim(); } pop.hidden = true; S.selArrow = null; drawArrows(); }
 
+/* ---------- writing: one block editor for long notes, notes and Object writing (N1–N4) ----------
+   The stored body stays Markdown (the app's own subset) plus four markers: @question / @goal paragraphs, an image
+   ![caption](media:…), an entry card ::card[](item:…) and a mention @[words](item:…). The editor edits blocks; every
+   change writes the Markdown back, and mentions, cards and questions are read out of it again (nothing else stores them). */
+const MEDIA_LABEL = { arcade: "Arcade and bay rhythm", courtyard: "Courtyard toward prayer hall", baywide: "Córdoba: the bay, repeated", baylight: "A bay in morning light", fathy: "Hassan Fathy" };
+const TEXT_T = ["p", "h2", "h3", "li", "ol", "quote", "question", "goal"];
+const plainText = s => String(s || "").replace(/@\[([^\]]+)\]\(item:[\w-]+\)/g, "$1").replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/::card\[[^\]]*\]\(item:[\w-]+\)/g, "").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\*([^*]+)\*/g, "$1").replace(/^(#{1,3}\s+|>\s?|[-*]\s+|\d+[.)]\s+)/gm, "").replace(/\s+/g, " ").trim();
+const refsIn = body => [...String(body || "").matchAll(/item:([\w-]+)/g)].map(m => m[1]);
+const isLong = it => it.type === "note" && !!it.title;
+function toBlocks(body) {
+  const out = [];
+  String(body || "").split(/\n\s*\n/).forEach(chunk => {
+    const p = chunk.trim(); let m;
+    if (!p) return;
+    if (p === "---") out.push({ t: "hr" });
+    else if ((m = /^!\[([^\]]*)\]\(media:([a-z]+)\)$/.exec(p))) out.push({ t: "img", cap: m[1], media: m[2] });
+    else if ((m = /^::card\[[^\]]*\]\(item:([\w-]+)\)$/.exec(p))) out.push({ t: "card", id: m[1] });
+    else if ((m = /^@(question|goal)\s+([\s\S]*)$/i.exec(p))) out.push({ t: m[1].toLowerCase(), text: m[2].replace(/\s+/g, " ").trim() });
+    else if ((m = /^(#{1,3})\s+(.*)$/.exec(p))) out.push({ t: m[1].length === 3 ? "h3" : "h2", text: m[2] });
+    else if (/^>\s?/.test(p)) out.push({ t: "quote", text: p.replace(/^>\s?/gm, "").replace(/\n/g, " ") });
+    else if (/^[-*]\s+/.test(p)) p.split("\n").forEach(l => out.push({ t: "li", text: l.replace(/^[-*]\s+/, "") }));
+    else if (/^\d+[.)]\s+/.test(p)) p.split("\n").forEach(l => out.push({ t: "ol", text: l.replace(/^\d+[.)]\s+/, "") }));
+    else out.push({ t: "p", text: p.replace(/\n/g, " ") });
+  });
+  return out;
+}
+function fromBlocks(bl) {
+  let n = 0;
+  return bl.map(b => {
+    if (b.t !== "ol") n = 0;
+    const tx = (b.text || "").trim();
+    switch (b.t) {
+      case "hr": return "---";
+      case "img": return `![${(b.cap || "").replace(/[\]\n]/g, " ")}](media:${b.media})`;
+      case "card": return `::card[](item:${b.id})`;
+      case "question": case "goal": return tx ? `@${b.t} ${tx}` : "";
+      case "h2": return tx ? `## ${tx}` : "";
+      case "h3": return tx ? `### ${tx}` : "";
+      case "quote": return tx ? `> ${tx}` : "";
+      case "li": return tx ? `- ${tx}` : "";
+      case "ol": return tx ? `${++n}. ${tx}` : "";
+      default: return tx;
+    }
+  }).filter(Boolean).join("\n\n");
+}
+function inlineMd(s) {
+  return esc(s).replace(/@\[([^\]]+)\]\(item:([\w-]+)\)/g, (_, t, id) => `<span class="mention${I(id) ? "" : " gone"}" contenteditable="false" data-mention="${id}">${t}</span>`)
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\*([^*]+)\*/g, "<i>$1</i>");
+}
+function ser(node) {
+  let s = "";
+  for (const n of node.childNodes) {
+    if (n.nodeType === 3) s += n.nodeValue;
+    else if (n.nodeType !== 1) continue;
+    else if (n.dataset.mention) s += `@[${n.textContent.replace(/[\]\n]/g, " ")}](item:${n.dataset.mention})`;
+    else if (/^(B|STRONG)$/.test(n.tagName)) { const x = ser(n); s += x.trim() ? `**${x}**` : x; }
+    else if (/^(I|EM)$/.test(n.tagName)) { const x = ser(n); s += x.trim() ? `*${x}*` : x; }
+    else if (n.tagName === "BR") s += " ";
+    else s += ser(n);
+  }
+  return s.replace(/ /g, " ");
+}
+function embedHTML(id) {
+  const x = I(id);
+  if (!x) return `<div class="nb-embed gone" contenteditable="false">This entry was deleted. Its card stays here until you remove it.</div>`;
+  const c = x.type === "object" ? COL(x.col) : null;
+  const pic = x.media ? `<img alt="" src="${MEDIA[x.media]}">` : x.type === "board" ? `<span>▦</span>` : `<span>${esc(c ? initials(x.title) : (kindLabel(x) || "?")[0])}</span>`;
+  const fields = c ? c.fields.filter(f => f.t !== "long").map(f => [f.label, fieldText(f, x.v[f.id])]).filter(([, v]) => v).slice(0, 3) : [];
+  const inside = ftIn(x);
+  return `<div class="nb-embed" contenteditable="false" data-ph="N2"><div class="nb-em-pic${c?.layout === "portrait" ? " round" : ""}">${pic}</div><div class="nb-em-t"><p class="nb-em-k">${esc(kindLabel(x))}${x.col && COL(x.col) ? " · " + esc(COL(x.col).name) : ""}${inside}</p><button type="button" class="nb-em-title" data-act="open" data-id="${x.id}">${esc(x.title || plainBody(x).slice(0, 60))}</button>${fields.length ? `<dl>${fields.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : `<p class="nb-em-d">${esc((x.desc || plainBody(x)).slice(0, 120))}</p>`}</div><button type="button" class="nb-em-open" data-act="open" data-id="${x.id}" aria-label="Open ${esc(x.title)}" title="Open">↗</button></div>`;
+}
+/** N4: Loci notices an entry's exact name written as plain words and offers to link it. One tap; never a silent edit. */
+function offerFor(text) {
+  if (!text) return "";
+  const ids = refsIn(text), plain = text.replace(/@\[[^\]]+\]\(item:[\w-]+\)/g, "");
+  const x = D().items.find(y => y.type === "object" && y.title.length > 5 && !ids.includes(y.id) && plain.includes(y.title));
+  return x ? `<button type="button" class="nb-offer" contenteditable="false" data-act="mentionoffer" data-id="${x.id}" data-ph="N4">↗ Link “${esc(x.title)}”</button>` : "";
+}
+function edBlocks(it) {
+  if (!S.ed || S.ed.id !== it.id) S.ed = { id: it.id, blocks: toBlocks(it.body) };
+  const last = S.ed.blocks.at(-1);
+  if (!last || last.t !== "p" || (last.text || "").trim()) S.ed.blocks.push({ t: "p", text: "" });
+  return S.ed.blocks;
+}
+function editorHTML(it, opts = {}) {
+  const bl = edBlocks(it), n = { question: 0, goal: 0 }; let ol = 0;
+  const anchors = it.margin.filter(m => m.block);
+  return `<div class="nbs" id="nbs" data-ph="${opts.ph || "N1"}">${bl.map((b, i) => {
+    if (b.t !== "ol") ol = 0;
+    const ed = (cls, ph) => `<div class="nb-t ${cls}" contenteditable="true" spellcheck="true" data-bi="${i}" data-ph-text="${esc(ph)}">${inlineMd(b.text || "")}</div>`;
+    let inner;
+    switch (b.t) {
+      case "h2": inner = ed("nb-h2", "Heading"); break;
+      case "h3": inner = ed("nb-h3", "Subheading"); break;
+      case "li": inner = `<span class="nb-bul" aria-hidden="true">•</span>${ed("", "List")}`; break;
+      case "ol": inner = `<span class="nb-bul" aria-hidden="true">${++ol}.</span>${ed("", "List")}`; break;
+      case "quote": inner = ed("nb-q", "Quote"); break;
+      case "hr": inner = `<hr class="nb-hr">`; break;
+      case "img": inner = `<figure class="nb-fig" data-ph="N2"><img alt="${esc(b.cap)}" src="${MEDIA[b.media]}"><figcaption class="nb-t nb-cap" contenteditable="true" data-bi="${i}" data-cap="1" data-ph-text="Add a caption">${esc(b.cap || "")}</figcaption></figure>`; break;
+      case "card": inner = embedHTML(b.id); break;
+      case "question": case "goal": {
+        const r = (b.text || "").trim() ? INL(`${it.id}:${b.t}:${n[b.t]++}`) : null;
+        inner = `<div class="inl ${b.t === "goal" ? "g" : "q"} nb-inl${r && done(st(r.key, r.kind).status) ? " done" : ""}" data-ph="Q1"><span class="gl" aria-hidden="true">${b.t === "goal" ? "◎" : "?"}</span>${ed("tx", b.t === "goal" ? "What do you want to be able to do, and by when?" : "What do you want to find out?")}${r ? stBtn(r) : `<span class="nb-new">new</span>`}${r ? ansLine(r) : ""}</div>`; break;
+      }
+      default: inner = ed("", bl.length === 1 ? (opts.empty || "Write, or type / for blocks and @ for a question, goal or entry") : "Type / for blocks · @ for a question, goal or entry");
+    }
+    const key = plainText(b.text || b.cap || "").slice(0, 40), mn = key ? anchors.filter(m => m.block === key).length : 0;
+    return `<div class="nb nb-${b.t}" data-i="${i}"><div class="nb-h" contenteditable="false"><button type="button" class="nb-add" data-act="nbadd" data-i="${i}" title="Add a block below" aria-label="Add a block below">+</button><button type="button" class="nb-grip" draggable="true" data-act="nbmenu" data-i="${i}" title="Drag to move · click for options" aria-label="Block options">⋮⋮</button></div><div class="nb-c">${inner}${["p", "li", "ol", "quote"].includes(b.t) ? offerFor(b.text) : ""}</div>${mn ? `<button type="button" class="nb-mn" data-act="mnjump" title="Margin notes on this block" data-ph="N3">✎ ${mn}</button>` : ""}</div>`;
+  }).join("")}</div>`;
+}
+/** Read-only, for margin notes, short-note cards on a board and anywhere the writing isn't being edited. */
+function readHTML(body, hk) {
+  const n = { question: 0, goal: 0 }, rows = allInlines().filter(x => x.key.startsWith(hk + ":"));
+  return toBlocks(body).map(b => {
+    switch (b.t) {
+      case "question": case "goal": { const r = rows.find(x => x.key === `${hk}:${b.t}:${n[b.t]++}`); return r ? inlRow(r, !!r.goalKey) : ""; }
+      case "h2": return `<h3>${inlineMd(b.text)}</h3>`;
+      case "h3": return `<h4>${inlineMd(b.text)}</h4>`;
+      case "li": return `<ul><li>${inlineMd(b.text)}</li></ul>`;
+      case "ol": return `<ol><li>${inlineMd(b.text)}</li></ol>`;
+      case "quote": return `<blockquote><p>${inlineMd(b.text)}</p></blockquote>`;
+      case "hr": return "<hr>";
+      case "img": return `<figure class="nb-fig"><img alt="" src="${MEDIA[b.media]}">${b.cap ? `<figcaption class="nb-cap">${esc(b.cap)}</figcaption>` : ""}</figure>`;
+      case "card": return embedHTML(b.id);
+      default: return `<p>${inlineMd(b.text)}</p>`;
+    }
+  }).join("");
+}
+function blockSummary(bl) {
+  const c = k => bl.filter(b => k.includes(b.t) && (b.text ?? "x").trim()).length;
+  const parts = [[c(["h2", "h3"]), "heading"], [c(["p"]), "paragraph"], [c(["li", "ol"]), "list item"], [c(["quote"]), "quote"], [c(["img"]), "image"], [c(["card"]), "entry card"]].filter(([k]) => k);
+  const total = parts.reduce((a, [k]) => a + k, 0);
+  return total ? `${total} blocks (${parts.map(([k, w]) => `${k} ${w}${k > 1 ? "s" : ""}`).join(", ")})` : "No writing yet";
+}
+
+/* ---------- connections: rail = what it is; the foot = notes about it, and where it appears ---------- */
+const mentionedIn = it => D().items.filter(x => x !== it && x.type !== "board" && (refsIn(x.body).includes(it.id) || x.margin.some(m => refsIn(m.body).includes(it.id))));
+function snippet(x, id) {
+  const src = [x.body, ...x.margin.map(m => m.body)].join("\n\n").split(/\n\s*\n/).find(p => p.includes("item:" + id)) || "";
+  if (/^::card/.test(src.trim())) return "Shown as a card";
+  const t = plainText(src.replace(/^@(question|goal)\s+/i, "")), m = I(id), at = m ? t.indexOf(m.title) : -1;
+  return at > 60 ? "…" + t.slice(at - 40, at + 100) : t.slice(0, 140);
+}
+function marginCards(it) {
+  return it.margin.map((m, i) => `<article class="mcard note" data-frame="paper" data-kind="note"><div class="ci"><div class="body">${m.at ? `<button class="note-time" type="button">${esc(m.at)}</button>` : ""}<div class="markdown-body mn-body">${renderBody(it, i)}</div></div><div class="ft"><div class="ft-meta"><span class="ft-shape">Margin note</span></div></div></div></article>`).join("");
+}
+function connections(it) {
+  const about = D().items.filter(x => x.about === it.id), mi = mentionedIn(it), ob = onBoards(it);
+  const answered = allInlines().filter(r => st(r.key, r.kind).ans.includes(it.id));
+  const canWrite = !isLong(it) && it.type !== "note" && it.type !== "quote";
+  const src = it.type === "source" ? `<button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="question" data-ph="Q3">? Question here</button><button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="goal">◎ Goal here</button>` : "";
+  const notes = `<section class="notes-about ip-shelf" id="notes-about" data-ph="Q3 · N3"><div class="ip-shelf-h"><h2>Notes about it</h2><span>${it.margin.length + about.length}</span></div>
+    ${about.length ? `<div class="ip-cards">${about.map(x => card(x)).join("")}</div>` : ""}${it.margin.length ? `<div class="notes-about-list ip-cards">${marginCards(it)}</div>` : ""}
+    ${!about.length && !it.margin.length ? `<p class="small" style="margin:-4px 0 10px">Nothing yet. A margin note is a line beside it; ${canWrite ? "<b>Write about it</b> starts a long note that's about it." : "it stays with this page."}</p>` : ""}
+    <div class="mn-add"><button class="button button-quiet" type="button" data-act="addmargin">Add a margin note</button>${canWrite ? `<button class="button" type="button" data-act="writeabout" data-id="${it.id}" data-ph="N3">Write about it</button>` : ""}${src}</div></section>`;
+  const n = mi.length + answered.length + ob.length;
+  const where = n ? `<section class="ip-shelf conn" data-ph="N2"><div class="ip-shelf-h"><h2>Where it appears</h2><span>${n}</span></div><p class="small conn-note">Each one is changed where it was made. Open it to change it.</p>
+    ${mi.length ? `<h3 class="conn-h">Mentioned in <span>${mi.length}</span></h3>${mi.map(x => `<button class="conn-row" type="button" data-act="open" data-id="${x.id}"><span class="conn-k">${esc(kindLabel(x))}</span><b>${esc(x.title || plainBody(x).slice(0, 50))}</b><span class="conn-s">${esc(snippet(x, it.id))}</span></button>`).join("")}` : ""}
+    ${answered.length ? `<h3 class="conn-h" data-ph="Q-O">Answers <span>${answered.length}</span></h3>${answered.map(r => `<div class="conn-row ans"><span class="conn-k" style="color:var(--ok)">✓ Answered</span><b style="font:15px/1.4 var(--read)">${esc(r.text)}</b><span class="conn-s qgrow" style="padding:0;border:0;display:block"><span class="host">${hostLink(r)}</span></span></div>`).join("")}` : ""}
+    ${ob.length ? `<h3 class="conn-h" data-ph="B2">On boards <span>${ob.length}</span></h3>${ob.map(b => { const p = b.pl.find(x => x.ref === "i:" + it.id), k = b.arrows.filter(a => a.from === p.id || a.to === p.id).length; return `<button class="conn-row" type="button" data-act="openboard" data-id="${b.id}"><span class="conn-k">Board</span><b>${esc(b.title)}</b><span class="conn-s">${k ? `${k} arrow${k > 1 ? "s" : ""} to or from it` : "Placed, no arrows yet"}</span></button>`; }).join("")}` : ""}</section>` : "";
+  return notes + where;
+}
+
+/* ---------- the long note page (N1) ---------- */
+function backLabel() { const h = S.hist.at(-1); if (!h) return "Commonplace"; if (h.screen === "board") return I(h.board)?.title || "Board"; if (h.screen === "qg") return "Questions and goals"; if (h.screen === "item" || h.screen === "note") return I(h.item)?.title || "Back"; return "Commonplace"; }
+function renderNote() {
+  const it = I(S.item); if (!it) { S.screen = "wall"; return renderWall(); }
+  const bl = edBlocks(it), heads = bl.map((b, i) => ({ b, i })).filter(x => (x.b.t === "h2" || x.b.t === "h3") && x.b.text.trim());
+  const ab = it.about ? I(it.about) : null, refs = [...new Set(refsIn(it.body))].map(I).filter(Boolean);
+  const rows = allInlines().filter(r => r.item === it), nq = rows.filter(r => r.kind === "question").length, ng = rows.filter(r => r.kind === "goal").length;
+  const rail = `<p class="ip-rh">Details</p>
+    ${prop("Template", "Long note")}
+    ${prop("About", ab ? `<div class="rel-row"><button class="entity-pill obj" type="button" data-act="open" data-id="${ab.id}">${esc(ab.title)}</button> <button class="addv" type="button" data-act="aboutpick">Change</button></div>` : `<button class="addv" type="button" data-act="aboutpick">+ Choose</button>`, "N3")}
+    ${prop("Mentions", refs.length ? `<div class="rel-row">${refs.map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title || "a note")}</button>`).join("")}</div><p class="small" style="margin:6px 0 0">From the writing. Type @ to add one.</p>` : `<span style="color:var(--ink-3)">None. Type @ and a name.</span>`, "N2")}
+    ${prop("Inside", nq || ng ? `${ng ? `<span style="color:var(--accent)">◎ ${ng} goal${ng > 1 ? "s" : ""}</span> ` : ""}${nq ? `<span style="color:var(--pick)">? ${nq} question${nq > 1 ? "s" : ""}</span>` : ""}` : `<span style="color:var(--ink-3)">None yet</span>`, "Q1")}
+    ${prop("In Loci", topicRail(it))}
+    ${it.col ? prop("Collection", `<a class="entity-link" href="#" data-act="col" data-id="${it.col}">${esc(COL(it.col).name)}</a> <button class="button button-link" type="button">Move to collection</button>`) : ""}
+    ${prop("Blocks", esc(blockSummary(bl)))}
+    <div class="row rail-actions"><a class="btn-open-graph" href="#">Open in Loci →</a></div><div class="rail-delete-row"><button class="button button-link rail-delete" type="button">Delete…</button></div>`;
+  return `<div class="ipage np${S.details ? " with-details" : ""}"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">Long note</span><span class="ip-saved" id="saved" aria-live="polite"></span><button class="button button-quiet np-dbtn" type="button" data-act="details" aria-pressed="${!!S.details}">Details</button><button class="ip-more" type="button" aria-label="Actions for this note">${SVG.ipmore}</button></div>
+    <div class="np-grid"><nav class="np-outline" aria-label="Outline">${heads.length >= 2 ? `<p class="np-ol-h">On this page</p>${heads.map(h => `<button type="button" class="${h.b.t}" data-act="olgo" data-i="${h.i}">${esc(plainText(h.b.text))}</button>`).join("")}` : ""}</nav>
+      <article class="np-doc" data-ph="N1"><p class="ip-kicker">Long note${it.col ? ` · ${esc(COL(it.col).name)}` : ""}</p>${ipTitle(it.title)}
+        <div class="np-meta">${ab ? `<span class="np-about" data-ph="N3">About <button class="entity-pill obj" type="button" data-act="open" data-id="${ab.id}">${esc(ab.title)}</button></span>` : `<button class="addv" type="button" data-act="aboutpick" data-ph="N3">+ What is it about?</button>`}${it.topics.map(t => `<span class="np-topic"><span class="dot s${t.s}"></span>${esc(t.n)}</span>`).join("")}<span class="np-count">${refs.length ? `${refs.length} entr${refs.length > 1 ? "ies" : "y"} · ` : ""}${ng ? `◎ ${ng} · ` : ""}${nq ? `? ${nq} · ` : ""}Saved as you type</span></div>
+        ${editorHTML(it)}<div class="np-tail" data-act="nbtail"></div>
+        ${connections(it)}</article>
+      <aside class="props ip-rail np-details" aria-label="Details">${rail}</aside></div></div>`;
+}
+
+/* ---------- editor behaviour ---------- */
+let saveT;
+function commit(it = I(S.ed?.id)) {
+  if (!it) return;
+  it.body = fromBlocks(S.ed.blocks);
+  const s = $("#saved"); if (s) { s.textContent = "Saving…"; clearTimeout(saveT); saveT = setTimeout(() => { s.textContent = "Saved"; }, 700); }
+}
+function caretOff(el) { const sel = getSelection(); if (!sel.rangeCount) return 0; const r = sel.getRangeAt(0), pre = document.createRange(); pre.selectNodeContents(el); try { pre.setEnd(r.startContainer, r.startOffset); } catch { return 0; } return pre.toString().length; }
+function setCaret(el, off) {
+  const sel = getSelection(), r = document.createRange();
+  if (off === "end" || off == null) { r.selectNodeContents(el); r.collapse(false); }
+  else if (off === "start" || off <= 0) { r.selectNodeContents(el); r.collapse(true); }
+  else {
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let left = off, node, done = false;
+    while ((node = w.nextNode())) {
+      const len = node.nodeValue.length;
+      if (left <= len) { const m = node.parentElement.closest("[data-mention]"); if (m) { left === 0 ? r.setStartBefore(m) : r.setStartAfter(m); } else r.setStart(node, left); r.collapse(true); done = true; break; }
+      left -= len;
+    }
+    if (!done) { r.selectNodeContents(el); r.collapse(false); }
+  }
+  sel.removeAllRanges(); sel.addRange(r);
+}
+function focusBlock(i, at = "end") {
+  const el = document.querySelector(`.nb[data-i="${i}"] .nb-t:not(.nb-cap)`) || document.querySelector(`.nb[data-i="${i}"] .nb-t`);
+  if (el) { el.focus(); setCaret(el, at); }
+}
+function edRender(i, at) { const y = document.getElementById("stage").scrollTop, wy = scrollY; render(); document.getElementById("stage").scrollTop = y; scrollTo(0, wy); if (i != null) focusBlock(i, at); }
+const SHORTCUTS = [[/^#{1,2} $/, "h2"], [/^### $/, "h3"], [/^[-*] $/, "li"], [/^1[.)] $/, "ol"], [/^> $/, "quote"], [/^\?\? $/, "question"]];
+function edInput(el) {
+  const i = +el.dataset.bi, b = S.ed.blocks[i]; if (!b) return;
+  if (el.dataset.cap) { b.cap = el.textContent; commit(); return; }
+  b.text = ser(el);
+  if (b.t === "p") {
+    for (const [re, t] of SHORTCUTS) if (re.test(b.text.replace(/ /g, " "))) { b.t = t; b.text = ""; commit(); edRender(i, "start"); return; }
+    if (b.text.trim() === "---") { b.t = "hr"; delete b.text; S.ed.blocks.splice(i + 1, 0, { t: "p", text: "" }); commit(); edRender(i + 1, "start"); return; }
+  }
+  commit();
+  const off = caretOff(el), before = el.textContent.slice(0, off);
+  let m;
+  if (b.t === "p" && (m = /^\/([\w ]{0,20})$/.exec(el.textContent))) showPick("slash", i, m[1].toLowerCase(), el);
+  else if ((m = /(^|\s)@([^\s@]{0,24})$/.exec(before))) showPick("at", i, m[2].toLowerCase(), el, { start: before.trim() === "@" + m[2], from: off - m[2].length - 1 });
+  else hidePick();
+}
+/* the pick menu: / for blocks, @ for a question, a goal or an entry */
+let pick = null;
+const SLASH = [["p", "Text", "A paragraph", "¶"], ["h2", "Heading", "A section title", "H"], ["h3", "Subheading", "A smaller title", "h"], ["li", "Bulleted list", "", "•"], ["ol", "Numbered list", "", "1."], ["quote", "Quote", "A passage, set apart", "“"], ["hr", "Divider", "", "—"], ["img", "Image", "From your photos, or upload", "◫"], ["card", "Entry card", "Show a Commonplace entry here", "▣"], ["question", "Question", "Something you want to find out", "?"], ["goal", "Learning goal", "Something you want to be able to do", "◎"]];
+function pickItems() {
+  if (pick.kind === "slash") return SLASH.filter(([, l]) => !pick.q || l.toLowerCase().includes(pick.q)).map(([k, l, s, g]) => ({ k, l, s, g }));
+  const q = pick.q, out = [];
+  if (pick.start || !q) [["question", "Question", "Something you want to find out", "?"], ["goal", "Learning goal", "Something you want to be able to do", "◎"]].filter(([, l]) => !q || l.toLowerCase().startsWith(q)).forEach(([k, l, s, g]) => out.push({ k, l, s, g }));
+  D().items.filter(x => x.id !== S.ed.id && (x.title || "").toLowerCase().includes(q) && x.title).slice(0, 6).forEach(x => out.push({ k: "item", id: x.id, l: x.title, s: kindLabel(x) + (x.col && COL(x.col) ? " · " + COL(x.col).name : ""), g: x.type === "object" ? "▣" : x.type === "board" ? "▦" : "↗" }));
+  return out;
+}
+function showPick(kind, i, q, el, x = {}) {
+  pick = { kind, i, q, el, on: 0, ...x }; const items = pickItems(), m = $("#pick");
+  if (!items.length) { hidePick(); return; }
+  m.innerHTML = (kind === "at" ? `<p class="pk-h">${pick.start || !q ? "Make, or link to an entry" : "Link to an entry"}</p>` : `<p class="pk-h">Insert a block</p>`) + items.map((it, n) => `<button type="button" class="${n === 0 ? "on" : ""}" data-pk="${n}"><span class="gl">${esc(it.g)}</span><b>${esc(it.l)}</b>${it.s ? `<small>${esc(it.s)}</small>` : ""}</button>`).join("");
+  m.hidden = false;
+  const r = (getSelection().rangeCount ? getSelection().getRangeAt(0).getBoundingClientRect() : el.getBoundingClientRect()), rr = r.width || r.height ? r : el.getBoundingClientRect();
+  m.style.left = Math.max(16, Math.min(rr.left, innerWidth - m.offsetWidth - 16)) + "px";
+  m.style.top = (rr.bottom + 8 + m.offsetHeight > innerHeight - 80 ? Math.max(16, rr.top - m.offsetHeight - 8) : rr.bottom + 8) + "px";
+}
+function hidePick() { $("#pick").hidden = true; pick = null; }
+function choosePick(n) {
+  const p = pick, it = pickItems()[n], b = S.ed.blocks[p.i]; hidePick(); if (!it) return;
+  if (p.kind === "slash" || (it.k === "question" || it.k === "goal") && p.start) {
+    b.text = p.kind === "at" ? b.text.replace(/@[^\s@]*\s*$/, "") : "";
+    if (it.k === "hr") { b.t = "hr"; delete b.text; S.ed.blocks.splice(p.i + 1, 0, { t: "p", text: "" }); commit(); edRender(p.i + 1, "start"); return; }
+    if (it.k === "img" || it.k === "card") { commit(); menuKey = p.i; const anchor = document.querySelector(`.nb[data-i="${p.i}"]`); openMenu(anchor, it.k === "img" ? imgMenu() : cardMenu()); return; }
+    b.t = it.k; commit(); edRender(p.i, "end"); return;
+  }
+  if (it.k === "question" || it.k === "goal") { b.text = b.text.replace(/@[^\s@]*$/, "").trimEnd(); S.ed.blocks.splice(p.i + 1, 0, { t: it.k, text: "" }); commit(); edRender(p.i + 1, "start"); return; }
+  const x = I(it.id), el = p.el, sel = getSelection(), r = sel.rangeCount ? sel.getRangeAt(0) : null;
+  if (!r || r.startContainer.nodeType !== 3 || r.startOffset < p.q.length + 1) return;
+  r.setStart(r.startContainer, r.startOffset - p.q.length - 1); r.deleteContents();
+  const span = document.createElement("span"); span.className = "mention"; span.contentEditable = "false"; span.dataset.mention = x.id; span.textContent = x.title;
+  r.insertNode(document.createTextNode("\u00a0")); r.insertNode(span);
+  b.text = ser(el); commit(); edRender(p.i, p.from + x.title.length + 1);
+  toast(`Linked. ${x.title}'s page lists this under Where it appears › Mentioned in.`);
+}
+const imgMenu = () => mHead("Image · from your photos") + Object.keys(MEDIA).map(k => `<button type="button" class="mi pk-img" data-act="nbimgset" data-k="${k}"><img alt="" src="${MEDIA[k]}"><span>${esc(MEDIA_LABEL[k])}</span></button>`).join("") + mItem("toast", "Upload from this device…", false, `data-msg="In the app this opens the file picker; the image is kept with this note and isn't a Photo on the wall unless you add it to Photos."`);
+const cardMenu = () => mHead("Entry card") + D().cols.filter(c => c.shape === "object").map(c => mHead(c.name) + D().items.filter(x => x.col === c.id).map(x => mItem("nbcardset", esc(x.title), false, `data-id="${x.id}"`)).join("")).join("") + mHead("Notes and sources") + D().items.filter(x => (x.type === "source" || isLong(x)) && x.id !== S.ed?.id).map(x => mItem("nbcardset", esc(x.title), false, `data-id="${x.id}"`)).join("") + mHead("Boards") + boards().map(x => mItem("nbcardset", "▦ " + esc(x.title), false, `data-id="${x.id}"`)).join("");
+function blockMenu(i) {
+  const b = S.ed.blocks[i], T = [["p", "Text"], ["h2", "Heading"], ["h3", "Subheading"], ["li", "Bulleted list"], ["ol", "Numbered list"], ["quote", "Quote"], ["question", "Question"], ["goal", "Learning goal"]];
+  let h = "";
+  if (TEXT_T.includes(b.t)) h += mHead("Turn into") + T.map(([k, l]) => mItem("nbturn", l, b.t === k, `data-v="${k}"`)).join("");
+  if (b.t === "card") h += mHead("Entry card") + mItem("nbcardline", "Show as a link in the text", false) + mItem("open", "Open the entry ↗", false, `data-id="${b.id}"`);
+  if (b.t === "img") h += mHead("Image") + mItem("nbimgreplace", "Replace…", false) + mItem("toast", "Add to Photos", false, `data-msg="It becomes a Photo on the wall too, linked back to this note."`);
+  h += mHead("Block") + mItem("nbmove", "Move up", false, 'data-d="-1"') + mItem("nbmove", "Move down", false, 'data-d="1"') + mItem("nbdup", "Duplicate", false) + (TEXT_T.includes(b.t) && (b.text || "").trim() ? mItem("nbmargin", "Margin note on this block", false) : "") + mItem("nbdel", `<span style="color:var(--warn)">Delete</span>`, false);
+  return h;
+}
+function edKey(e, el) {
+  const i = +el.dataset.bi, bl = S.ed.blocks, b = bl[i];
+  if (pick && !$("#pick").hidden) {
+    const items = [...document.querySelectorAll("#pick [data-pk]")];
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); items[pick.on]?.classList.remove("on"); pick.on = (pick.on + (e.key === "ArrowDown" ? 1 : items.length - 1)) % items.length; items[pick.on].classList.add("on"); items[pick.on].scrollIntoView({ block: "nearest" }); return; }
+    if (e.key === "Enter" || e.key === "Tab") { e.preventDefault(); choosePick(pick.on); return; }
+    if (e.key === "Escape") { e.preventDefault(); hidePick(); return; }
+  }
+  if (el.dataset.cap) { if (e.key === "Enter") { e.preventDefault(); if (!bl[i + 1] || !TEXT_T.includes(bl[i + 1].t)) bl.splice(i + 1, 0, { t: "p", text: "" }); commit(); edRender(i + 1, "start"); } return; }
+  const sel = getSelection(), collapsed = sel.isCollapsed, off = caretOff(el), len = el.textContent.length;
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    const r = sel.getRangeAt(0); r.deleteContents();
+    const tail = document.createRange(); tail.selectNodeContents(el); tail.setStart(r.endContainer, r.endOffset);
+    const div = document.createElement("div"); div.appendChild(tail.extractContents());
+    const before = ser(el), after = ser(div);
+    if (["li", "ol", "question"].includes(b.t) && !before.trim() && !after.trim()) { b.t = "p"; b.text = ""; commit(); edRender(i, "start"); return; }
+    b.text = before;
+    const nt = ["li", "ol"].includes(b.t) ? b.t : b.t === "goal" || b.t === "question" ? "question" : "p";
+    bl.splice(i + 1, 0, { t: nt, text: after }); commit(); edRender(i + 1, "start"); return;
+  }
+  if (e.key === "Backspace" && collapsed && off === 0) {
+    if (b.t !== "p") { e.preventDefault(); b.t = "p"; commit(); edRender(i, "start"); return; }
+    if (i === 0) return;
+    e.preventDefault();
+    const prev = bl[i - 1];
+    if (TEXT_T.includes(prev.t)) { const pel = document.querySelector(`.nb[data-i="${i - 1}"] .nb-t`), join = pel ? pel.textContent.length : 0; prev.text = (prev.text || "") + b.text; bl.splice(i, 1); commit(); edRender(i - 1, join); }
+    else { bl.splice(i - 1, 1); commit(); edRender(i - 1, "start"); toast(prev.t === "card" ? "Entry card removed. The entry itself is still in Commonplace." : "Block removed."); }
+    return;
+  }
+  if (e.key === "ArrowUp" && off === 0) { for (let j = i - 1; j >= 0; j--) if (TEXT_T.includes(bl[j].t)) { e.preventDefault(); focusBlock(j, "end"); return; } }
+  if (e.key === "ArrowDown" && off === len) { for (let j = i + 1; j < bl.length; j++) if (TEXT_T.includes(bl[j].t)) { e.preventDefault(); focusBlock(j, "start"); return; } }
+}
+
 /* ---------- render ---------- */
 function renderProto() {
   $("#proto").innerHTML = `<b>Prototype</b><div class="seg" role="group" aria-label="Sample learner">${Object.keys(DB).map(k => `<button type="button" data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
-    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="cols" aria-pressed="${S.screen === "customize"}">Customize</button></div>
+    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="note" aria-pressed="${S.screen === "note"}">Long note</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="cols" aria-pressed="${S.screen === "customize"}">Customize</button></div>
     <label><input type="checkbox" id="phases" ${S.phases ? "checked" : ""}> Show phases</label>`;
   document.body.classList.toggle("phases", S.phases);
 }
 function render() {
   renderProto();
   const m = $("#main");
-  m.className = S.screen === "item" ? "" : "library-page";
+  m.className = S.screen === "item" || S.screen === "note" ? "" : "library-page";
+  hidePick(); $("#selbar").hidden = true;
   if (S.screen === "item") m.innerHTML = renderItem();
+  else if (S.screen === "note") m.innerHTML = renderNote();
   else if (S.screen === "qg") m.innerHTML = renderQG();
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
   else if (S.screen === "board") { m.innerHTML = renderBoard(); requestAnimationFrame(drawArrows); }
@@ -5361,28 +5770,61 @@ function addOnCanvas(tool, x, y) {
 }
 
 /* ---------- clicks ---------- */
-function go(screen) { S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
+function go(screen, keep) { if (!keep) S.hist = []; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
 document.addEventListener("click", e => {
   if (S.skipClick) { S.skipClick = false; return; }
   const a = e.target.closest("[data-act]");
   if (a && a.tagName === "A") e.preventDefault();
-  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick"].includes(a.dataset.act))) closeMenu();
+  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick", "nbmenu", "aboutpick", "sellink", "addmargin"].includes(a.dataset.act))) closeMenu();
   const line = e.target.closest("[data-arrow]");
   if (line && S.screen === "board") { openArrow(line.dataset.arrow, e.clientX, e.clientY); return; }
   if (!e.target.closest("#apop") && !$("#apop").hidden) closeApop();
+  const men = e.target.closest("[data-mention]");
+  if (men) { e.preventDefault(); mentionPop(men); return; }
+  if (pick && !e.target.closest("#pick")) hidePick();
   if (!a) { if (e.target.closest("a[href='#']")) e.preventDefault(); return; }
   const d = a.dataset;
   switch (d.act) {
-    case "field": S.field = d.k; S.board = DB[d.k].start; S.type = "all"; S.col = null; S.has = null; S.q = ""; S.sel = null; S.view = { x: 20, y: 10, z: .8 }; go(S.screen === "item" || S.screen === "customize" ? "wall" : S.screen); break;
-    case "go": if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
+    case "field": S.ed = null; if (S.screen === "note") S.item = DB[d.k].page; S.field = d.k; S.board = DB[d.k].start; S.type = "all"; S.col = null; S.has = null; S.q = ""; S.sel = null; S.view = { x: 20, y: 10, z: .8 }; go(S.screen === "item" || S.screen === "customize" ? "wall" : S.screen); break;
+    case "details": S.details = !S.details; render(); break;
+    case "olgo": document.querySelector(`.nb[data-i="${d.i}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }); break;
+    case "nbtail": { const bl = S.ed.blocks; if (!(bl.at(-1).t === "p" && !bl.at(-1).text.trim())) { bl.push({ t: "p", text: "" }); edRender(bl.length - 1, "start"); } else focusBlock(bl.length - 1, "start"); break; }
+    case "nbadd": { const i = +d.i; S.ed.blocks.splice(i + 1, 0, { t: "p", text: "" }); edRender(i + 1, "start"); showPick("slash", i + 1, "", document.querySelector(`.nb[data-i="${i + 1}"] .nb-t`)); break; }
+    case "nbmenu": e.stopPropagation(); menuKey = +d.i; openMenu(a, blockMenu(+d.i)); break;
+    case "nbturn": { const b = S.ed.blocks[menuKey], i = menuKey; b.t = d.v; if (b.text == null) b.text = ""; closeMenu(); commit(); edRender(i, "end"); break; }
+    case "nbmove": { const i = menuKey, j = i + +d.d, bl = S.ed.blocks; closeMenu(); if (j < 0 || j >= bl.length) break; [bl[i], bl[j]] = [bl[j], bl[i]]; commit(); edRender(); break; }
+    case "nbdup": { const bl = S.ed.blocks, i = menuKey; bl.splice(i + 1, 0, { ...bl[i] }); closeMenu(); commit(); edRender(); break; }
+    case "nbdel": { const bl = S.ed.blocks, b = bl[menuKey]; bl.splice(menuKey, 1); closeMenu(); commit(); edRender(); toast(b.t === "card" ? "Card removed. The entry is still in Commonplace." : "Block deleted."); break; }
+    case "nbmargin": { const b = S.ed.blocks[menuKey]; closeMenu(); addMargin(b); break; }
+    case "nbimgset": { const bl = S.ed.blocks, i = menuKey; bl[i] = { t: "img", media: d.k, cap: bl[i].cap || "" }; if (!bl[i + 1] || !TEXT_T.includes(bl[i + 1].t)) bl.splice(i + 1, 0, { t: "p", text: "" }); closeMenu(); commit(); edRender(); document.querySelector(`.nb[data-i="${i}"] .nb-cap`)?.focus(); toast("Kept with this note. To have it on the wall too, choose Add to Photos in its ⋮⋮ menu."); break; }
+    case "nbimgreplace": { const k = menuKey; openMenu(document.querySelector(`.nb[data-i="${k}"]`), imgMenu()); menuKey = k; break; }
+    case "nbcardset": { const bl = S.ed.blocks, i = menuKey; bl[i] = { t: "card", id: d.id }; if (!bl[i + 1] || !TEXT_T.includes(bl[i + 1].t)) bl.splice(i + 1, 0, { t: "p", text: "" }); closeMenu(); commit(); edRender(i + 1, "start"); toast(`${I(d.id).title} is shown here as a card. Its page lists this note under Mentioned in.`); break; }
+    case "nbcardline": { const bl = S.ed.blocks, i = menuKey, x = I(bl[i].id); bl[i] = { t: "p", text: x ? `@[${x.title}](item:${x.id})` : "" }; closeMenu(); commit(); edRender(i, "end"); break; }
+    case "unmention": { const { bi, id } = menuKey, b = S.ed.blocks[bi]; b.text = b.text.replace(new RegExp(`@\\[([^\\]]+)\\]\\(item:${id}\\)`), "$1"); closeMenu(); commit(); edRender(bi, "end"); break; }
+    case "mentioncard": { const { bi, id } = menuKey; S.ed.blocks.splice(bi + 1, 0, { t: "card", id }); closeMenu(); commit(); edRender(); break; }
+    case "mentionoffer": { const i = +a.closest(".nb").dataset.i, b = S.ed.blocks[i], x = I(d.id); b.text = b.text.replace(x.title, `@[${x.title}](item:${x.id})`); commit(); edRender(i, "end"); toast(`Linked. ${x.title}'s page lists this under Where it appears › Mentioned in.`); break; }
+    case "aboutpick": { e.stopPropagation(); const it = I(S.item); openMenu(a, mHead("What is this note about?") + D().items.filter(x => x.type === "object" || x.type === "source").map(x => mItem("aboutset", esc(x.title), it.about === x.id, `data-id="${x.id}"`)).join("") + mItem("aboutset", "Nothing in particular", !it.about, 'data-id=""')); break; }
+    case "aboutset": { const it = I(S.item); it.about = d.id || null; closeMenu(); render(); if (d.id) toast(`Listed on ${I(d.id).title}'s page under Notes about it.`); break; }
+    case "writeabout": writeAbout(I(d.id)); break;
+    case "addmargin": { const it = I(S.item); it.margin.push({ at: "", body: "A line beside it, kept with it." }); render(); document.getElementById("notes-about")?.scrollIntoView({ block: "center" }); toast("Margin note added under Notes about it."); break; }
+    case "mnjump": document.getElementById("notes-about")?.scrollIntoView({ behavior: "smooth", block: "center" }); break;
+    case "selfmt": { document.execCommand(d.k); const n = getSelection().anchorNode, el = (n?.nodeType === 1 ? n : n?.parentElement)?.closest(".nb-t"); if (el) edInput(el); break; }
+    case "sellink": e.stopPropagation(); openMenu(a, mHead("Link the selected words to") + D().items.filter(x => x.title && x.id !== S.ed?.id).map(x => mItem("sellinkset", `${esc(x.title)} <small style="color:var(--ink-3)">${esc(kindLabel(x))}</small>`, false, `data-id="${x.id}"`)).join("")); break;
+    case "sellinkset": { const r = S.selRange, x = I(d.id); closeMenu(); if (!r) break; const span = document.createElement("span"); span.className = "mention"; span.contentEditable = "false"; span.dataset.mention = x.id; span.textContent = r.toString().trim() || x.title; r.deleteContents(); r.insertNode(span); const el = span.closest(".nb-t"); S.ed.blocks[+el.dataset.bi].text = ser(el); commit(); edRender(); toast(`Linked to ${x.title}. Its page lists this under Mentioned in.`); break; }
+    case "selask": { const i = S.selBi, b = S.ed.blocks[i]; if (b && TEXT_T.includes(b.t)) { b.t = "question"; commit(); edRender(i, "end"); toast("It's a question now. It shows on Questions and goals, named by this note."); } break; }
+    case "selmargin": addMargin(S.ed.blocks[S.selBi], S.selRange?.toString().trim()); break;
+    case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
+    case "kb": kb(d.k); break;
+
+    case "go": if (d.k === "note") { S.item = DB[S.field].page; S.ed = null; go("note"); } else if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
     case "type": S.type = d.k; S.col = null; go("wall"); break;
     case "col": S.col = d.id; S.type = COL(d.id).shape === "image" ? "image" : COL(d.id).shape; go("wall"); break;
     case "view": COL(S.col).view = d.k; render(); break;
     case "hasmenu": e.stopPropagation(); menuKind = "has"; openMenu(a, mHead("Has") + mItem("has", "Open questions", S.has === "question", 'data-v="question"') + mItem("has", "Goals", S.has === "goal", 'data-v="goal"') + mItem("has", "Anything", !S.has, 'data-v=""') + mItem("go", "See them all →", false, 'data-k="qg"')); break;
     case "has": S.has = d.v || null; closeMenu(); render(); break;
-    case "open": { const it = I(d.id); if (!it) break; if (it.type === "board") { S.board = it.id; go("board"); break; } S.from = S.screen === "board" ? "board" : S.screen === "qg" ? "qg" : "wall"; S.item = d.id; S.editing = null; go("item"); break; }
-    case "openboard": S.board = d.id; go("board"); break;
-    case "back": go(S.from === "board" ? "board" : S.from === "qg" ? "qg" : "wall"); break;
+    case "open": openEntry(d.id); break;
+    case "openboard": pushHist(); S.board = d.id; go("board", true); break;
+    case "back": { const h = S.hist.pop(); if (!h) { go("wall"); break; } Object.assign(S, { item: h.item, board: h.board }); S.ed = null; go(h.screen, true); break; }
     case "customize": if (S.screen === "item") S.col = I(S.item).col; go("customize"); break;
     case "ccol": S.col = d.id; render(); break;
     case "stmenu": e.stopPropagation(); menuKey = d.k; openMenu(a, stMenu(d.k)); break;
@@ -5422,8 +5864,8 @@ document.addEventListener("dblclick", e => {
   const el = e.target.closest("[data-pid]"); if (!el) return;
   const b = I(S.board), p = b.pl.find(x => x.id === el.dataset.pid), r = refOf(p.ref, b);
   if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
-  else if (r.type === "item" && r.it.type === "note") { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
-  else if (r.type === "item") { S.from = "board"; S.item = r.it.id; go("item"); }
+  else if (r.type === "item" && r.it.type === "note" && !r.it.title) { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
+  else if (r.type === "item") openEntry(r.it.id);
 });
 document.addEventListener("change", e => {
   const t = e.target, c = COL(S.col);
@@ -5440,6 +5882,9 @@ document.addEventListener("input", e => {
   if (t.id === "q") { S.q = t.value; const pos = t.selectionStart; m_render_keep(pos); return; }
   if (t.dataset.fname) { FLD(c, t.dataset.fname).label = t.value; return; }
   if (t.dataset.cf) { c[t.dataset.cf] = t.value; return; }
+  if (t.dataset.cfw) { c.write = t.value.split(",").map(x => x.trim()).filter(Boolean); return; }
+  if (t.classList?.contains("ip-title-field") && I(S.item) && (S.screen === "note" || S.screen === "item")) { I(S.item).title = t.value.replace(/\n/g, " "); t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; return; }
+  const nt = t.closest?.(".nb-t"); if (nt) { edInput(nt); return; }
   atInput(e);
 });
 function m_render_keep(pos) { render(); const q = $("#q"); if (q) { q.focus(); q.setSelectionRange(pos, pos); } }
@@ -5476,7 +5921,9 @@ document.addEventListener("keydown", e => {
     if (e.key === "q" || e.key === "g") { e.preventDefault(); chooseAt(e.key === "q" ? "question" : "goal"); return; }
     if (e.key === "Escape") { hideAt(); return; }
   }
-  const t = e.target;
+  const t = e.target, nbt = t.closest?.(".nb-t");
+  if (nbt) { edKey(e, nbt); return; }
+  if (t.classList?.contains("ip-title-field") && e.key === "Enter" && S.screen === "note") { e.preventDefault(); focusBlock(0, "start"); return; }
   if (t.id === "mdedit" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveBody(); return; }
   if (t.dataset?.qedit && e.key === "Enter") { e.preventDefault(); t.blur(); return; }
   if (/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
@@ -5494,6 +5941,58 @@ document.addEventListener("dragstart", e => { const c = e.target.closest?.("[dat
 document.addEventListener("dragover", e => { const col = e.target.closest?.(".ccol"); if (!col || !S.drag) return; e.preventDefault(); document.querySelectorAll(".ccol.over").forEach(x => x !== col && x.classList.remove("over")); col.classList.add("over"); });
 document.addEventListener("drop", e => { const col = e.target.closest?.(".ccol"); if (!col || !S.drag) return; e.preventDefault(); const o = I(S.drag); o.v[col.dataset.f] = col.dataset.drop ? [col.dataset.drop] : []; S.drag = null; render(); toast(`${o.title} → ${col.dataset.drop || "none"}`); });
 document.addEventListener("dragend", () => { S.drag = null; document.querySelectorAll(".ccol.over").forEach(x => x.classList.remove("over")); });
+
+/* ---------- moving between entries: one history, so ← always names where it goes ---------- */
+function pushHist() { S.hist.push({ screen: S.screen, item: S.item, board: S.board }); }
+function openEntry(id) { const it = I(id); if (!it) return; closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
+function mentionPop(el) {
+  const x = I(el.dataset.mention), bi = el.closest(".nb-t")?.dataset.bi;
+  menuKey = { bi: bi == null ? null : +bi, id: el.dataset.mention };
+  openMenu(el, x ? `<div class="mpop">${card(x, { noMore: true })}</div>` + mItem("open", "Open ↗", false, `data-id="${x.id}"`) + (bi != null ? mItem("mentioncard", "Show it as a card below", false) + mItem("unmention", "Unlink, keep the words", false) : "") : mHead("This entry was deleted") + (bi != null ? mItem("unmention", "Keep the words, remove the link", false) : ""));
+}
+function addMargin(b, q) {
+  const it = I(S.ed.id), t = plainText(b?.text || b?.cap || "");
+  it.margin.push({ at: "¶ " + t.slice(0, 26) + (t.length > 26 ? "…" : ""), block: t.slice(0, 40), body: q ? `On “${q.slice(0, 80)}”: check this against the section drawing.` : "Check this against the section drawing." });
+  $("#selbar").hidden = true; edRender(); toast("Margin note added beside this block (✎). It's listed under Notes about it.");
+}
+function writeAbout(x) {
+  if (!x) return;
+  const c = x.type === "object" ? COL(x.col) : null, heads = c?.write?.length ? c.write : ["Notes"];
+  const nid = "w" + Date.now(), body = [`::card[](item:${x.id})`, ...heads.map(h => `## ${h}`)].join("\n\n");
+  D().items.unshift(note(nid, "essays", `On ${x.title}`, body, { about: x.id, topics: x.topics }));
+  pushHist(); S.item = nid; S.ed = { id: nid, blocks: toBlocks(body).flatMap(b => b.t === "h2" ? [b, { t: "p", text: "" }] : [b]) };
+  go("note", true); focusBlock(2, "start");
+  toast(`A long note about ${x.title}${c ? `, started from the ${c.name} template` : ""}. It's listed on its page under Notes about it.`);
+}
+/* blocks: drag by ⋮⋮ */
+document.addEventListener("dragstart", e => { const g = e.target.closest?.(".nb-grip"); if (!g) return; S.dragB = +g.dataset.i; e.dataTransfer.setData("text/plain", "block"); e.dataTransfer.effectAllowed = "move"; const nb = g.closest(".nb"); e.dataTransfer.setDragImage(nb, 20, 12); nb.classList.add("dragging"); });
+document.addEventListener("dragover", e => { if (S.dragB == null) return; const nb = e.target.closest?.(".nb"); if (!nb) return; e.preventDefault(); const r = nb.getBoundingClientRect(), below = e.clientY > r.top + r.height / 2; document.querySelectorAll(".nb.drop-above,.nb.drop-below").forEach(x => x.classList.remove("drop-above", "drop-below")); nb.classList.add(below ? "drop-below" : "drop-above"); });
+document.addEventListener("drop", e => { if (S.dragB == null) return; e.preventDefault(); const nb = e.target.closest?.(".nb"); if (nb) { const bl = S.ed.blocks, from = S.dragB, to = +nb.dataset.i + (nb.classList.contains("drop-below") ? 1 : 0), [b] = bl.splice(from, 1); bl.splice(to > from ? to - 1 : to, 0, b); commit(); } S.dragB = null; edRender(); });
+document.addEventListener("dragend", () => { if (S.dragB != null) { S.dragB = null; edRender(); } });
+document.addEventListener("paste", e => { const el = e.target.closest?.(".nb-t"); if (!el) return; e.preventDefault(); document.execCommand("insertText", false, (e.clipboardData.getData("text/plain") || "").replace(/\s*\n\s*/g, " ")); });
+$("#pick").addEventListener("mousedown", e => { e.preventDefault(); const b = e.target.closest("[data-pk]"); if (b && pick) choosePick(+b.dataset.pk); });
+$("#selbar").addEventListener("mousedown", e => e.preventDefault());
+document.addEventListener("selectionchange", () => {
+  const bar = $("#selbar"), sel = getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) { if (!bar.matches(":hover")) bar.hidden = true; return; }
+  const n = sel.anchorNode, el = (n?.nodeType === 1 ? n : n?.parentElement)?.closest(".nb-t:not(.nb-cap)");
+  if (!el || !el.contains(sel.focusNode)) { bar.hidden = true; return; }
+  const r = sel.getRangeAt(0).getBoundingClientRect(); S.selRange = sel.getRangeAt(0).cloneRange(); S.selBi = +el.dataset.bi;
+  bar.hidden = false; bar.style.left = Math.max(16, Math.min(r.left + r.width / 2 - bar.offsetWidth / 2, innerWidth - bar.offsetWidth - 16)) + "px"; bar.style.top = Math.max(8, r.top - bar.offsetHeight - 10) + "px";
+});
+/* phones: a writing bar above the keyboard instead of the hover handles */
+document.addEventListener("focusin", e => { const el = e.target.closest?.(".nb-t"); if (el && innerWidth < 700) { $("#kbar").hidden = false; S.kbEl = el; } });
+document.addEventListener("focusout", e => { if (e.target.closest?.(".nb-t")) setTimeout(() => { if (!document.activeElement?.closest?.(".nb-t")) $("#kbar").hidden = true; }, 200); });
+$("#kbar").addEventListener("mousedown", e => e.preventDefault());
+function kb(k) {
+  const el = document.activeElement?.closest?.(".nb-t") || S.kbEl; if (!el || !S.ed) return;
+  const i = +el.dataset.bi, b = S.ed.blocks[i];
+  if (k === "done") { el.blur(); $("#kbar").hidden = true; return; }
+  if (k === "menu") { menuKey = i; openMenu(el, blockMenu(i)); return; }
+  if (k === "question" || k === "goal") { if (TEXT_T.includes(b.t)) { b.t = k; commit(); edRender(i, "end"); } return; }
+  if (k === "slash") { S.ed.blocks.splice(i + 1, 0, { t: "p", text: "" }); edRender(i + 1, "start"); showPick("slash", i + 1, "", document.querySelector(`.nb[data-i="${i + 1}"] .nb-t`)); return; }
+  if (k === "at") { const before = el.textContent.slice(0, caretOff(el)); document.execCommand("insertText", false, (before && !/\s$/.test(before) ? " " : "") + "@"); }
+}
 
 S.board = DB[S.field].start;
 render();

@@ -8,7 +8,8 @@ HIGH (a programme of five stages across six lanes; each phase states its own tie
 **Joins three designs into one order:**
 - [Objects: build phases](2026-10-25-objects-build-phases.md) (fields, page, views, types: lanes F, P, V, T);
 - [Questions and goals roadmap](2026-10-25-questions-and-goals-roadmap-design.md) and its [design](2026-10-25-questions-and-goals-inside-items-design.md) (lane Q);
-- [Boards](2026-10-24-boards-design.md) (lane B).
+- [Boards](2026-10-24-boards-design.md) (lane B);
+- [Long notes and connections](2026-10-28-long-notes-and-connections-design.md) (lane N, added 28 October: the writing page, and the three ways things connect).
 
 Each of those documents keeps its detail and its reasoning. This one decides **the order**, **where they meet**, and the few rules that change because they meet.
 
@@ -58,6 +59,8 @@ flowchart LR
 | **3 · Loci uses them** | **Q5** Loci reads, explains, offers | **F3** Group, Place, Event bases (migration) | — | — | **T3** Sensitivity, Loci drafts a collection (migration) | — |
 | **4 · Boards** | **Q-B** Questions and goals on boards | — | — | — | — | **B1** Boards as entries (migration) · **B2** Viewer · **B3** Learn on a board (migration) · **B4** Boards in Loci (migration) |
 
+**Lane N · Long notes and connections** (added 28 October) runs beside these: **N1** the writing page and editor in Stage 1, **N2** mentions, entry cards, images and the shared *Where it appears* in Stage 2 (with F2), **N3** *Write about it* and margin notes on a block from Stage 2 into 3, and **N4** Loci in the writing in Stage 3. Detail, the connection model and its decisions (LN-D1 to LN-D9) are in [its design](2026-10-28-long-notes-and-connections-design.md).
+
 **Why questions and goals come first.** Q1 needs no migration: the words live in the note's own text, so learners start the habit on day one, and every later lane reads what they wrote. Q2 and Q3 run beside the field work in Stage 1. By the time Objects get relation fields (Stage 2), *Answered in* already exists for them to join.
 
 **Why boards come last.** A board is where everything else is placed. It needs the photo roadmap's header, viewer and Picks (Boards design §1); question and goal inlines (Q2), so its goal and questions are inlines from the start and nothing is migrated twice; and relation fields (F2), so *Keep as a field* and field links work. Building it earlier means building its own goal field and question notes and then replacing them, which Boards design §0 and IN-D7 already ruled out.
@@ -66,6 +69,7 @@ flowchart LR
 - Agent A: Q1 → Q2 → Q4 → Q-O → Q5 → Q-B.
 - Agent B: F0 → F1 → F2 → F3.
 - Agent C (from Stage 1): P0 → P1 → V1 → P2 → V2.
+- Agent D (from Stage 1, after Q1 merges): N1 → N2 → N3 → N4.
 - The small T phases slot in wherever an agent waits for a migration approval. Lane B starts after Stage 2 and the photo roadmap's Phase 7, and is one agent's lane from then on.
 
 **Migrations are numbered at merge.** Each lane owns its tables (Q: `item_inlines`, `inline_answers`; F: `collection_fields`, `item_field_values`, `content_relations.field_id`; P: `collections.page_layout`; V: `library_views`; T: `collections.base` checks, `collections.sensitivity`; B: `board_placements`, `board_arrows`, `board_frames`, the `board` shape). Branches name their file `00xx_<lane>_<what>.sql` and take the next number when they merge, and each one is applied only on the owner's word (`AGENTS.md`).
@@ -131,6 +135,7 @@ Boards design §3 stands, with what Stages 0–3 already built folded in. The ta
 
 | Rule | Why |
 |---|---|
+| **Three kinds of connection, each made in one place** (lane N): a *mention* in the writing, a *property* in the rail, an *arrow* on a board. Every page shows them the same way: the rail says what it is, the foot says where it shows up | So a learner always knows where to look and where to change it, and the code has one writer per kind (Long notes design §2) |
 | **An arrow never writes a field, and a field never draws an arrow.** *Keep as a field* is one tap; field links are dashed and can't be edited on the board | An arrow is a claim on one board (Boards §2.1); a field is a fact everywhere. Mixing them makes both unreliable |
 | **A question has one host.** Placing a note's question on a board places a *view* of it ("from *Seminar notes*"); its status is the same everywhere | One question, everywhere (IN rule 3) |
 | **Answered in points at items, Lumens or boards** | A question is often answered by an Object, sometimes by a whole board |

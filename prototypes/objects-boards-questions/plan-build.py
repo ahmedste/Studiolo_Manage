@@ -13,7 +13,8 @@ PARTS = [
     ("objects", "Part 1 · Objects: build phases", "2026-10-25-objects-build-phases.md"),
     ("questions", "Part 2 · Questions and goals: the roadmap", "2026-10-25-questions-and-goals-roadmap-design.md"),
     ("questions-design", "Part 3 · Questions and goals: the design", "2026-10-25-questions-and-goals-inside-items-design.md"),
-    ("boards", "Part 4 · Boards", "2026-10-24-boards-design.md"),
+    ("long-notes", "Part 4 · Long notes and connections", "2026-10-28-long-notes-and-connections-design.md"),
+    ("boards", "Part 5 · Boards", "2026-10-24-boards-design.md"),
 ]
 ARTIFACTS = {
     "prototypes/objects-boards-questions": "https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b",

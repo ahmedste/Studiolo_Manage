@@ -9,7 +9,7 @@ You're reviewing design prototypes for **Studiolo**, a learning app. Its library
 Read the plan first, then test the prototypes against it.
 
 1. **The plan (read first):** https://claude.ai/artifact/Hc7B9N1X7kmCELnew6qbNi
-   The build order for three features. It starts with the programme (the order, and where the features meet), then has each design in full: Objects, Questions and goals (roadmap, then design), and Boards last.
+   The build order. It starts with the programme (the order, and where the features meet), then has each design in full: Objects, Questions and goals (roadmap, then design), Long notes and connections, and Boards last.
 2. **Main prototype, Objects + boards + questions and goals:** https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b
    The end state, drawn in the current real Commonplace screens. Switch Architect, Lawyer and Doctor in the bar at the bottom; **Board**, **Questions** and **Customize** jump between screens.
 3. **Objects, phase by phase:** https://claude.ai/artifact/3sJpPHVcPMUJiDgA7MpCTH
@@ -22,7 +22,10 @@ Read the plan first, then test the prototypes against it.
 - On the lawyer's board, click the arrow *Robinson explains "Is Caparo still a test?"* and accept **Mark answered in Robinson**. Then double-click Robinson. Is the question listed under **Answers**? Is it marked answered on **Questions and goals**?
 - Change any question's status from the board's **Inside** panel. Does it change on the Object's page and on the list?
 - Use **?** to ask a question on the canvas, and **✎** to write a note that contains `@question …`. Do both appear on **Questions and goals**, named by where they were written?
-- Open an Object's page, choose **Edit**, and type `@` at the start of a paragraph. Does the menu insert a question or goal correctly?
+- Open **Long note** (bar at the bottom). Type `/` in an empty line and add a heading, an image and an entry card. Type `@` and part of a name mid-sentence: does it link the entry? Select some words: do **Link to entry**, **Ask about this** and **Margin note** do what they say? Drag a block by **⋮⋮**.
+- Click the **Hassan Fathy** mention and open him. Under **Where it appears › Mentioned in**, is the sentence shown, and does the row open the note?
+- On any building, choose **Write about it**. Does the new note start with the building's card and the collection's headings, and is it listed under **Notes about it** when you go back?
+- Is it always clear where to go to change a connection? Write down any moment when it wasn't.
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
 - On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
 - Turn on **Show phases**. Does each part's phase label match the plan?
@@ -32,7 +35,7 @@ Read the plan first, then test the prototypes against it.
 **Then review the plan:**
 - Is the order sound? Questions and goals come first and Boards last. Are the dependencies right?
 - Can the lanes really run in parallel?
-- Are any of the decisions (OQB-D1 to D8) wrong?
+- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9) wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
 
 **Report in four parts:**
 1. Bugs, with steps to reproduce.
