@@ -1,0 +1,343 @@
+<title>Learner Memory Build Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="What to give the coding agent: six phases, and the first one in detail.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Studiolo's own palette and faces (warm paper, fine rules, restrained ultramarine). Layout: a contents rail beside one reading column; diagrams and tables may run wider. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #8e99a1; --accent: #1e3e9e; --accent-soft: #e6ebf8;
+  --save: #2f6b4a; --call: #1e3e9e; --edit: #9a3b2e;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; } }
+:root[data-theme="dark"] { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding-block: 40px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 960px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 24px 64px; } }
+nav.toc { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; font-size: 13px; }
+nav.toc h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: flex; gap: 10px; padding: 4px 8px; margin-left: -8px; border-radius: 3px; color: var(--ink-2); text-decoration: none; }
+nav.toc a:hover { background: var(--panel); color: var(--ink); }
+nav.toc a span { color: var(--ink-3); font-variant-numeric: tabular-nums; min-width: 1ch; }
+@media (max-width: 960px) { nav.toc { position: static; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); } nav.toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { nav.toc ol { grid-template-columns: minmax(0, 1fr); } }
+main { min-width: 0; }
+.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+h1 { font-family: var(--read); font-weight: 400; font-size: clamp(30px, 5vw, 42px); line-height: 1.1; margin: 0 0 18px; text-wrap: balance; letter-spacing: -0.01em; }
+.intro { display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); font-size: 13.5px; color: var(--ink-2); max-width: 760px; }
+.intro p { margin: 0; }
+.intro strong { color: var(--ink); }
+.paths { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 0 0; font-size: 13px; color: var(--ink-2); }
+.paths b { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.paths i { width: 22px; height: 0; border-top: 2px solid var(--save); display: inline-block; }
+.paths .c i { border-top: 2px dashed var(--call); } .paths .e i { border-top: 4px solid var(--edit); }
+main h2 { font-family: var(--read); font-weight: 500; font-size: 27px; line-height: 1.2; margin: 56px 0 14px; padding-top: 22px; border-top: 1px solid var(--line); text-wrap: balance; scroll-margin-top: 16px; }
+main h3 { font-size: 15px; font-weight: 600; margin: 32px 0 8px; text-wrap: balance; scroll-margin-top: 16px; }
+main p, main li { max-width: 68ch; }
+main p { margin: 0 0 12px; }
+main ol, main ul { padding-left: 22px; margin: 0 0 14px; display: grid; gap: 6px; }
+main li::marker { color: var(--ink-3); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+strong { font-weight: 600; }
+.tbl { overflow-x: auto; margin: 6px 0 18px; border: 1px solid var(--line); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); background: var(--paper); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td { font-variant-numeric: tabular-nums; min-width: 120px; }
+.dia { margin: 10px 0 22px; padding: 18px; border: 1px solid var(--line); background: var(--panel); overflow-x: auto; }
+.dia pre.mermaid { margin: 0; background: none; text-align: center; font-family: var(--ui); }
+.dia pre.mermaid svg { max-width: 100%; height: auto; }
+blockquote { margin: 0 0 14px; padding: 4px 16px; border-left: 2px solid var(--accent); font-family: var(--read); font-size: 17px; }
+.foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#0-what-to-read-in-this-order"><span>0</span>What to read, in this order</a></li><li><a href="#1-the-phases"><span>1</span>The phases</a></li><li><a href="#2-l1-in-detail-settings-tabs-and-instructions"><span>2</span>L1 in detail: Settings tabs and Instructions</a></li><li><a href="#3-l2-in-outline-the-next-spec"><span>3</span>L2 in outline (the next spec)</a></li><li><a href="#4-rules-every-phase-keeps"><span>4</span>Rules every phase keeps</a></li><li><a href="#5-decisions-for-the-owner"><span>5</span>Decisions for the owner</a></li><li><a href="#6-what-changed-since-the-design-24-28-october"><span>6</span>What changed since the design (24 → 28 October)</a></li></ol></nav>
+  <main>
+    <p class="kicker">Studiolo · learner memory · proposed</p>
+    <h1>Learner memory: the build brief</h1>
+    <div class="intro"><p>HIGH (a programme of six phases; L1 is MEDIUM, L2 onwards HIGH; each phase states its own tier)</p><p></p><p></p><p><strong>For:</strong> the coding agent who builds learner memory in <code>studiolo</code>, and the owner who approves each phase.</p><p><strong>Status:</strong> The owner asked on 28 October 2026 to start this next. That sets the direction; it doesn&#39;t approve each decision. Under <code>AGENTS.md</code>, the agent writes its own spec and plan for <strong>L1</strong>, the owner approves it, and nothing merges or migrates without the owner&#39;s word in the conversation.</p><p><strong>Checked against:</strong> <code>studiolo</code> main @ <code>7c0e8732</code> (28 October 2026), read only. Every path below exists on that commit unless marked <em>new</em>. Line numbers are as of that commit; re-check before relying on them.</p></div>
+    
+    <h2 id="0-what-to-read-in-this-order">0. What to read, in this order</h2>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>Read</th>
+<th>For</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td><strong>This brief</strong></td>
+<td>Scope, order, the first phase in detail</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">Design spec</a>: §0, §2, §4 (especially §4.4, <em>Show less</em>), §5, §6, §9</td>
+<td>What and why: cards on the map, the four depths, the slice, the Settings tabs</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">System reference</a> (<a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">readable page</a>)</td>
+<td>How: every Save, Call and Edit step, the tables, costs, invariants and function names</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Prototype</a> and <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener"><code>prototypes/settings-memory/</code></a></td>
+<td>What it looks like and how it behaves. Turn on <strong>Builder</strong> for the slice</td>
+</tr>
+<tr>
+<td>5</td>
+<td>In <code>studiolo</code>: <code>AGENTS.md</code>; <code>project-docs/workflow/README.md</code> (tiers, temporary switches); <code>project-docs/product/mvp-scope.md</code> → <em>Learner context and personalization</em>; <code>project-docs/architecture/data-model.md</code> → <em>Learner context and explainer records</em>; <code>project-docs/implementation/ai.md</code> → <em>Copilot → Context</em> and <em>The learner line</em>; <code>project-docs/design/interface.md</code> → <em>Learner instructions and memory</em></td>
+<td>The agreed scope this must not break, and the house rules</td>
+</tr>
+</tbody></table></div>
+<p>The design spec and the system reference stay the source of truth for the design. This brief decides <strong>order and scope</strong>; where it narrows a phase, this brief wins.</p>
+<h2 id="1-the-phases">1. The phases</h2>
+<p>Each phase is useful on its own and ships on its own branch.</p>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>Phase</th>
+<th>What the learner gets</th>
+<th>Tier</th>
+<th>Migration</th>
+<th>Switch (temporary)</th>
+<th>Needs</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>L1</strong></td>
+<td><strong>Settings tabs and Instructions</strong></td>
+<td>Settings gets <strong>Profile · Learning · Privacy &amp; data</strong>. Profile gains <em>What you do</em>, spelling and units, and the full time-zone list. Learning has four preferences and two instruction boxes. <strong>Loci and every Lumen read them</strong></td>
+<td>MEDIUM</td>
+<td>yes (one)</td>
+<td><code>LEARNER_INSTRUCTIONS</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>L2</strong></td>
+<td><strong>Memory you can see and set</strong></td>
+<td>The <strong>Memory</strong> tab (Glance and Open, §4.4), cards on the map, the <strong>level dial</strong>, onboarding answers turned into the first entries, <strong>Tell Loci…</strong> notes on topics, the one line on a topic&#39;s panel, <strong>For you</strong> on Lumens, the memory toggle, Delete all. The slice reads by place, sent once per conversation</td>
+<td>HIGH</td>
+<td>yes</td>
+<td><code>LEARNER_MEMORY</code></td>
+<td>L1</td>
+</tr>
+<tr>
+<td><strong>L3</strong></td>
+<td><strong>Loci remembers what you tell it</strong></td>
+<td>The copilot&#39;s <code>remember</code> tool, <strong>Remembered: …</strong> with <strong>Undo</strong>, and <strong>Why?</strong> pointing at the message</td>
+<td>HIGH</td>
+<td>yes (evidence links)</td>
+<td><code>LEARNER_MEMORY</code></td>
+<td>L2</td>
+</tr>
+<tr>
+<td><strong>L4</strong></td>
+<td><strong>Rules and suggestions</strong></td>
+<td>Evidence from finished Lumens, ratings, <strong>Too basic · Too advanced</strong> and Live taps; the threshold rules; <strong>Waiting for you</strong>; the one-question rule (Q1, Q2, Q4–Q7); roll-ups and expiry</td>
+<td>HIGH</td>
+<td>yes</td>
+<td><code>MEMORY_RULES</code></td>
+<td>L3</td>
+</tr>
+<tr>
+<td><strong>L5</strong></td>
+<td><strong>The scribe</strong></td>
+<td>Free text the copilot didn&#39;t catch, read by Haiku 5.5 per place in batches, behind the 20-history evaluation (design §12)</td>
+<td>HIGH</td>
+<td>yes (queue)</td>
+<td><code>MEMORY_SCRIBE</code></td>
+<td>L4</td>
+</tr>
+<tr>
+<td><strong>L6</strong></td>
+<td><strong>Checks and goals</strong></td>
+<td>Stage 4 checks write <em>you showed</em> (course engine §6.3); active goals suggest <code>why</code> (questions-and-goals roadmap <strong>Q5b</strong>)</td>
+<td>HIGH</td>
+<td>with Stage 4 / Q2</td>
+<td>per slice</td>
+<td>L4, Stage 4, Q2</td>
+</tr>
+</tbody></table></div>
+<p><strong>Why this order:</strong></p>
+<ul>
+<li><strong>L1 changes what the AI reads, safely.</strong> It replaces today&#39;s onboarding line with a richer &quot;you&quot; block at the two places that read it. Every later phase only adds lines to that same block.</li>
+<li><strong>L2 is where it becomes memory.</strong> It&#39;s the biggest phase, but it has no AI writing anything: everything on a card comes from onboarding, from Settings, or from the learner&#39;s own taps. That makes it easy to test and impossible to get creepy.</li>
+<li><strong>L3–L5 add writing in order of risk:</strong> the learner&#39;s own words first, then fixed rules, then a model.</li>
+</ul>
+<h2 id="2-l1-in-detail-settings-tabs-and-instructions">2. L1 in detail: Settings tabs and Instructions</h2>
+<h3 id="21-what-the-learner-gets">2.1 What the learner gets</h3>
+<ol>
+<li><strong>Settings tabs</strong>: <strong>Profile · Learning · Privacy &amp; data</strong>, in the existing <code>DestinationHeader</code>. Memory joins in L2, and Usage when prices and the allowance land (Phase 3D).</li>
+<li><strong>Profile</strong>: display name and time zone, as today; the time zone becomes the full IANA list with search, instead of five zones; plus:<ul>
+<li><strong>What you do</strong>: the onboarding field (chips plus the learner&#39;s own words). It edits the <strong>same onboarding row</strong> the map&#39;s note card edits, so there is one record and two ways in (decision M-D8).</li>
+<li><strong>Spelling</strong> (British · American) and <strong>units</strong> (Metric · Imperial).</li>
+</ul>
+</li>
+<li><strong>Learning</strong>: four preferences and two boxes, as in the prototype:<ul>
+<li><strong>Start with</strong> (Watch · Listen · Read), <strong>Length</strong> (Short · Standard · Long), <strong>Quick checks</strong> (Often · Sometimes · Never), <strong>Examples from my field</strong> (on/off);</li>
+<li><strong>About me and my work</strong> and <strong>How I like to be taught</strong>, each at most 1,000 characters.</li>
+</ul>
+</li>
+<li><strong>Privacy &amp; data</strong>: today&#39;s analytics row moves here unchanged, with the &quot;What Loci never notes&quot; list (design §4.2) as plain text. Export and Delete account stay out of L1.</li>
+<li><strong>The effect.</strong> From the next Loci turn and the next Lumen, the AI reads the learner&#39;s preferences and instructions beside today&#39;s onboarding line. Nothing on screen announces it.</li>
+</ol>
+<h3 id="22-where-it-goes-in-the-code">2.2 Where it goes in the code</h3>
+<div class="tbl"><table><thead><tr>
+<th>What</th>
+<th>Where today (main @ <code>7c0e8732</code>)</th>
+<th>L1 change</th>
+</tr>
+</thead><tbody><tr>
+<td>Settings tabs</td>
+<td><code>src/components/shell/destinations.ts:50</code>, <code>settings: [{ href: &quot;/settings&quot;, label: &quot;Profile&quot; }]</code></td>
+<td>Three sections; routes <code>/settings</code>, <code>/settings/learning</code> <em>new</em>, <code>/settings/privacy</code> <em>new</em></td>
+</tr>
+<tr>
+<td>Profile page</td>
+<td><code>src/app/(workspace)/settings/page.tsx</code>; <code>src/features/settings/{schema,repository,preferences-form,preferences-state}.ts(x)</code></td>
+<td>Add the fields; keep the version check and the conflict view that Profile already has</td>
+</tr>
+<tr>
+<td>Privacy row</td>
+<td><code>src/features/settings/privacy-setting.tsx</code></td>
+<td>Moves to <code>/settings/privacy</code> unchanged</td>
+</tr>
+<tr>
+<td>Onboarding answers</td>
+<td><code>studiolo.onboarding</code> (<code>drizzle/0022_onboarding.sql</code>); <code>src/features/onboarding/answers.ts</code>, <code>learner.ts</code></td>
+<td>Profile&#39;s <em>What you do</em> writes <code>field_key</code> / <code>field_text</code> through the onboarding module&#39;s own update, not a second copy</td>
+</tr>
+<tr>
+<td>Learner line reads</td>
+<td><code>src/features/copilot/store.ts:229</code> and <code>src/features/explainers/repository.ts:328</code>, both <code>readLearnerLine(tx, accountId)</code></td>
+<td>Both call <em>new</em> <code>readLearnerContext(tx, accountId)</code> instead (§2.4)</td>
+</tr>
+<tr>
+<td>Copilot context</td>
+<td><code>src/features/copilot/context.ts:20–29</code> (<code>learner</code> section, <code>learnerSection</code>)</td>
+<td>Same <code>learner</code> key; its <code>line</code> becomes the &quot;you&quot; block; its <code>note</code> says instructions are the learner&#39;s own words and win over everything else</td>
+</tr>
+<tr>
+<td>Lumen brief</td>
+<td><code>src/features/explainers/contract/brief.ts:47–74</code> (<code>learner</code>), rendered as the <code>Learner:</code> line; job input <code>src/features/explainers/job-input.ts:86</code>, <code>learner: z.string().max(600)</code></td>
+<td>Same key and type. <strong>The 600-character cap must rise</strong> (§2.4), which needs a <strong>worker deploy</strong></td>
+</tr>
+</tbody></table></div>
+<p>A new feature folder, <code>src/features/learner/</code> <em>new</em>, owns <code>readLearnerContext</code>, the instruction and preference schemas, and the repository. Settings screens import from it; the copilot and explainers call only <code>readLearnerContext</code>.</p>
+<h3 id="23-data-one-migration-the-agent-proposes-the-number-the-next-free-one-on-main-is-0030">2.3 Data: one migration (the agent proposes the number; the next free one on main is 0030)</h3>
+<div class="tbl"><table><thead><tr>
+<th>Table</th>
+<th>Change</th>
+</tr>
+</thead><tbody><tr>
+<td><code>account_preferences</code> (exists)</td>
+<td>Add <code>spelling</code> (<code>british</code>, <code>american</code>; default <code>british</code>), <code>units</code> (<code>metric</code>, <code>imperial</code>; default <code>metric</code>), <code>learning_prefs</code> (JSON, validated by a Zod schema on read and write; default <code>{}</code>). The row&#39;s existing <code>version</code> covers them</td>
+</tr>
+<tr>
+<td><code>learner_instructions</code> <em>new</em></td>
+<td><code>account_id</code>, <code>id</code>, <code>place_id</code> (null in L1: everywhere; topic notes use it in L2, with an <code>ON DELETE CASCADE</code> foreign key to <code>topics (account_id, id)</code>), <code>kind</code> (<code>about</code>, <code>teaching</code>, <code>topic_note</code>), <code>text</code> (1–1,000 characters), <code>version</code>, timestamps. Unique on <code>(account_id, kind)</code> where <code>place_id</code> is null</td>
+</tr>
+</tbody></table></div>
+<p>Under <code>AGENTS.md</code>: the migration is built and tested on a disposable Neon branch; it reaches shared Dev and production only with the owner&#39;s explicit approval, and code that needs it reaches <code>main</code> only after it has been applied to every hosted database.</p>
+<h3 id="24-the-you-block-what-the-ai-reads">2.4 The &quot;you&quot; block (what the AI reads)</h3>
+<p><code>readLearnerContext</code> returns one string, the <strong>you</strong> part of the design&#39;s slice (§6.1), in plain labelled lines, at most about 120 tokens (about 500 characters) before instructions:</p>
+<pre class="code"><code>you: Architect. British spelling, metric.
+learning: The learner works in architecture. They are learning passive cooling for work and know the basics of it.
+prefers: starts with Watch; short; quick checks sometimes; examples from their field.
+about (their words): "Architect, 8 years, mostly religious and civic buildings in the Gulf…"
+taught (their words): "Diagrams before text. Define a term once, then use it…"</code></pre>
+<p>Rules:</p>
+<ul>
+<li><strong>Same data, same bytes.</strong> A fixed order and fixed wording, so the hash is stable (system reference invariant 10).</li>
+<li><strong>Instructions are quoted as the learner&#39;s words</strong>, escaped like every value today (<code>tagSafeJson</code> in the copilot; <code>escapeValue</code> in the brief).</li>
+<li><strong>Nothing set, nothing sent.</strong> Without preferences or instructions the block is exactly today&#39;s learner line, so an account that never opens Settings sees no change.</li>
+<li><strong>Length.</strong> Each instruction is cut to 400 characters in the block (whole words, with an ellipsis), so the block stays under 1,600 characters. Raise <code>job-input.ts:86</code> from 600 to <strong>1,600</strong> and redeploy the Trigger worker; an older worker would reject the longer string, so the worker deploys <strong>before</strong> the app.</li>
+<li><strong>Cache.</strong> The block goes where the learner line goes today: per-turn data in the copilot&#39;s user message, and the brief&#39;s variable part. The cached system prefix and the author&#39;s cached block don&#39;t change, so no prompt version bump is needed. Check it with the existing pinned-hash tests (<code>tests/unit/copilot-prompt.test.ts</code>).</li>
+<li><strong>Preferences are hints, not options.</strong> <em>Length</em> and <em>Examples from my field</em> become words in the block, not new keys in the explainer options bag (<code>src/features/explainers/options.ts</code>), which stays the Lumen dialog&#39;s own choices. <em>Start with</em> sets the default format in Learn&#39;s Make bar where that choice exists, and is stored either way.</li>
+</ul>
+<h3 id="25-done-when">2.5 Done when</h3>
+<ul>
+<li><input disabled="" type="checkbox"> Settings shows three tabs on desktop and phone, in the existing Settings frame (<code>.preferences-form</code>, <code>.field</code>), with saving, saved, conflict, unavailable and empty states.</li>
+<li><input disabled="" type="checkbox"> Profile&#39;s <em>What you do</em> and the map&#39;s note card edit the same onboarding row; changing one shows in the other.</li>
+<li><input disabled="" type="checkbox"> A saved instruction reaches the <strong>next</strong> copilot turn and the <strong>next</strong> Lumen brief (integration tests, as <code>tests/integration/onboarding-learner-line.test.ts</code> does for the line today).</li>
+<li><input disabled="" type="checkbox"> With nothing set, the copilot context and the brief are <strong>byte-identical</strong> to before (unit test).</li>
+<li><input disabled="" type="checkbox"> The copilot&#39;s cached prefix hash is unchanged (existing pinned test passes untouched).</li>
+<li><input disabled="" type="checkbox"> The worker accepts a 1,600-character learner block, and the app never sends more.</li>
+<li><input disabled="" type="checkbox"> Account isolation: another account&#39;s instructions never appear (integration test).</li>
+<li><input disabled="" type="checkbox"> Docs updated in the same branch: <code>project-docs/implementation/ai.md</code> (<em>The learner line</em> becomes <em>The learner block</em>), <code>frontend.md</code>, <code>backend.md</code>, <code>database.md</code>, and <code>interface.md</code> (Settings).</li>
+<li><input disabled="" type="checkbox"> The prototype&#39;s Learning tab and the built one compared at matching widths (<code>AGENTS.md</code>: fidelity is checked in the browser, not by reading code).</li>
+</ul>
+<h3 id="26-not-in-l1">2.6 Not in L1</h3>
+<p>The Memory tab, cards, the level dial, topic notes, the topic panel line, <strong>For you</strong>, <code>remember</code>, evidence, rules, the scribe, Usage, Export, Delete account and Off the record. They&#39;re L2 and later.</p>
+<h2 id="3-l2-in-outline-the-next-spec">3. L2 in outline (the next spec)</h2>
+<p>The agent writes L2&#39;s own spec after L1 is accepted. Its scope, from the design and the reference:</p>
+<ul>
+<li><strong>Tables:</strong> <code>memory_entries</code>, <code>memory_tombstones</code>, <code>memory_digests</code>, <code>context_snapshots</code> (system reference §2).</li>
+<li><strong>Backfill:</strong> each account&#39;s onboarding answers become entries: the field on <strong>You</strong>, and level and purpose on the first interest&#39;s topic, basis <em>you said</em>.</li>
+<li><strong>Compile on write</strong> (reference §3.4) and <strong><code>learnerSlice</code></strong> (reference §4.1), which replaces <code>readLearnerContext</code> and adds <code>path</code>, <code>here</code>, <code>seen</code>, <code>below</code> and <code>related</code> by place.</li>
+<li><strong>Unified Loci chat.</strong> Since 24 October Loci has one conversation whose turns each carry a place (<code>src/features/copilot/context.ts:12–18</code>). So send-once (reference §4.2) splits in two: the <strong>you</strong> block is sent once per conversation, and the <strong>place</strong> part whenever the turn&#39;s place changes or its hash does.</li>
+<li><strong>Screens:</strong> the Memory tab&#39;s Glance and Open, the level dial, <strong>Tell Loci…</strong> on a topic&#39;s menu, the one line on a topic&#39;s panel (in the shared Loci place core, <code>useLociPlace</code> (<code>src/components/graph/use-loci-place.ts</code>), so the Map and the Palace both get it), <strong>For you</strong> on Lumens from the snapshot, the memory toggle, Delete all.</li>
+<li><strong>The job input grows again</strong> to carry the place part (about 2,400 characters), with another worker deploy before the app.</li>
+</ul>
+<h2 id="4-rules-every-phase-keeps">4. Rules every phase keeps</h2>
+<ol>
+<li><strong>What the learner sees is what Loci reads</strong> (design §4.4). No line reaches a model that the learner can&#39;t open and change.</li>
+<li><strong>Instructions win</strong> over memory, and memory never changes topic status, My Focus, courses, published Lumens or schedules.</li>
+<li><strong>No model reads memory.</strong> Reading is templates and one query; models only write, and only from L3.</li>
+<li><strong>Sensitive categories are never stored</strong> (design §4.2), enforced by a validator in code, not left to a prompt.</li>
+<li><strong>Temporary switches.</strong> Each phase names its switch; the switch and its off side are removed once the owner accepts the phase (<code>project-docs/workflow/README.md</code>, <em>Feature switches are temporary</em>).</li>
+<li><strong>The house rules</strong> of <code>AGENTS.md</code>: own branch, docs in the same branch, local checks (lint, typecheck, unit, <code>check:docs</code>, <code>scripts/check-prototype.cjs</code>, build) before handing over, and no merge, push of <code>main</code>, migration or deploy without the owner&#39;s word.</li>
+</ol>
+<h2 id="5-decisions-for-the-owner">5. Decisions for the owner</h2>
+<p><strong>Before L1 starts</strong> (the agent asks these in its L1 spec; recommendations from the design):</p>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>Decision</th>
+<th>Recommendation</th>
+</tr>
+</thead><tbody><tr>
+<td>M-D3</td>
+<td>Settings tabs: Profile · Learning · Memory · Usage · Privacy &amp; data (L1 ships the first, second and fifth)</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>M-D8</td>
+<td>Onboarding answers editable in Settings as well as on the map&#39;s note card, one record</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>M-D16</td>
+<td>Learning keeps four preferences and two boxes; depth moves to the level dial (L2)</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>B-1</td>
+<td>The learner block&#39;s cap: 1,600 characters, with a worker deploy before the app</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>B-2</td>
+<td>The L1 migration (<code>account_preferences</code> columns and <code>learner_instructions</code>)</td>
+<td>The owner approves it when the spec is ready</td>
+</tr>
+</tbody></table></div>
+<p><strong>Before L2:</strong> M-D1 (memory attached to places on the map), M-D2 (the card&#39;s slots), M-D6 (deleting a topic deletes its cards), M-D7 (retention), M-D9 (<strong>For you</strong> on Lumens), M-D13 (show less), M-D15 (send once). <strong>Before L4:</strong> M-D5, M-D10, M-D14. <strong>Before L5:</strong> M-D12. The design spec&#39;s §13 has each one with its reasoning.</p>
+<h2 id="6-what-changed-since-the-design-24-28-october">6. What changed since the design (24 → 28 October)</h2>
+<ul>
+<li><strong>Feature switches were retired on 27 October</strong> (<code>retire-switches</code>, merged as <code>8cefbcf8</code>), and new ones are temporary by rule. The switch names in §1 follow that rule.</li>
+<li><strong>Loci&#39;s chat is one conversation</strong> with a place per turn (Unified Loci chat). That&#39;s why send-once splits into a &quot;you&quot; part and a place part (§3).</li>
+<li><strong>The Loci place core</strong> (<code>useLociPlace</code> in <code>src/components/graph/use-loci-place.ts</code>, C1 of the 27 October stabilise pass) serves the Map and the Palace, so L2&#39;s topic-panel line goes there once.</li>
+<li><strong>Questions and goals</strong> (Studiolo_Manage, 25 October) plans <strong>Q5b</strong>: an active goal suggests a place&#39;s <code>why</code>. That&#39;s L6 here, after both are built.</li>
+<li><strong>Migrations 0025–0029</strong> have landed; L1&#39;s migration is the next free number.</li>
+</ul>
+
+    <p class="foot">Source: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-28-learner-memory-build-brief.md" target="_blank" rel="noopener">docs/superpowers/specs/2026-10-28-learner-memory-build-brief.md</a> in Studiolo_Manage. Design: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">learner memory and Settings</a>. Prototype: <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Studiolo Learner Memory</a>.</p>
+  </main>
+</div>
