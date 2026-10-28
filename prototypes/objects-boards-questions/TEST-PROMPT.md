@@ -14,8 +14,10 @@ Read the plan first, then test the prototypes against it.
    The end state, drawn in the current real Commonplace screens. Switch Architect, Lawyer and Doctor in the bar at the bottom; **Board**, **Questions** and **Customize** jump between screens.
 3. **Objects, phase by phase:** https://claude.ai/artifact/3sJpPHVcPMUJiDgA7MpCTH
    The real Commonplace with a switch from Today through Phase 3.
-4. **Boards, the original concept:** https://claude.ai/artifact/CVVpm4kM6pshfmURATKXvi
-5. **Objects in any field, the first exploration:** https://claude.ai/artifact/XLHqoBxTXgaCoarmpUmo59
+4. **Linking and collections (read with the plan):** https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4
+   How things link, drawn as diagrams, the problems thought through, backlinks, and the collection studio.
+5. **Boards, the original concept:** https://claude.ai/artifact/CVVpm4kM6pshfmURATKXvi
+6. **Objects in any field, the first exploration:** https://claude.ai/artifact/XLHqoBxTXgaCoarmpUmo59
 
 **Test these flows in the main prototype (2), and say for each whether it works and whether it's clear:**
 - On the architect's board, click the arrow *Hassan Fathy explains New Gourna Village* and accept **Set New Gourna Village's Architect to Hassan Fathy**. Does the dashed field link appear, and does New Gourna's page show the field?
@@ -23,8 +25,11 @@ Read the plan first, then test the prototypes against it.
 - Change any question's status from the board's **Inside** panel. Does it change on the Object's page and on the list?
 - Use **?** to ask a question on the canvas, and **✎** to write a note that contains `@question …`. Do both appear on **Questions and goals**, named by where they were written?
 - Open **Long note** (bar at the bottom). Type `/` in an empty line and add a heading, an image and an entry card. Type `@` and part of a name mid-sentence: does it link the entry? Select some words: do **Link to entry**, **Ask about this** and **Margin note** do what they say? Drag a block by **⋮⋮**.
-- Click the **Hassan Fathy** mention and open him. Under **Where it appears › Mentioned in**, is the sentence shown, and does the row open the note?
+- Click the **Hassan Fathy** mention and open him. Under **Appears in › Mentioned in**, is the sentence shown, and does the row open the note?
 - On any building, choose **Write about it**. Does the new note start with the building's card and the collection's headings, and is it listed under **Notes about it** when you go back?
+- **Collections** tab: make a new collection with **+ New collection**. Are the three steps clear? Then in the studio, try each tab: change the card layout, take a field off the card, hide a section, add a suggested field, delete a field that has values. Did anything feel overwhelming, or did you lose track of what you changed? Does **Undo** do what you expect?
+- On any Object page, click a property's name (e.g. *Architect*). Does it take you to the right place in the studio?
+- Open **Hassan Fathy**, the **Arcade and bay rhythm** photo and the **Climate and Architecture** PDF. Does **↩ Appears in** at the top tell you where each is used? Does each row open the exact spot, highlighted?
 - Is it always clear where to go to change a connection? Write down any moment when it wasn't.
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
 - On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
@@ -35,7 +40,7 @@ Read the plan first, then test the prototypes against it.
 **Then review the plan:**
 - Is the order sound? Questions and goals come first and Boards last. Are the dependencies right?
 - Can the lanes really run in parallel?
-- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9) wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
+- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9, CL-D1 to D9) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
 
 **Report in four parts:**
 1. Bugs, with steps to reproduce.

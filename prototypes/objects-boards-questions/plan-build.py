@@ -14,7 +14,8 @@ PARTS = [
     ("questions", "Part 2 · Questions and goals: the roadmap", "2026-10-25-questions-and-goals-roadmap-design.md"),
     ("questions-design", "Part 3 · Questions and goals: the design", "2026-10-25-questions-and-goals-inside-items-design.md"),
     ("long-notes", "Part 4 · Long notes and connections", "2026-10-28-long-notes-and-connections-design.md"),
-    ("boards", "Part 5 · Boards", "2026-10-24-boards-design.md"),
+    ("collections", "Part 5 · Collections and linking", "2026-10-28-collections-and-linking-design.md"),
+    ("boards", "Part 6 · Boards", "2026-10-24-boards-design.md"),
 ]
 ARTIFACTS = {
     "prototypes/objects-boards-questions": "https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b",
@@ -133,16 +134,27 @@ def convert(md, prefix):
 
 
 def main():
+    build(PARTS, "plan.html", None)
+    build([("collections", "Collections and linking", "2026-10-28-collections-and-linking-design.md")], "linking.html",
+          ("Commonplace Linking and Collections", "How Commonplace links, and how collections are shaped",
+           "The linking model drawn out (what can link to what, which link to use, two sides of one link, links of links), the problems thought through, backlinks on every entry, and the collection studio. Proposed, 28 October 2026."))
+
+
+def build(parts, out, head):
     sections, nav = [], []
-    for pid, label, fname in PARTS:
+    for pid, label, fname in parts:
         md = (SPECS / fname).read_text()
         body, toc = convert(md, pid)
         sections.append(f'<section class="part" aria-labelledby="{pid}"><p class="eyebrow">{html.escape(label)}</p>{body}</section>')
         nav.append(f'<li><a href="#{pid}">{html.escape(label)}</a></li>')
     page = (HERE / "plan.src.html").read_text()
     page = page.replace("<!--NAV-->", "\n".join(nav)).replace("<!--PARTS-->", "\n".join(sections))
-    (HERE / "plan.html").write_text(page)
-    print("plan.html written")
+    if head:
+        title, h1, intro = head
+        page = page.replace("<title>Objects, Questions and Boards Programme</title>", f"<title>{title}</title>")
+        page = page.replace(page[page.index('<header class="top">'):page.index("</header>") + 9], f'<header class="top"><h1>{h1}</h1><p>{intro}</p></header>')
+    (HERE / out).write_text(page)
+    print(out, "written")
 
 
 main()

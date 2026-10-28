@@ -27,7 +27,7 @@ Everything else is not a connection kind: a note's **About** is the note's subje
 
 **Where to look, on every page, always in the same place:**
 - **The rail is what it is:** its properties (fields and named links, both directions) and what's inside it (questions and goals).
-- **The foot is where it shows up:** first **Notes about it** (margin notes and long notes, made here), then **Where it appears** (*Mentioned in*, *Answers*, *On boards*). Each of these is changed where it was made, and each row opens that place.
+- **The foot is where it shows up:** first **Notes about it** (margin notes and long notes, made here), then **Appears in** (*Mentioned in*, *Answers*, *On boards*). Each of these is changed where it was made, and each row opens that place.
 
 **One way up, never automatic:** a mention is loose, an arrow is argued, a property is a fact. Each step up is a one-tap offer (*Keep as a field* on an arrow, OQB-D6), never a silent change.
 
@@ -68,7 +68,7 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 | Rule | What it means for the learner | What it means for the code |
 |---|---|---|
 | **C1 · Made in one place** | You change a connection where you made it: a mention in the writing, a property in the rail, an arrow on the board. Everywhere else it's a reflection that opens that place | One writer per kind; reflections are read-only queries |
-| **C2 · Same two places on every page** | The rail says what it is; the foot says where it shows up: **Notes about it**, then **Where it appears** | One `<Connections>` component and one read model replace four shelves (§5.4) |
+| **C2 · Same two places on every page** | The rail says what it is; the foot says where it shows up: **Notes about it**, then **Appears in** | One `<Connections>` component and one read model replace four shelves (§5.4) |
 | **C3 · Up, never sideways, and only by offer** | Mention → arrow → property. *Keep as a field* on an arrow (exists, OQB-D6); *Make it a property…* on a mention (N4) | No automatic writes between kinds; every offer is one tap (A2) |
 | **C4 · About is a subject, not a link** | A margin note or a long note can be **about** one entry. It's listed under that entry's **Notes about it** | `about_id` stays as it is; a long note may set it too |
 | **C5 · A question belongs to its writing** | As in the Questions design; **Answered in** is the question's own property; the answering entry lists it under **Answers** | `inline_answers` unchanged |
@@ -81,8 +81,8 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 | Named links (11) | **Property**, rail | `mentions` leaves the Link dialog: its rows become mentions (§5.3). The other ten stay |
 | Item and relation fields | **Property**, rail | Their other side moves from a card shelf to the rail (F2's *other-side blocks* still exist in P2's Arrange page) |
 | `about_id` notes | **Notes about it** | Long notes can be *about* too (N3) |
-| *Answered in* | **Where it appears › Answers** | The Q-O shelf folds into the section |
-| Placed on a board | **Where it appears › On boards** | The rail row (B2) moves to the foot |
+| *Answered in* | **Appears in › Answers** | The Q-O shelf folds into the section |
+| Placed on a board | **Appears in › On boards** | The rail row (B2) moves to the foot |
 | Arrows | the board | Unchanged |
 | Topics | **In Loci** | Unchanged |
 
@@ -97,7 +97,7 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 | show it inside my writing | the writing | `/` › **Entry card** |
 | argue how two things relate | a board | place both, drag an arrow, say why |
 | ask something, or set a goal | wherever I'm writing | `@` › **Question** or **Learning goal** |
-| see everything that refers to it | its page, **Where it appears** | open a row |
+| see everything that refers to it | its page, **Appears in** | open a row |
 
 ## 3. The long note page
 
@@ -106,7 +106,7 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 - **A reading column**, about 700 px, centred on the stage. The title is the app's title field (`ip-title-field`), large Newsreader. Under it is one quiet line: **About** (the entry it's about, if any), its topics, and a count ("3 entries · ◎ 1 · ? 2 · Saved as you type"). A rule separates it from the writing.
 - **On this page**, on the left on wide screens: the headings, once there are two or more. Click one to scroll to it.
 - **Details** is a toggle in the top bar, closed by default: the rail (Template, About, **Mentions** read from the writing, Inside, In Loci, Collection, Blocks, Open in Loci, Delete). Craft keeps the page clean the same way, and a long note has few properties.
-- **The foot** is the same on every page (C2): **Notes about it**, then **Where it appears**.
+- **The foot** is the same on every page (C2): **Notes about it**, then **Appears in**.
 - The top bar keeps the app's `ip-top`. **←** names where it goes back to: the board, the list, or the entry you came from. One history covers every way of opening an entry.
 
 ### 3.2 Blocks
@@ -197,7 +197,7 @@ The prototype draws its blocks with plain `contenteditable` to show the behaviou
 ### 5.4 One read model, one component
 
 - *New* `connectionsFor(itemId)` returns `{ notesAbout, mentionedIn, answers, onBoards }` in one round trip: `about_id`, `item_refs` reversed, `inline_answers`, and `board_placements` (from B1).
-- *New* `<Connections>` draws **Notes about it** and **Where it appears**. It replaces `NotesAbout` and `LinkedShelf` at the foot of every page, the Q-O *Answers* shelf and B2's *On boards* rail row. The rail keeps `LinkedItems` for named links (properties).
+- *New* `<Connections>` draws **Notes about it** and **Appears in**. It replaces `NotesAbout` and `LinkedShelf` at the foot of every page, the Q-O *Answers* shelf and B2's *On boards* rail row. The rail keeps `LinkedItems` for named links (properties).
 
 ## 6. What it looks like for each learner (prototype data)
 
@@ -210,7 +210,7 @@ The prototype draws its blocks with plain `contenteditable` to show the behaviou
 | ID | Stage | What | Tier | Migration | Depends on |
 |---|---|---|---|---|---|
 | **N1** | 1 · Track and fields | **The page and the editor**: CodeMirror live preview, always editable, autosave, blocks (heading, subheading, lists, quote, divider), `/` menu, handles, keys, **On this page**, **Details** toggle, phone writing bar. Object writing and short notes use it | HIGH | no | Q1 (its markers render as chips) |
-| **N2** | 2 · Links and places | **Mentions, entry cards and images**: the three markers, `@` for entries, the selection bar's **Link to entry**, `item_refs`, `<Connections>` with **Where it appears**, `mentions` retired from the Link dialog | HIGH | yes: `item_refs`, migrate `mentions` | N1; lands beside F2 (both are links) |
+| **N2** | 2 · Links and places | **Mentions, entry cards and images**: the three markers, `@` for entries, the selection bar's **Link to entry**, `item_refs`, `<Connections>` with **Appears in**, `mentions` retired from the Link dialog | HIGH | yes: `item_refs`, migrate `mentions` | N1; lands beside F2 (both are links) |
 | **N3** | 2 → 3 | **Write about it**: About on long notes, collection writing templates, margin notes on a block (locator kind `block`) | MEDIUM | yes: locator kind; `collections.write_template` | N2, F1, T1 for starter headings |
 | **N4** | 3 · Loci uses them | **Loci in the writing**: link offers when an entry's exact name is typed, **Explain** on a selection (kept as a margin note), *Make it a property…* on a mention, *Make this a question?* | HIGH | no | N2, Q5 |
 
@@ -223,7 +223,7 @@ The prototype draws its blocks with plain `contenteditable` to show the behaviou
 | ID | Decision | Recommendation |
 |---|---|---|
 | **LN-D1** | Three connection kinds (mention, property, arrow), each made in one place | **Yes**. It is the rule that keeps the UI and the code small |
-| **LN-D2** | Every page: the rail says what it is, the foot says where it shows up (**Notes about it**, **Where it appears**) | **Yes** |
+| **LN-D2** | Every page: the rail says what it is, the foot says where it shows up (**Notes about it**, **Appears in**) | **Yes** |
 | **LN-D3** | Retire the hand-made *Mentions* link; mentions come from the writing | **Yes**, migrating old rows as "linked by hand" |
 | **LN-D4** | The body stays Markdown with three new markers | **Yes**. Export, search, versions and Undo keep working |
 | **LN-D5** | CodeMirror 6 live preview, not a rich-text framework | **Yes**. It's already a dependency, with one model and no round trip |

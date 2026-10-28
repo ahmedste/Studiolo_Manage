@@ -296,6 +296,173 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
   .nb-embed { grid-template-columns: 52px minmax(0, 1fr) auto; } .nb-em-pic { width: 52px; height: 52px; }
 }
 
+/* collections (C1–C3) and Appears in (C4): on the app's tokens; the studio is one picture and one panel, never a long form */
+.ck-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 18px; }
+.coll-wrap { position: relative; }
+.coll-wrap .coll { display: block; }
+.coll-edit { position: absolute; top: 10px; right: 10px; z-index: 2; border: 0; border-radius: 14px; padding: 4px 11px; font: 500 12.5px var(--ui); background: var(--surface-float); color: var(--ink); box-shadow: var(--shadow-float); cursor: pointer; opacity: 0; transition: opacity var(--dur-quick); }
+.coll-wrap:hover .coll-edit, .coll-edit:focus-visible { opacity: 1; }
+.coll-new { display: grid; place-content: center; gap: 6px; min-height: 230px; border: 1.5px dashed var(--line); border-radius: 4px; background: none; color: var(--ink-2); font: 500 14px var(--ui); cursor: pointer; }
+.coll-new span { font: 300 34px/1 var(--ui); color: var(--accent); }
+.coll-new:hover { border-color: var(--accent); color: var(--accent); }
+.cgrid.one { grid-template-columns: minmax(0, 280px); }
+.wz-scrim { position: fixed; inset: 0; z-index: 85; background: color-mix(in srgb, var(--ink) 28%, transparent); }
+.wz { position: fixed; z-index: 86; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow-float); padding: 18px 24px 20px; }
+.wz h2 { margin: 6px 0 4px; font: 400 28px/1.2 var(--read); }
+.wz-top { display: flex; justify-content: space-between; align-items: center; }
+.wz-foot { display: flex; justify-content: space-between; margin-top: 20px; }
+.wz-kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; }
+.wz-kind, .wz-start { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 4px; align-content: start; padding: 16px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); }
+.wz-kind:hover, .wz-start:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.wz-kind.on, .wz-start.on { box-shadow: inset 0 0 0 2px var(--accent); background: var(--accent-soft); }
+.wz-kind b, .wz-start b { font: 400 19px/1.2 var(--read); } .wz-kind small, .wz-start small { color: var(--ink-2); font-size: 12.5px; line-height: 1.4; }
+.wz-ic { color: var(--accent); }
+.wz-starts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 16px; }
+.wz-fields { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.wz-fields span { font-size: 11.5px; padding: 2px 7px; border-radius: 9px; background: var(--hover-fill); color: var(--ink-2); }
+.wz-fields i { font-style: normal; margin-right: 4px; color: var(--ink-3); }
+.wz-start.loci { background: none; box-shadow: inset 0 0 0 1px var(--line); border: 0; }
+.wz-flag { justify-self: start; font-size: 11px; color: var(--warn); }
+.wz-look { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; margin-top: 14px; align-items: start; }
+.lab { margin: 0 0 8px; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.cs-sw { display: flex; flex-wrap: wrap; gap: 6px; }
+.cs-sw button { border: 0; display: inline-flex; gap: 7px; align-items: center; padding: 6px 11px; border-radius: 16px; font: 13px var(--ui); background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; }
+.cs-sw button.on { box-shadow: inset 0 0 0 2px var(--accent); }
+.cs-sw .dot { width: 14px; height: 14px; }
+.cs { margin-top: 4px; }
+.cs-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 0 0 14px; border-bottom: 1px solid var(--line); }
+.cs-switch { border: 0; display: inline-flex; gap: 8px; align-items: center; background: none; font: 400 26px/1.1 var(--read); color: var(--ink); cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.cs-switch:hover { background: var(--hover-fill); }
+.cs-tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--board); }
+.cs-tabs button { border: 0; background: none; border-radius: 7px; padding: 6px 14px; font: 500 13.5px var(--ui); color: var(--ink-2); cursor: pointer; }
+.cs-tabs button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: var(--shadow-pic); }
+.cs-grow { flex: 1; }
+.cs-saved { font-size: 12.5px; color: var(--ink-2); }
+.cs-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 0; min-height: 560px; }
+.cs-stage { padding: 26px 28px 30px 0; border-right: 1px solid var(--line); min-width: 0; }
+.cs-panel { padding: 18px 0 30px 24px; display: grid; gap: 4px; align-content: start; }
+.cs-cap { margin: 14px 0 0; }
+.cs-sec { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.cs-sec:last-child { border-bottom: 0; }
+.cs-sec h3 { margin: 0; display: flex; gap: 8px; align-items: center; justify-content: space-between; font: 600 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.cs-sec h3 span { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
+.cs-sec h3 .cs-ti { margin-right: auto; }
+.cs-sec .small { margin: 0; }
+.cs-sec .form-row { margin: 0; } .cs-sec .form-row input, .cs-sec .form-row textarea, .cs-sec select, .cs-lab input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); color: var(--ink); font: 14px var(--ui); }
+.cs-lab { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.cs-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; padding: 18px; background: var(--board); border-radius: 6px; align-items: start; }
+.cs-cardwrap { cursor: pointer; border-radius: 6px; transition: box-shadow var(--dur-quick); }
+.cs-cardwrap.on { box-shadow: 0 0 0 2px var(--accent); }
+.cs-cardwrap .mcard { margin: 0; }
+.cs-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cs-thumbs.five { grid-template-columns: repeat(3, 1fr); }
+.cs-thumb { border: 0; display: grid; gap: 6px; justify-items: center; padding: 8px 6px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; }
+.cs-thumb.on { box-shadow: inset 0 0 0 2px var(--accent); color: var(--ink); background: var(--accent-soft); }
+.th { position: relative; display: block; width: 64px; height: 52px; border-radius: 3px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--rule); overflow: hidden; }
+.th i { position: absolute; display: block; background: var(--line); border-radius: 1px; }
+.th .l1 { left: 8px; right: 14px; height: 5px; } .th .l2 { left: 8px; right: 24px; height: 3px; } .th .l3 { left: 8px; right: 30px; height: 3px; }
+.th-p .r { left: 8px; top: 8px; width: 14px; height: 14px; border-radius: 50%; } .th-p .l1 { top: 10px; left: 26px; } .th-p .l2 { top: 30px; } .th-p .l3 { top: 38px; }
+.th-i .pic { left: 0; right: 0; top: 0; height: 30px; background: var(--status-1); border-radius: 0; } .th-i .l1 { top: 35px; } .th-i .l2 { top: 44px; }
+.th-t .k { left: 8px; top: 8px; width: 16px; height: 3px; background: var(--ink-3); } .th-t .l1 { top: 16px; } .th-t .l2 { top: 27px; } .th-t .l3 { top: 35px; }
+.th-h .a { left: 8px; right: 8px; top: 8px; height: 18px; } .th-h .b { left: 8px; right: 20px; top: 32px; height: 4px; } .th-h .c { left: 8px; right: 30px; top: 40px; height: 3px; }
+.th-portrait .a { width: 18px; height: 18px; border-radius: 50%; right: auto; } .th-portrait .b { left: 32px; top: 12px; }
+.th-picture .a { left: 0; right: 0; top: 0; height: 26px; background: var(--status-1); border-radius: 0; }
+.th-slideshow .a { left: 0; right: 0; top: 0; height: 26px; background: var(--status-1); border-radius: 0; box-shadow: 6px 0 0 var(--panel) inset, -6px 0 0 var(--panel) inset; }
+.th-doc .a { left: 10px; right: 10px; top: 6px; height: 22px; background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); }
+.th-title .a { height: 6px; top: 14px; }
+.cs-slots { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.cs-slots li { display: grid; grid-template-columns: 22px 22px minmax(0, 1fr) 28px 46px; gap: 6px; align-items: center; padding: 7px 8px; border-radius: 4px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font-size: 13.5px; }
+.cs-blocks li { grid-template-columns: 22px minmax(0, 1fr) 28px 52px; }
+.cs-slots li.off { opacity: .55; }
+.cs-slots li.add { grid-template-columns: 22px minmax(0, 1fr); background: none; box-shadow: inset 0 0 0 1px var(--line); border: 0; }
+.cs-slots li.add select { border: 0; background: none; color: var(--accent); font: 13.5px var(--ui); padding: 0; }
+.cs-slots button { border: 0; background: none; border-radius: 4px; padding: 3px 6px; color: var(--ink-2); cursor: pointer; font: 12.5px var(--ui); }
+.cs-slots button:hover { background: var(--hover-fill); color: var(--ink); }
+.cs-n { font-size: 11.5px; color: var(--ink-3); text-align: center; }
+.cs-ti { font-style: normal; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 4px; background: var(--hover-fill); color: var(--ink-2); font: 600 11px var(--ui); }
+.cs-tog { display: flex; gap: 8px; align-items: baseline; font-size: 13.5px; color: var(--ink); }
+.cs-tog small { color: var(--ink-3); font-size: 12px; }
+.cs-page { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 22px; padding: 20px; background: var(--panel); border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; }
+.cs-phero { display: flex; gap: 12px; align-items: center; padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+.cs-phero b { display: block; font: 400 22px/1.15 var(--read); }
+.cs-phero.cs-h-picture { display: grid; } .cs-phero.cs-h-picture img { width: 100%; height: 110px; object-fit: cover; border-radius: 3px; }
+.cs-port { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--board); font: 20px var(--read); color: var(--ink-3); flex: none; }
+.cs-port img { width: 100%; height: 100%; object-fit: cover; }
+.cs-phero.cs-h-doc { display: grid; } .cs-doc { padding: 14px; text-align: center; font: italic 17px var(--read); background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); border-radius: 2px; }
+.cs-pb { padding: 8px 10px; margin: 6px 0; border-radius: 3px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); display: grid; gap: 4px; }
+.cs-pb.off { opacity: .4; text-decoration: line-through; }
+.cs-pbh { font: 400 15px var(--read); } .cs-pbv { color: var(--ink-2); }
+.cs-pb .ln { display: block; height: 5px; background: var(--line); border-radius: 2px; } .cs-pb .ln.s { width: 60%; }
+.cs-prail { border-left: 1px solid var(--line); padding-left: 14px; }
+.cs-prow { display: grid; gap: 1px; padding: 6px 4px; border-bottom: 1px solid var(--line); cursor: pointer; border-radius: 3px; }
+.cs-prow:hover { background: var(--hover-fill); } .cs-prow.muted { cursor: default; }
+.cs-prow span { color: var(--ink-3); font-size: 11.5px; } .cs-prow b { font-weight: 500; }
+.cs-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cs-chip { display: inline-flex; gap: 4px; align-items: center; padding: 3px 4px 3px 10px; border-radius: 12px; background: var(--hover-fill); font-size: 13px; }
+.cs-chip button { border: 0; background: none; color: var(--ink-3); cursor: pointer; padding: 0 4px; font-size: 14px; }
+.cs-chipin { border: 1px dashed var(--line); border-radius: 12px; padding: 4px 10px; background: none; font: 13px var(--ui); color: var(--ink); min-width: 150px; }
+.cs-fields { display: grid; gap: 2px; }
+.cs-fhead { display: grid; grid-template-columns: 22px 26px 170px minmax(0, 1fr) auto; gap: 10px; padding: 0 10px 6px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.cs-fhead span:first-child { grid-column: 1 / 4; }
+.cs-frow { display: grid; grid-template-columns: 22px 26px 170px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px; border-radius: 5px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; }
+.cs-frow:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.cs-frow.on { box-shadow: inset 0 0 0 2px var(--accent); }
+.cs-frow.off b { color: var(--ink-3); }
+.cs-frow.dragging { opacity: .4; } .cs-frow.drop-above { box-shadow: 0 -2px 0 var(--accent); } .cs-frow.drop-below { box-shadow: 0 2px 0 var(--accent); }
+.cs-grip { color: var(--ink-3); font-size: 11px; letter-spacing: -2px; cursor: grab; }
+.cs-frow b { font-weight: 500; font-size: 14px; } .cs-fv { color: var(--ink-2); font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-tags { display: flex; gap: 4px; } .cs-tag { font-size: 11px; padding: 2px 7px; border-radius: 9px; background: var(--hover-fill); color: var(--ink-2); white-space: nowrap; }
+.cs-addrow { border: 1.5px dashed var(--line); border-radius: 5px; background: none; padding: 11px; margin-top: 6px; font: 500 14px var(--ui); color: var(--accent); cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.cs-addrow small { margin-left: auto; color: var(--ink-3); font-weight: 400; } .cs-addrow.on { border-color: var(--accent); }
+.cs-sug { display: flex; flex-wrap: wrap; gap: 6px; }
+.cs-sug button { border: 0; padding: 6px 11px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-strong); font: 500 13px var(--ui); cursor: pointer; }
+.cs-sug i { font-style: normal; margin-right: 6px; opacity: .7; }
+.cs-types { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.cs-types button { border: 0; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 1px 8px; text-align: left; padding: 9px; border-radius: 5px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--ink); }
+.cs-types button:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.cs-types button.on { box-shadow: inset 0 0 0 2px var(--accent); background: var(--accent-soft); }
+.cs-types i { grid-row: span 2; font-style: normal; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 4px; background: var(--hover-fill); font: 600 11px var(--ui); color: var(--ink-2); }
+.cs-types b { font: 500 13px var(--ui); } .cs-types small { font-size: 11.5px; color: var(--ink-3); line-height: 1.3; }
+.cs-types.small-t button { grid-template-columns: 24px minmax(0, 1fr); align-items: center; padding: 6px 8px; } .cs-types.small-t i { grid-row: auto; }
+.cs-two { display: grid; gap: 4px; padding: 10px; border-radius: 4px; background: var(--board); font-size: 13px; }
+.cs-sens { display: grid; gap: 6px; }
+.cs-sens button { border: 0; display: grid; gap: 2px; text-align: left; padding: 10px 12px; border-radius: 5px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--ink); }
+.cs-sens button.on { box-shadow: inset 0 0 0 2px var(--accent); background: var(--accent-soft); }
+.cs-sens small { color: var(--ink-2); font-size: 12px; }
+.cs-covers { display: flex; flex-wrap: wrap; gap: 6px; }
+.cs-covers button { border: 0; width: 64px; height: 48px; border-radius: 4px; overflow: hidden; padding: 0; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; font: 12px var(--ui); color: var(--ink-2); }
+.cs-covers button.on { box-shadow: 0 0 0 2px var(--accent); } .cs-covers img { width: 100%; height: 100%; object-fit: cover; }
+.cs-danger { display: flex !important; flex-wrap: wrap; gap: 10px; align-items: center; }
+.cs-danger h3 { width: 100%; }
+.cs-set-prev { max-width: 300px; }
+/* Appears in */
+.ap-chip { border: 0; padding: 5px 11px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-strong); font: 500 12.5px var(--ui); cursor: pointer; margin-left: 4px; }
+.ap-chip:hover { text-decoration: underline; }
+.ap-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 6px; }
+.ap-filters button { border: 0; padding: 4px 10px; border-radius: 12px; background: none; box-shadow: inset 0 0 0 1px var(--line); font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; }
+.ap-filters button span { margin-left: 6px; color: var(--ink-3); }
+.ap-filters button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; } .ap-filters button[aria-pressed="true"] span { color: inherit; opacity: .7; }
+.ap-row { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: start; width: 100%; max-width: 760px; padding: 11px 10px; border-top: 1px solid var(--line); }
+.ap-row:hover { background: var(--hover-fill); } .ap-row:focus-visible { outline: var(--focus-ring); }
+.ap-ic { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: var(--board); color: var(--ink-2); font-size: 14px; }
+.ap-t { display: grid; gap: 2px; min-width: 0; }
+.ap-t b { font-weight: 500; font-size: 14.5px; } .ap-t small { font-size: 12px; color: var(--ink-3); }
+.ap-s { font: 15px/1.5 var(--read); color: var(--ink-2); }
+.ap-s mark { background: var(--accent-soft); color: var(--accent-strong); border-radius: 2px; padding: 0 2px; }
+.ap-go { font-size: 12px; color: var(--ink-3); padding-top: 4px; white-space: nowrap; } .ap-row:hover .ap-go { color: var(--accent); }
+.ap-empty { max-width: 62ch; }
+@keyframes flash { 0%, 30% { box-shadow: 0 0 0 3px var(--accent); background-color: var(--accent-soft); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.flash { animation: flash 2.2s ease-out; border-radius: 4px; }
+@media (max-width: 1000px) { .cs-body { grid-template-columns: minmax(0, 1fr); } .cs-stage { border-right: 0; padding-right: 0; border-bottom: 1px solid var(--line); } .cs-panel { padding-left: 0; } }
+@media (max-width: 699.98px) {
+  .cs-frow, .cs-fhead { grid-template-columns: 22px 26px minmax(0, 1fr); } .cs-fv, .cs-tags, .cs-fhead span:nth-child(n+2) { display: none; }
+  .cs-page { grid-template-columns: minmax(0, 1fr); } .cs-prail { border-left: 0; padding-left: 0; }
+  .wz-look { grid-template-columns: minmax(0, 1fr); } .coll-edit { opacity: 1; }
+  .ap-row { grid-template-columns: 30px minmax(0, 1fr); } .ap-go { display: none; }
+  .cs-switch { font-size: 22px; }
+}
+
+.prop-lab { all: unset; cursor: pointer; } .prop-lab:hover { color: var(--accent); text-decoration: underline; }
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
   .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 380px; }
@@ -333,6 +500,7 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 <div id="selbar" class="selbar" role="toolbar" aria-label="Selected text" hidden><button type="button" data-act="selfmt" data-k="bold" aria-label="Bold"><b>B</b></button><button type="button" data-act="selfmt" data-k="italic" aria-label="Italic"><i>I</i></button><span class="sep"></span><button type="button" data-act="sellink" data-ph="N2">↗ Link to entry</button><button type="button" data-act="selask">? Ask about this</button><button type="button" data-act="selmargin" data-ph="N3">✎ Margin note</button><span class="sep"></span><button type="button" data-act="selexplain" data-ph="N4">Explain</button></div>
 <div id="kbar" class="kbar" role="toolbar" aria-label="Writing" hidden><button type="button" data-act="kb" data-k="slash">+ Block</button><button type="button" data-act="kb" data-k="question">?</button><button type="button" data-act="kb" data-k="goal">◎</button><button type="button" data-act="kb" data-k="at">@</button><button type="button" data-act="kb" data-k="menu">⋮⋮</button><button type="button" data-act="kb" data-k="done">Done</button></div>
 <div id="toast" hidden></div>
+<div id="wiz"></div>
 
 <script>
 "use strict";
@@ -494,7 +662,7 @@ const INL = key => allInlines().find(x => x.key === key);
 function st(key, kind) { if (!ST[key]) ST[key] = { status: kind === "goal" ? "active" : "open", answer: "", ans: [] }; return ST[key]; }
 const done = s => ["answered", "reached", "parked", "dropped"].includes(s);
 function inCount(it) { const l = allInlines().filter(x => x.item === it); return { q: l.filter(x => x.kind === "question" && st(x.key, x.kind).status === "open").length, g: l.filter(x => x.kind === "goal" && st(x.key, x.kind).status === "active").length }; }
-function ftIn(it) { const c = inCount(it); return c.q || c.g ? `<span class="ft-in" data-ph="Q1">${c.q ? `<span class="cq">? ${c.q}</span>` : ""}${c.g ? `<span class="cg">◎ ${c.g}</span>` : ""}</span>` : ""; }
+function ftIn(it) { if (it.type === "object" && COL(it.col)?.counts === false) return ""; const c = inCount(it); return c.q || c.g ? `<span class="ft-in" data-ph="Q1">${c.q ? `<span class="cq">? ${c.q}</span>` : ""}${c.g ? `<span class="cg">◎ ${c.g}</span>` : ""}</span>` : ""; }
 function stBtn(r) { const s = st(r.key, r.kind); return `<button class="st ${s.status}" data-act="stmenu" data-k="${esc(r.key)}" data-ph="Q2">${cap(s.status)} ▾</button>`; }
 function ansLine(r) {
   const s = st(r.key, r.kind);
@@ -550,7 +718,7 @@ function card(it, opts = {}) {
     return `<article class="mcard" data-frame="paper" data-kind="person"><div class="ci"><div class="body"><div class="person-head"><div class="person-mark">${it.media ? `<img alt="" src="${MEDIA[it.media]}">` : esc(initials(it.title))}</div><div class="person-name"><h2 class="mcard-title per"><a class="mcard-link" href="#" ${open}>${esc(it.title)}</a></h2>${t.length ? `<p>${esc(t.slice(0, 2).join(" · "))}</p>` : ""}</div></div>${t[2] ? `<p>${esc(t[2])}</p>` : ""}${it.desc ? `<p>${esc(it.desc)}</p>` : ""}</div>${ft()}</div></article>`;
   }
   const kind = `${c.label}${cardLine(it) ? " · " + cardLine(it) : ""}`;
-  const chips = c.fields.filter(f => f.t === "choice" && !c.card.includes(f.id)).flatMap(f => arr(it.v[f.id]).map(v => `<span class="cc" data-ph="F1">${esc(v)}</span>`)).join("");
+  const chips = c.fields.filter(f => c.chips !== false && !f.hidden && f.t === "choice" && !c.card.includes(f.id)).flatMap(f => arr(it.v[f.id]).map(v => `<span class="cc" data-ph="F1">${esc(v)}</span>`)).join("");
   if (c.layout === "picture" && it.media) return `<article class="mcard" data-frame="picture" data-kind="thing"><div class="ci"><div class="im pic t"><img alt="" src="${MEDIA[it.media]}"></div><div class="cap-line"><div class="t"><div class="body"><h2 class="mcard-title"><a class="mcard-link" href="#" ${open}>${esc(it.title)}</a></h2><p class="mcard-kind">${esc(kind)}</p>${it.desc ? `<p>${esc(it.desc)}</p>` : ""}</div><div class="ft"><div class="ft-meta">${topicFt(it)}${notesFt(it)}${ftIn(it)}</div></div></div>${more}</div></div></article>`;
   return `<article class="mcard" data-frame="paper" data-kind="thing"><div class="ci"><div class="body"><p class="kicker">${esc(c.name)}${c.clinical ? ` · <span style="color:var(--warn)">Clinical</span>` : ""}</p><h2 class="mcard-title"><a class="mcard-link" href="#" ${open}>${esc(it.title)}</a></h2><p class="mcard-kind">${esc(kind)}</p>${it.desc ? `<p>${esc(it.desc)}</p>` : ""}${chips ? `<p>${chips}</p>` : ""}</div>${ft()}</div></article>`;
 }
@@ -639,19 +807,20 @@ function renderItem() {
   const ob = onBoards(it);
   const rail = `<p class="ip-rh">Properties</p>
     ${prop(person ? "Template" : "Type", esc(c ? c.label : kindLabel(it)))}
-    ${c ? c.fields.filter(f => f.t !== "long").map(f => prop(f.label, f.t === "rel" ? `<div class="rel-row">${arr(it.v[f.id]).map(I).filter(Boolean).map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("") || `<span style="color:var(--ink-3)">Not recorded</span>`} <button class="addv" type="button" data-act="relpick" data-f="${f.id}">${f.o.many ? "+ Link" : arr(it.v[f.id]).length ? "Change" : "+ Link"}</button></div>`
+    ${c ? c.fields.filter(f => f.t !== "long" && !f.hidden).map(f => propF(f, f.t === "rel" ? `<div class="rel-row">${arr(it.v[f.id]).map(I).filter(Boolean).map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("") || `<span style="color:var(--ink-3)">Not recorded</span>`} <button class="addv" type="button" data-act="relpick" data-f="${f.id}">${f.o.many ? "+ Link" : arr(it.v[f.id]).length ? "Change" : "+ Link"}</button></div>`
       : f.t === "choice" ? (arr(it.v[f.id]).map(v => `<span class="cc">${esc(v)}</span>`).join("") || `<span style="color:var(--ink-3)">Not recorded</span>`)
       : `<div class="inline-edit-wrap"><input class="inline-edit rail-input" value="${esc(it.v[f.id] || "")}" placeholder="${f.t === "url" ? "https://…" : "Not recorded"}" data-fv="${f.id}"></div>`, f.t === "rel" ? "F2" : f.t === "choice" ? "F1" : "")).join("") : ""}
     ${prop("Inside", nq || ng ? `${ng ? `<span style="color:var(--accent)">◎ ${ng} goal${ng > 1 ? "s" : ""}</span> ` : ""}${nq ? `<span style="color:var(--pick)">? ${nq} question${nq > 1 ? "s" : ""}</span>` : ""}` : `<span style="color:var(--ink-3)">None yet</span>`, "Q1")}
     ${it.type === "object" && !person ? prop("Photos", `<div class="photos-property"><div class="ip-strip"><button class="ip-thumb ip-thumb-add" type="button"><span>+</span></button></div></div>`) : ""}
     ${prop(person ? "Strongest on" : "In Loci", topicRail(it))}
+    ${it.type === "quote" ? prop("Taken from", (() => { const s = D().items.find(x => x.type === "source" && x.title === it.src?.em); return s ? `<button class="entity-pill obj" type="button" data-act="open" data-id="${s.id}">${esc(s.title)}</button> <span class="small">${esc(it.src.loc)}</span>` : esc(it.src ? `${it.src.b}, ${it.src.em}` : "—"); })(), "C4") : ""}
     ${inv}
     ${it.linked?.length ? prop("Linked", `<div class="linked-block"><div class="linked-groups">${it.linked.map(l => `<div class="linked-group"><p class="linked-label">${esc(l.rel)}</p><ul class="linked-list"><li class="linked-row"><a class="entity-pill work" href="#" data-act="open" data-id="${l.id}">${esc(I(l.id)?.title)} · ${esc(kindLabel(I(l.id)))} ↗</a><p class="linked-note">${esc(l.note)}</p></li></ul></div>`).join("")}</div><button class="button button-link" type="button">Link…</button></div>`) : ""}
     ${it.col ? prop("Collection", `<a class="entity-link" href="#" data-act="col" data-id="${it.col}">${esc(COL(it.col).name)}</a> <button class="button button-link" type="button">Move to collection</button>`) : ""}
     <div class="row rail-actions">${c ? `<button class="button button-quiet" type="button" data-act="customize">Add a property</button>` : ""}<a class="btn-open-graph" href="#">Open in Loci →</a></div><div class="rail-delete-row"><button class="button button-link rail-delete" type="button">Delete…</button></div>`;
-  return `<div class="ipage"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">${esc(c ? c.label : kindLabel(it))}</span><span class="ip-saved" id="saved" aria-live="polite"></span><button class="ip-more" type="button" aria-label="Actions for this item">${SVG.ipmore}</button></div>
+  return `<div class="ipage"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">${esc(c ? c.label : kindLabel(it))}</span>${apChip(it)}<span class="ip-saved" id="saved" aria-live="polite"></span><button class="ip-more" type="button" aria-label="Actions for this item">${SVG.ipmore}</button></div>
     ${c?.clinical ? `<div class="library-notice urgent" role="note" data-ph="T3"><span><b>Clinical collection.</b> De-identified, for learning and reflection. Keep bands, never names, dates of birth or record numbers. Loci remembers only the lessons you file.</span></div>` : ""}
-    <div class="ip-grid"><article class="ip-main"><div class="ip-hero">${hero}${lead}</div>${writing}${longs}${connections(it)}</article><aside class="props ip-rail" aria-label="Properties">${rail}</aside></div></div>`;
+    <div class="ip-grid"><article class="ip-main"><div class="ip-hero">${hero}${lead}</div>${c ? pageBlocks(c).filter(k => !(c.hidden || []).includes(k)).map(k => k === "writing" ? writing : k === "notes" ? notesAboutSection(it) : k === "appears" ? appearsSection(it) : longSec(c, it, k.slice(2))).join("") : writing + longs + connections(it)}</article><aside class="props ip-rail" aria-label="Properties">${rail}</aside></div></div>`;
 }
 
 /* ---------- Questions and goals page ---------- */
@@ -676,39 +845,187 @@ function renderQG() {
     </div>`;
 }
 
-/* ---------- customizer: collection-customizer.tsx ---------- */
-const TYPE_LABEL = { text: "Text", long: "Long text", number: "Number", date: "Date", choice: "Choice", check: "Checkbox", rel: "Relation", url: "Web link" };
+/* ---------- collections: the Collections page, New collection, and the collection studio (C1–C3) ----------
+   One idea: you change a collection by looking at it. The studio shows the real card, the real page and the real
+   fields of your own entries, and every choice is made on that picture, one tab at a time. */
+const FT = { text: ["Aa", "Text", "A short line"], long: ["¶", "Long text", "Its own section on the page"], number: ["#", "Number", "With a unit if you like"], date: ["◷", "Date or year", "A year makes a Timeline"], choice: ["◉", "Choice", "Pick from a list; shows as chips"], check: ["☑", "Checkbox", "Yes or no"], rel: ["↗", "Link to…", "Another entry, shown on both pages"], url: ["⌘", "Web link", "An address"] };
+const SWATCH = [["s1", "Ultramarine"], ["s2", "Mid blue"], ["s3", "Pale blue"]];
+const KIND = { note: ["Notes", "Thoughts, quotes and long notes", SVG.note], source: ["Sources", "Books, PDFs, videos and links", SVG.source], image: ["Photos", "Pictures you took or kept", SVG.image], object: ["Objects", "People, places and things, each with its own fields", SVG.object] };
+const STARTERS = {
+  architect: [
+    { name: "Buildings", label: "Building", base: "thing", layout: "picture", fields: [["Built", "date"], ["Where", "text"], ["Architect", "rel", "people"], ["Typology", "choice", ["Mosque", "Village", "Madrasa", "House"]], ["Why it matters", "long"]], card: [0, 1], write: ["Site and climate", "Plan and section", "What I'd take from it"] },
+    { name: "Architects", label: "Architect", base: "person", layout: "portrait", fields: [["Role", "text"], ["Based in", "text"], ["Dates", "text"], ["Known for", "long"]], card: [0, 1, 2], write: ["Ideas", "Works I know", "What I'd borrow"] },
+    { name: "Materials", label: "Material", base: "thing", layout: "text", fields: [["Kind", "choice", ["Earth", "Masonry", "Timber", "Metal"]], ["Thermal mass", "choice", ["Low", "Medium", "High"]], ["Where I've seen it", "text"], ["How it behaves", "long"]], card: [0, 1], write: ["Properties", "Where it works", "Where it fails"] }
+  ],
+  lawyer: [
+    { name: "Cases", label: "Case", base: "thing", layout: "text", fields: [["Citation", "text"], ["Court", "text"], ["Year", "date"], ["Area of law", "choice", ["Tort", "Contract", "Construction"]], ["Cites", "rel", "cases"], ["Holding", "long"]], card: [0, 1], write: ["Facts", "Held", "Why it matters for the client"] },
+    { name: "Judges", label: "Judge", base: "person", layout: "portrait", fields: [["Court", "text"], ["Appointed", "date"], ["Known for", "long"]], card: [0, 1], write: ["Approach", "Leading judgments"] },
+    { name: "Clauses", label: "Clause", base: "thing", layout: "text", fields: [["Contract", "choice", ["JCT", "NEC", "FIDIC"]], ["Clause", "text"], ["What it does", "long"]], card: [0, 1], write: ["Wording", "How courts read it"] }
+  ],
+  doctor: [
+    { name: "Drugs", label: "Drug", base: "thing", layout: "text", fields: [["Class", "choice", ["DOAC", "LMWH", "Vitamin K antagonist"]], ["Monitoring", "text"], ["Watch for", "long"]], card: [0, 1], write: ["When I'd use it", "Watch for"] },
+    { name: "Guidelines", label: "Guideline", base: "thing", layout: "text", fields: [["Issuer", "choice", ["NICE", "ESC"]], ["Code", "text"], ["Published", "date"], ["Recommends", "rel", "drugs"], ["Key points", "long"]], card: [0, 1], write: ["Key recommendations", "On the ward"] },
+    { name: "Teaching cases", label: "Teaching case", base: "thing", layout: "text", clinical: true, fields: [["Age band", "choice", ["30–39", "50–59", "70–79"]], ["Presenting complaint", "text"], ["Learning points", "long"]], card: [0, 1], write: ["What happened", "What I'd do differently"] }
+  ]
+};
+const fromStarter = (st, id) => { const fs = st.fields.map(([l, t, o], k) => F(`${id}f${k}`, l, t, t === "choice" ? { opts: [...o] } : t === "rel" ? { to: o, many: true, inv: "" } : t === "date" ? { year: true } : {})); return C(id, st.name, "object", { label: st.label, base: st.base, layout: st.layout, fields: fs, card: st.card.map(k => fs[k].id), write: [...st.write], clinical: !!st.clinical, accent: "s3" }); };
+const colItems = c => D().items.filter(x => x.col === c.id);
+const kindOf = c => c.shape === "object" ? "object" : c.shape;
+
+/* the Collections page (collections-page.tsx, as rendered at 7c0e8732), with kind chips and an Edit on each tile */
+function collTile(c) {
+  const its = colItems(c), top = its[0];
+  const prev = !top ? `<div aria-hidden="true" class="prev is-empty"><i></i><i></i><i class="prev-empty">No items yet</i></div>`
+    : (c.cover || top.media) ? `<div aria-hidden="true" class="prev"><i></i><i></i><i class="prev-photo"><img alt="" src="${MEDIA[c.cover || top.media]}"></i></div>`
+    : `<div aria-hidden="true" class="prev"><i></i><i></i><div class="coll-qv is-title"><span class="qv-domain">${esc(kindLabel(top))}</span><span class="qv-title">${esc(top.title || plainBody(top).slice(0, 60))}</span></div></div>`;
+  return `<div class="coll-wrap"><a class="coll" href="#" data-act="col" data-id="${c.id}" aria-label="${esc(c.name)}, ${its.length} items">${prev}<div class="lb"><span aria-hidden="true" class="dot ${c.accent}"></span><b>${esc(c.name)}</b><span>${its.length}</span><span class="tp">${c.shape === "object" ? `${c.fields.length} fields` : KIND[kindOf(c)][0]}${c.clinical ? " · Clinical" : ""}</span></div></a><button class="coll-edit" type="button" data-act="editcoll" data-id="${c.id}" data-ph="C2">Edit</button></div>`;
+}
+function renderColls() {
+  const k = S.ck || "all", q = (S.cq || "").toLowerCase(), cols = D().cols.filter(c => (k === "all" || kindOf(c) === k) && (!q || c.name.toLowerCase().includes(q)));
+  return `${header("cols")}<div class="collection-view"><div class="collection-toolbar"><div class="lsearch"><input id="cq" aria-label="Search your collections" placeholder="Search your collections…" type="search" value="${esc(S.cq || "")}"><span aria-live="polite" class="n">${D().cols.length} collections</span></div><div class="collection-toolbar-actions"><button class="button button-quiet collection-more" type="button" data-act="toast" data-msg="Reorder, and Show empty collections.">⋯</button><button class="button" type="button" data-act="newcoll" data-ph="C1">+ New collection</button></div></div>
+    <nav class="ck-row" aria-label="Kinds" data-ph="C1">${[["all", "All"], ...Object.entries(KIND).map(([key, v]) => [key, v[0]])].map(([key, t]) => `<button type="button" class="cph-type" data-act="ck" data-k="${key}" ${k === key ? 'aria-current="true"' : ""}>${key === "all" ? SVG.all : KIND[key][2]}${t}<span class="n">${key === "all" ? D().cols.length : D().cols.filter(c => kindOf(c) === key).length}</span></button>`).join("")}</nav>
+    <div class="cgrid">${cols.map(collTile).join("")}<button class="coll-new" type="button" data-act="newcoll"><span>+</span>New collection</button></div></div>`;
+}
+
+/* New collection: three small steps, each with its picture */
+function wizHTML() {
+  const w = S.wiz; if (!w) return "";
+  const st = STARTERS[S.field], pick = w.start != null ? st[w.start] : null;
+  let body = "";
+  if (w.step === 1) body = `<h2>What will you keep in it?</h2><p class="small">You can change its look and fields later; what it holds is chosen now.</p><div class="wz-kinds">${Object.entries(KIND).map(([k, [t, s, ic]]) => `<button type="button" class="wz-kind${w.kind === k ? " on" : ""}" data-act="wzkind" data-k="${k}"><span class="wz-ic">${ic}</span><b>${t}</b><small>${s}</small></button>`).join("")}</div>`;
+  if (w.step === 2) body = `<h2>Start from…</h2><p class="small">A starting point for ${esc(DB[S.field].label.toLowerCase())}s. Every field can be renamed, moved or removed.</p><div class="wz-starts">${st.map((x, i) => `<button type="button" class="wz-start${w.start === i ? " on" : ""}" data-act="wzstart" data-i="${i}"><b>${esc(x.name)}</b><small>${x.base === "person" ? "People" : "Things"} · ${x.layout} cards</small><span class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</span>${x.clinical ? `<span class="wz-flag">Clinical</span>` : ""}</button>`).join("")}<button type="button" class="wz-start${w.start === -1 ? " on" : ""}" data-act="wzstart" data-i="-1"><b>Blank</b><small>A name and nothing else</small><span class="wz-fields"><span><i>+</i>Add fields as you need them</span></span></button><button type="button" class="wz-start loci" data-act="toast" data-msg="Phase T3: describe what you keep in a sentence, and Loci fills in these steps for you to check." data-ph="T3"><b>Describe it</b><small>“Cases I cite, with court and holding”</small><span class="wz-fields"><span><i>✦</i>Loci drafts the fields</span></span></button></div>`;
+  if (w.step === 3) {
+    const prevC = { name: w.name || "Untitled", accent: w.accent, shape: w.kind === "object" ? "object" : w.kind, fields: pick ? pick.fields : [], clinical: !!pick?.clinical, id: "_p" };
+    body = `<h2>Name and look</h2><div class="wz-look"><div class="wz-form"><div class="form-row"><label for="wz-name">Name</label><input id="wz-name" type="text" value="${esc(w.name)}" data-wz="name" placeholder="${esc(pick?.name || "e.g. Site visits")}"></div>${w.kind === "object" ? `<div class="form-row"><label for="wz-label">One entry is called</label><input id="wz-label" type="text" value="${esc(w.label)}" data-wz="label" placeholder="${esc(pick?.label || "e.g. Building")}"></div>` : ""}<div class="form-row"><span class="form-label">Colour</span><div class="cs-sw">${SWATCH.map(([k, t]) => `<button type="button" class="${w.accent === k ? "on" : ""}" data-act="wzacc" data-k="${k}"><span class="dot ${k}"></span>${t}</button>`).join("")}</div></div></div>
+      <div class="wz-prev"><p class="lab">On the Collections page</p><div class="cgrid one"><div class="coll-wrap"><a class="coll"><div class="prev is-empty"><i></i><i></i><i class="prev-empty">No items yet</i></div><div class="lb"><span class="dot ${w.accent}"></span><b>${esc(prevC.name)}</b><span>0</span><span class="tp">${w.kind === "object" ? `${prevC.fields.length} fields` : KIND[w.kind][0]}</span></div></a></div></div></div></div>`;
+  }
+  const steps = w.kind === "object" ? 3 : 2, at = w.kind === "object" ? w.step : w.step === 3 ? 2 : 1;
+  const can = w.step === 1 ? !!w.kind : w.step === 2 ? w.start != null : true;
+  return `<div class="wz-scrim" data-act="wzclose"></div><div class="wz" role="dialog" aria-modal="true" aria-label="New collection" data-ph="C1"><div class="wz-top"><span class="small">New collection · step ${at} of ${steps}</span><button class="button button-link" type="button" data-act="wzclose">Cancel</button></div>${body}<div class="wz-foot">${w.step > 1 ? `<button class="button button-quiet" type="button" data-act="wzback">Back</button>` : "<span></span>"}<button class="button" type="button" data-act="${w.step === 3 ? "wzmake" : "wznext"}" ${can ? "" : "disabled"}>${w.step === 3 ? "Make the collection" : "Next"}</button></div></div>`;
+}
+
+/* the studio */
+function pageBlocks(c) {
+  const longs = c.fields.filter(f => f.t === "long").map(f => "f:" + f.id), base = ["writing", ...longs, "notes", "appears"];
+  c.order = [...(c.order || []).filter(k => base.includes(k)), ...base.filter(k => !(c.order || []).includes(k))];
+  return c.order;
+}
+const BLOCK_NAME = (c, k) => k === "writing" ? "What I took from it" : k === "notes" ? "Notes about it" : k === "appears" ? "Appears in" : FLD(c, k.slice(2))?.label || "Section";
+function csSample(c) { const its = colItems(c); return its.find(x => x.id === S.csItem) || its[0] || null; }
+function cardThumb(l) {
+  if (l === "portrait") return `<span class="th th-p"><i class="r"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i></span>`;
+  if (l === "picture") return `<span class="th th-i"><i class="pic"></i><i class="l1"></i><i class="l2"></i></span>`;
+  return `<span class="th th-t"><i class="k"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i></span>`;
+}
+function heroThumb(h) { return `<span class="th th-h th-${h}"><i class="a"></i><i class="b"></i><i class="c"></i></span>`; }
 function renderCustomize() {
   const c = COL(S.col) || D().cols.find(x => x.shape === "object"); S.col = c.id;
-  const objCols = D().cols.filter(x => x.shape === "object"), n = D().items.filter(x => x.col === c.id).length, sample = D().items.find(x => x.col === c.id);
-  const rows = c.fields.map((f, i) => `<li><div class="field-row has-card"><span aria-hidden="true" class="field-num">${i + 1}.</span><input type="text" value="${esc(f.label)}" data-fname="${f.id}" aria-label="Field ${i + 1} name"><select data-ftype="${f.id}" aria-label="Field ${i + 1} type">${Object.entries(TYPE_LABEL).map(([k, t]) => `<option value="${k}" ${k === f.t ? "selected" : ""}>${t}</option>`).join("")}</select><label class="field-card"><input type="checkbox" data-card="${f.id}" ${c.card.includes(f.id) ? "checked" : ""} ${!c.card.includes(f.id) && c.card.length >= 3 ? "disabled" : ""}> Card</label><button class="field-del" type="button" data-act="rmfield" data-f="${f.id}" aria-label="Remove ${esc(f.label)}">✕</button></div>${S.cfgOpen === "all" ? fieldCfg(c, f) : ""}</li>`).join("");
-  return `${header("cols", `${D().items.length} entries, ${D().cols.length} collections`)}
-    <div class="collection-customizer"><nav aria-label="Breadcrumb" class="library-crumb"><a href="#" data-act="go" data-k="wall">Everything</a><i>/</i><a href="#">Collections</a><i>/</i><a href="#" data-act="col" data-id="${c.id}">${esc(c.name)}</a><i>/</i><b>Edit</b></nav>
-    <div class="customizer-layout"><div class="customizer-editor"><h2>Edit collection</h2><p class="small">Fields show on each item's page; up to three can also show on the card. Changes apply to every ${esc(lower(c.label))} (${n}).</p>
-      <div aria-label="Collections" class="coll-select-pills cf-pills" role="group">${objCols.map(x => `<button type="button" class="${x.id === c.id ? "on" : ""}" aria-pressed="${x.id === c.id}" data-act="ccol" data-id="${x.id}"><span aria-hidden="true" class="dot ${x.accent}"></span>${esc(x.name)}</button>`).join("")}<button type="button" class="add-new" data-act="toast" data-msg="Phase 3 (T3): describe what you keep, and Loci fills in this form for you to change and save.">+ New collection</button></div>
-      <section class="cf-section"><h3 class="cf-section-head">About</h3><div class="form-row"><label for="cf-name">Name</label><input id="cf-name" type="text" value="${esc(c.name)}" data-cf="name"></div><div class="form-row"><label for="cf-desc">Description</label><textarea id="cf-desc" rows="2" data-cf="desc">${esc(c.desc)}</textarea></div></section>
-      <section class="cf-section"><h3 class="cf-section-head">Card</h3>
-        <div class="form-row"><span class="form-label">Base</span><div class="coll-select-pills" role="group" data-ph="F3">${["Person", "Group", "Place", "Thing", "Event"].map(b => `<button type="button" class="${(c.base || "thing") === b.toLowerCase() ? "on" : ""}" disabled>${b}</button>`).join("")}</div><p class="small cf-note">A collection's base is chosen when it is created and does not change.</p></div>
-        <div class="form-row"><span class="form-label">Layout</span><div class="coll-select-pills" role="group">${["portrait", "picture", "text"].map(l => `<button type="button" class="${c.layout === l ? "on" : ""}" data-act="layout" data-k="${l}">${cap(l)}</button>`).join("")}</div></div>
-        <div class="form-row"><label for="cf-label">One item is called</label><input id="cf-label" type="text" value="${esc(c.label)}" data-cf="label"></div></section>
-      <section class="cf-section"><h3 class="cf-section-head">Fields</h3><div class="customizer-section-head"><span class="form-label" data-ph="F2">Up to 24</span><span class="small">${c.fields.length} fields</span></div>
-        <div class="preset-bar" data-ph="T1"><span class="small">Start from:</span>${(S.field === "lawyer" ? ["Cases", "Courts", "Judges", "Clauses"] : S.field === "doctor" ? ["Drugs", "Guidelines", "Procedures", "Teaching cases"] : ["Buildings", "Architects", "Materials"]).map(p => `<button class="preset-chip" type="button" data-act="toast" data-msg="${p}: fields with choices, sections and card fields.">${p}</button>`).join("")}</div>
-        <ol class="fields-list" style="list-style:none;margin:0;padding:0">${rows}</ol>
-        <div class="row" style="margin-top:10px;display:flex;gap:10px"><button class="button button-quiet" type="button" data-act="addfield">+ Add a field</button><button class="button button-link" type="button" data-act="cfgall">${S.cfgOpen === "all" ? "Hide field settings" : "Show field settings"}</button></div></section>
-      <section class="cf-section" data-ph="P2"><h3 class="cf-section-head">Page</h3><div class="form-row"><span class="form-label">Top of the page</span><div class="coll-select-pills" role="group">${[["portrait", "Portrait"], ["picture", "Picture"], ["slideshow", "Slideshow"], ["doc", "Document"], ["title", "Title only"]].map(([k, t]) => `<button type="button" class="${(c.hero || (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title")) === k ? "on" : ""}" data-act="hero" data-k="${k}">${t}</button>`).join("")}</div><div class="form-row" data-ph="N3" style="margin-top:14px"><label for="cf-write">Write about it starts with</label><input id="cf-write" type="text" value="${esc(c.write.join(", "))}" data-cfw="1"><p class="small cf-note">Headings, separated by commas. <b>Write about it</b> on any ${esc(lower(c.label))} starts a long note with its card and these headings.</p></div><p class="small cf-note">To move or hide blocks, open any ${esc(lower(c.label))} and choose Arrange page in its ⋯ menu.</p></div></section>
-      <section class="cf-section" data-ph="T3"><h3 class="cf-section-head">Sensitivity</h3><div class="form-row"><div class="coll-select-pills" role="group">${["Normal", "Confidential", "Clinical"].map(s => `<button type="button" class="${(c.clinical ? "Clinical" : "Normal") === s ? "on" : ""}" data-act="sens" data-k="${s}">${s}</button>`).join("")}</div><p class="small cf-note">Confidential and Clinical keep this collection off the record: Loci remembers only the lessons you file.</p></div></section>
-      <div class="customizer-actions"><button class="button" type="button" data-act="toast" data-msg="Saved. Every ${esc(lower(c.label))} now uses it.">Save</button><button class="button button-quiet" type="button" data-act="col" data-id="${c.id}">Cancel</button></div></div>
-    <aside aria-label="Live preview" class="customizer-preview"><div class="preview-sticky"><h3>Preview</h3><div class="preview-box"><p class="lab">Card on the wall</p>${sample ? card(sample, { noMore: true }) : ""}</div>
-      <div class="preview-box"><p class="lab">Item page</p><dl class="props-preview">${c.fields.map(f => `<div class="prop-item"><dt>${esc(f.label)}</dt><dd>${sample ? esc(fieldText(f, sample.v[f.id]).slice(0, 60)) || "—" : "—"}</dd></div>`).join("")}</dl></div></div></aside></div></div>`;
+  const isObj = c.shape === "object", tab = isObj ? (S.cst || "card") : "settings", its = colItems(c), sample = csSample(c);
+  const tabs = isObj ? [["card", "Card"], ["page", "Page"], ["fields", "Fields"], ["settings", "Settings"]] : [["settings", "Settings"]];
+  let stage = "", panel = "";
+  if (tab === "card") {
+    stage = `<div class="cs-wall">${its.length ? its.slice(0, 3).map(x => `<div class="cs-cardwrap${x === sample ? " on" : ""}" data-act="csitem" data-id="${x.id}">${card(x, { noMore: true })}</div>`).join("") : `<p class="small">Add a ${esc(lower(c.label))} to see its card here.</p>`}</div><p class="small cs-cap">Your own ${esc(lower(c.name))}, as they look on the wall. Click one to preview with it.</p>`;
+    const free = c.fields.filter(f => !c.card.includes(f.id) && f.t !== "long" && !f.hidden);
+    panel = `<section class="cs-sec"><h3>Layout</h3><div class="cs-thumbs">${["portrait", "picture", "text"].map(l => `<button type="button" class="cs-thumb${c.layout === l ? " on" : ""}" data-act="layout" data-k="${l}">${cardThumb(l)}<span>${cap(l)}</span></button>`).join("")}</div></section>
+      <section class="cs-sec"><h3>Under the title <span>${c.card.length} of 3</span></h3><p class="small">The fields a card shows, in this order.</p><ol class="cs-slots">${c.card.map((id, k) => `<li><span class="cs-n">${k + 1}</span><i class="cs-ti">${FT[FLD(c, id).t][0]}</i><b>${esc(FLD(c, id).label)}</b>${k ? `<button type="button" data-act="csup" data-f="${id}" aria-label="Move up">↑</button>` : "<span></span>"}<button type="button" data-act="csoff" data-f="${id}" aria-label="Take off the card">×</button></li>`).join("")}${c.card.length < 3 ? `<li class="add"><span class="cs-n">${c.card.length + 1}</span><select data-csadd="1" aria-label="Add a field to the card"><option value="">+ Add a field…</option>${free.map(f => `<option value="${f.id}">${esc(f.label)}</option>`).join("")}</select></li>` : ""}</ol></section>
+      <section class="cs-sec" data-ph="F1"><h3>Also on the card</h3><label class="cs-tog"><input type="checkbox" data-cstog="chips" ${c.chips !== false ? "checked" : ""}> Choices as chips <small>Typology: Mosque</small></label><label class="cs-tog"><input type="checkbox" data-cstog="counts" ${c.counts !== false ? "checked" : ""}> Open questions and goals <small>? 1 · ◎ 1</small></label></section>`;
+  }
+  if (tab === "page") {
+    const blocks = pageBlocks(c), hid = c.hidden || [], hero = c.hero || (c.layout === "portrait" ? "portrait" : c.layout === "picture" ? "picture" : "title");
+    stage = `<div class="cs-page"><div class="cs-pmain"><div class="cs-phero cs-h-${hero}">${hero === "portrait" ? `<span class="cs-port">${sample?.media ? `<img alt="" src="${MEDIA[sample.media]}">` : esc(initials(sample?.title))}</span>` : hero === "picture" && sample?.media ? `<img alt="" src="${MEDIA[sample.media]}">` : hero === "doc" ? `<span class="cs-doc">${esc(sample?.title || c.label)}</span>` : ""}<div><p class="ip-kicker">${esc(c.label)}</p><b>${esc(sample?.title || "Title")}</b></div></div>
+      ${blocks.map(k => `<div class="cs-pb${hid.includes(k) ? " off" : ""}"><span class="cs-pbh">${esc(BLOCK_NAME(c, k))}</span>${k === "writing" ? `<i class="ln"></i><i class="ln s"></i>` : k.startsWith("f:") ? `<span class="cs-pbv">${esc(fieldText(FLD(c, k.slice(2)), sample?.v[k.slice(2)]) || "—").slice(0, 90)}</span>` : k === "notes" ? `<span class="cs-pbv">Margin notes · Write about it</span>` : `<span class="cs-pbv">Mentioned in · Shown in · On boards</span>`}</div>`).join("")}</div>
+      <div class="cs-prail"><p class="ip-rh">Properties</p>${c.fields.filter(f => f.t !== "long" && !f.hidden).map(f => `<div class="cs-prow" data-act="csfield" data-f="${f.id}"><span>${esc(f.label)}</span><b>${esc(fieldText(f, sample?.v[f.id]) || "—").slice(0, 34)}</b></div>`).join("")}<div class="cs-prow muted"><span>In Loci</span><b>Topics</b></div></div></div><p class="small cs-cap">${sample ? `${esc(sample.title)}'s page, drawn small.` : "A page, drawn small."} Click a property to edit its field.</p>`;
+    panel = `<section class="cs-sec"><h3>Top of the page</h3><div class="cs-thumbs five">${[["portrait", "Portrait"], ["picture", "Picture"], ["slideshow", "Slideshow"], ["doc", "Document"], ["title", "Title only"]].map(([k, t]) => `<button type="button" class="cs-thumb${hero === k ? " on" : ""}" data-act="hero" data-k="${k}" data-ph="P2">${heroThumb(k)}<span>${t}</span></button>`).join("")}</div></section>
+      <section class="cs-sec" data-ph="P2"><h3>Sections, in order</h3><ol class="cs-slots cs-blocks">${blocks.map((k, n) => `<li class="${hid.includes(k) ? "off" : ""}"><span class="cs-n">${n + 1}</span><b>${esc(BLOCK_NAME(c, k))}</b>${n ? `<button type="button" data-act="csbup" data-k="${k}" aria-label="Move up">↑</button>` : "<span></span>"}<button type="button" data-act="csbhide" data-k="${k}" aria-label="${hid.includes(k) ? "Show" : "Hide"}">${hid.includes(k) ? "Show" : "Hide"}</button></li>`).join("")}</ol><p class="small">Long text fields are sections. The properties sit in the rail, in the Fields order.</p></section>
+      <section class="cs-sec" data-ph="N3"><h3>Write about it starts with</h3><div class="cs-chips">${c.write.map((h, n) => `<span class="cs-chip">${esc(h)}<button type="button" data-act="cswrm" data-i="${n}" aria-label="Remove ${esc(h)}">×</button></span>`).join("")}<input type="text" class="cs-chipin" data-cswadd="1" placeholder="+ Heading, then Enter"></div><p class="small">A long note about a ${esc(lower(c.label))} opens with its card and these headings.</p></section>`;
+  }
+  if (tab === "fields") {
+    const sel = FLD(c, S.csField);
+    stage = `<div class="cs-fields"><div class="cs-fhead"><span>Field</span><span>${sample ? esc(sample.title) : "Example"}</span><span></span></div>${c.fields.map(f => `<div class="cs-frow${sel === f ? " on" : ""}${f.hidden ? " off" : ""}" data-act="csfield" data-f="${f.id}" draggable="true" data-fdrag="${f.id}"><span class="cs-grip" aria-hidden="true">⋮⋮</span><i class="cs-ti">${FT[f.t][0]}</i><b>${esc(f.label)}</b><span class="cs-fv">${f.t === "choice" ? arr(sample?.v[f.id]).map(v => `<span class="cc">${esc(v)}</span>`).join("") : esc(fieldText(f, sample?.v[f.id]) || "—").slice(0, 60)}</span><span class="cs-tags">${c.card.includes(f.id) ? `<span class="cs-tag">On the card</span>` : ""}${f.t === "long" ? `<span class="cs-tag">Section</span>` : ""}${f.t === "rel" ? `<span class="cs-tag">→ ${esc(COL(f.o.to)?.name || "")}</span>` : ""}${f.hidden ? `<span class="cs-tag">Hidden</span>` : ""}</span></div>`).join("")}
+      <button class="cs-addrow${S.csField === "_add" ? " on" : ""}" type="button" data-act="csaddmode"><span>+</span> Add a field <small>${c.fields.length} of 24</small></button></div><p class="small cs-cap">Drag ⋮⋮ to reorder. The order is the rail's order on every ${esc(lower(c.label))}.</p>`;
+    panel = S.csField === "_add" || !sel ? addPanel(c) : fieldPanel(c, sel);
+  }
+  if (tab === "settings") {
+    const sens = c.clinical ? "Clinical" : c.conf ? "Confidential" : "Normal", pics = [...new Set(its.map(x => x.media).filter(Boolean))];
+    stage = `<div class="cs-set-prev"><p class="lab">On the Collections page</p><div class="cgrid one">${collTile(c)}</div>${isObj ? "" : `<p class="small" style="margin-top:14px">${esc(KIND[kindOf(c)][0])} collections keep the kind's own card and page. Fields, cards and pages are for Objects collections.</p>`}</div>`;
+    panel = `<section class="cs-sec"><h3>Name</h3><div class="form-row"><label for="cs-name">Name</label><input id="cs-name" type="text" value="${esc(c.name)}" data-cs="name"></div>${isObj ? `<div class="form-row"><label for="cs-label">One entry is called</label><input id="cs-label" type="text" value="${esc(c.label)}" data-cs="label"></div>` : ""}<div class="form-row"><label for="cs-desc">Description <small>${c.desc.length} / 1,000</small></label><textarea id="cs-desc" rows="2" data-cs="desc" placeholder="What this collection is for…">${esc(c.desc)}</textarea></div></section>
+      <section class="cs-sec"><h3>Look</h3><div class="cs-sw">${SWATCH.map(([k, t]) => `<button type="button" class="${c.accent === k ? "on" : ""}" data-act="csacc" data-k="${k}"><span class="dot ${k}"></span>${t}</button>`).join("")}</div><p class="small" style="margin:12px 0 6px">Cover</p><div class="cs-covers"><button type="button" class="${!c.cover ? "on" : ""}" data-act="cscover" data-k="">Newest</button>${pics.map(m => `<button type="button" class="${c.cover === m ? "on" : ""}" data-act="cscover" data-k="${m}"><img alt="" src="${MEDIA[m]}"></button>`).join("")}</div></section>
+      ${isObj ? `<section class="cs-sec" data-ph="T3"><h3>Sensitivity</h3><div class="cs-sens">${[["Normal", "Loci remembers what you learn from it."], ["Confidential", "Client work. Loci keeps only the lessons you file."], ["Clinical", "Patients. De-identified bands only, with a banner on every page."]].map(([k, d]) => `<button type="button" class="${sens === k ? "on" : ""}" data-act="sens" data-k="${k}"><b>${k}</b><small>${d}</small></button>`).join("")}</div></section>
+      <section class="cs-sec"><h3>Kind</h3><p class="small">${c.base === "person" ? "People" : "Things"}: chosen when it was made, so every entry keeps its shape.</p></section>` : ""}
+      <section class="cs-sec cs-danger"><h3>Manage</h3><button class="button button-quiet" type="button" data-act="csmerge">Merge into another collection…</button><button class="button button-link" type="button" data-act="toast" data-msg="Deleting a collection moves its ${its.length} entries to Unsorted; nothing in them is lost. Undo is available." style="color:var(--warn)">Delete collection…</button></section>`;
+  }
+  return `${header("cols")}<div class="cs" data-ph="C2"><div class="cs-top"><button class="cs-switch" type="button" data-act="csswitch"><span class="dot ${c.accent}"></span>${esc(c.name)} ▾</button><nav class="cs-tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" type="button" aria-selected="${tab === k}" data-act="cstab" data-k="${k}">${t}</button>`).join("")}</nav><span class="cs-grow"></span><span class="cs-saved" id="cs-saved">${S.csUndo ? `Saved · <button class="button button-link" type="button" data-act="csundo">Undo</button>` : `Changes apply to every ${esc(lower(isObj ? c.label : "entry"))} (${its.length})`}</span><button class="button" type="button" data-act="col" data-id="${c.id}">Done</button></div>
+    <div class="cs-body"><div class="cs-stage">${stage}</div><aside class="cs-panel" aria-label="${esc(cap(tab))} settings">${panel}</aside></div></div>`;
 }
-function fieldCfg(c, f) {
-  let h = "";
-  if (f.t === "choice") h = `<label>Options, separated by commas<input type="text" data-cfg="opts" data-f="${f.id}" value="${esc(f.o.opts.join(", "))}"></label>`;
-  if (f.t === "rel") h = `<label>Links to<select data-cfg="to" data-f="${f.id}">${D().cols.filter(x => x.shape === "object").map(x => `<option value="${x.id}" ${x.id === f.o.to ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label><label>Name on the other side<input type="text" data-cfg="inv" data-f="${f.id}" value="${esc(f.o.inv || "")}" placeholder="e.g. Cited by"></label><span class="rowl"><label><input type="checkbox" data-cfg="many" data-f="${f.id}" ${f.o.many ? "checked" : ""}> Allow several</label></span>`;
-  if (f.t === "long") h = `<span>Shown as its own section on the page, under “What I took from it”.</span>`;
-  if (f.o.year) h += `<span>Read as a year: the collection gets a Timeline view.</span>`;
-  return h ? `<div class="field-cfg" data-ph="${f.t === "rel" ? "F2" : "F1"}">${h}</div>` : "";
+function addPanel(c) {
+  const st = STARTERS[S.field].find(x => x.name === c.name || x.label === c.label), have = new Set(c.fields.map(f => f.label.toLowerCase()));
+  const sug = (st ? st.fields : [["Where", "text"], ["Year", "date"], ["Notes", "long"]]).filter(([l]) => !have.has(l.toLowerCase()));
+  return `<section class="cs-sec"><h3>Add a field</h3>${sug.length ? `<p class="small">Often kept for ${esc(lower(c.name))}:</p><div class="cs-sug">${sug.map(([l, t, o], n) => `<button type="button" data-act="cssug" data-i="${n}"><i>${FT[t][0]}</i>${esc(l)}</button>`).join("")}</div>` : ""}<p class="small" style="margin-top:14px">Or choose a kind:</p><div class="cs-types">${Object.entries(FT).map(([k, [ic, t, s]]) => `<button type="button" data-act="csnew" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${s}</small></button>`).join("")}</div></section>`;
 }
+function fieldPanel(c, f) {
+  const n = colItems(c).filter(x => fieldText(f, x.v[f.id])).length, onCard = c.card.includes(f.id);
+  let cfg = "";
+  if (f.t === "choice") cfg = `<section class="cs-sec"><h3>Choices</h3><div class="cs-chips">${f.o.opts.map((o, k) => `<span class="cs-chip cc">${esc(o)}<button type="button" data-act="csoptrm" data-i="${k}" aria-label="Remove ${esc(o)}">×</button></span>`).join("")}<input type="text" class="cs-chipin" data-csopt="1" placeholder="+ Choice, then Enter"></div><label class="cs-tog"><input type="checkbox" data-csfo="many" ${f.o.many ? "checked" : ""}> More than one can be picked</label></section>`;
+  if (f.t === "rel") cfg = `<section class="cs-sec" data-ph="F2"><h3>Links to</h3><select data-csfo="to">${D().cols.filter(x => x.shape === "object" || x.shape === "source").map(x => `<option value="${x.id}" ${x.id === f.o.to ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select><label class="cs-lab">On ${esc(COL(f.o.to)?.name || "the other")} pages it's called<input type="text" data-csfo="inv" value="${esc(f.o.inv || "")}" placeholder="e.g. Works, Cited by"></label><div class="cs-two"><span><b>${esc(c.label)}</b> → ${esc(f.label)}</span><span><b>${esc(COL(f.o.to)?.label || "")}</b> → ${esc(f.o.inv || c.name)}</span></div><label class="cs-tog"><input type="checkbox" data-csfo="many" ${f.o.many ? "checked" : ""}> Several</label><p class="small">One link, shown on both pages. Changing it on either page changes it on both.</p></section>`;
+  if (f.t === "date") cfg = `<section class="cs-sec"><h3>Dates</h3><label class="cs-tog"><input type="checkbox" data-csfo="year" ${f.o.year ? "checked" : ""}> A year or a range is enough <small>Gives the collection a Timeline</small></label></section>`;
+  return `<section class="cs-sec"><h3><i class="cs-ti">${FT[f.t][0]}</i> ${esc(f.label)}</h3><div class="form-row"><label for="csf-name">Name</label><input id="csf-name" type="text" value="${esc(f.label)}" data-csf="label"></div>
+    <p class="small" style="margin:10px 0 6px">Kind</p><div class="cs-types small-t">${Object.entries(FT).map(([k, [ic, t]]) => `<button type="button" class="${f.t === k ? "on" : ""}" data-act="csftype" data-k="${k}"><i>${ic}</i><b>${t}</b></button>`).join("")}</div></section>${cfg}
+    <section class="cs-sec"><label class="cs-tog"><input type="checkbox" data-cstogf="card" ${onCard ? "checked" : ""} ${!onCard && c.card.length >= 3 ? "disabled" : ""} ${f.t === "long" ? "disabled" : ""}> On the card ${!onCard && c.card.length >= 3 ? "<small>The card already shows three</small>" : ""}</label><label class="cs-tog"><input type="checkbox" data-cstogf="hidden" ${f.hidden ? "checked" : ""}> Hidden on pages <small>Kept, not shown</small></label></section>
+    <section class="cs-sec cs-danger"><p class="small">${n ? `${n} ${esc(lower(n > 1 ? c.name : c.label))} ${n > 1 ? "have" : "has"} a value here.` : "No values yet."}</p><button class="button button-link" type="button" data-act="csfdel" style="color:var(--warn)">${n ? "Delete field and its values…" : "Delete field"}</button></section>`;
+}
+
+/* ---------- Appears in: backlinks on every page (C4) ----------
+   Read from where things are made: mentions, entry cards and images in writing; quotes taken from a source; answers;
+   boards. Each row opens the place and jumps to the exact spot. One step only: a note that mentions a note that mentions
+   this does not appear here. */
+function appearsIn(it) {
+  const rows = [], add = r => { const prev = rows.find(x => x.g === r.g && x.x === r.x && x.where === r.where); if (prev) prev.n++; else rows.push({ n: 1, ...r }); };
+  for (const x of D().items) {
+    if (x === it || x.type === "board") continue;
+    const scan = (body, where) => { let head = ""; toBlocks(body).forEach(b => {
+      if (b.t === "h2" || b.t === "h3") head = plainText(b.text);
+      if (b.t === "card" && b.id === it.id) add({ g: "card", x, head, where, snip: "" });
+      else if (b.t === "img" && it.type === "image" && b.media === it.media) add({ g: "shown", x, head, where, snip: b.cap || "" });
+      else if (b.text && refsIn(b.text).includes(it.id)) { const term = (b.text.match(new RegExp(`@\\[([^\\]]+)\\]\\(item:${it.id}\\)`)) || [])[1] || it.title; add({ g: "mention", x, head, where, snip: plainText(b.text.replace(/^@(question|goal)\s+/i, "")), term }); }
+    }); };
+    scan(x.body, ""); x.margin.forEach(m => scan(m.body, m.at ? `margin note at ${m.at}` : "a margin note"));
+    if (it.type === "image" && x.type === "object" && x.media && x.media === it.media) add({ g: "shown", x, head: "", where: "its picture", snip: "" });
+    if (it.type === "source" && x.type === "quote" && x.src?.em === it.title) add({ g: "quoted", x, where: x.src.loc, snip: x.body });
+  }
+  allInlines().filter(r => st(r.key, r.kind).ans.includes(it.id)).forEach(r => add({ g: "answers", x: r.item, where: r.at ? `margin note at ${r.at}` : "", snip: r.text, key: r.key }));
+  onBoards(it).forEach(b => { const p = b.pl.find(q => q.ref === "i:" + it.id), arrows = b.arrows.filter(a => a.from === p.id || a.to === p.id).map(a => { const other = refOf(b.pl.find(q => q.id === (a.from === p.id ? a.to : a.from))?.ref || "", b); const nm = other ? (other.type === "item" ? other.it.title || "a note" : INL(other.key)?.text) : "?"; return a.from === p.id ? `${a.word} → ${nm}` : `${nm} → ${a.word} this`; }); add({ g: "boards", x: b, where: "", snip: arrows.length ? arrows.join(" · ") : "Placed, no arrows yet" }); });
+  return rows;
+}
+const AP_GROUPS = [["mention", "Mentioned in"], ["card", "Shown as a card in"], ["shown", "Shown in"], ["quoted", "Quoted in"], ["answers", "Answers"], ["boards", "On boards"]];
+const hostIcon = x => x.type === "board" ? "▦" : isLong(x) ? "✎" : x.type === "object" ? "▣" : x.type === "quote" ? "“" : x.type === "source" ? "▤" : x.type === "image" ? "◫" : "¶";
+function markTerm(s, term) { const e = esc(s.length > 170 ? (() => { const i = term ? s.indexOf(term) : -1; return i > 70 ? "…" + s.slice(i - 60, i + 110) + "…" : s.slice(0, 170) + "…"; })() : s); return term ? e.replace(esc(term), `<mark>${esc(term)}</mark>`) : e; }
+function appearsSection(it) {
+  const rows = appearsIn(it), hosts = new Set(rows.map(r => r.x)).size, f = S.apf && rows.some(r => r.g === S.apf) ? S.apf : "all";
+  const empty = `<p class="small ap-empty">Nothing uses it yet. Mention it with <b>@</b> in any note, show it with <b>/ Entry card</b>, or place it on a board. Each place will be listed here.</p>`;
+  return `<section class="ip-shelf ap" id="appears" data-ph="C4 · N2"><div class="ip-shelf-h"><h2>Appears in</h2><span>${hosts}</span></div>${rows.length ? `<p class="small conn-note">Every place that shows or uses it. Open one to go to the exact spot; change it there.</p>
+    ${rows.length > 4 ? `<div class="ap-filters" role="group" aria-label="Show">${[["all", "All"], ...AP_GROUPS.filter(([g]) => rows.some(r => r.g === g))].map(([g, t]) => `<button type="button" data-act="apf" data-k="${g}" aria-pressed="${f === g}">${t}<span>${g === "all" ? rows.length : rows.filter(r => r.g === g).length}</span></button>`).join("")}</div>` : ""}
+    ${AP_GROUPS.filter(([g]) => (f === "all" || f === g) && rows.some(r => r.g === g)).map(([g, t]) => `<h3 class="conn-h">${t} <span>${rows.filter(r => r.g === g).length}</span></h3>${rows.filter(r => r.g === g).map(r => `<button class="ap-row" type="button" data-act="openat" data-id="${r.x.id}" data-t="${it.id}"><span class="ap-ic" aria-hidden="true">${hostIcon(r.x)}</span><span class="ap-t"><b>${esc(r.x.title || plainBody(r.x).slice(0, 50))}</b><small>${esc(kindLabel(r.x))}${r.x.col && COL(r.x.col) ? " · " + esc(COL(r.x.col).name) : ""}${r.head ? ` · under “${esc(r.head)}”` : ""}${r.where ? ` · ${esc(r.where)}` : ""}${r.n > 1 ? ` · ${r.n} times` : ""}</small>${r.snip ? `<span class="ap-s">${markTerm(r.snip, r.term)}</span>` : ""}</span><span class="ap-go" aria-hidden="true">Open ↗</span></button>`).join("")}`).join("")}` : empty}</section>`;
+}
+function apChip(it) { const n = new Set(appearsIn(it).map(r => r.x)).size; return `<button class="ap-chip" type="button" data-act="apjump" data-ph="C4" title="Where this is shown or used">${n ? `↩ Appears in ${n} place${n > 1 ? "s" : ""}` : "↩ Not used anywhere yet"}</button>`; }
+function notesAboutSection(it) {
+  const about = D().items.filter(x => x.about === it.id), canWrite = !isLong(it) && it.type !== "note" && it.type !== "quote";
+  const src = it.type === "source" ? `<button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="question" data-ph="Q3">? Question here</button><button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="goal">◎ Goal here</button>` : "";
+  return `<section class="notes-about ip-shelf" id="notes-about" data-ph="Q3 · N3"><div class="ip-shelf-h"><h2>Notes about it</h2><span>${it.margin.length + about.length}</span></div>
+    ${about.length ? `<div class="ip-cards">${about.map(x => card(x)).join("")}</div>` : ""}${it.margin.length ? `<div class="notes-about-list ip-cards">${marginCards(it)}</div>` : ""}
+    ${!about.length && !it.margin.length ? `<p class="small" style="margin:-4px 0 10px">Nothing yet. A margin note is a line beside it; ${canWrite ? "<b>Write about it</b> starts a long note that's about it." : "it stays with this page."}</p>` : ""}
+    <div class="mn-add"><button class="button button-quiet" type="button" data-act="addmargin">Add a margin note</button>${canWrite ? `<button class="button" type="button" data-act="writeabout" data-id="${it.id}" data-ph="N3">Write about it</button>` : ""}${src}</div></section>`;
+}
+/** After opening an entry from Appears in: scroll to the exact spot and flash it. */
+function doJump() {
+  const t = S.jump; S.jump = null; if (!t) return;
+  if (S.screen === "board") { const b = I(S.board), p = b?.pl.find(q => q.ref === "i:" + t); if (p) setTimeout(() => { const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 120) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); document.querySelector(`[data-pid="${p.id}"]`)?.classList.add("sel", "flash"); }, 60); return; }
+  const it = I(t), el = document.querySelector(`#main [data-mention="${t}"]`) || document.querySelector(`#main .nb[data-ref="${t}"]`) || (it?.media && document.querySelector(`#main .nb[data-media="${it.media}"]`));
+  const box = el?.closest(".nb, .mcard, .inl") || el;
+  if (box) { box.scrollIntoView({ block: "center" }); box.classList.add("flash"); setTimeout(() => box.classList.remove("flash"), 2400); }
+}
+
+const longSec = (c, it, id) => { const f = FLD(c, id); return f && !f.hidden && it.v[f.id] ? `<section class="ip-writing doc" data-ph="P1"><h2>${esc(f.label)}</h2><div class="markdown-body"><p>${esc(it.v[f.id])}</p></div></section>` : ""; };
+const propF = (f, html, ph) => `<div class="prop"${ph ? ` data-ph="${ph}"` : ""}><span><button class="prop-lab" type="button" data-act="editfield" data-f="${f.id}" title="Edit this field for the whole collection">${esc(f.label)}</button></span><div class="prop-value">${html}</div></div>`;
 
 /* ---------- board ---------- */
 function refOf(ref, b = I(S.board)) {
@@ -907,7 +1224,7 @@ function editorHTML(it, opts = {}) {
       default: inner = ed("", bl.length === 1 ? (opts.empty || "Write, or type / for blocks and @ for a question, goal or entry") : "Type / for blocks · @ for a question, goal or entry");
     }
     const key = plainText(b.text || b.cap || "").slice(0, 40), mn = key ? anchors.filter(m => m.block === key).length : 0;
-    return `<div class="nb nb-${b.t}" data-i="${i}"><div class="nb-h" contenteditable="false"><button type="button" class="nb-add" data-act="nbadd" data-i="${i}" title="Add a block below" aria-label="Add a block below">+</button><button type="button" class="nb-grip" draggable="true" data-act="nbmenu" data-i="${i}" title="Drag to move · click for options" aria-label="Block options">⋮⋮</button></div><div class="nb-c">${inner}${["p", "li", "ol", "quote"].includes(b.t) ? offerFor(b.text) : ""}</div>${mn ? `<button type="button" class="nb-mn" data-act="mnjump" title="Margin notes on this block" data-ph="N3">✎ ${mn}</button>` : ""}</div>`;
+    return `<div class="nb nb-${b.t}" data-i="${i}" data-ref="${b.t === "card" ? b.id : ""}" data-media="${b.t === "img" ? b.media : ""}"><div class="nb-h" contenteditable="false"><button type="button" class="nb-add" data-act="nbadd" data-i="${i}" title="Add a block below" aria-label="Add a block below">+</button><button type="button" class="nb-grip" draggable="true" data-act="nbmenu" data-i="${i}" title="Drag to move · click for options" aria-label="Block options">⋮⋮</button></div><div class="nb-c">${inner}${["p", "li", "ol", "quote"].includes(b.t) ? offerFor(b.text) : ""}</div>${mn ? `<button type="button" class="nb-mn" data-act="mnjump" title="Margin notes on this block" data-ph="N3">✎ ${mn}</button>` : ""}</div>`;
   }).join("")}</div>`;
 }
 /** Read-only, for margin notes, short-note cards on a board and anywhere the writing isn't being edited. */
@@ -946,22 +1263,7 @@ function snippet(x, id) {
 function marginCards(it) {
   return it.margin.map((m, i) => `<article class="mcard note" data-frame="paper" data-kind="note"><div class="ci"><div class="body">${m.at ? `<button class="note-time" type="button">${esc(m.at)}</button>` : ""}<div class="markdown-body mn-body">${renderBody(it, i)}</div></div><div class="ft"><div class="ft-meta"><span class="ft-shape">Margin note</span></div></div></div></article>`).join("");
 }
-function connections(it) {
-  const about = D().items.filter(x => x.about === it.id), mi = mentionedIn(it), ob = onBoards(it);
-  const answered = allInlines().filter(r => st(r.key, r.kind).ans.includes(it.id));
-  const canWrite = !isLong(it) && it.type !== "note" && it.type !== "quote";
-  const src = it.type === "source" ? `<button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="question" data-ph="Q3">? Question here</button><button class="button button-quiet" type="button" data-act="mq" data-id="${it.id}" data-k="goal">◎ Goal here</button>` : "";
-  const notes = `<section class="notes-about ip-shelf" id="notes-about" data-ph="Q3 · N3"><div class="ip-shelf-h"><h2>Notes about it</h2><span>${it.margin.length + about.length}</span></div>
-    ${about.length ? `<div class="ip-cards">${about.map(x => card(x)).join("")}</div>` : ""}${it.margin.length ? `<div class="notes-about-list ip-cards">${marginCards(it)}</div>` : ""}
-    ${!about.length && !it.margin.length ? `<p class="small" style="margin:-4px 0 10px">Nothing yet. A margin note is a line beside it; ${canWrite ? "<b>Write about it</b> starts a long note that's about it." : "it stays with this page."}</p>` : ""}
-    <div class="mn-add"><button class="button button-quiet" type="button" data-act="addmargin">Add a margin note</button>${canWrite ? `<button class="button" type="button" data-act="writeabout" data-id="${it.id}" data-ph="N3">Write about it</button>` : ""}${src}</div></section>`;
-  const n = mi.length + answered.length + ob.length;
-  const where = n ? `<section class="ip-shelf conn" data-ph="N2"><div class="ip-shelf-h"><h2>Where it appears</h2><span>${n}</span></div><p class="small conn-note">Each one is changed where it was made. Open it to change it.</p>
-    ${mi.length ? `<h3 class="conn-h">Mentioned in <span>${mi.length}</span></h3>${mi.map(x => `<button class="conn-row" type="button" data-act="open" data-id="${x.id}"><span class="conn-k">${esc(kindLabel(x))}</span><b>${esc(x.title || plainBody(x).slice(0, 50))}</b><span class="conn-s">${esc(snippet(x, it.id))}</span></button>`).join("")}` : ""}
-    ${answered.length ? `<h3 class="conn-h" data-ph="Q-O">Answers <span>${answered.length}</span></h3>${answered.map(r => `<div class="conn-row ans"><span class="conn-k" style="color:var(--ok)">✓ Answered</span><b style="font:15px/1.4 var(--read)">${esc(r.text)}</b><span class="conn-s qgrow" style="padding:0;border:0;display:block"><span class="host">${hostLink(r)}</span></span></div>`).join("")}` : ""}
-    ${ob.length ? `<h3 class="conn-h" data-ph="B2">On boards <span>${ob.length}</span></h3>${ob.map(b => { const p = b.pl.find(x => x.ref === "i:" + it.id), k = b.arrows.filter(a => a.from === p.id || a.to === p.id).length; return `<button class="conn-row" type="button" data-act="openboard" data-id="${b.id}"><span class="conn-k">Board</span><b>${esc(b.title)}</b><span class="conn-s">${k ? `${k} arrow${k > 1 ? "s" : ""} to or from it` : "Placed, no arrows yet"}</span></button>`; }).join("")}` : ""}</section>` : "";
-  return notes + where;
-}
+function connections(it) { return notesAboutSection(it) + appearsSection(it); }
 
 /* ---------- the long note page (N1) ---------- */
 function backLabel() { const h = S.hist.at(-1); if (!h) return "Commonplace"; if (h.screen === "board") return I(h.board)?.title || "Board"; if (h.screen === "qg") return "Questions and goals"; if (h.screen === "item" || h.screen === "note") return I(h.item)?.title || "Back"; return "Commonplace"; }
@@ -979,7 +1281,7 @@ function renderNote() {
     ${it.col ? prop("Collection", `<a class="entity-link" href="#" data-act="col" data-id="${it.col}">${esc(COL(it.col).name)}</a> <button class="button button-link" type="button">Move to collection</button>`) : ""}
     ${prop("Blocks", esc(blockSummary(bl)))}
     <div class="row rail-actions"><a class="btn-open-graph" href="#">Open in Loci →</a></div><div class="rail-delete-row"><button class="button button-link rail-delete" type="button">Delete…</button></div>`;
-  return `<div class="ipage np${S.details ? " with-details" : ""}"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">Long note</span><span class="ip-saved" id="saved" aria-live="polite"></span><button class="button button-quiet np-dbtn" type="button" data-act="details" aria-pressed="${!!S.details}">Details</button><button class="ip-more" type="button" aria-label="Actions for this note">${SVG.ipmore}</button></div>
+  return `<div class="ipage np${S.details ? " with-details" : ""}"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">Long note</span>${apChip(it)}<span class="ip-saved" id="saved" aria-live="polite"></span><button class="button button-quiet np-dbtn" type="button" data-act="details" aria-pressed="${!!S.details}">Details</button><button class="ip-more" type="button" aria-label="Actions for this note">${SVG.ipmore}</button></div>
     <div class="np-grid"><nav class="np-outline" aria-label="Outline">${heads.length >= 2 ? `<p class="np-ol-h">On this page</p>${heads.map(h => `<button type="button" class="${h.b.t}" data-act="olgo" data-i="${h.i}">${esc(plainText(h.b.text))}</button>`).join("")}` : ""}</nav>
       <article class="np-doc" data-ph="N1"><p class="ip-kicker">Long note${it.col ? ` · ${esc(COL(it.col).name)}` : ""}</p>${ipTitle(it.title)}
         <div class="np-meta">${ab ? `<span class="np-about" data-ph="N3">About <button class="entity-pill obj" type="button" data-act="open" data-id="${ab.id}">${esc(ab.title)}</button></span>` : `<button class="addv" type="button" data-act="aboutpick" data-ph="N3">+ What is it about?</button>`}${it.topics.map(t => `<span class="np-topic"><span class="dot s${t.s}"></span>${esc(t.n)}</span>`).join("")}<span class="np-count">${refs.length ? `${refs.length} entr${refs.length > 1 ? "ies" : "y"} · ` : ""}${ng ? `◎ ${ng} · ` : ""}${nq ? `? ${nq} · ` : ""}Saved as you type</span></div>
@@ -1067,7 +1369,7 @@ function choosePick(n) {
   const span = document.createElement("span"); span.className = "mention"; span.contentEditable = "false"; span.dataset.mention = x.id; span.textContent = x.title;
   r.insertNode(document.createTextNode("\u00a0")); r.insertNode(span);
   b.text = ser(el); commit(); edRender(p.i, p.from + x.title.length + 1);
-  toast(`Linked. ${x.title}'s page lists this under Where it appears › Mentioned in.`);
+  toast(`Linked. ${x.title}'s page lists this under Appears in › Mentioned in.`);
 }
 const imgMenu = () => mHead("Image · from your photos") + Object.keys(MEDIA).map(k => `<button type="button" class="mi pk-img" data-act="nbimgset" data-k="${k}"><img alt="" src="${MEDIA[k]}"><span>${esc(MEDIA_LABEL[k])}</span></button>`).join("") + mItem("toast", "Upload from this device…", false, `data-msg="In the app this opens the file picker; the image is kept with this note and isn't a Photo on the wall unless you add it to Photos."`);
 const cardMenu = () => mHead("Entry card") + D().cols.filter(c => c.shape === "object").map(c => mHead(c.name) + D().items.filter(x => x.col === c.id).map(x => mItem("nbcardset", esc(x.title), false, `data-id="${x.id}"`)).join("")).join("") + mHead("Notes and sources") + D().items.filter(x => (x.type === "source" || isLong(x)) && x.id !== S.ed?.id).map(x => mItem("nbcardset", esc(x.title), false, `data-id="${x.id}"`)).join("") + mHead("Boards") + boards().map(x => mItem("nbcardset", "▦ " + esc(x.title), false, `data-id="${x.id}"`)).join("");
@@ -1117,7 +1419,7 @@ function edKey(e, el) {
 /* ---------- render ---------- */
 function renderProto() {
   $("#proto").innerHTML = `<b>Prototype</b><div class="seg" role="group" aria-label="Sample learner">${Object.keys(DB).map(k => `<button type="button" data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
-    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="note" aria-pressed="${S.screen === "note"}">Long note</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="cols" aria-pressed="${S.screen === "customize"}">Customize</button></div>
+    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="note" aria-pressed="${S.screen === "note"}">Long note</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="studio" aria-pressed="${S.screen === "customize"}">Customize</button></div>
     <label><input type="checkbox" id="phases" ${S.phases ? "checked" : ""}> Show phases</label>`;
   document.body.classList.toggle("phases", S.phases);
 }
@@ -1130,10 +1432,13 @@ function render() {
   else if (S.screen === "note") m.innerHTML = renderNote();
   else if (S.screen === "qg") m.innerHTML = renderQG();
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
+  else if (S.screen === "colls") m.innerHTML = renderColls();
   else if (S.screen === "board") { m.innerHTML = renderBoard(); requestAnimationFrame(drawArrows); }
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
+  $("#wiz").innerHTML = wizHTML();
+  if (S.jump) requestAnimationFrame(doJump);
 }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
 function masonry() { const m = $("#mason"); if (!m) return; for (const el of m.children) { el.style.setProperty("--masonry-span", "1"); } for (const el of m.children) { const h = el.getBoundingClientRect().height; el.style.setProperty("--masonry-span", String(Math.ceil((h + 12) / 20))); } }
@@ -1214,7 +1519,7 @@ document.addEventListener("click", e => {
   if (S.skipClick) { S.skipClick = false; return; }
   const a = e.target.closest("[data-act]");
   if (a && a.tagName === "A") e.preventDefault();
-  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick", "nbmenu", "aboutpick", "sellink", "addmargin"].includes(a.dataset.act))) closeMenu();
+  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick", "nbmenu", "aboutpick", "sellink", "addmargin", "csswitch", "csfdel", "csmerge"].includes(a.dataset.act))) closeMenu();
   const line = e.target.closest("[data-arrow]");
   if (line && S.screen === "board") { openArrow(line.dataset.arrow, e.clientX, e.clientY); return; }
   if (!e.target.closest("#apop") && !$("#apop").hidden) closeApop();
@@ -1241,7 +1546,7 @@ document.addEventListener("click", e => {
     case "nbcardline": { const bl = S.ed.blocks, i = menuKey, x = I(bl[i].id); bl[i] = { t: "p", text: x ? `@[${x.title}](item:${x.id})` : "" }; closeMenu(); commit(); edRender(i, "end"); break; }
     case "unmention": { const { bi, id } = menuKey, b = S.ed.blocks[bi]; b.text = b.text.replace(new RegExp(`@\\[([^\\]]+)\\]\\(item:${id}\\)`), "$1"); closeMenu(); commit(); edRender(bi, "end"); break; }
     case "mentioncard": { const { bi, id } = menuKey; S.ed.blocks.splice(bi + 1, 0, { t: "card", id }); closeMenu(); commit(); edRender(); break; }
-    case "mentionoffer": { const i = +a.closest(".nb").dataset.i, b = S.ed.blocks[i], x = I(d.id); b.text = b.text.replace(x.title, `@[${x.title}](item:${x.id})`); commit(); edRender(i, "end"); toast(`Linked. ${x.title}'s page lists this under Where it appears › Mentioned in.`); break; }
+    case "mentionoffer": { const i = +a.closest(".nb").dataset.i, b = S.ed.blocks[i], x = I(d.id); b.text = b.text.replace(x.title, `@[${x.title}](item:${x.id})`); commit(); edRender(i, "end"); toast(`Linked. ${x.title}'s page lists this under Appears in › Mentioned in.`); break; }
     case "aboutpick": { e.stopPropagation(); const it = I(S.item); openMenu(a, mHead("What is this note about?") + D().items.filter(x => x.type === "object" || x.type === "source").map(x => mItem("aboutset", esc(x.title), it.about === x.id, `data-id="${x.id}"`)).join("") + mItem("aboutset", "Nothing in particular", !it.about, 'data-id=""')); break; }
     case "aboutset": { const it = I(S.item); it.about = d.id || null; closeMenu(); render(); if (d.id) toast(`Listed on ${I(d.id).title}'s page under Notes about it.`); break; }
     case "writeabout": writeAbout(I(d.id)); break;
@@ -1254,8 +1559,51 @@ document.addEventListener("click", e => {
     case "selmargin": addMargin(S.ed.blocks[S.selBi], S.selRange?.toString().trim()); break;
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
+    case "openat": S.jump = d.t; openEntry(d.id); break;
+    case "apjump": document.getElementById("appears")?.scrollIntoView({ behavior: "smooth", block: "start" }); break;
+    case "apf": S.apf = d.k; render(); document.getElementById("appears")?.scrollIntoView({ block: "start" }); break;
+    case "ck": S.ck = d.k; render(); break;
+    case "editcoll": S.col = d.id; S.cst = "card"; S.csField = null; S.csUndo = null; go("customize"); break;
+    case "editfield": { const it = I(S.item); S.col = it.col; S.cst = "fields"; S.csField = d.f; S.csUndo = null; go("customize"); break; }
+    case "cstab": S.cst = d.k; if (d.k !== "fields") S.csField = null; render(); break;
+    case "csitem": S.csItem = d.id; render(); break;
+    case "csswitch": { e.stopPropagation(); const obj = D().cols.filter(c => c.shape === "object"), other = D().cols.filter(c => c.shape !== "object"); openMenu(a, mHead("Objects") + obj.map(c => mItem("cscol", `<span class="dot ${c.accent}"></span> ${esc(c.name)}`, c.id === S.col, `data-id="${c.id}"`)).join("") + mHead("Notes, sources, photos") + other.map(c => mItem("cscol", esc(c.name), c.id === S.col, `data-id="${c.id}"`)).join("") + mItem("newcoll", "+ New collection", false)); break; }
+    case "cscol": closeMenu(); S.col = d.id; S.csField = null; S.csItem = null; S.csUndo = null; render(); break;
+    case "csup": { csSnap(); const c = COL(S.col), i = c.card.indexOf(d.f); [c.card[i - 1], c.card[i]] = [c.card[i], c.card[i - 1]]; render(); break; }
+    case "csoff": { csSnap(); const c = COL(S.col); c.card = c.card.filter(x => x !== d.f); render(); break; }
+    case "csbup": { csSnap(); const c = COL(S.col), o = pageBlocks(c), i = o.indexOf(d.k); [o[i - 1], o[i]] = [o[i], o[i - 1]]; render(); break; }
+    case "csbhide": { csSnap(); const c = COL(S.col), h = c.hidden || []; c.hidden = h.includes(d.k) ? h.filter(x => x !== d.k) : [...h, d.k]; render(); break; }
+    case "cswrm": { csSnap(); COL(S.col).write.splice(+d.i, 1); render(); break; }
+    case "csfield": { const c = COL(S.col); S.cst = "fields"; S.csField = d.f; render(); break; }
+    case "csaddmode": S.csField = "_add"; render(); break;
+    case "csnew": case "cssug": { csSnap(); const c = COL(S.col); if (c.fields.length >= 24) { toast("A collection keeps up to 24 fields. Hide or delete one first."); break; }
+      let label, t, o = {};
+      if (d.act === "cssug") { const st = STARTERS[S.field].find(x => x.name === c.name || x.label === c.label), have = new Set(c.fields.map(f => f.label.toLowerCase())), sug = (st ? st.fields : [["Where", "text"], ["Year", "date"], ["Notes", "long"]]).filter(([l]) => !have.has(l.toLowerCase())), s = sug[+d.i]; [label, t] = s; if (t === "choice") o = { opts: [...s[2]] }; if (t === "rel") o = { to: s[2], many: true, inv: "" }; if (t === "date") o = { year: true }; }
+      else { t = d.k; label = "New " + FT[t][1].toLowerCase().replace("…", ""); if (t === "choice") o = { opts: ["First", "Second"] }; if (t === "rel") o = { to: D().cols.find(x => x.shape === "object" && x.id !== c.id)?.id || c.id, many: true, inv: "" }; if (t === "date") o = { year: true }; }
+      const f = F("f" + Date.now(), label, t, o); c.fields.push(f); S.csField = f.id; render(); if (d.act === "csnew") { const i = $("#csf-name"); i?.focus(); i?.select(); } toast(`${label} added to every ${lower(c.label)}. It shows in the rail${t === "long" ? " as a section" : ""}.`); break; }
+    case "csftype": { csSnap(); const c = COL(S.col), f = FLD(c, S.csField), had = colItems(c).some(x => fieldText(f, x.v[f.id])); f.t = d.k; if (d.k === "choice" && !f.o.opts) f.o.opts = ["First", "Second"]; if (d.k === "rel" && !f.o.to) Object.assign(f.o, { to: D().cols.find(x => x.shape === "object" && x.id !== c.id)?.id || c.id, many: true }); if (d.k === "long") c.card = c.card.filter(x => x !== f.id); render(); if (had) toast("Values that don't fit the new kind are kept, and shown as text until you change them."); break; }
+    case "csoptrm": { csSnap(); const f = FLD(COL(S.col), S.csField); f.o.opts.splice(+d.i, 1); render(); break; }
+    case "csfdel": { const c = COL(S.col), f = FLD(c, S.csField), n = colItems(c).filter(x => fieldText(f, x.v[f.id])).length; if (!n) { csSnap(); c.fields = c.fields.filter(x => x !== f); c.card = c.card.filter(x => x !== f.id); S.csField = null; render(); break; } e.stopPropagation(); openMenu(a, mHead(`${n} ${n > 1 ? "entries have" : "entry has"} a value`) + mItem("csfhide", "Hide it instead, keep the values", false) + mItem("csfdelok", `<span style="color:var(--warn)">Delete the field and ${n} value${n > 1 ? "s" : ""}</span>`, false)); break; }
+    case "csfhide": { csSnap(); FLD(COL(S.col), S.csField).hidden = true; closeMenu(); render(); toast("Hidden on every page. The values are kept; show it again any time."); break; }
+    case "csfdelok": { csSnap(); const c = COL(S.col), f = FLD(c, S.csField); c.fields = c.fields.filter(x => x !== f); c.card = c.card.filter(x => x !== f.id); S.csField = null; closeMenu(); render(); toast(`${f.label} deleted. Undo brings it back with its values.`); break; }
+    case "csacc": csSnap(); COL(S.col).accent = d.k; render(); break;
+    case "cscover": csSnap(); COL(S.col).cover = d.k || null; render(); break;
+    case "csmerge": { e.stopPropagation(); const c = COL(S.col); openMenu(a, mHead(`Merge ${esc(c.name)} into…`) + D().cols.filter(x => x !== c && x.shape === c.shape).map(x => mItem("toast", esc(x.name), false, `data-msg="Its ${colItems(c).length} entries would move to ${esc(x.name)}. Fields with the same name and kind join; the others come along as new fields, so nothing is lost."`)).join("")); break; }
+    case "csundo": { const u = S.csUndo; if (!u) break; const c = COL(u.id); Object.keys(c).forEach(k => delete c[k]); Object.assign(c, JSON.parse(u.c)); u.v.forEach(([id, v]) => { const x = I(id); if (x) x.v = v; }); S.csUndo = null; render(); toast("Undone."); break; }
+    case "newcoll": closeMenu(); S.wiz = { step: 1, kind: null, start: null, name: "", label: "", accent: "s3" }; render(); break;
+    case "wzkind": S.wiz.kind = d.k; render(); break;
+    case "wzstart": { const w = S.wiz, st = STARTERS[S.field][+d.i]; w.start = +d.i; if (st) { w.name = w.name || st.name; w.label = w.label || st.label; } render(); break; }
+    case "wznext": { const w = S.wiz; w.step = w.step === 1 && w.kind !== "object" ? 3 : w.step + 1; render(); $("#wz-name")?.focus(); break; }
+    case "wzback": { const w = S.wiz; w.step = w.step === 3 && w.kind !== "object" ? 1 : w.step - 1; render(); break; }
+    case "wzclose": S.wiz = null; render(); break;
+    case "wzacc": S.wiz.accent = d.k; render(); break;
+    case "wzmake": { const w = S.wiz, id = "c" + Date.now(); let c;
+      if (w.kind === "object") { const st = w.start >= 0 ? STARTERS[S.field][w.start] : null; c = st ? fromStarter(st, id) : C(id, "", "object", { base: "thing", layout: "text" }); c.name = w.name.trim() || st?.name || "Untitled"; c.label = w.label.trim() || st?.label || "Entry"; }
+      else c = C(id, w.name.trim() || KIND[w.kind][0], w.kind);
+      c.accent = w.accent; D().cols.push(c); S.wiz = null; S.col = id; S.cst = c.shape === "object" ? "fields" : "settings"; S.csField = null; S.csUndo = null; go("customize");
+      toast(c.shape === "object" ? `${c.name} is made. These are its fields; change anything, then add your first ${lower(c.label)}.` : `${c.name} is made.`); break; }
 
-    case "go": if (d.k === "note") { S.item = DB[S.field].page; S.ed = null; go("note"); } else if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
+    case "go": if (d.k === "note") { S.item = DB[S.field].page; S.ed = null; go("note"); } else if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") go("colls"); else if (d.k === "studio") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; S.cst = S.cst || "card"; S.csUndo = null; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
     case "type": S.type = d.k; S.col = null; go("wall"); break;
     case "col": S.col = d.id; S.type = COL(d.id).shape === "image" ? "image" : COL(d.id).shape; go("wall"); break;
     case "view": COL(S.col).view = d.k; render(); break;
@@ -1264,7 +1612,7 @@ document.addEventListener("click", e => {
     case "open": openEntry(d.id); break;
     case "openboard": pushHist(); S.board = d.id; go("board", true); break;
     case "back": { const h = S.hist.pop(); if (!h) { go("wall"); break; } Object.assign(S, { item: h.item, board: h.board }); S.ed = null; go(h.screen, true); break; }
-    case "customize": if (S.screen === "item") S.col = I(S.item).col; go("customize"); break;
+    case "customize": if (S.screen === "item") { S.col = I(S.item).col; S.cst = "fields"; S.csField = "_add"; } else { S.cst = "card"; S.csField = null; } S.csUndo = null; go("customize"); break;
     case "ccol": S.col = d.id; render(); break;
     case "stmenu": e.stopPropagation(); menuKey = d.k; openMenu(a, stMenu(d.k)); break;
     case "setst": { const r = INL(menuKey); st(menuKey, r.kind).status = d.v; closeMenu(); render(); toast(`${r.kind === "goal" ? "Goal" : "Question"} marked ${d.v}, everywhere it shows.`); break; }
@@ -1290,9 +1638,9 @@ document.addEventListener("click", e => {
     case "offer": { const o = $("#apop")._off[+d.i]; if (o.kind === "field") { const X = I(o.x), f = FLD(COL(X.col), o.f); X.v[f.id] = f.o.many ? [...arr(X.v[f.id]), o.y] : [o.y]; toast(`${X.title}: ${f.label} is now ${I(o.y).title}. It shows on the Object's page and as a field link here.`); } else { const s = st(o.key, "question"); s.ans.push(o.id); s.status = "answered"; toast(`Answered in ${I(o.id).title}. Its page now lists the question under Answers.`); } closeApop(); render(); break; }
     case "delarrow": { const b = I(S.board); b.arrows = b.arrows.filter(z => z.id !== $("#apop")._a); $("#apop").hidden = true; drawArrows(); break; }
     case "closeapop": closeApop(); break;
-    case "layout": COL(S.col).layout = d.k; render(); break;
-    case "hero": COL(S.col).hero = d.k; render(); toast("Every page in this collection now opens with this top."); break;
-    case "sens": COL(S.col).clinical = d.k === "Clinical"; render(); break;
+    case "layout": csSnap(); COL(S.col).layout = d.k; render(); break;
+    case "hero": csSnap(); COL(S.col).hero = d.k; render(); toast("Every page in this collection now opens with this top."); break;
+    case "sens": { csSnap(); const c = COL(S.col); c.clinical = d.k === "Clinical"; c.conf = d.k === "Confidential"; render(); break; }
     case "addfield": { const c = COL(S.col), f = F("f" + Date.now(), "New field", "text"); c.fields.push(f); render(); setTimeout(() => { const i = document.querySelector(`[data-fname="${f.id}"]`); i?.focus(); i?.select(); }, 0); break; }
     case "rmfield": { const c = COL(S.col); c.fields = c.fields.filter(f => f.id !== d.f); c.card = c.card.filter(x => x !== d.f); render(); break; }
     case "cfgall": S.cfgOpen = S.cfgOpen === "all" ? null : "all"; render(); break;
@@ -1432,6 +1780,37 @@ function kb(k) {
   if (k === "slash") { S.ed.blocks.splice(i + 1, 0, { t: "p", text: "" }); edRender(i + 1, "start"); showPick("slash", i + 1, "", document.querySelector(`.nb[data-i="${i + 1}"] .nb-t`)); return; }
   if (k === "at") { const before = el.textContent.slice(0, caretOff(el)); document.execCommand("insertText", false, (before && !/\s$/.test(before) ? " " : "") + "@"); }
 }
+
+/* the studio: changes save as they're made; Undo takes back the last one */
+function csSnap() { const c = COL(S.col); S.csUndo = { id: c.id, c: JSON.stringify(c), v: colItems(c).map(x => [x.id, JSON.parse(JSON.stringify(x.v || {}))]) }; }
+document.addEventListener("dragstart", e => { const r = e.target.closest?.("[data-fdrag]"); if (!r) return; S.fdrag = r.dataset.fdrag; e.dataTransfer.setData("text/plain", "field"); r.classList.add("dragging"); });
+document.addEventListener("dragover", e => { if (!S.fdrag) return; const r = e.target.closest?.(".cs-frow"); if (!r) return; e.preventDefault(); const b = r.getBoundingClientRect(), below = e.clientY > b.top + b.height / 2; document.querySelectorAll(".cs-frow.drop-above,.cs-frow.drop-below").forEach(x => x.classList.remove("drop-above", "drop-below")); r.classList.add(below ? "drop-below" : "drop-above"); });
+document.addEventListener("drop", e => { if (!S.fdrag) return; e.preventDefault(); const r = e.target.closest?.(".cs-frow"), c = COL(S.col); if (r && r.dataset.f !== S.fdrag) { csSnap(); const from = c.fields.findIndex(f => f.id === S.fdrag), [f] = c.fields.splice(from, 1); let to = c.fields.findIndex(x => x.id === r.dataset.f) + (r.classList.contains("drop-below") ? 1 : 0); c.fields.splice(to, 0, f); } S.fdrag = null; render(); });
+document.addEventListener("dragend", () => { if (S.fdrag) { S.fdrag = null; render(); } });
+document.addEventListener("input", e => {
+  const t = e.target, c = COL(S.col);
+  if (t.id === "cq") { S.cq = t.value; const pos = t.selectionStart; render(); const q = $("#cq"); q.focus(); q.setSelectionRange(pos, pos); }
+  else if (t.dataset?.wz) S.wiz[t.dataset.wz] = t.value;
+  else if (t.dataset?.cs && c) { c[t.dataset.cs] = t.value; const sv = $("#cs-saved"); if (sv) sv.textContent = "Saved"; }
+  else if (t.dataset?.csf && c) FLD(c, S.csField).label = t.value;
+  else if (t.dataset?.csfo === "inv" && c) FLD(c, S.csField).o.inv = t.value;
+}, true);
+document.addEventListener("focusin", e => { const t = e.target; if ((t.dataset?.cs || t.dataset?.csf) && COL(S.col)) csSnap(); });
+document.addEventListener("change", e => {
+  const t = e.target, c = COL(S.col); if (!t.dataset) return;
+  if (t.dataset.wz) render();
+  else if (t.dataset.cs || t.dataset.csf) render();
+  else if (t.dataset.csadd && t.value) { csSnap(); c.card.push(t.value); render(); }
+  else if (t.dataset.cstog) { csSnap(); c[t.dataset.cstog] = t.checked; render(); }
+  else if (t.dataset.cstogf) { csSnap(); const f = FLD(c, S.csField); if (t.dataset.cstogf === "card") c.card = t.checked ? [...c.card, f.id] : c.card.filter(x => x !== f.id); else f.hidden = t.checked; render(); }
+  else if (t.dataset.csfo) { csSnap(); const f = FLD(c, S.csField), k = t.dataset.csfo; f.o[k] = t.type === "checkbox" ? t.checked : t.value; render(); }
+});
+document.addEventListener("keydown", e => {
+  const t = e.target; if (e.key !== "Enter" || !(t.dataset?.cswadd || t.dataset?.csopt)) return;
+  e.preventDefault(); const v = t.value.trim(), c = COL(S.col); if (!v) return; csSnap();
+  if (t.dataset.cswadd) c.write.push(v); else { const f = FLD(c, S.csField); if (!f.o.opts.includes(v)) f.o.opts.push(v); }
+  render(); document.querySelector(t.dataset.cswadd ? "[data-cswadd]" : "[data-csopt]")?.focus();
+}, true);
 
 S.board = DB[S.field].start;
 render();
