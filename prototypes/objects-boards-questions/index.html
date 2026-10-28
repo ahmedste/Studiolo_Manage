@@ -5148,33 +5148,6 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .lp-l.make { background: none; box-shadow: inset 0 0 0 1px var(--status-1); }
 .lp-ord { display: flex; gap: 2px; } .lp-ord button { all: unset; cursor: pointer; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-3); font-size: 12px; } .lp-ord button:hover { background: var(--hover-fill); color: var(--ink); }
 .lp-all { width: 100%; justify-content: center; }
-body:has(.ln) .proto { display: none; }
-.ln-scrim { position: fixed; inset: 0; z-index: 87; background: color-mix(in srgb, var(--ink) 30%, transparent); backdrop-filter: blur(3px); }
-.ln { position: fixed; z-index: 88; inset: 18px; max-width: 1240px; margin: 0 auto; background: var(--surface-page, var(--paper)); border-radius: 12px; box-shadow: var(--shadow-float); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
-.ln-top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--line); background: var(--panel); }
-.ln-goal { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 220px; }
-.ln-goal small { display: block; font-size: 11px; color: var(--accent-strong); } .ln-goal b { font: 400 15px/1.3 var(--read); }
-.ln-dots { display: flex; align-items: center; gap: 0; }
-.ln-dots > i { width: 14px; height: 2px; background: var(--line); }
-.ln-dot { border: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); box-shadow: inset 0 0 0 1.5px var(--line); font: 600 12px var(--ui); color: var(--ink-2); cursor: pointer; }
-.ln-dot.answered { color: var(--ok); box-shadow: inset 0 0 0 1.5px var(--ok); }
-.ln-dot.next { box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent-strong); }
-.ln-dot.on { background: var(--accent); color: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
-.ln-dot.end { color: var(--accent); }
-.ln-body { display: grid; grid-template-columns: minmax(0, 1fr) 330px; min-height: 0; }
-.ln-main { overflow: auto; padding: 26px 34px 30px; }
-.ln-side { overflow: auto; padding: 20px 20px 24px; border-left: 1px solid var(--line); background: var(--panel); display: grid; gap: 10px; align-content: start; }
-.ln-side h3 { margin: 8px 0 0; font: 600 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); } .ln-side h3 span { color: var(--ink-3); font-weight: 400; }
-.ln-side textarea, .ln-nq input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); font: 14px/1.5 var(--ui); color: var(--ink); resize: vertical; }
-.ln-note { padding: 8px 10px; border-radius: 4px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); border-left: 2px solid var(--accent); } .ln-note p { margin: 0; font: 14.5px/1.45 var(--read); }
-.ln-ar { margin: 0; font-size: 13px; } .ln-ar span { font-size: 11px; padding: 1px 6px; border-radius: 8px; background: var(--hover-fill); color: var(--ink-2); margin-right: 4px; } .ln-ar small { display: block; color: var(--ink-2); font-style: italic; margin-top: 2px; }
-.ln-nq { display: flex; gap: 6px; }
-.ln-k { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
-.ln-q { margin: 0 0 18px; font: 400 clamp(26px, 3vw, 34px)/1.2 var(--read); color: var(--ink); max-width: 30ch; }
-.ln-empty { padding: 20px; border-radius: 10px; border: 1.5px dashed var(--line); max-width: 680px; } .ln-empty > p:first-child { margin: 0 0 12px; font-size: 14.5px; }
-.ln-fmts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-.ln-fmts button { border: 0; display: grid; gap: 2px; text-align: left; padding: 12px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--ink); }
-.ln-fmts button:hover { box-shadow: inset 0 0 0 1.5px var(--accent); } .ln-fmts b { font: 400 18px var(--read); } .ln-fmts small { font-size: 12px; color: var(--ink-2); }
 .lpl { max-width: 720px; display: grid; gap: 12px; }
 .lpl.making { display: flex; gap: 12px; align-items: center; padding: 30px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); } .lpl.making p { margin: 0; color: var(--ink-2); }
 .spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin 0.8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
@@ -5191,16 +5164,54 @@ body:has(.ln) .proto { display: none; }
 .lpl-tr { margin: 0; font: 18px/1.55 var(--read); }
 .lpl-nav { display: flex; justify-content: space-between; align-items: center; }
 .lpl-dots { display: flex; gap: 6px; } .lpl-dots button { border: 0; width: 8px; height: 8px; border-radius: 50%; padding: 0; background: var(--line); cursor: pointer; } .lpl-dots button.on { background: var(--accent); width: 22px; border-radius: 4px; }
-.ln-check { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); max-width: 720px; }
-.ln-check p { margin: 0 8px 0 0; font: 17px var(--read); } .ln-check.done { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ok) 40%, transparent); } .ln-check.done p { color: var(--ok); }
-.ln-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); background: var(--panel); } .ln-foot .small { margin: 0; text-align: center; }
-.ln-recall { overflow: auto; padding: 26px 34px; }
 .rc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
 .rc { display: grid; gap: 8px; padding: 14px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); } .rc.got { box-shadow: inset 0 0 0 1.5px var(--ok); } .rc.not { box-shadow: inset 0 0 0 1.5px var(--pick); }
 .rc-q { margin: 0; font-size: 13px; color: var(--ink-2); }
 .rc-cover { border: 0; text-align: left; padding: 12px; border-radius: 6px; background: var(--board); font: 16px/1.45 var(--read); color: var(--ink); cursor: pointer; min-height: 48px; }
 .rc-b { display: flex; gap: 6px; } .rc-b button { border: 0; flex: 1; padding: 6px; border-radius: 6px; background: var(--hover-fill); cursor: pointer; font: 13px var(--ui); color: var(--ink); }
-@media (max-width: 900px) { .ln-top { display: grid; grid-template-columns: auto 1fr; } .ln-dots { justify-self: end; } .ln-goal { grid-column: 1 / -1; order: 3; } .ln-goal b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; } .ln { inset: 0; border-radius: 0; } .ln-body { grid-template-columns: minmax(0, 1fr); overflow: auto; } .ln-main, .ln-side { overflow: visible; } .ln-side { border-left: 0; border-top: 1px solid var(--line); } .ln-main { padding: 20px 16px; } .ln-fmts { grid-template-columns: 1fr; } .ln-goal { min-width: 0; } .ln-foot .small { display: none; } }
+
+/* the shelf, the double-click search, and Lumens that play in their cards */
+.bwrap.shelf { grid-template-columns: 250px minmax(0, 1fr) 300px; }
+.bshelf { border-right: 1px solid var(--line); background: var(--panel); display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; min-height: 0; }
+.sh-h { display: flex; justify-content: space-between; align-items: center; padding: 12px 12px 6px; } .sh-h b { font: 400 16px var(--read); }
+.sh-s { display: flex; gap: 6px; align-items: center; margin: 0 12px; padding: 6px 9px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); color: var(--ink-3); }
+.sh-s input, .qp-s input { flex: 1; min-width: 0; border: 0; background: none; font: 14px var(--ui); color: var(--ink); outline: none; }
+.sh-tabs { display: flex; flex-wrap: wrap; gap: 3px; padding: 8px 12px; }
+.sh-tabs button { border: 0; padding: 3px 8px; border-radius: 10px; background: none; font: 12px var(--ui); color: var(--ink-2); cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); }
+.sh-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.sh-list { overflow: auto; padding: 4px 12px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+.sh-t { position: relative; display: grid; align-content: start; gap: 4px; padding: 8px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); cursor: grab; min-height: 70px; overflow: hidden; }
+.sh-t:hover { box-shadow: inset 0 0 0 1px var(--accent), var(--shadow-pic); }
+.sh-t.pic { padding: 0; } .sh-t.pic img { width: 100%; height: 62px; object-fit: cover; display: block; } .sh-t.pic .sh-b { padding: 6px 8px 8px; }
+.sh-b { display: grid; gap: 2px; } .sh-b small { font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); } .sh-b b { font: 400 13px/1.25 var(--read); color: var(--ink); } .sh-b span { font-size: 11px; color: var(--ink-2); }
+.sh-t.q { background: var(--pick-soft); box-shadow: inset 0 0 0 1px var(--pick-rule); grid-column: span 2; } .sh-t.q p { margin: 0; font: 13.5px/1.3 var(--read); } .sh-t.q small { font-size: 11px; color: var(--ink-2); }
+.sh-gl { color: var(--pick); font-weight: 600; }
+.sh-t.on { opacity: .55; } .sh-on { position: absolute; bottom: 6px; right: 6px; font-style: normal; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--surface-float); color: var(--ink-2); }
+.sh-foot { margin: 0; padding: 8px 12px 12px; border-top: 1px solid var(--line); }
+.viewport.dropping { box-shadow: inset 0 0 0 2px var(--accent); }
+.qp { position: absolute; z-index: 9; width: 340px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 8px; display: grid; gap: 6px; }
+.qp-s { display: flex; gap: 6px; align-items: center; padding: 7px 9px; border-radius: 6px; box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--paper); color: var(--ink-3); }
+.qp-list { display: grid; gap: 1px; max-height: 250px; overflow: auto; }
+.qp-list button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 0 8px; padding: 6px 8px; border-radius: 5px; }
+.qp-list button.on, .qp-list button:hover { background: var(--hover-fill); }
+.qp-list .gl { grid-row: span 2; color: var(--ink-2); text-align: center; } .qp-list b { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .qp-list small { font-size: 11.5px; color: var(--ink-3); }
+.qp-foot { margin: 0; font-size: 11px; color: var(--ink-3); padding: 0 4px; }
+.bpl.lm.open { width: 440px; z-index: 4; }
+.mcard.lcard.open > .ci { box-shadow: inset 0 0 0 1px var(--line), var(--shadow-float); }
+.lco-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; } .lco-top .kicker { margin: 0; }
+.lco-x { border: 0; background: none; color: var(--ink-3); font-size: 18px; cursor: pointer; line-height: 1; } .lco-x:hover { color: var(--ink); }
+.lco-f { margin: 8px 0 10px; }
+.lpl-slide.sm { min-height: 150px; padding: 18px 20px; } .lpl-slide.sm h3 { font-size: 20px; margin-bottom: 8px; } .lpl-slide.sm p:last-child { font-size: 15.5px; }
+.lpl-video.sm .lpl-frame b { font-size: 20px; } .lpl-video.sm .lpl-cap { font-size: 13.5px; padding: 8px 12px; }
+.lpl-audio.sm { padding: 14px 16px; } .lpl-audio.sm .lpl-tr { font-size: 15px; } .lpl-audio.sm .lpl-wave { height: 30px; margin-bottom: 8px; }
+.bpl.lm.open .lpl-nav { margin-top: 8px; }
+.lco-ft { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
+.lco-ft .button { padding: 4px 10px; font-size: 12.5px; min-height: 0; } .lco-q { font: 14px var(--read); margin-right: 4px; } .lco-done { color: var(--ok); font-size: 13px; }
+.qc-act { all: unset; cursor: pointer; font-size: 11.5px; color: var(--accent-strong); padding: 2px 8px; border-radius: 9px; background: var(--accent-soft); white-space: nowrap; }
+.lp-go { width: 100%; justify-content: center; }
+.rc-panel { display: grid; gap: 8px; } .rc-panel .rc { padding: 10px; } .rc-panel .rc-cover { font-size: 14px; min-height: 0; padding: 8px 10px; }
+@media (max-width: 1100px) { .bwrap.shelf { grid-template-columns: minmax(0, 1fr) 300px; } .bshelf { position: absolute; z-index: 7; left: 0; top: 0; bottom: 0; width: 250px; box-shadow: var(--shadow-float); } }
+@media (max-width: 860px) { .bwrap.shelf { grid-template-columns: minmax(0, 1fr); } .bpl.lm.open { width: 340px; } }
 
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
@@ -5871,6 +5882,7 @@ function stopsOf(b) {
   const all = [...b.inl.filter(x => x.kind === "question").map(x => `${b.id}:question:${x.id}`), ...b.pl.map(p => p.ref).filter(r => r.startsWith("q:")).map(r => r.slice(2))];
   if (!b.path) b.path = all;
   b.path = b.path.filter(k => INL(k));
+  b.path.push(...all.filter(k => !b.path.includes(k) && !(b.skip || []).includes(k)));
   return b.path;
 }
 function sideQs(b) {
@@ -5894,54 +5906,100 @@ function makeLumen(b, key, fmt = "read") {
 }
 function lumenCard(p, b) {
   const l = I(p.ref.slice(2)); if (!l) return "";
+  if (S.playing?.lid === l.id) return lumenCardOpen(p, b, l);
   const n = stopsOf(b).indexOf(l.forQ) + 1;
   return `<div class="bpl lm${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body"><p class="kicker">▶ Lumen · ${FMT[l.fmt]} · ${l.slides.length} slides</p><h2 class="mcard-title">${esc(l.title)}</h2><p class="lc-s">${esc(l.slides[0].t.slice(0, 96))}…</p></div><div class="ft"><div class="ft-meta"><span>${n ? `Answers stop ${n}` : "Answers a side question"}</span></div><button class="button button-quiet lc-play" type="button" data-act="lplay" data-id="${l.id}">▶ Play</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
+}
+function recallItems(b) {
+  const nm = pid => { const o = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); const t = o ? (o.type === "item" ? o.it.title || plainBody(o.it) : INL(o.key)?.text) : "?"; return t.length > 44 ? t.slice(0, 42).replace(/\s+\S*$/, "") + "…" : t; };
+  return [...stopsOf(b).flatMap(k => stopNotes(b, k).filter(n => n.body).map(n => ({ q: INL(k).text, t: plainBody(n), id: n.id }))), ...b.arrows.filter(a => a.why && !a.why.startsWith("made to")).map(a => ({ q: `${nm(a.from)} → ${a.word} → ${nm(a.to)}. Why?`, t: a.why, id: a.id }))];
 }
 function pathPanel(b) {
   const stops = stopsOf(b), nx = nextStop(b), d = stops.filter(k => st(k, "question").status === "answered").length, goal = allInlines().find(r => r.item === b && r.kind === "goal");
   const noL = stops.filter(k => st(k, "question").status === "open" && !lumensFor(k).length);
   return `<aside class="inside" aria-label="Learning on this board" data-ph="LB1"><h3>Goal</h3>${goal ? `<div class="row g" data-act="focuscard" data-pid="${pidOfKey(b, goal.key) || ""}"><span class="gl">◎</span><span class="tx">${esc(goal.text)}</span><span class="meta">${stBtn(goal)}</span></div>` : ""}
     <div class="lp-prog">${ring(d, stops.length, 42)}<div><b>${d} of ${stops.length} stops answered</b><small>${nx ? `Suggested next: ${esc(INL(nx).text)}` : stops.length ? "Every stop answered. Recall, then mark the goal reached." : "Add a question to start a path."}</small></div></div>
-    <button class="button lp-start" type="button" data-act="lstart" ${stops.length ? "" : "disabled"}>${d ? "▶ Continue learning" : "▶ Start learning"}</button>
-    <p class="small lp-free">A suggested order, not a rule. Take the stops in any order, skip one, or add your own.</p>
-    <h3>Path to the goal <span>${stops.length}</span></h3><ol class="lp-stops">${stops.map((k, i) => { const r = INL(k), s = st(k, "question").status, ls = lumensFor(k), ns = stopNotes(b, k).length; return `<li class="lp-stop ${s}${k === nx ? " next" : ""}"><span class="stopn">${s === "answered" ? "✓" : i + 1}</span><div class="lp-b"><button class="lp-q" type="button" data-act="lgo" data-i="${i}" title="Learn this stop">${esc(r.text)}</button><div class="lp-meta">${ls.length ? ls.map(l => `<button class="lp-l" type="button" data-act="lplay" data-id="${l.id}">▶ ${esc(FMT[l.fmt])}</button>`).join("") : s === "open" ? `<button class="lp-l make" type="button" data-act="lans" data-k="${esc(k)}">▶ Answer with a Lumen</button>` : ""}${ns ? `<span>✎ ${ns}</span>` : ""}${r.item !== b ? `<span>from ${esc(r.item.title || "a note")}</span>` : ""}</div></div><span class="lp-ord">${i ? `<button type="button" data-act="pathup" data-i="${i}" aria-label="Move earlier">↑</button>` : ""}<button type="button" data-act="pathskip" data-k="${esc(k)}" aria-label="Take off the path" title="Take off the path; it stays on the board">×</button></span></li>`; }).join("")}</ol>
+    ${nx ? `<button class="button button-quiet lp-go" type="button" data-act="pathgo">Show me the next stop</button>` : ""}
+    <p class="small lp-free">A suggested order, not a rule. Work on any card in any order; the board is where you learn.</p>
+    <h3>Path to the goal <span>${stops.length}</span></h3><ol class="lp-stops">${stops.map((k, i) => { const r = INL(k), s = st(k, "question").status, ls = lumensFor(k), ns = stopNotes(b, k).length; return `<li class="lp-stop ${s}${k === nx ? " next" : ""}"><span class="stopn">${s === "answered" ? "✓" : i + 1}</span><div class="lp-b"><button class="lp-q" type="button" data-act="focuscard" data-pid="${pidOfKey(b, k) || ""}" title="Show it on the board">${esc(r.text)}</button><div class="lp-meta">${ls.length ? ls.map(l => `<button class="lp-l" type="button" data-act="lplay" data-id="${l.id}">▶ ${esc(FMT[l.fmt])}</button>`).join("") : s === "open" ? `<button class="lp-l make" type="button" data-act="lans" data-k="${esc(k)}">▶ Answer with a Lumen</button>` : ""}${ns ? `<span>✎ ${ns}</span>` : ""}${r.item !== b ? `<span>from ${esc(r.item.title || "a note")}</span>` : ""}</div></div><span class="lp-ord">${i ? `<button type="button" data-act="pathup" data-i="${i}" aria-label="Move earlier">↑</button>` : ""}<button type="button" data-act="pathskip" data-k="${esc(k)}" aria-label="Take off the path" title="Take off the path; it stays on the board">×</button></span></li>`; }).join("")}</ol>
     ${noL.length > 1 ? `<button class="button button-quiet lp-all" type="button" data-act="lansall">▶ Answer the ${noL.length} open stops with Lumens</button>` : ""}
-    <h3>Side questions <span>${sideQs(b).length}</span></h3>${sideQs(b).map(k => `<div class="row q"><span class="gl">?</span><span class="tx">${esc(INL(k).text)}</span><span class="meta">${stBtn(INL(k))}<button class="addv" type="button" data-act="pathadd" data-k="${esc(k)}">+ Add to path</button></span></div>`).join("") || `<p class="small">Questions you take off the path, and those inside its cards, wait here.</p>`}</aside>`;
+    <h3>Side questions <span>${sideQs(b).length}</span></h3>${sideQs(b).map(k => `<div class="row q"><span class="gl">?</span><span class="tx">${esc(INL(k).text)}</span><span class="meta">${stBtn(INL(k))}<button class="addv" type="button" data-act="pathadd" data-k="${esc(k)}">+ Add to path</button></span></div>`).join("") || `<p class="small">Questions you take off the path, and those inside its cards, wait here.</p>`}
+    <h3>Recall <span></span></h3><p class="small">Your notes and your arrows' whys, covered.</p><button class="button button-quiet" type="button" data-act="precall" data-ph="LB3">${S.recallOpen ? "Hide recall" : "Test yourself"}</button>
+    ${S.recallOpen ? `<div class="rc-panel">${recallItems(b).map(x => `<div class="rc ${S.rc?.[x.id] || ""}"><p class="rc-q">${esc(x.q)}</p><button class="rc-cover" type="button" data-act="rcshow" data-id="${x.id}">${S.rc?.[x.id] ? esc(x.t) : "Show"}</button>${S.rc?.[x.id] ? `<div class="rc-b"><button type="button" data-act="rcset" data-id="${x.id}" data-v="got">Got it</button><button type="button" data-act="rcset" data-id="${x.id}" data-v="not">Not yet</button></div>` : ""}</div>`).join("") || `<p class="small">Write notes beside the Lumens first.</p>`}${!nx && stops.length && goal && st(goal.key, "goal").status !== "reached" ? `<button class="button" type="button" data-act="lreach">◎ Mark the goal reached</button>` : ""}</div>` : ""}</aside>`;
 }
-function playerHTML(l) {
-  const s = Math.min(S.learn.s || 0, l.slides.length), last = s >= l.slides.length, sl = last ? { h: "Check", t: INL(l.forQ).text } : l.slides[s];
-  const dots = `<div class="lpl-dots">${l.slides.map((_, j) => `<button type="button" class="${j === s ? "on" : ""}" data-act="lslide" data-i="${j}" aria-label="Slide ${j + 1}"></button>`).join("")}<button type="button" class="${last ? "on" : ""}" data-act="lslide" data-i="${l.slides.length}" aria-label="Check"></button></div>`;
-  const nav = `<div class="lpl-nav"><button class="button button-quiet" type="button" data-act="lslide" data-i="${s - 1}" ${s ? "" : "disabled"}>←</button>${dots}<button class="button button-quiet" type="button" data-act="lslide" data-i="${s + 1}" ${last ? "disabled" : ""}>→</button></div>`;
+
+/* ---------- Learning happens on the board (LB2, LB3 revised 28 Oct) ----------
+   No separate mode: a Lumen plays inside its own card, notes are written as cards beside it, and Recall lives in the
+   board's panel. The canvas centres and zooms to whatever you're working on. */
+function playerIn(l) {
+  const s = Math.min(S.playing?.s || 0, l.slides.length), last = s >= l.slides.length, sl = last ? { h: "Check", t: INL(l.forQ)?.text || "" } : l.slides[s];
   let view;
-  if (l.fmt === "watch") view = `<div class="lpl-video"><div class="lpl-frame"><b>${esc(sl.h)}</b></div><p class="lpl-cap">${esc(sl.t)}</p><div class="lpl-bar"><span>▶</span><i><b style="width:${Math.round(100 * Math.min(s, l.slides.length) / l.slides.length)}%"></b></i><small>${Math.min(s + 1, l.slides.length)}:00 / ${l.slides.length}:00</small></div></div>`;
-  else if (l.fmt === "listen") view = `<div class="lpl-audio"><div class="lpl-wave">${Array.from({ length: 48 }, (_, j) => `<i style="height:${8 + ((j * 37) % 26)}px" class="${j < Math.round(48 * s / l.slides.length) ? "on" : ""}"></i>`).join("")}</div><p class="lpl-k">${esc(sl.h)}</p><p class="lpl-tr">${esc(sl.t)}</p></div>`;
-  else view = `<div class="lpl-slide"><p class="lpl-k">${last ? "Check" : `${s + 1} / ${l.slides.length}`}</p><h3>${esc(sl.h)}</h3><p>${esc(sl.t)}</p></div>`;
-  return `<div class="lpl" data-ph="LB2"><div class="lpl-top"><span class="ln-k">▶ ${esc(l.title)}</span><span class="cph-views" role="group" aria-label="How to take it">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="lfmt" data-k="${k}" aria-pressed="${l.fmt === k}">${t}</button>`).join("")}</span></div>${view}${nav}</div>`;
+  if (l.fmt === "watch") view = `<div class="lpl-video sm"><div class="lpl-frame"><b>${esc(sl.h)}</b></div><p class="lpl-cap">${esc(sl.t)}</p><div class="lpl-bar"><span>▶</span><i><b style="width:${Math.round(100 * s / l.slides.length)}%"></b></i></div></div>`;
+  else if (l.fmt === "listen") view = `<div class="lpl-audio sm"><div class="lpl-wave">${Array.from({ length: 34 }, (_, j) => `<i style="height:${6 + ((j * 37) % 20)}px" class="${j < Math.round(34 * s / l.slides.length) ? "on" : ""}"></i>`).join("")}</div><p class="lpl-k">${esc(sl.h)}</p><p class="lpl-tr">${esc(sl.t)}</p></div>`;
+  else view = `<div class="lpl-slide sm"><p class="lpl-k">${last ? "Check" : `${s + 1} / ${l.slides.length}`}</p><h3>${esc(sl.h)}</h3><p>${esc(sl.t)}</p></div>`;
+  const dots = `<div class="lpl-dots">${l.slides.map((_, j) => `<button type="button" class="${j === s ? "on" : ""}" data-act="pslide" data-i="${j}" aria-label="Slide ${j + 1}"></button>`).join("")}<button type="button" class="${last ? "on" : ""}" data-act="pslide" data-i="${l.slides.length}" aria-label="Check"></button></div>`;
+  return `${view}<div class="lpl-nav"><button class="button button-quiet" type="button" data-act="pslide" data-i="${s - 1}" ${s ? "" : "disabled"}>←</button>${dots}<button class="button button-quiet" type="button" data-act="pslide" data-i="${s + 1}" ${last ? "disabled" : ""}>→</button></div>`;
 }
-function learnHTML() {
-  if (!S.learn) return "";
-  const b = I(S.learn.b); if (!b) return "";
-  const stops = stopsOf(b), goal = allInlines().find(r => r.item === b && r.kind === "goal"), nx = nextStop(b), d = stops.filter(k => st(k, "question").status === "answered").length;
-  const top = `<header class="ln-top"><button class="button button-quiet" type="button" data-act="lexit">← Back to the board</button><div class="ln-goal">${ring(d, stops.length, 34)}<div><small>◎ Goal · ${esc(b.title)}</small><b>${esc(goal?.text || b.title)}</b></div></div><nav class="ln-dots" aria-label="Stops">${stops.map((k, j) => { const s = st(k, "question").status; return `<button type="button" class="ln-dot ${s}${!S.learn.recall && j === S.learn.i ? " on" : ""}${k === nx ? " next" : ""}" data-act="lgo" data-i="${j}" title="${esc(INL(k).text)}">${s === "answered" ? "✓" : j + 1}</button>`; }).join("<i></i>")}<i></i><button type="button" class="ln-dot end${S.learn.recall ? " on" : ""}" data-act="lrecall" title="Recall, then the goal">◎</button></nav></header>`;
-  if (S.learn.recall) {
-    const items = [...stops.flatMap(k => stopNotes(b, k).map(n => ({ q: INL(k).text, t: plainBody(n), id: n.id }))), ...b.arrows.filter(a => a.why && !a.why.startsWith("made to")).map(a => { const nm = pid => { const o = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); const t = o ? (o.type === "item" ? o.it.title || plainBody(o.it) : INL(o.key)?.text) : "?"; return t.length > 44 ? t.slice(0, 42).replace(/\s+\S*$/, "") + "…" : t; }; return { q: `${nm(a.from)} → ${a.word} → ${nm(a.to)}. Why?`, t: a.why, id: a.id }; })];
-    return `<div class="ln-scrim"></div><div class="ln" role="dialog" aria-modal="true" aria-label="Learning: ${esc(b.title)}" data-ph="LB3">${top}<div class="ln-recall"><p class="ln-k">Recall</p><h2 class="ln-q">What do you remember?</h2><p class="small">Your own words, covered. Say each one, then check. <b>Not yet</b> goes to To revisit on Loci.</p>
-      <div class="rc-grid">${items.map(x => `<div class="rc ${S.rc?.[x.id] || ""}"><p class="rc-q">${esc(x.q)}</p><button class="rc-cover" type="button" data-act="rcshow" data-id="${x.id}">${S.rc?.[x.id] ? esc(x.t) : "Show"}</button>${S.rc?.[x.id] ? `<div class="rc-b"><button type="button" data-act="rcset" data-id="${x.id}" data-v="got">Got it</button><button type="button" data-act="rcset" data-id="${x.id}" data-v="not">Not yet</button></div>` : ""}</div>`).join("") || `<p class="small">Write notes on the stops first; Recall covers your own words.</p>`}</div>
-      <div class="ln-check">${nx ? `<p>${stops.length - d} stop${stops.length - d > 1 ? "s" : ""} still open.</p><button class="button button-quiet" type="button" data-act="lgo" data-i="${stops.indexOf(nx)}">Go to the open stop</button>` : `<p>Every stop answered.</p><button class="button" type="button" data-act="lreach" ${goal ? "" : "disabled"}>◎ Mark the goal reached</button>`}<button class="button button-link" type="button" data-act="toast" data-msg="Make a Lumen from the whole board (B3): it follows your path and arrows, and your notes become its check.">Make one Lumen of the whole board</button></div></div></div>`;
+function lumenCardOpen(p, b, l) {
+  const q = INL(l.forQ), s = q ? st(q.key, "question") : null;
+  return `<div class="bpl lm open${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard open" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body">
+    <div class="lco-top"><p class="kicker">▶ Lumen · ${esc(l.title)}</p><button class="lco-x" type="button" data-act="pclose" aria-label="Close the player" title="Fold back to a card">×</button></div>
+    <span class="cph-views lco-f" role="group" aria-label="How to take it">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="pfmt" data-k="${k}" aria-pressed="${l.fmt === k}">${t}</button>`).join("")}</span>
+    ${l.making ? `<div class="lpl making"><span class="spin"></span><p>Loci is making it from this board and your Commonplace…</p></div>` : playerIn(l)}</div>
+    <div class="lco-ft">${!q ? "" : s.status === "answered" ? `<span class="lco-done">✓ Answered</span><button class="button button-link" type="button" data-act="pdid" data-v="reopen">Reopen</button>` : l.making ? "" : `<span class="lco-q">Did this answer it?</span><button class="button" type="button" data-act="pdid" data-v="yes">Yes</button><button class="button button-quiet" type="button" data-act="pdid" data-v="partly">Partly</button><button class="button button-quiet" type="button" data-act="pdid" data-v="no">Not yet</button>`}<span class="cph-grow"></span><button class="button button-quiet" type="button" data-act="pnote" title="Write a note beside it">✎ Note</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
+}
+function centreOn(pid, z = 1) { const b = I(S.board), p = b?.pl.find(x => x.id === pid), vp = $("#vp"); if (!p || !vp) return; S.view.z = z; const el = document.querySelector(`[data-pid="${pid}"]`), w = el?.offsetWidth || 300, h = el?.offsetHeight || 200; S.view.x = vp.clientWidth / 2 - (p.x + w / 2) * z; S.view.y = Math.max(20 - p.y * z, vp.clientHeight / 2 - (p.y + h / 2) * z); applyView(); requestAnimationFrame(drawArrows); }
+function playLumen(l) { const b = I(l.board); S.playing = { lid: l.id, s: 0 }; render(); const p = b.pl.find(x => x.ref === "l:" + l.id); if (p) requestAnimationFrame(() => centreOn(p.id, 1)); }
+
+/* ---------- Placing things: double-click to search, or drag from the shelf (B1, revised 28 Oct) ---------- */
+const SHELF_TABS = [["all", "All"], ["object", "Objects"], ["note", "Notes"], ["source", "Sources"], ["image", "Photos"], ["question", "Questions"]];
+const fold = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function shelfItems(q, tab) {
+  q = fold(q);
+  const items = D().items.filter(x => x.type !== "board" && (tab === "all" || typeOf(x) === tab || (tab === "source" && x.type === "source")) && (!q || fold([x.title, plainBody(x), x.desc].join(" ")).includes(q))).map(x => ({ ref: "i:" + x.id, x }));
+  const qs = (tab === "all" || tab === "question") ? allInlines().filter(r => r.kind === "question" && r.item.type !== "board" && st(r.key, r.kind).status === "open" && (!q || fold(r.text).includes(q))).map(r => ({ ref: "q:" + r.key, r })) : [];
+  if (q) items.sort((a, b) => (fold(b.x.title).includes(q) ? 1 : 0) - (fold(a.x.title).includes(q) ? 1 : 0));
+  return [...items, ...qs];
+}
+function tileHTML(t, on) {
+  if (t.r) return `<div class="sh-t q${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board"><span class="sh-gl">?</span><p>${esc(t.r.text)}</p><small>in ${esc(t.r.item.title || "a note")}</small></div>`;
+  const x = t.x, pic = x.media ? `<img alt="" src="${MEDIA[x.media]}">` : "";
+  const sub = x.type === "object" ? cardLine(x) : kindLabel(x);
+  return `<div class="sh-t${x.media ? " pic" : ""}${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board">${pic}<div class="sh-b"><small>${esc(kindLabel(x))}</small><b>${esc(x.title || plainBody(x).slice(0, 70))}</b>${x.type === "object" && sub ? `<span>${esc(sub)}</span>` : ""}</div>${on ? `<i class="sh-on">On board</i>` : ""}</div>`;
+}
+function shelfHTML(b) {
+  const on = new Set(b.pl.map(p => p.ref)), tab = S.shtab || "all", list = shelfItems(S.shq, tab);
+  return `<aside class="bshelf" aria-label="Your Commonplace" data-ph="B1"><div class="sh-h"><b>Your Commonplace</b><button class="button button-link" type="button" data-act="shelf" title="Hide the shelf">Hide</button></div>
+    <label class="sh-s">${SVG.search}<input id="shq" type="search" placeholder="Search to place…" value="${esc(S.shq || "")}"></label>
+    <div class="sh-tabs">${SHELF_TABS.map(([k, t]) => `<button type="button" data-act="shtab" data-k="${k}" aria-pressed="${tab === k}">${t}</button>`).join("")}</div>
+    <div class="sh-list">${list.map(t => tileHTML(t, on.has(t.ref))).join("") || `<p class="small">Nothing matches.</p>`}</div><p class="small sh-foot">Drag onto the board, or click to place in the middle. Double-click empty board to search there.</p></aside>`;
+}
+function qpHTML() {
+  if (!S.qp) return "";
+  const list = shelfItems(S.qp.q, "all").slice(0, 7), on = new Set(I(S.board).pl.map(p => p.ref)), acts = [["note", "✎", "A new note here"], ["question", "?", "A question here"]];
+  const actRows = acts.map(([k, g, t]) => ({ k, g, t: S.qp.q && k === "note" ? `New note: “${S.qp.q}”` : S.qp.q && k === "question" ? `New question: “${S.qp.q.replace(/\?$/, "")}?”` : t, s: "" }));
+  const found = list.map(t => ({ ref: t.ref, g: t.r ? "?" : t.x.type === "object" ? "▣" : t.x.type === "image" ? "◫" : t.x.type === "source" ? "▤" : "¶", t: t.r ? t.r.text : t.x.title || plainBody(t.x).slice(0, 60), s: t.r ? `in ${t.r.item.title || "a note"}` : kindLabel(t.x) + (on.has(t.ref) ? " · on this board" : "") }));
+  const rows = S.qp.q ? [...found, ...actRows] : [...actRows, ...found];
+  S.qp.rows = rows; S.qp.on = Math.min(S.qp.on || 0, rows.length - 1);
+  return `<div class="qp" style="left:${S.qp.cx}px;top:${S.qp.cy}px" data-ph="B1"><label class="qp-s">${SVG.search}<input id="qpi" type="text" placeholder="Search your Commonplace, or type a note…" value="${esc(S.qp.q)}" autocomplete="off"></label><div class="qp-list">${rows.map((r, i) => `<button type="button" class="${i === S.qp.on ? "on" : ""}" data-qpi="${i}"><span class="gl">${r.g}</span><b>${esc(r.t)}</b>${r.s ? `<small>${esc(r.s)}</small>` : ""}</button>`).join("")}</div><p class="qp-foot">↑↓ to choose · Enter to place · Esc to close</p></div>`;
+}
+function placeRef(ref, x, y) {
+  const b = I(S.board);
+  if (b.pl.some(p => p.ref === ref)) { const p = b.pl.find(p => p.ref === ref); toast("Already on this board: showing it."); centreOn(p.id, S.view.z); S.sel = p.id; render(); return; }
+  b.pl.push({ id: "p" + Date.now(), ref, x: Math.round(x), y: Math.round(y) }); render();
+  toast(ref.startsWith("q:") ? "Placed. The question still belongs to where it was written." : "Placed, not copied: it's the same entry as in Commonplace.");
+}
+function chooseQp(i) {
+  const r = S.qp.rows[i], { x, y } = S.qp, text = (S.qp.q || "").trim(); S.qp = null;
+  if (!r) { render(); return; }
+  if (r.k === "note" || r.k === "question") {
+    if (!text) { addOnCanvas(r.k, x, y); return; }
+    const b = I(S.board);
+    if (r.k === "question") { const id = "q" + Date.now(); b.inl.push({ id, kind: "question", text: text.replace(/\?$/, "") + "?" }); b.pl.push({ id: "p" + id, ref: "b:" + id, x, y }); render(); toast("Asked here, and added to the path."); }
+    else { const nid = "n" + Date.now(); D().items.unshift(note(nid, "notes", "", text, { topics: b.topics })); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x, y }); render(); toast("Saved to Commonplace as a note, and placed here."); }
+    return;
   }
-  const i = Math.max(0, Math.min(S.learn.i, stops.length - 1)), key = stops[i];
-  if (!key) return `<div class="ln-scrim"></div><div class="ln">${top}<p class="small" style="padding:30px">Add a question to the board to start a path.</p></div>`;
-  const r = INL(key), s = st(key, "question"), ls = lumensFor(key), l = ls.find(x => x.id === S.learn.l) || ls.at(-1), qp = b.pl.find(p => p.id === pidOfKey(b, key));
-  const around = qp ? b.arrows.filter(a => (a.to === qp.id || a.from === qp.id) && !String(a.from).startsWith("plm")).map(a => { const o = refOf(b.pl.find(p => p.id === (a.to === qp.id ? a.from : a.to))?.ref || "", b); return o ? { t: o.type === "item" ? o.it.title || plainBody(o.it).slice(0, 50) : INL(o.key)?.text, w: a.word, why: a.why, id: o.type === "item" ? o.it.id : null } : null; }).filter(Boolean) : [];
-  const notes = stopNotes(b, key), ni = stops.indexOf(nx);
-  return `<div class="ln-scrim"></div><div class="ln" role="dialog" aria-modal="true" aria-label="Learning: ${esc(b.title)}" data-ph="LB3">${top}
-    <div class="ln-body"><section class="ln-main"><p class="ln-k">Stop ${i + 1} of ${stops.length}${key === nx ? " · suggested next" : s.status === "answered" ? " · answered" : ""}${r.item !== b ? ` · from ${esc(r.item.title || "a note")}` : ""}</p><h2 class="ln-q">${esc(r.text)}</h2>
-      ${l ? (l.making ? `<div class="lpl making"><span class="spin"></span><p>Loci is making a Lumen from your board and your Commonplace…</p></div>` : playerHTML(l)) : `<div class="ln-empty" data-ph="LB2"><p>Answer it with a Lumen: Loci explains it from this board and your Commonplace, at your level.</p><div class="ln-fmts">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="lmake" data-k="${esc(key)}" data-f="${k}"><b>${t}</b><small>${k === "read" ? "Slides you go through" : k === "watch" ? "A short video, narrated" : "Listen, with a transcript"}</small></button>`).join("")}</div><p class="small">Or answer it yourself in your notes, or <button class="button button-link" type="button" data-act="toast" data-msg="Find resources (Q5): books, videos and papers that answer it, placed on the board.">find resources</button>.</p></div>`}
-      ${s.status === "answered" ? `<div class="ln-check done"><p>✓ Answered${s.ans.length ? ` in ${s.ans.map(I).filter(Boolean).map(x => esc(x.title)).join(", ")}` : ""}.</p><button class="button button-link" type="button" data-act="ldid" data-v="reopen">Reopen</button></div>` : l && !l.making ? `<div class="ln-check"><p>Did this answer it?</p><button class="button" type="button" data-act="ldid" data-v="yes">Yes, mark answered</button><button class="button button-quiet" type="button" data-act="ldid" data-v="partly">Partly: ask a follow-up</button><button class="button button-quiet" type="button" data-act="ldid" data-v="no">Not yet</button></div>` : ""}</section>
-    <aside class="ln-side"><h3>Your notes on this stop <span>${notes.length}</span></h3>${notes.map(n => `<div class="ln-note">${renderBody(n)}</div>`).join("")}<textarea id="lnote" rows="4" placeholder="Write what you're learning, in your words. Saved to Commonplace and placed beside the question."></textarea><button class="button button-quiet" type="button" data-act="lnote">Keep note</button>
-      ${around.length ? `<h3>Around it on the board</h3>${around.map(x => `<p class="ln-ar"><span>${esc(x.w)}</span> ${esc(x.t)}${x.why && !x.why.startsWith("made to") ? `<small>“${esc(x.why)}”</small>` : ""}</p>`).join("")}` : ""}
-      <h3>A new question?</h3><div class="ln-nq"><input id="lnq" type="text" placeholder="Ask it; it joins the path after this stop"><button class="button button-quiet" type="button" data-act="lnewq">Add</button></div></aside></div>
-    <footer class="ln-foot"><button class="button button-quiet" type="button" data-act="lgo" data-i="${i - 1}" ${i ? "" : "disabled"}>← Previous</button><span class="small">${nx && nx !== key ? `Suggested next: ${esc(INL(nx).text)}` : !nx ? "Every stop answered: Recall is next" : "Take your time; every stop stays one click away"}</span><button class="button" type="button" data-act="${!nx ? "lrecall" : "lgo"}" data-i="${nx && nx !== key ? ni : Math.min(i + 1, stops.length - 1)}">${!nx ? "Recall →" : "Next stop →"}</button></footer></div>`;
+  placeRef(r.ref, x, y);
 }
 
 function refOf(ref, b = I(S.board)) {
@@ -5960,7 +6018,7 @@ function placed(p, b) {
     const row = INL(r.key), s = st(r.key, r.kind);
     if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span class="gprog" style="margin:0">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span></div>${stBtn(row)}</div></div></article>`); }
     const editing = S.editing === "inl:" + r.key;
-    return wrap(" q", `<article class="mcard note qcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">? Question${r.own ? "" : ` · from ${esc(row.item.title || "a note")}`}</p>${editing ? `<textarea data-qedit="${esc(r.key)}">${esc(row.text)}</textarea>` : `<p class="nt">${esc(row.text)}</p>`}${s.ans.length || s.answer ? `<p class="ans-l">✓ ${s.ans.length ? "Answered in " + s.ans.map(I).filter(Boolean).map(x => esc(x.title)).join(", ") : esc(s.answer)}</p>` : ""}</div><div class="ft"><div class="ft-meta"></div>${stBtn(row)}</div></div></article>`);
+    return wrap(" q", `<article class="mcard note qcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">? Question${r.own ? "" : ` · from ${esc(row.item.title || "a note")}`}</p>${editing ? `<textarea data-qedit="${esc(r.key)}" placeholder="Ask a question…">${esc(row.text)}</textarea>` : `<p class="nt">${esc(row.text)}</p>`}${s.ans.length || s.answer ? `<p class="ans-l">✓ ${s.ans.length ? "Answered in " + s.ans.map(I).filter(Boolean).map(x => esc(x.title)).join(", ") : esc(s.answer)}</p>` : ""}</div><div class="ft"><div class="ft-meta">${s.status === "open" && !lumensFor(r.key).length ? `<button class="qc-act" type="button" data-act="lans" data-k="${esc(r.key)}" data-ph="LB2">▶ Answer with a Lumen</button>` : lumensFor(r.key).length ? `<button class="qc-act" type="button" data-act="lplay" data-id="${lumensFor(r.key).at(-1).id}">▶ Play the Lumen</button>` : ""}</div>${stBtn(row)}</div></div></article>`);
   }
   const it = r.it;
   if (it.type === "note" && S.editing === "note:" + it.id) return wrap("", `<article class="mcard note" data-frame="paper"><div class="ci"><div class="body"><textarea data-nedit="${it.id}" placeholder="Write… start a paragraph with @question or @goal">${esc(it.body)}</textarea></div></div></article>`);
@@ -5990,15 +6048,15 @@ function drawerHTML(b) {
 }
 function renderBoard() {
   const b = I(S.board) || boards()[0]; S.board = b.id;
-  const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Drag a card's blue dot onto another card to connect. Click an arrow for its word and why.";
+  const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click empty board to search and place · drag from the shelf · drag a blue dot to connect";
   return `${header("wall", `Boards / ${esc(b.title)}`)}
     <div class="bhead"><div><p class="ip-kicker" data-ph="B1">Board</p><h2>${esc(b.title)}</h2><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="drawer">+ Place</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button><button class="button" type="button" data-act="lstart" data-ph="LB3">${stopsOf(b).some(k => st(k, "question").status === "answered") ? "▶ Continue learning" : "▶ Start learning"}</button></div></div>
-    <div class="bwrap"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>
-      <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="drawer" title="Place from Commonplace (+)" aria-label="Place">+</button></div>
-      <div class="bhint"><span>${hint}</span></div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="shelf" aria-pressed="${S.shelf !== false}">${S.shelf !== false ? "Hide shelf" : "Your Commonplace"}</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button></div></div>
+    <div class="bwrap${S.shelf !== false ? " shelf" : ""}">${S.shelf !== false ? shelfHTML(b) : ""}<div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>
+      <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" title="Your Commonplace shelf (+)" aria-label="Show the shelf">+</button></div>${qpHTML()}
+      ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
       <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div>
-      ${S.drawer ? drawerHTML(b) : ""}</div>${pathPanel(b)}</div>`;
+      </div>${pathPanel(b)}</div>`;
 }
 function drawArrows() {
   const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
@@ -6358,7 +6416,7 @@ function render() {
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
-  $("#wiz").innerHTML = wizHTML() + howHTML() + learnHTML();
+  $("#wiz").innerHTML = wizHTML() + howHTML();
   if (S.jump) requestAnimationFrame(doJump);
 }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
@@ -6391,7 +6449,7 @@ let drag = null;
 const toCanvas = (cx, cy) => { const r = $("#vp").getBoundingClientRect(); return { x: (cx - r.left - S.view.x) / S.view.z, y: (cy - r.top - S.view.y) / S.view.z }; };
 function applyView() { const cv = $("#cv"); if (cv) cv.style.transform = `translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})`; const z = document.querySelector(".bzoom span"); if (z) z.textContent = Math.round(S.view.z * 100) + "%"; }
 document.addEventListener("pointerdown", e => {
-  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,button,a,textarea,input,.st,select")) return;
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,button,a,textarea,input,.st,select")) return;
   const dot = e.target.closest("[data-dot]"), pl = e.target.closest("[data-pid]");
   if (e.target.closest("[data-arrow]")) return;
   if (dot) { const p = I(S.board).pl.find(x => x.id === dot.dataset.dot), el = dot.parentElement; drag = { kind: "connect", from: p.id, sx: el.offsetLeft + el.offsetWidth, sy: el.offsetTop + el.offsetHeight / 2 }; e.preventDefault(); return; }
@@ -6416,7 +6474,7 @@ document.addEventListener("pointerup", e => {
   } else if (d.kind === "move" && !d.moved) { S.sel = d.p.id; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); d.el.classList.add("sel"); }
 });
 document.addEventListener("wheel", e => {
-  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer")) return;
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer,.qp")) return;
   e.preventDefault();
   if (e.ctrlKey || e.metaKey) zoomAt(e.deltaY < 0 ? 1.1 : 1 / 1.1, e.clientX, e.clientY); else { S.view.x -= e.deltaX; S.view.y -= e.deltaY; applyView(); }
 }, { passive: false });
@@ -6429,13 +6487,13 @@ function fit() {
 }
 function addOnCanvas(tool, x, y) {
   const b = I(S.board);
-  if (tool === "question") { const id = "q" + (b.inl.length + 1) + "x" + (Date.now() % 1000); b.inl.push({ id, kind: "question", text: "New question" }); b.pl.push({ id: "p" + Date.now(), ref: "b:" + id, x, y }); S.editing = `inl:${b.id}:question:${id}`; }
+  if (tool === "question") { const id = "q" + (b.inl.length + 1) + "x" + (Date.now() % 1000); b.inl.push({ id, kind: "question", text: "" }); b.pl.push({ id: "p" + Date.now(), ref: "b:" + id, x, y }); S.editing = `inl:${b.id}:question:${id}`; }
   else { const nid = "n" + Date.now(); D().items.push(note(nid, "notes", "", "", { topics: b.topics })); b.pl.push({ id: "p" + Date.now(), ref: "i:" + nid, x, y }); S.editing = "note:" + nid; }
   S.tool = "select"; S.focusEdit = true; render();
 }
 
 /* ---------- clicks ---------- */
-function go(screen, keep) { if (!keep) S.hist = []; if (screen !== "board") S.learn = null; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
+function go(screen, keep) { if (!keep) S.hist = []; if (screen !== "board") S.playing = null; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
 document.addEventListener("click", e => {
   if (S.skipClick) { S.skipClick = false; return; }
   const a = e.target.closest("[data-act]");
@@ -6481,30 +6539,31 @@ document.addEventListener("click", e => {
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
     case "openat": S.jump = d.t; openEntry(d.id); break;
-    case "lstart": { const b = I(S.board), st0 = stopsOf(b), nx = nextStop(b); S.learn = { b: b.id, i: nx ? st0.indexOf(nx) : 0, s: 0 }; render(); break; }
-    case "lgo": { if (!S.learn) { S.learn = { b: S.board, i: +d.i, s: 0 }; } else { S.learn.i = +d.i; S.learn.s = 0; S.learn.l = null; S.learn.recall = false; } render(); document.querySelector(".ln")?.scrollTo(0, 0); break; }
-    case "lexit": { const b = I(S.learn.b), n = stopsOf(b).length, i = S.learn.i; S.learn = null; render(); requestAnimationFrame(drawArrows); toast(`You were on stop ${i + 1} of ${n}. Continue learning picks up there; the board is yours to rearrange.`); break; }
-    case "lrecall": S.learn = S.learn || { b: S.board, i: 0, s: 0 }; S.learn.recall = true; render(); break;
-    case "lplay": { const l = I(d.id); if (!l) break; const b = I(l.board); if (S.screen !== "board" || S.board !== b.id) { pushHist(); S.board = b.id; go("board", true); } S.learn = { b: b.id, i: Math.max(0, stopsOf(b).indexOf(l.forQ)), s: 0, l: l.id }; render(); break; }
+    case "lplay": { const l = I(d.id); if (!l) break; if (S.screen !== "board" || S.board !== l.board) { pushHist(); S.board = l.board; go("board", true); } setTimeout(() => playLumen(l), 40); break; }
     case "lans": { e.stopPropagation(); menuKey = d.k; openMenu(a, mHead("Answer with a Lumen") + Object.entries(FMT).map(([k, t]) => mItem("lmake", `<b>${t}</b> <small style="color:var(--ink-3)">${k === "read" ? "slides" : k === "watch" ? "a short video" : "audio and transcript"}</small>`, false, `data-k="${esc(d.k)}" data-f="${k}"`)).join("") + `<p class="small" style="margin:6px 9px">From this board and your Commonplace. You decide if it answered the question.</p>`); break; }
-    case "lmake": { closeMenu(); const b = I(S.learn?.b || S.board), l = makeLumen(b, d.k, d.f); l.making = true; if (S.learn) { S.learn.l = l.id; S.learn.s = 0; } render(); setTimeout(() => { l.making = false; render(); if (!S.learn) toast(`“${l.title}” is beside its question. Play it, or Start learning.`); }, 900); break; }
-    case "lansall": { const b = I(S.board), ks = stopsOf(b).filter(k => st(k, "question").status === "open" && !lumensFor(k).length); ks.forEach(k => makeLumen(b, k, "read")); render(); toast(`${ks.length} Lumens made, one beside each open stop. Nothing is marked answered until you say so.`); break; }
-    case "lfmt": { const l = I(S.learn.l) || lumensFor(stopsOf(I(S.learn.b))[S.learn.i]).at(-1); if (l) { l.fmt = d.k; S.learn.l = l.id; } render(); break; }
-    case "lslide": { const b = I(S.learn.b), l = I(S.learn.l) || lumensFor(stopsOf(b)[S.learn.i]).at(-1); S.learn.l = l.id; S.learn.s = Math.max(0, Math.min(+d.i, l.slides.length)); render(); break; }
-    case "ldid": { const b = I(S.learn.b), key = stopsOf(b)[S.learn.i], s = st(key, "question"), l = I(S.learn.l) || lumensFor(key).at(-1);
-      if (d.v === "yes") { s.status = "answered"; if (l && !s.ans.includes(l.id)) s.ans.push(l.id); render(); toast(`Answered in “${l.title}”. It shows everywhere the question does.`); }
+    case "lmake": { closeMenu(); const b = I(S.board), l = makeLumen(b, d.k, d.f); l.making = true; S.playing = { lid: l.id, s: 0 }; render(); requestAnimationFrame(() => centreOn("p" + l.id, 1)); setTimeout(() => { l.making = false; render(); }, 900); break; }
+    case "pslide": { const l = I(S.playing?.lid); if (!l) break; S.playing.s = Math.max(0, Math.min(+d.i, l.slides.length)); render(); break; }
+    case "pfmt": { const l = I(S.playing?.lid); if (l) { l.fmt = d.k; render(); } break; }
+    case "pclose": S.playing = null; render(); requestAnimationFrame(drawArrows); break;
+    case "pdid": { const l = I(S.playing?.lid), q = INL(l.forQ), s = st(q.key, "question"), b = I(l.board);
+      if (d.v === "yes") { s.status = "answered"; if (!s.ans.includes(l.id)) s.ans.push(l.id); render(); const nx = nextStop(b); toast(nx ? `Answered in “${l.title}”. Next on the path: ${INL(nx).text}` : `Answered. Every stop on the path is answered; Recall is in the panel.`); }
       else if (d.v === "reopen") { s.status = "open"; render(); }
-      else if (d.v === "partly") { render(); const q = $("#lnq"); q.value = "What about "; q.focus(); toast("Ask what's still unclear: it joins the path right after this stop."); }
-      else toast("Kept open. Try it as Watch or Listen, or write what's unclear in your notes.");
+      else if (d.v === "partly") { const lp = b.pl.find(x => x.ref === "l:" + l.id); addOnCanvas("question", lp.x, lp.y + (document.querySelector(`[data-pid="${lp.id}"]`)?.offsetHeight || 300) + 40); const last = b.inl.at(-1), nk = `${b.id}:question:${last.id}`, p = stopsOf(b).filter(k => k !== nk); p.splice(p.indexOf(q.key) + 1, 0, nk); b.path = p; toast("Ask what's still unclear. It joins the path right after this one."); }
+      else toast("Kept open. Try it as Watch or Listen, or write what's unclear in a note.");
       break; }
-    case "lnote": { const t = $("#lnote")?.value.trim(); if (!t) break; const b = I(S.learn.b), key = stopsOf(b)[S.learn.i], qp = b.pl.find(p => p.id === pidOfKey(b, key)), k = stopNotes(b, key).length, nid = "n" + Date.now(); const n = note(nid, "notes", "", t, { topics: b.topics }); n.stop = key; D().items.unshift(n); if (qp) b.pl.push({ id: "p" + nid, ref: "i:" + nid, x: qp.x + 270, y: qp.y + 200 + k * 40 }); render(); toast("Kept in your Commonplace, and placed beside the question on the board."); break; }
-    case "lnewq": { const t = $("#lnq")?.value.trim(); if (!t || t === "What about") break; const b = I(S.learn.b), id = "q" + Date.now(), key = `${b.id}:question:${id}`, cur = stopsOf(b)[S.learn.i], qp = b.pl.find(p => p.id === pidOfKey(b, cur)); b.inl.push({ id, kind: "question", text: t }); b.path.splice(S.learn.i + 1, 0, key); b.pl.push({ id: "p" + id, ref: "b:" + id, x: (qp?.x ?? 60) - 20, y: (qp?.y ?? 60) + 420 }); render(); toast("Added as the next stop, and placed on the board. Go there now or later."); break; }
-    case "lreach": { const b = I(S.learn.b), g = allInlines().find(r => r.item === b && r.kind === "goal"); st(g.key, "goal").status = "reached"; render(); toast("Goal reached. It shows as reached on Questions and goals, and Loci remembers it for this place."); break; }
+    case "pnote": { const l = I(S.playing?.lid), b = I(l.board), lp = b.pl.find(x => x.ref === "l:" + l.id), w = document.querySelector(`[data-pid="${lp.id}"]`)?.offsetWidth || 440, n0 = stopNotes(b, l.forQ).length, nid = "n" + Date.now(), n = note(nid, "notes", "", "", { topics: b.topics }); n.stop = l.forQ; D().items.unshift(n); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x: lp.x + w + 40, y: lp.y + n0 * 60 }); S.editing = "note:" + nid; S.focusEdit = true; render(); break; }
+    case "shelf": S.shelf = !S.shelf; render(); break;
+    case "shtab": S.shtab = d.k; render(); break;
+    case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + vp.width / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
+    case "pathgo": { const b = I(S.board), nx = nextStop(b); if (!nx) break; const pid = pidOfKey(b, nx); centreOn(pid, Math.max(S.view.z, .9)); S.sel = pid; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${pid}"]`)?.classList.add("sel", "flash"); break; }
+    case "precall": S.recallOpen = !S.recallOpen; render(); break;
+    case "lansall": { const b = I(S.board), ks = stopsOf(b).filter(k => st(k, "question").status === "open" && !lumensFor(k).length); ks.forEach(k => makeLumen(b, k, "read")); render(); toast(`${ks.length} Lumens made, one beside each open stop. Nothing is marked answered until you say so.`); break; }
+    case "lreach": { const b = I(S.board), g = allInlines().find(r => r.item === b && r.kind === "goal"); st(g.key, "goal").status = "reached"; render(); toast("Goal reached. It shows as reached on Questions and goals, and Loci remembers it for this place."); break; }
     case "rcshow": S.rc = S.rc || {}; S.rc[d.id] = S.rc[d.id] || "shown"; render(); break;
     case "rcset": S.rc[d.id] = d.v; render(); if (d.v === "not") toast("Added to To revisit on Loci, for this place."); break;
     case "pathup": { const b = I(S.board), p = stopsOf(b), i = +d.i; [p[i - 1], p[i]] = [p[i], p[i - 1]]; render(); break; }
-    case "pathskip": { const b = I(S.board); b.path = stopsOf(b).filter(k => k !== d.k); render(); toast("Taken off the path. It's still on the board, under Side questions."); break; }
-    case "pathadd": { const b = I(S.board); stopsOf(b).push(d.k); render(); break; }
+    case "pathskip": { const b = I(S.board); b.skip = [...(b.skip || []), d.k]; b.path = stopsOf(b).filter(k => k !== d.k); render(); toast("Taken off the path. It's still on the board, under Side questions."); break; }
+    case "pathadd": { const b = I(S.board); b.skip = (b.skip || []).filter(k => k !== d.k); stopsOf(b).includes(d.k) || stopsOf(b).push(d.k); render(); break; }
 
     case "tt": S.tt = d.k; render(); break;
     case "how": S.how = true; render(); break;
@@ -6612,6 +6671,8 @@ document.addEventListener("dblclick", e => {
   if (S.screen !== "board") return;
   const el = e.target.closest("[data-pid]"); if (!el) return;
   const b = I(S.board), p = b.pl.find(x => x.id === el.dataset.pid), r = refOf(p.ref, b);
+  if (p.ref.startsWith("l:")) { playLumen(I(p.ref.slice(2))); return; }
+  if (!r) return;
   if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
   else if (r.type === "item" && r.it.type === "note" && !r.it.title) { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
   else if (r.type === "item") openEntry(r.it.id);
@@ -6639,7 +6700,7 @@ document.addEventListener("input", e => {
 function m_render_keep(pos) { render(); const q = $("#q"); if (q) { q.focus(); q.setSelectionRange(pos, pos); } }
 document.addEventListener("focusout", e => {
   const t = e.target;
-  if (t.dataset?.qedit) { const [bid, , id] = t.dataset.qedit.split(":"), x = I(bid).inl.find(y => y.id === id); x.text = t.value.trim() || x.text; S.editing = null; setTimeout(render, 0); }
+  if (t.dataset?.qedit) { const [bid, , id] = t.dataset.qedit.split(":"), x = I(bid).inl.find(y => y.id === id); const v = t.value.trim(); if (v) x.text = v; else { const b0 = I(bid); b0.inl = b0.inl.filter(y => y !== x); b0.pl = b0.pl.filter(p => p.ref !== "b:" + id); } S.editing = null; setTimeout(render, 0); }
   if (t.dataset?.nedit) { const it = I(t.dataset.nedit); it.body = t.value.trim(); S.editing = null; const n = parse(it.body); setTimeout(render, 0); toast(n.length ? `Saved to Commonplace with ${n.length} question${n.length > 1 ? "s and goals" : n[0].kind === "goal" ? " (a goal)" : ""} inside.` : "Saved to Commonplace as a note."); }
 });
 function saveBody() { const ta = $("#mdedit"), it = I(S.item); if (!ta) return; const before = parse(it.body).length; it.body = ta.value; S.editing = null; render(); const after = parse(it.body).length; if (after !== before) toast(`${after} question${after === 1 ? "" : "s"} and goals inside. Each shows in Questions and goals.`); }
@@ -6676,13 +6737,13 @@ document.addEventListener("keydown", e => {
   if (t.id === "mdedit" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveBody(); return; }
   if (t.dataset?.qedit && e.key === "Enter") { e.preventDefault(); t.blur(); return; }
   if (/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
-  if (e.key === "Escape" && S.learn) { S.learn = null; render(); requestAnimationFrame(drawArrows); return; }
+  if (e.key === "Escape" && S.playing) { S.playing = null; render(); requestAnimationFrame(drawArrows); return; }
   if (e.key === "Escape") { closeMenu(); if (!$("#apop").hidden) closeApop(); if (S.drawer) { S.drawer = false; render(); } }
   if (e.key === "/" && S.screen === "wall") { e.preventDefault(); $("#q")?.focus(); }
   if (S.screen === "board") {
     const k = e.key.toLowerCase();
     if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
-    else if (e.key === "+") { S.drawer = !S.drawer; render(); } else if (k === "0") fit();
+    else if (e.key === "+") { S.shelf = S.shelf === false; render(); } else if (k === "0") fit();
     else if ((e.key === "Delete" || e.key === "Backspace") && S.sel) { const b = I(S.board); b.pl = b.pl.filter(p => p.id !== S.sel); b.arrows = b.arrows.filter(a => a.from !== S.sel && a.to !== S.sel); S.sel = null; render(); toast("Removed from the board. It's still in your Commonplace."); }
   }
 });
@@ -6694,7 +6755,7 @@ document.addEventListener("dragend", () => { S.drag = null; document.querySelect
 
 /* ---------- moving between entries: one history, so ← always names where it goes ---------- */
 function pushHist() { S.hist.push({ screen: S.screen, item: S.item, board: S.board }); }
-function openEntry(id) { const it = I(id); if (!it) return; if (it.type === "lumen") { pushHist(); S.board = it.board; go("board", true); S.learn = { b: it.board, i: Math.max(0, stopsOf(I(it.board)).indexOf(it.forQ)), s: 0, l: it.id }; render(); return; } closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
+function openEntry(id) { const it = I(id); if (!it) return; if (it.type === "lumen") { pushHist(); S.board = it.board; go("board", true); setTimeout(() => playLumen(it), 40); return; } closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
 function mentionPop(el) {
   const x = I(el.dataset.mention), bi = el.closest(".nb-t")?.dataset.bi;
   menuKey = { bi: bi == null ? null : +bi, id: el.dataset.mention };
@@ -6777,6 +6838,30 @@ document.addEventListener("keydown", e => {
 
 for (const f of Object.keys(DB)) { S.field = f; const b = I(DB[f].start), k = stopsOf(b)[0]; if (k) makeLumen(b, k, "read"); }
 S.field = "architect";
+/* placing: double-click empty board to search; drag tiles from the shelf */
+document.addEventListener("dblclick", e => {
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest("[data-pid],.btools,.bzoom,.bhint,.qp")) return;
+  const c = toCanvas(e.clientX, e.clientY), r = $("#vp").getBoundingClientRect();
+  S.qp = { x: c.x - 120, y: c.y - 30, cx: Math.min(e.clientX - r.left, r.width - 360), cy: Math.min(e.clientY - r.top, r.height - 330), q: "", on: 0 }; render(); $("#qpi")?.focus();
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "qpi") { S.qp.q = e.target.value; S.qp.on = 0; const pos = e.target.selectionStart; render(); const i = $("#qpi"); i.focus(); i.setSelectionRange(pos, pos); }
+  if (e.target.id === "shq") { S.shq = e.target.value; const pos = e.target.selectionStart; render(); const i = $("#shq"); i.focus(); i.setSelectionRange(pos, pos); }
+}, true);
+document.addEventListener("keydown", e => {
+  if (e.target.id !== "qpi") return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); S.qp.on = (S.qp.on + (e.key === "ArrowDown" ? 1 : S.qp.rows.length - 1)) % S.qp.rows.length; const pos = e.target.selectionStart; render(); const i = $("#qpi"); i.focus(); i.setSelectionRange(pos, pos); }
+  else if (e.key === "Enter") { e.preventDefault(); chooseQp(S.qp.on); }
+  else if (e.key === "Escape") { e.preventDefault(); S.qp = null; render(); }
+  e.stopPropagation();
+}, true);
+document.addEventListener("mousedown", e => { const b = e.target.closest?.("[data-qpi]"); if (b && S.qp) { e.preventDefault(); chooseQp(+b.dataset.qpi); } else if (S.qp && !e.target.closest?.(".qp")) { S.qp = null; render(); } }, true);
+document.addEventListener("dragstart", e => { const t = e.target.closest?.("[data-dragref]"); if (!t) return; S.dragRef = t.dataset.dragref; e.dataTransfer.setData("text/plain", S.dragRef); e.dataTransfer.effectAllowed = "copy"; });
+document.addEventListener("dragover", e => { if (!S.dragRef || !e.target.closest?.("#vp")) return; e.preventDefault(); $("#vp").classList.add("dropping"); });
+document.addEventListener("dragleave", e => { if (e.target.id === "vp") $("#vp")?.classList.remove("dropping"); });
+document.addEventListener("drop", e => { if (!S.dragRef || !e.target.closest?.("#vp")) return; e.preventDefault(); const c = toCanvas(e.clientX, e.clientY), ref = S.dragRef; S.dragRef = null; placeRef(ref, c.x - 120, c.y - 40); });
+document.addEventListener("dragend", () => { S.dragRef = null; $("#vp")?.classList.remove("dropping"); });
+
 S.board = DB[S.field].start;
 render();
 </script>
