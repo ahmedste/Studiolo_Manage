@@ -1,6 +1,6 @@
 <title>Learner Memory Build Brief</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="What to give the coding agent: six phases, and the first one in detail.">
+<meta name="description" content="What to give the coding agent for Studiolo's learner memory: six phases in order, and the first one in detail.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -55,6 +55,7 @@ td { font-variant-numeric: tabular-nums; min-width: 120px; }
 .dia pre.mermaid { margin: 0; background: none; text-align: center; font-family: var(--ui); }
 .dia pre.mermaid svg { max-width: 100%; height: auto; }
 blockquote { margin: 0 0 14px; padding: 4px 16px; border-left: 2px solid var(--accent); font-family: var(--read); font-size: 17px; }
+.ref { border-bottom: 1px dotted var(--ink-3); }
 .foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 html { scroll-behavior: smooth; }
@@ -67,6 +68,7 @@ html { scroll-behavior: smooth; }
     <div class="intro"><p>HIGH (a programme of six phases; L1 is MEDIUM, L2 onwards HIGH; each phase states its own tier)</p><p></p><p></p><p><strong>For:</strong> the coding agent who builds learner memory in <code>studiolo</code>, and the owner who approves each phase.</p><p><strong>Status:</strong> The owner asked on 28 October 2026 to start this next. That sets the direction; it doesn&#39;t approve each decision. Under <code>AGENTS.md</code>, the agent writes its own spec and plan for <strong>L1</strong>, the owner approves it, and nothing merges or migrates without the owner&#39;s word in the conversation.</p><p><strong>Checked against:</strong> <code>studiolo</code> main @ <code>7c0e8732</code> (28 October 2026), read only. Every path below exists on that commit unless marked <em>new</em>. Line numbers are as of that commit; re-check before relying on them.</p></div>
     
     <h2 id="0-what-to-read-in-this-order">0. What to read, in this order</h2>
+<p>Everything you need is in <strong>four pages</strong> and the <code>studiolo</code> repo. Each page is self-contained. Links to other planning documents are background only, and you don&#39;t need them to build.</p>
 <div class="tbl"><table><thead><tr>
 <th>#</th>
 <th>Read</th>
@@ -79,18 +81,18 @@ html { scroll-behavior: smooth; }
 </tr>
 <tr>
 <td>2</td>
-<td><a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">Design spec</a>: §0, §2, §4 (especially §4.4, <em>Show less</em>), §5, §6, §9</td>
-<td>What and why: cards on the map, the four depths, the slice, the Settings tabs</td>
+<td><a href="https://claude.ai/artifact/PMhNu3p63tGbr9RoTT5iNm" target="_blank" rel="noopener">Design spec</a>: §0, §2, §4 (especially §4.4, <em>Show less</em>), §5, §6, §9</td>
+<td>What and why: cards on the map, the four depths, the slice, the Settings tabs, the decisions</td>
 </tr>
 <tr>
 <td>3</td>
-<td><a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">System reference</a> (<a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">readable page</a>)</td>
+<td><a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">System reference</a></td>
 <td>How: every Save, Call and Edit step, the tables, costs, invariants and function names</td>
 </tr>
 <tr>
 <td>4</td>
-<td><a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Prototype</a> and <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener"><code>prototypes/settings-memory/</code></a></td>
-<td>What it looks like and how it behaves. Turn on <strong>Builder</strong> for the slice</td>
+<td><a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Prototype</a> (how to use it: §0.1 below)</td>
+<td>What it looks like and how it behaves</td>
 </tr>
 <tr>
 <td>5</td>
@@ -99,6 +101,15 @@ html { scroll-behavior: smooth; }
 </tr>
 </tbody></table></div>
 <p>The design spec and the system reference stay the source of truth for the design. This brief decides <strong>order and scope</strong>; where it narrows a phase, this brief wins.</p>
+<h3 id="01-using-the-prototype">0.1 Using the prototype</h3>
+<p>It&#39;s built on Studiolo&#39;s real shell and styles, with a sample learner (an architect working on a prayer hall in Dubai); every entry is an example and nothing persists. The bar at the bottom right switches <strong>Settings</strong>, <strong>In Loci</strong> and <strong>Builder</strong>.</p>
+<ul>
+<li><strong>Settings → Learning</strong> is L1: four preferences, two instruction boxes, and <em>Notes on topics</em> folded into one line (topic notes are L2). With <strong>Builder</strong> on, a box beside it shows the &quot;you&quot; block updating as you type: that&#39;s the text L1 sends to the AI (§2.4).</li>
+<li><strong>Settings → Profile</strong> and <strong>Privacy &amp; data</strong> are also L1. <strong>Usage</strong> is later; its figures are examples.</li>
+<li><strong>Settings → Memory</strong> is L2: it opens on one paragraph about you, at most three things waiting, and one line per area. Tap an area, then a topic, for the level dial and the place&#39;s lines, each with <strong>⋯</strong> (Why?, Edit, Delete).</li>
+<li><strong>Builder</strong> (L2 onwards) shows the exact text Loci reads at any place and surface, its size in tokens, and <strong>Try it</strong>, which plans the same Lumen with and without that text.</li>
+<li><strong>In Loci</strong> (L2 and L3) shows the one line on a topic&#39;s panel, <strong>Tell Loci…</strong>, <strong>Remembered: …</strong> with Undo in a reply, and <strong>For you</strong> on a Lumen offer.</li>
+</ul>
 <h2 id="1-the-phases">1. The phases</h2>
 <p>Each phase is useful on its own and ships on its own branch.</p>
 <div class="tbl"><table><thead><tr>
@@ -338,6 +349,6 @@ taught (their words): "Diagrams before text. Define a term once, then use it…"
 <li><strong>Migrations 0025–0029</strong> have landed; L1&#39;s migration is the next free number.</li>
 </ul>
 
-    <p class="foot">Source: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-28-learner-memory-build-brief.md" target="_blank" rel="noopener">docs/superpowers/specs/2026-10-28-learner-memory-build-brief.md</a> in Studiolo_Manage. Design: <a href="https://github.com/ahmedste/Studiolo_Manage/blob/claude/gifted-cerf-w0cwoi/docs/superpowers/specs/2026-10-24-learner-memory-and-settings-design.md" target="_blank" rel="noopener">learner memory and Settings</a>. Prototype: <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Studiolo Learner Memory</a>.</p>
+    <p class="foot">The four pages: <b>Build brief</b> · <a href="https://claude.ai/artifact/PMhNu3p63tGbr9RoTT5iNm" target="_blank" rel="noopener">Design spec</a> · <a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">System reference</a> · <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Prototype</a></p>
   </main>
 </div>

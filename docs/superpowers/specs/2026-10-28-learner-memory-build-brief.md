@@ -8,15 +8,27 @@ HIGH (a programme of six phases; L1 is MEDIUM, L2 onwards HIGH; each phase state
 
 ## 0. What to read, in this order
 
+Everything you need is in **four pages** and the `studiolo` repo. Each page is self-contained. Links to other planning documents are background only, and you don't need them to build.
+
 | # | Read | For |
 |---|---|---|
 | 1 | **This brief** | Scope, order, the first phase in detail |
-| 2 | [Design spec](2026-10-24-learner-memory-and-settings-design.md): §0, §2, §4 (especially §4.4, *Show less*), §5, §6, §9 | What and why: cards on the map, the four depths, the slice, the Settings tabs |
-| 3 | [System reference](2026-10-24-learner-memory-system-reference.md) ([readable page](https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q)) | How: every Save, Call and Edit step, the tables, costs, invariants and function names |
-| 4 | [Prototype](https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk) and [`prototypes/settings-memory/`](../../../prototypes/settings-memory/README.md) | What it looks like and how it behaves. Turn on **Builder** for the slice |
+| 2 | [Design spec](https://claude.ai/artifact/PMhNu3p63tGbr9RoTT5iNm): §0, §2, §4 (especially §4.4, *Show less*), §5, §6, §9 | What and why: cards on the map, the four depths, the slice, the Settings tabs, the decisions |
+| 3 | [System reference](https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q) | How: every Save, Call and Edit step, the tables, costs, invariants and function names |
+| 4 | [Prototype](https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk) (how to use it: §0.1 below) | What it looks like and how it behaves |
 | 5 | In `studiolo`: `AGENTS.md`; `project-docs/workflow/README.md` (tiers, temporary switches); `project-docs/product/mvp-scope.md` → *Learner context and personalization*; `project-docs/architecture/data-model.md` → *Learner context and explainer records*; `project-docs/implementation/ai.md` → *Copilot → Context* and *The learner line*; `project-docs/design/interface.md` → *Learner instructions and memory* | The agreed scope this must not break, and the house rules |
 
 The design spec and the system reference stay the source of truth for the design. This brief decides **order and scope**; where it narrows a phase, this brief wins.
+
+### 0.1 Using the prototype
+
+It's built on Studiolo's real shell and styles, with a sample learner (an architect working on a prayer hall in Dubai); every entry is an example and nothing persists. The bar at the bottom right switches **Settings**, **In Loci** and **Builder**.
+
+- **Settings → Learning** is L1: four preferences, two instruction boxes, and *Notes on topics* folded into one line (topic notes are L2). With **Builder** on, a box beside it shows the "you" block updating as you type: that's the text L1 sends to the AI (§2.4).
+- **Settings → Profile** and **Privacy & data** are also L1. **Usage** is later; its figures are examples.
+- **Settings → Memory** is L2: it opens on one paragraph about you, at most three things waiting, and one line per area. Tap an area, then a topic, for the level dial and the place's lines, each with **⋯** (Why?, Edit, Delete).
+- **Builder** (L2 onwards) shows the exact text Loci reads at any place and surface, its size in tokens, and **Try it**, which plans the same Lumen with and without that text.
+- **In Loci** (L2 and L3) shows the one line on a topic's panel, **Tell Loci…**, **Remembered: …** with Undo in a reply, and **For you** on a Lumen offer.
 
 ## 1. The phases
 
