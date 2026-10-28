@@ -1,12 +1,12 @@
-HIGH (lane C in the Objects, questions and boards programme: collections you shape by looking at them, and backlinks on every entry; four phases, one small migration)
+HIGH (lane C in the Objects, questions and boards programme: collections you shape by looking at them, and backlinks on every entry, and Templates; five phases, one small migration)
 
-# Collections and linking: shaping collections, and knowing where everything is used
+# Collections, templates and linking: shaping collections, starting from templates, and knowing where everything is used
 
 **For:** the owner, to approve the model and the order; then the agents who build lane C in `studiolo`.
 **Status:** Proposed. Claude, 28 October 2026. Nothing here is approved until the owner says so in the conversation.
 **Checked against:** `studiolo` main @ `7c0e8732`, read only. Paths exist on that commit unless marked *new*.
 **Builds on:** [Long notes and connections](2026-10-28-long-notes-and-connections-design.md) (the three connection kinds, `item_refs`, lane N), the [Objects build phases](2026-10-25-objects-build-phases.md) (fields F1–F3, page P2, starter types T1) and the [programme](2026-10-28-objects-questions-boards-programme.md).
-**Prototype:** [`prototypes/objects-boards-questions/`](../../../prototypes/objects-boards-questions/README.md). Try **Collections** (the header tab), **Customize** (the bar at the bottom), and the **↩ Appears in** chip at the top of any entry. **Show phases** labels the parts C1 to C4.
+**Prototype:** [`prototypes/objects-boards-questions/`](../../../prototypes/objects-boards-questions/README.md). Try **Collections** and **Templates** (the header tabs), **Customize** (the bar at the bottom), the **?** in the wall's bar, and the **↩ Appears in** chip at the top of any entry. **Show phases** labels the parts C1 to C5.
 
 ## 0. In short
 
@@ -14,7 +14,8 @@ The owner's direction (28 Oct):
 - make editing a collection visual and customisable without overwhelming anyone;
 - design backlinks on notes, Objects, photos and everything else, so that opening an entry tells you where it's shown or borrowed, and every backlink is clickable;
 - draw how linking works, what's allowed, and what happens when linked things link onward;
-- think of Commonplace as a whole, for any field, and keep it easy to understand.
+- think of Commonplace as a whole, for any field, and keep it easy to understand;
+- design Templates too, as part of the same exercise: Objects, boards, customisation, templates and all of Commonplace.
 
 **Collections: you shape a collection by looking at it.** Today's *Edit collection* is one long form. It becomes a **studio** with four tabs, each answering one question about a picture of your own entries:
 
@@ -28,6 +29,13 @@ The owner's direction (28 Oct):
 Changes save as you make them, and **Undo** takes back the last one. Nothing deletes values without first offering to **hide** instead. **New collection** is three small steps, each with a picture: what it holds, a starting point for your field, then a name and a colour.
 
 **Backlinks: every entry says where it appears.** At the top of every page, a chip reads **↩ Appears in 4 places**. At the foot, **Appears in** lists each place: *Mentioned in* (with the sentence), *Shown as a card in*, *Shown in* (for photos), *Quoted in* (for sources), *Answers*, and *On boards* (with the arrows). Each row opens that place **at the exact spot**, highlighted.
+
+**Templates: one gallery of what you can start from** (§2.6). The Templates tab stops being *The Four Types* (an explainer, plus nine create forms that duplicate Capture). It becomes a gallery in three groups, each with a picture of what it makes and **Use**:
+- **Collections**: the field's starters;
+- **Long notes**: writing templates, including each collection's *Write about it* headings;
+- **Boards**: starting layouts.
+
+The explainer becomes a short sheet, **How Commonplace works**, opened from **?**. The word *template* now means only this: the rail's "Template" row is renamed **Kind**.
 
 **Linking stays three kinds, each made in one place** (lane N): a *mention* in writing, a *property* in the rail, an *arrow* on a board. Backlinks go **one step**: what links here, never what links to what links here. That one rule avoids loops, floods and confusion (§4.4).
 
@@ -131,6 +139,48 @@ Three steps in one dialog, each with **Back**. Notes, Sources and Photos skip st
 | a collection's wall | **Edit collection** | **Card** |
 | the Collections page | **Edit** on a tile | **Card** |
 | New collection | **Make the collection** | **Fields** |
+
+### 2.6 Templates: start from something (C5)
+
+**Today** (`templates-page.tsx`, `template-specs.ts`), the tab is *The Four Types*:
+- an explanation of Note, Source, Photo and Object;
+- nine tabs: Note, Long note, Quote, Source, Video / link, Photo, Object · Person, Object · Thing, Conversation;
+- for each one, what its card and page look like, examples across fields, and a small form to create one.
+
+The programme changes most of what it describes, and its forms repeat Capture and New collection.
+
+**Proposed: one gallery of things to start from.** It opens with *Start from a template* ("Collections, long notes and boards, set up for architects. Use one and change anything after"), then kind chips *All · Collections · Long notes · Boards*, then three groups of cards. Each card has:
+- a **picture of what it makes**;
+- a name and one line (what's in it);
+- **Use**.
+
+| Group | A card shows | **Use** does |
+|---|---|---|
+| **Collections** | the card layout as a thumbnail, and every field as a chip with its kind icon (*◷ Built · Aa Where · ↗ Architect · ◉ Typology · ¶ Why it matters*); "Things · 5 fields · picture cards"; *You have Buildings* if you do | opens **New collection** at step 3 (name and look), already filled in; **Back** shows step 2 |
+| **Long notes** | a small page with the title and its headings, plus *◎ A goal for it* or *? A question to answer* when the template ends with one. General templates for the field (*Site visit · Lecture notes · Comparing two precedents*; *Case brief · Seminar notes · Advice outline*; *Ward round · Lecture notes · Guideline summary*). Then **each collection's own** *Write about it* headings ("Writing about a building"), with **Edit headings** | a general one starts a long note with its headings, the caret under the first; a collection's asks *Write about which building?* and starts *Write about it* on the one you choose |
+| **Boards** | a small board: the goal (accent), questions (amber), cards and arrows. *Toward a goal* (a goal, its questions, room for answers), *Compare two* (two cards, *contrasts with*, and the question it *raises*), *Cause and effect* (a chain of *leads to*, ending in a question) | makes the board with those cards, arrows and words; the goal and questions are inlines (B1); placeholder notes say "Double-click to write, or + Place an entry here" |
+
+- **Where the templates come from.** Collection starters are T1's per-field starter types. Writing templates are general ones per field, plus `collections.write_template` (N3). Board layouts are fixed in code (B1).
+- **Your own templates (later).** *Save as template* on any long note or board, and your own collections' writing headings appear here already. Making one from a long note is N3's, and from a board is B3's.
+
+### 2.7 How Commonplace works
+
+The Four Types explainer becomes a sheet, **How Commonplace works**. It opens from:
+- **?** on the Templates page;
+- the round **?** in the wall's slim bar;
+- *How linking works* in an empty **Appears in**.
+
+It says, in six short blocks:
+1. **Every entry is one of four kinds**: Notes, Sources, Photos, Objects, each with its icon and a line.
+2. **A collection says what it is**.
+3. **A topic says what it's about** (Loci).
+4. **Things connect in three ways**: Mention, Property and Arrow, each with where it's changed. Then a line on **↩ Appears in**.
+5. **Questions and goals**, written with `@`.
+6. **Boards**.
+
+It's the one place the whole model is explained, in the words the screens use.
+
+**Naming.** *Template* means only these starting points. The rail's **Template** row (today "Template: Person", "Template: Long note"; the Work page says "Type") becomes **Kind** on every page. *Type* stays in the code (`content_items.shape`, `ITEM_KIND_SPECS`).
 
 ## 3. Appears in: backlinks on every entry (C4)
 
@@ -335,8 +385,9 @@ stateDiagram-v2
 | **C2** | 1 → 2 | **The studio**: Card, Fields and Settings tabs in Stage 1; the Page tab when P2 lands; autosave and Undo; hide before delete | HIGH | yes: `collection_fields.hidden`, `collections.card_options` | F1 (the field kinds), P2 for the Page tab |
 | **C3** | 1 | **Edit from where you are**: the rail's property names, *Add a property*, *Edit collection* | LOW | no | C2 |
 | **C4** | 2 | **Appears in**: the chip, the section, every group, jump to the spot, filters, *Taken from* on Quotes | HIGH | no (reads `item_refs` from N2) | N2; *On boards* rows arrive with B1 |
+| **C5** | 2 (boards' group in 4) | **Templates**: the gallery with Collections and Long notes groups; **How Commonplace works**; **Kind** in the rail; the create forms of *The Four Types* retired. The Boards group arrives with B1 | MEDIUM | no | C1 (New collection at step 3), T1 (starters), N3 (writing templates) |
 
-**Agents.** C1 → C2 → C3 is one agent's lane from Stage 1, beside lane F: F adds field kinds, and C2 is where you see them. C4 belongs to lane N's agent, straight after N2, because it reads the same index.
+**Agents.** C1 → C2 → C3 is one agent's lane from Stage 1, beside lane F: F adds field kinds, and C2 is where you see them. C4 belongs to lane N's agent, straight after N2, because it reads the same index. C5 follows C3 on Agent E's lane once N3's writing templates exist.
 
 ## 8. Decisions for the owner
 
@@ -351,6 +402,10 @@ stateDiagram-v2
 | **CL-D7** | Properties stay in the rail, not in Appears in | **Yes**: facts about it, not places it's used |
 | **CL-D8** | Opening a backlink goes to the exact spot, highlighted | **Yes** |
 | **CL-D9** | A clinical entry's backlinks show to its owner, labelled *Clinical* | **Yes**; memory still skips it |
+| **CL-D10** | Templates becomes a gallery of collections, long notes and boards to start from, each with a picture and **Use** | **Yes** |
+| **CL-D11** | Retire *The Four Types* create forms; Capture and New collection make things | **Yes**: one way to make each thing |
+| **CL-D12** | The explainer becomes the **How Commonplace works** sheet, opened from **?** | **Yes** |
+| **CL-D13** | *Template* means only starting points; the rail's row is renamed **Kind** | **Yes** |
 
 ## 9. What this is not
 

@@ -14,7 +14,7 @@ PARTS = [
     ("questions", "Part 2 · Questions and goals: the roadmap", "2026-10-25-questions-and-goals-roadmap-design.md"),
     ("questions-design", "Part 3 · Questions and goals: the design", "2026-10-25-questions-and-goals-inside-items-design.md"),
     ("long-notes", "Part 4 · Long notes and connections", "2026-10-28-long-notes-and-connections-design.md"),
-    ("collections", "Part 5 · Collections and linking", "2026-10-28-collections-and-linking-design.md"),
+    ("collections", "Part 5 · Collections, templates and linking", "2026-10-28-collections-and-linking-design.md"),
     ("boards", "Part 6 · Boards", "2026-10-24-boards-design.md"),
 ]
 ARTIFACTS = {
@@ -135,9 +135,9 @@ def convert(md, prefix):
 
 def main():
     build(PARTS, "plan.html", None)
-    build([("collections", "Collections and linking", "2026-10-28-collections-and-linking-design.md")], "linking.html",
-          ("Commonplace Linking and Collections", "How Commonplace links, and how collections are shaped",
-           "The linking model drawn out (what can link to what, which link to use, two sides of one link, links of links), the problems thought through, backlinks on every entry, and the collection studio. Proposed, 28 October 2026."))
+    build([("collections", "Collections, templates and linking", "2026-10-28-collections-and-linking-design.md")], "linking.html",
+          ("Commonplace Linking and Collections", "How Commonplace links, and how collections and templates work",
+           "The linking model drawn out (what can link to what, which link to use, two sides of one link, links of links), the problems thought through, backlinks on every entry, the collection studio, and Templates. Proposed, 28 October 2026."))
 
 
 def build(parts, out, head):

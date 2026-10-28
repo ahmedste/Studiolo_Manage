@@ -9,9 +9,9 @@ You're building the next part of **Studiolo**, a learning app (`ahmedste/studiol
 **Look first, then read:**
 
 1. **The prototype (the end state, drawn in the real Commonplace CSS):** https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b
-   The bar at the bottom switches Architect, Lawyer and Doctor, and jumps between **Everything**, **Long note**, **Board**, **Questions** and **Customize**. **Show phases** labels every part with the phase that builds it.
+   The bar at the bottom switches Architect, Lawyer and Doctor, and jumps between **Everything**, **Long note**, **Board**, **Questions**, **Customize** and **Templates**. **Show phases** labels every part with the phase that builds it.
 2. **The plan (the order, then every design in full):** https://claude.ai/artifact/Hc7B9N1X7kmCELnew6qbNi
-3. **Linking and collections (diagrams, problem cases, backlinks, the collection studio):** https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4
+3. **Linking, collections and templates (diagrams, problem cases, backlinks, the collection studio, Templates):** https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4
 
 **The source documents** (in `ahmedste/studiolo_manage`, branch `claude/gifted-cerf-w0cwoi`, under `docs/superpowers/specs/`):
 
@@ -21,7 +21,7 @@ You're building the next part of **Studiolo**, a learning app (`ahmedste/studiol
 | `2026-10-25-questions-and-goals-roadmap-design.md` and `2026-10-25-questions-and-goals-inside-items-design.md` | Lane Q: `@question` and `@goal` inside any writing; `item_inlines`; the Questions and goals page as cards (§10) |
 | `2026-10-25-objects-build-phases.md` | Lanes F, P, V, T: Object fields, pages, views (Table, Columns, Timeline), starter types |
 | `2026-10-28-long-notes-and-connections-design.md` | Lane N: the long-note page and editor (CodeMirror 6 live preview); the three connection kinds |
-| `2026-10-28-collections-and-linking-design.md` | Lane C: the collection studio, New collection, **Appears in** backlinks, the linking model |
+| `2026-10-28-collections-and-linking-design.md` | Lane C: the collection studio, New collection, **Appears in** backlinks, Templates as a gallery to start from, *How Commonplace works*, the linking model |
 | `2026-10-24-boards-design.md` | Lane B: Boards, built last |
 
 The prototype's source is `prototypes/objects-boards-questions/index.src.html` in the same repository. Read it for exact wording, behaviour and edge cases. Don't port its code: it's a single-file sketch, and the designs name the real files and modules to change.
@@ -30,11 +30,11 @@ The prototype's source is `prototypes/objects-boards-questions/index.src.html` i
 
 - **Stage 0:** Q1 (write questions and goals, no migration), F0 (field-type descriptor), P0 (one Object page from blocks).
 - **Stage 1:** Q2, Q3, F1, P1, V1, T1, N1 (the long-note page), C1–C3 (collections).
-- **Stage 2:** Q4, Q-O, F2, P2, V2, T2, N2 (mentions, cards, images), C4 (Appears in).
+- **Stage 2:** Q4, Q-O, F2, P2, V2, T2, N2 (mentions, cards, images), C4 (Appears in), C5 (Templates; its Boards group arrives with B1).
 - **Stage 3:** Q5, F3, T3, N3, N4.
 - **Stage 4:** Boards B1–B4 with Q-B.
 
-The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D9 and CL-D1–D9. Treat a recommendation as agreed unless the owner has said otherwise.
+The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D9 and CL-D1–D13. Treat a recommendation as agreed unless the owner has said otherwise.
 
 **Your first task: phase Q1.**
 

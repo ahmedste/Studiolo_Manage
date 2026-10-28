@@ -14,8 +14,8 @@ Read the plan first, then test the prototypes against it.
    The end state, drawn in the current real Commonplace screens. Switch Architect, Lawyer and Doctor in the bar at the bottom; **Board**, **Questions** and **Customize** jump between screens.
 3. **Objects, phase by phase:** https://claude.ai/artifact/3sJpPHVcPMUJiDgA7MpCTH
    The real Commonplace with a switch from Today through Phase 3.
-4. **Linking and collections (read with the plan):** https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4
-   How things link, drawn as diagrams, the problems thought through, backlinks, and the collection studio.
+4. **Linking, collections and templates (read with the plan):** https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4
+   How things link, drawn as diagrams, the problems thought through, backlinks, the collection studio, and Templates.
 5. **Boards, the original concept:** https://claude.ai/artifact/CVVpm4kM6pshfmURATKXvi
 6. **Objects in any field, the first exploration:** https://claude.ai/artifact/XLHqoBxTXgaCoarmpUmo59
 
@@ -31,6 +31,7 @@ Read the plan first, then test the prototypes against it.
 - On any Object page, click a property's name (e.g. *Architect*). Does it take you to the right place in the studio?
 - Open **Hassan Fathy**, the **Arcade and bay rhythm** photo and the **Climate and Architecture** PDF. Does **↩ Appears in** at the top tell you where each is used? Does each row open the exact spot, highlighted?
 - Open **Questions** (bar at the bottom). Do the goal cards, rings and **Next** lines make it clear what to do? Mark a question answered, then switch to **Answered**: does *What you've found out* read well? Does clicking a question open the exact place it was written?
+- **Templates** tab: use one collection, one long-note and one board template. Does each make what its picture shows? Open **? How Commonplace works**: after reading it, could a new user explain collections, topics and the three ways things link?
 - Is it always clear where to go to change a connection? Write down any moment when it wasn't.
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
 - On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
@@ -41,7 +42,7 @@ Read the plan first, then test the prototypes against it.
 **Then review the plan:**
 - Is the order sound? Questions and goals come first and Boards last. Are the dependencies right?
 - Can the lanes really run in parallel?
-- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9, CL-D1 to D9) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
+- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9, CL-D1 to D13) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
 
 **Report in four parts:**
 1. Bugs, with steps to reproduce.

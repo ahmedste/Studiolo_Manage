@@ -10,7 +10,7 @@ HIGH (a programme of five stages across six lanes; each phase states its own tie
 - [Questions and goals roadmap](2026-10-25-questions-and-goals-roadmap-design.md) and its [design](2026-10-25-questions-and-goals-inside-items-design.md) (lane Q);
 - [Boards](2026-10-24-boards-design.md) (lane B);
 - [Long notes and connections](2026-10-28-long-notes-and-connections-design.md) (lane N, added 28 October: the writing page, and the three ways things connect);
-- [Collections and linking](2026-10-28-collections-and-linking-design.md) (lane C, added 28 October: the collection studio, New collection, and **Appears in** backlinks on every entry, with the linking model drawn out).
+- [Collections and linking](2026-10-28-collections-and-linking-design.md) (lane C, added 28 October: the collection studio, New collection, **Appears in** backlinks on every entry, Templates, and the linking model drawn out).
 
 Each of those documents keeps its detail and its reasoning. This one decides **the order**, **where they meet**, and the few rules that change because they meet.
 
@@ -62,7 +62,7 @@ flowchart LR
 
 **Lane N · Long notes and connections** (added 28 October) runs beside these: **N1** the writing page and editor in Stage 1, **N2** mentions, entry cards, images and the shared *Appears in* in Stage 2 (with F2), **N3** *Write about it* and margin notes on a block from Stage 2 into 3, and **N4** Loci in the writing in Stage 3. Detail, the connection model and its decisions (LN-D1 to LN-D9) are in [its design](2026-10-28-long-notes-and-connections-design.md).
 
-**Lane C · Collections and linking** (added 28 October): **C1** the Collections page and New collection, **C2** the collection studio and **C3** editing from where you are, all in Stage 1 beside lane F (C2's Page tab waits for P2); **C4** *Appears in* in Stage 2, straight after N2. Detail and decisions (CL-D1 to CL-D9) are in [its design](2026-10-28-collections-and-linking-design.md).
+**Lane C · Collections and linking** (added 28 October): **C1** the Collections page and New collection, **C2** the collection studio and **C3** editing from where you are, all in Stage 1 beside lane F (C2's Page tab waits for P2); **C4** *Appears in* in Stage 2, straight after N2; **C5** Templates as a gallery of collections, long notes and boards to start from, with *How Commonplace works*, in Stage 2 (its Boards group with B1). Detail and decisions (CL-D1 to CL-D13) are in [its design](2026-10-28-collections-and-linking-design.md).
 
 **Why questions and goals come first.** Q1 needs no migration: the words live in the note's own text, so learners start the habit on day one, and every later lane reads what they wrote. Q2 and Q3 run beside the field work in Stage 1. By the time Objects get relation fields (Stage 2), *Answered in* already exists for them to join.
 
@@ -73,7 +73,7 @@ flowchart LR
 - Agent B: F0 → F1 → F2 → F3.
 - Agent C (from Stage 1): P0 → P1 → V1 → P2 → V2.
 - Agent D (from Stage 1, after Q1 merges): N1 → N2 → C4 → N3 → N4.
-- Agent E (from Stage 1, beside Agent B): C1 → C2 → C3.
+- Agent E (from Stage 1, beside Agent B): C1 → C2 → C3 → C5.
 - The small T phases slot in wherever an agent waits for a migration approval. Lane B starts after Stage 2 and the photo roadmap's Phase 7, and is one agent's lane from then on.
 
 **Migrations are numbered at merge.** Each lane owns its tables (Q: `item_inlines`, `inline_answers`; F: `collection_fields`, `item_field_values`, `content_relations.field_id`; P: `collections.page_layout`; V: `library_views`; T: `collections.base` checks, `collections.sensitivity`; B: `board_placements`, `board_arrows`, `board_frames`, the `board` shape). Branches name their file `00xx_<lane>_<what>.sql` and take the next number when they merge, and each one is applied only on the owner's word (`AGENTS.md`).

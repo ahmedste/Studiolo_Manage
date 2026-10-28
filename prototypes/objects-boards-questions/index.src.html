@@ -525,6 +525,42 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .gprog .ring { flex: none; }
 @media (max-width: 860px) { .qg-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gc-grid { grid-template-columns: minmax(0, 1fr); } }
 
+/* Templates (C5) and How Commonplace works */
+.cph-how { border: 0; width: 24px; height: 24px; border-radius: 50%; background: none; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font: 600 12px var(--ui); cursor: pointer; margin-right: 6px; }
+.cph-how:hover { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.tp-head { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: flex-end; margin: 0 0 14px; }
+.tp-title { margin: 0 0 4px; font: 400 clamp(28px, 3.4vw, 36px)/1.1 var(--read); }
+.tp-head .small { margin: 0; max-width: 62ch; }
+.tp-tabs { margin-bottom: 8px; }
+.tp-sec { margin: 22px 0 30px; }
+.tp-sh { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin-bottom: 12px; }
+.tp-sh h2 { margin: 0; font: 400 23px/1.2 var(--read); } .tp-sh .small { margin: 0; }
+.tp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+.tp-card { display: grid; grid-template-rows: auto 1fr auto; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.tp-card:hover { box-shadow: inset 0 0 0 1px var(--ink-3), var(--shadow-pic); }
+.tp-prev { height: 150px; padding: 14px; background: var(--board); display: grid; place-items: center; overflow: hidden; }
+.tp-prev-c { grid-template-columns: 70px minmax(0, 1fr); gap: 12px; align-items: center; place-items: center start; }
+.tp-prev-c .th { width: 70px; height: 58px; }
+.tp-prev .wz-fields { margin: 0; }
+.tp-t { display: grid; gap: 3px; padding: 12px 14px 6px; } .tp-t b { font: 400 18px/1.25 var(--read); } .tp-t small { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+.tp-ft { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 14px 12px; }
+.tp-ft .small { margin: 0; }
+.tp-sketch { width: 100%; max-width: 210px; height: 100%; padding: 10px 12px; border-radius: 3px; background: var(--panel); box-shadow: var(--shadow-pic); display: grid; align-content: start; gap: 3px; overflow: hidden; }
+.tp-sketch b { font: 400 13px/1.2 var(--read); margin-bottom: 3px; }
+.tp-h { font: 400 10.5px/1.2 var(--read); color: var(--ink); } .tp-sketch i { display: block; height: 3px; width: 80%; background: var(--line); border-radius: 2px; margin-bottom: 2px; }
+.tp-g, .tp-q { font-size: 9.5px; padding: 2px 5px; border-radius: 2px; } .tp-g { background: var(--accent-soft); color: var(--accent-strong); } .tp-q { background: var(--pick-soft); color: var(--pick); }
+.tp-board { width: 100%; height: 100%; aspect-ratio: auto; }
+.tp-board svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.how { width: min(820px, calc(100vw - 32px)); }
+.how-h { margin: 18px 0 8px; font: 600 11.5px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.how p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink); }
+.how-kinds, .how-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.how-kinds div, .how-links div { display: grid; gap: 3px; padding: 12px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.how-kinds b, .how-links b { font: 400 17px var(--read); } .how-kinds small, .how-links small { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+.how-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.how kbd { font: 12px ui-monospace, Menlo, monospace; padding: 0 4px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--line); }
+@media (max-width: 699.98px) { .how-two { grid-template-columns: 1fr; } }
+
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
   .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 380px; }
@@ -822,7 +858,7 @@ function renderWall() {
         <span class="cph-fbtn"><button type="button">Topic ▾</button></span>
         <span class="cph-fbtn" data-ph="Q1"><button type="button" data-act="hasmenu" ${S.has ? 'aria-pressed="true"' : ""}>${hasLabel} ▾</button></span>
         ${isObj ? `<span class="cph-views" role="group" aria-label="View" data-ph="V1 · V2">${[["cards", "Cards"], ["table", "Table"], ["columns", "Columns"], ["timeline", "Timeline"]].map(([k, t]) => `<button type="button" data-act="view" data-k="${k}" aria-pressed="${view === k}">${t}</button>`).join("")}</span>` : ""}
-        <span class="cph-grow"></span><span class="cph-count">${items.length} entries · newest first</span>${isObj ? `<button class="cph-display" type="button" data-act="customize">Edit collection</button>` : `<button class="cph-display" type="button">Display ▾</button>`}</div>
+        <span class="cph-grow"></span><button class="cph-how" type="button" data-act="how" title="How Commonplace works" aria-label="How Commonplace works" data-ph="C5">?</button><span class="cph-count">${items.length} entries · newest first</span>${isObj ? `<button class="cph-display" type="button" data-act="customize">Edit collection</button>` : `<button class="cph-display" type="button">Display ▾</button>`}</div>
     </div>${isObj && c.desc ? `<p class="small" style="margin:0 0 12px;max-width:70ch">${esc(c.desc)}</p>` : ""}${body}</div>`;
 }
 function table(c, items) {
@@ -868,7 +904,7 @@ function renderItem() {
   const inv = c ? D().cols.flatMap(sc => sc.fields.filter(f => f.t === "rel" && f.o.to === c.id).map(f => ({ sc, f }))).map(({ sc, f }) => { const ids = D().items.filter(x => x.col === sc.id && arr(x.v[f.id]).includes(it.id)); return ids.length ? prop(f.o.inv || sc.name, `<div class="rel-row">${ids.map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("")}</div>`, "F2") : ""; }).join("") : "";
   const ob = onBoards(it);
   const rail = `<p class="ip-rh">Properties</p>
-    ${prop(person ? "Template" : "Type", esc(c ? c.label : kindLabel(it)))}
+    ${prop("Kind", esc(c ? c.label : kindLabel(it)), "C5")}
     ${c ? c.fields.filter(f => f.t !== "long" && !f.hidden).map(f => propF(f, f.t === "rel" ? `<div class="rel-row">${arr(it.v[f.id]).map(I).filter(Boolean).map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("") || `<span style="color:var(--ink-3)">Not recorded</span>`} <button class="addv" type="button" data-act="relpick" data-f="${f.id}">${f.o.many ? "+ Link" : arr(it.v[f.id]).length ? "Change" : "+ Link"}</button></div>`
       : f.t === "choice" ? (arr(it.v[f.id]).map(v => `<span class="cc">${esc(v)}</span>`).join("") || `<span style="color:var(--ink-3)">Not recorded</span>`)
       : `<div class="inline-edit-wrap"><input class="inline-edit rail-input" value="${esc(it.v[f.id] || "")}" placeholder="${f.t === "url" ? "https://…" : "Not recorded"}" data-fv="${f.id}"></div>`, f.t === "rel" ? "F2" : f.t === "choice" ? "F1" : "")).join("") : ""}
@@ -1077,6 +1113,48 @@ function fieldPanel(c, f) {
     <section class="cs-sec cs-danger"><p class="small">${n ? `${n} ${esc(lower(n > 1 ? c.name : c.label))} ${n > 1 ? "have" : "has"} a value here.` : "No values yet."}</p><button class="button button-link" type="button" data-act="csfdel" style="color:var(--warn)">${n ? "Delete field and its values…" : "Delete field"}</button></section>`;
 }
 
+/* ---------- Templates: one gallery of what you can start from (C5) ----------
+   "Template" means only this: a collection to start from, a long note to start from, a board to start from. Each shows
+   what it makes, and Use makes it. How Commonplace works is a sheet, not a page of forms. */
+const GEN_WRITE = {
+  architect: [["Site visit", ["Where and when", "What I saw", "Sketches and photos", "What I'd take"], "question"], ["Lecture notes", ["The main idea", "Key points", "Words to look up"], "goal"], ["Comparing two precedents", ["The two", "Where they agree", "Where they differ", "What I'd use"], "question"]],
+  lawyer: [["Case brief", ["Facts", "Issue", "Held", "Reasoning", "Why it matters"], "question"], ["Seminar notes", ["The question", "Authorities", "My view"], "goal"], ["Advice outline", ["The question", "Short answer", "Analysis", "Risks"], "question"]],
+  doctor: [["Ward round", ["Patient (age band only)", "Findings", "Plan", "What I learned"], "question"], ["Lecture notes", ["The main idea", "Key points", "Doses to remember"], "goal"], ["Guideline summary", ["Who it's for", "Key recommendations", "What changes on the ward"], "question"]]
+};
+const BOARD_STARTS = [
+  ["Toward a goal", "A goal, the questions under it, and room to place what answers them.", [["g", 6, 8, 46, 24], ["q", 6, 50, 28, 18], ["q", 38, 50, 28, 18], ["n", 70, 8, 26, 18], ["n", 70, 50, 26, 18]], [[3, 1, "explains"], [4, 2, "explains"]]],
+  ["Compare two", "Two things side by side, an arrow that says how they differ, and the question it raises.", [["n", 6, 14, 30, 26], ["n", 62, 14, 30, 26], ["q", 34, 58, 30, 18]], [[0, 1, "contrasts with"], [1, 2, "raises"]]],
+  ["Cause and effect", "A chain: what leads to what, and why, ending in what you want to explain.", [["n", 4, 30, 22, 22], ["n", 30, 30, 22, 22], ["n", 56, 30, 22, 22], ["q", 80, 30, 18, 22]], [[0, 1, "leads to"], [1, 2, "leads to"], [2, 3, "raises"]]]
+];
+function sketchPage(title, heads, extra) { return `<div class="tp-sketch"><b>${esc(title)}</b>${heads.map(h => `<span class="tp-h">${esc(h)}</span><i></i>`).join("")}${extra === "goal" ? `<span class="tp-g">◎ A goal for it</span>` : extra === "question" ? `<span class="tp-q">? A question to answer</span>` : ""}</div>`; }
+function sketchBoard(boxes, links) {
+  const c = k => k === "g" ? "g" : k === "q" ? "q" : "";
+  const mid = ([, x, y, w, h]) => [x + w / 2, y + h / 2];
+  return `<div class="bcover tp-board">${links.map(([a, b]) => { const [x1, y1] = mid(boxes[a]), [x2, y2] = mid(boxes[b]); return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink-3)" stroke-width=".6" vector-effect="non-scaling-stroke"/></svg>`; }).join("")}${boxes.map(([k, x, y, w, h]) => `<i class="${c(k)}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></i>`).join("")}</div>`;
+}
+function renderTpl() {
+  const tab = S.tt || "all", st = STARTERS[S.field], gw = GEN_WRITE[S.field], cw = D().cols.filter(c => c.shape === "object" && c.write.length);
+  const sec = (k, h, sub, body) => tab === "all" || tab === k ? `<section class="tp-sec"><div class="tp-sh"><h2>${h}</h2><p class="small">${sub}</p></div>${body}</section>` : "";
+  const colls = `<div class="tp-grid">${st.map((x, i) => `<article class="tp-card"><div class="tp-prev tp-prev-c">${cardThumb(x.layout)}<div class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</div></div><div class="tp-t"><b>${esc(x.name)}</b><small>${x.base === "person" ? "People" : "Things"} · ${x.fields.length} fields · ${x.layout} cards${x.clinical ? ` · <span style="color:var(--warn)">Clinical</span>` : ""}</small></div><div class="tp-ft">${D().cols.some(c => c.name === x.name) ? `<span class="small">You have ${esc(x.name)}</span>` : "<span></span>"}<button class="button" type="button" data-act="tpcoll" data-i="${i}">Use</button></div></article>`).join("")}</div>`;
+  const writing = `<div class="tp-grid">${gw.map(([t, h, ex], i) => `<article class="tp-card"><div class="tp-prev">${sketchPage(t, h, ex)}</div><div class="tp-t"><b>${esc(t)}</b><small>Long note · ${h.length} headings${ex ? ` · with a ${ex === "goal" ? "goal" : "question"}` : ""}</small></div><div class="tp-ft"><span></span><button class="button" type="button" data-act="tpwrite" data-i="${i}">Use</button></div></article>`).join("")}${cw.map(c => `<article class="tp-card"><div class="tp-prev">${sketchPage("On " + (colItems(c)[0]?.title || c.label), c.write, null)}</div><div class="tp-t"><b>Writing about a ${esc(lower(c.label))}</b><small>From your ${esc(c.name)} collection · edit in its studio</small></div><div class="tp-ft"><button class="button button-link" type="button" data-act="tpedit" data-id="${c.id}">Edit headings</button><button class="button" type="button" data-act="tpabout" data-id="${c.id}">Use</button></div></article>`).join("")}</div>`;
+  const brds = `<div class="tp-grid">${BOARD_STARTS.map(([t, d, boxes, links], i) => `<article class="tp-card"><div class="tp-prev">${sketchBoard(boxes, links)}</div><div class="tp-t"><b>${esc(t)}</b><small>${esc(d)}</small></div><div class="tp-ft"><span></span><button class="button" type="button" data-act="tpboard" data-i="${i}" data-ph="B1">Use</button></div></article>`).join("")}</div>`;
+  return `${header("tpl", "Templates")}<div class="tp" data-ph="C5"><div class="tp-head"><div><h1 class="tp-title">Start from a template</h1><p class="small">Collections, long notes and boards, set up for ${esc(DB[S.field].label.toLowerCase())}s. Use one and change anything after.</p></div><button class="button button-quiet" type="button" data-act="how">? How Commonplace works</button></div>
+    <nav class="cph-types tp-tabs" aria-label="Templates">${[["all", "All", SVG.all], ["coll", "Collections", SVG.object], ["write", "Long notes", SVG.note], ["board", "Boards", SVG.board]].map(([k, t, ic]) => `<button class="cph-type" type="button" data-act="tt" data-k="${k}" ${tab === k ? 'aria-current="true"' : ""}>${ic}${t}</button>`).join("")}</nav>
+    ${sec("coll", "Collections", "What each entry records, and how its card and page look.", colls)}
+    ${sec("write", "Long notes", "Headings to write into. Your collections' own appear here too.", writing)}
+    ${sec("board", "Boards", "A layout of cards and arrows to think on.", brds)}</div>`;
+}
+function howHTML() {
+  if (!S.how) return "";
+  const kinds = [["note", "Notes", "A thought, a quote, or a long note you write in."], ["source", "Sources", "Books, PDFs, videos and links you learn from."], ["image", "Photos", "Pictures you took or kept."], ["object", "Objects", "People, places and things, with the fields you choose."]];
+  return `<div class="wz-scrim" data-act="howclose"></div><div class="wz how" role="dialog" aria-modal="true" aria-label="How Commonplace works" data-ph="C5"><div class="wz-top"><span class="small">Commonplace</span><button class="button button-link" type="button" data-act="howclose">Close</button></div><h2>How Commonplace works</h2>
+    <h3 class="how-h">Every entry is one of four kinds</h3><div class="how-kinds">${kinds.map(([k, t, d]) => `<div><span class="wz-ic">${KIND[k][2]}</span><b>${t}</b><small>${d}</small></div>`).join("")}</div>
+    <div class="how-two"><div><h3 class="how-h">A collection says what it is</h3><p>Buildings, Cases, Drugs. One per entry, of its kind. Objects collections choose their fields, card and page.</p></div><div><h3 class="how-h">A topic says what it's about</h3><p>Topics live on Loci, your map. An entry can sit on several.</p></div></div>
+    <h3 class="how-h">Things connect in three ways</h3><div class="how-links"><div><b>Mention</b><small>Type <kbd>@</kbd> and a name while writing. Changed in the writing.</small></div><div><b>Property</b><small>A fact in the rail: Architect, Cites. Changed in the rail, shown on both pages.</small></div><div><b>Arrow</b><small>On a board: a word and why. Changed on the board.</small></div></div>
+    <p class="small">Every entry shows <b>↩ Appears in</b>: each place that uses it, one click from the exact spot.</p>
+    <div class="how-two"><div><h3 class="how-h"><span style="color:var(--pick)">?</span> Questions and <span style="color:var(--accent)">◎</span> goals</h3><p>Write them inside anything with <kbd>@</kbd>. They stay where you wrote them, and all show on Questions and goals.</p></div><div><h3 class="how-h">▦ Boards</h3><p>Place entries, draw arrows that say why, toward a goal. A board is an entry too.</p></div></div></div>`;
+}
+
 /* ---------- Appears in: backlinks on every page (C4) ----------
    Read from where things are made: mentions, entry cards and images in writing; quotes taken from a source; answers;
    boards. Each row opens the place and jumps to the exact spot. One step only: a note that mentions a note that mentions
@@ -1104,7 +1182,7 @@ const hostIcon = x => x.type === "board" ? "▦" : isLong(x) ? "✎" : x.type ==
 function markTerm(s, term) { const e = esc(s.length > 170 ? (() => { const i = term ? s.indexOf(term) : -1; return i > 70 ? "…" + s.slice(i - 60, i + 110) + "…" : s.slice(0, 170) + "…"; })() : s); return term ? e.replace(esc(term), `<mark>${esc(term)}</mark>`) : e; }
 function appearsSection(it) {
   const rows = appearsIn(it), hosts = new Set(rows.map(r => r.x)).size, f = S.apf && rows.some(r => r.g === S.apf) ? S.apf : "all";
-  const empty = `<p class="small ap-empty">Nothing uses it yet. Mention it with <b>@</b> in any note, show it with <b>/ Entry card</b>, or place it on a board. Each place will be listed here.</p>`;
+  const empty = `<p class="small ap-empty">Nothing uses it yet. Mention it with <b>@</b> in any note, show it with <b>/ Entry card</b>, or place it on a board. Each place will be listed here. <button class="button button-link" type="button" data-act="how">How linking works</button></p>`;
   return `<section class="ip-shelf ap" id="appears" data-ph="C4 · N2"><div class="ip-shelf-h"><h2>Appears in</h2><span>${hosts}</span></div>${rows.length ? `<p class="small conn-note">Every place that shows or uses it. Open one to go to the exact spot; change it there.</p>
     ${rows.length > 4 ? `<div class="ap-filters" role="group" aria-label="Show">${[["all", "All"], ...AP_GROUPS.filter(([g]) => rows.some(r => r.g === g))].map(([g, t]) => `<button type="button" data-act="apf" data-k="${g}" aria-pressed="${f === g}">${t}<span>${g === "all" ? rows.length : rows.filter(r => r.g === g).length}</span></button>`).join("")}</div>` : ""}
     ${AP_GROUPS.filter(([g]) => (f === "all" || f === g) && rows.some(r => r.g === g)).map(([g, t]) => `<h3 class="conn-h">${t} <span>${rows.filter(r => r.g === g).length}</span></h3>${rows.filter(r => r.g === g).map(r => `<button class="ap-row" type="button" data-act="openat" data-id="${r.x.id}" data-t="${it.id}"><span class="ap-ic" aria-hidden="true">${hostIcon(r.x)}</span><span class="ap-t"><b>${esc(r.x.title || plainBody(r.x).slice(0, 50))}</b><small>${esc(kindLabel(r.x))}${r.x.col && COL(r.x.col) ? " · " + esc(COL(r.x.col).name) : ""}${r.head ? ` · under “${esc(r.head)}”` : ""}${r.where ? ` · ${esc(r.where)}` : ""}${r.n > 1 ? ` · ${r.n} times` : ""}</small>${r.snip ? `<span class="ap-s">${markTerm(r.snip, r.term)}</span>` : ""}</span><span class="ap-go" aria-hidden="true">Open ↗</span></button>`).join("")}`).join("")}` : empty}</section>`;
@@ -1382,7 +1460,7 @@ function renderNote() {
   const ab = it.about ? I(it.about) : null, refs = [...new Set(refsIn(it.body))].map(I).filter(Boolean);
   const rows = allInlines().filter(r => r.item === it), nq = rows.filter(r => r.kind === "question").length, ng = rows.filter(r => r.kind === "goal").length;
   const rail = `<p class="ip-rh">Details</p>
-    ${prop("Template", "Long note")}
+    ${prop("Kind", "Long note", "C5")}
     ${prop("About", ab ? `<div class="rel-row"><button class="entity-pill obj" type="button" data-act="open" data-id="${ab.id}">${esc(ab.title)}</button> <button class="addv" type="button" data-act="aboutpick">Change</button></div>` : `<button class="addv" type="button" data-act="aboutpick">+ Choose</button>`, "N3")}
     ${prop("Mentions", refs.length ? `<div class="rel-row">${refs.map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title || "a note")}</button>`).join("")}</div><p class="small" style="margin:6px 0 0">From the writing. Type @ to add one.</p>` : `<span style="color:var(--ink-3)">None. Type @ and a name.</span>`, "N2")}
     ${prop("Inside", nq || ng ? `${ng ? `<span style="color:var(--accent)">◎ ${ng} goal${ng > 1 ? "s" : ""}</span> ` : ""}${nq ? `<span style="color:var(--pick)">? ${nq} question${nq > 1 ? "s" : ""}</span>` : ""}` : `<span style="color:var(--ink-3)">None yet</span>`, "Q1")}
@@ -1528,7 +1606,7 @@ function edKey(e, el) {
 /* ---------- render ---------- */
 function renderProto() {
   $("#proto").innerHTML = `<b>Prototype</b><div class="seg" role="group" aria-label="Sample learner">${Object.keys(DB).map(k => `<button type="button" data-act="field" data-k="${k}" aria-pressed="${S.field === k}">${DB[k].label}</button>`).join("")}</div>
-    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="note" aria-pressed="${S.screen === "note"}">Long note</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="studio" aria-pressed="${S.screen === "customize"}">Customize</button></div>
+    <div class="seg" role="group" aria-label="Jump to"><button type="button" data-act="go" data-k="wall" aria-pressed="${S.screen === "wall"}">Everything</button><button type="button" data-act="go" data-k="note" aria-pressed="${S.screen === "note"}">Long note</button><button type="button" data-act="go" data-k="board" aria-pressed="${S.screen === "board"}">Board</button><button type="button" data-act="go" data-k="qg" aria-pressed="${S.screen === "qg"}">Questions</button><button type="button" data-act="go" data-k="studio" aria-pressed="${S.screen === "customize"}">Customize</button><button type="button" data-act="go" data-k="tpl" aria-pressed="${S.screen === "tpl"}">Templates</button></div>
     <label><input type="checkbox" id="phases" ${S.phases ? "checked" : ""}> Show phases</label>`;
   document.body.classList.toggle("phases", S.phases);
 }
@@ -1542,11 +1620,12 @@ function render() {
   else if (S.screen === "qg") m.innerHTML = renderQG();
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
   else if (S.screen === "colls") m.innerHTML = renderColls();
+  else if (S.screen === "tpl") m.innerHTML = renderTpl();
   else if (S.screen === "board") { m.innerHTML = renderBoard(); requestAnimationFrame(drawArrows); }
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
-  $("#wiz").innerHTML = wizHTML();
+  $("#wiz").innerHTML = wizHTML() + howHTML();
   if (S.jump) requestAnimationFrame(doJump);
 }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
@@ -1669,6 +1748,18 @@ document.addEventListener("click", e => {
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
     case "openat": S.jump = d.t; openEntry(d.id); break;
+    case "tt": S.tt = d.k; render(); break;
+    case "how": S.how = true; render(); break;
+    case "howclose": S.how = false; render(); break;
+    case "tpcoll": { const x = STARTERS[S.field][+d.i]; S.wiz = { step: 3, kind: "object", start: +d.i, name: D().cols.some(c => c.name === x.name) ? `${x.name} 2` : x.name, label: x.label, accent: "s3" }; render(); $("#wz-name")?.focus(); break; }
+    case "tpwrite": { const [t, heads, ex] = GEN_WRITE[S.field][+d.i], nid = "w" + Date.now(), blocks = heads.flatMap(h => [{ t: "h2", text: h }, { t: "p", text: "" }]); if (ex) blocks.push({ t: ex, text: "" }); D().items.unshift(note(nid, "essays", t, fromBlocks(blocks), {})); pushHist(); S.item = nid; S.ed = { id: nid, blocks }; go("note", true); focusBlock(1, "start"); toast(`A long note from the ${t} template. Rename it, and write under each heading.`); break; }
+    case "tpabout": { e.stopPropagation(); const c = COL(d.id); openMenu(a, mHead(`Write about which ${esc(lower(c.label))}?`) + colItems(c).map(x => mItem("writeabout", esc(x.title), false, `data-id="${x.id}"`)).join("") || mHead("No entries yet")); break; }
+    case "tpedit": S.col = d.id; S.cst = "page"; S.csUndo = null; go("customize"); break;
+    case "tpboard": { const [t, , boxes, links] = BOARD_STARTS[+d.i], id = "b" + Date.now(), pl = [], qs = [];
+      boxes.forEach(([k, x, y], n) => { const ref = k === "g" ? "b:g" : k === "q" ? (qs.push(k === "q" ? (n === 1 || boxes.filter(b => b[0] === "q").length === 1 ? "What do you want to find out?" : "And what else?") : ""), "b:q" + qs.length) : (() => { const nid = "n" + id + n; D().items.push(note(nid, "notes", "", n === 0 && t === "Compare two" ? "The first thing" : n === 1 && t === "Compare two" ? "The second thing" : "Double-click to write, or + Place an entry here", {})); return "i:" + nid; })(); pl.push({ id: "p" + n, ref, x: Math.round(x * 13), y: Math.round(y * 9) }); });
+      const bd = board(id, t, "Choose a place on Loci", "What do you want to understand or be able to do?", qs, pl, links.map(([a, b, w], n) => ({ id: "a" + n, from: "p" + a, to: "p" + b, word: w, why: "" })), {});
+      D().items.unshift(bd); pushHist(); S.board = id; go("board", true); toast(`A board from the ${t} template. Write its goal, then place entries with + Place.`); break; }
+
     case "openq": { const r = INL(d.k); if (!r) break; S.jump = "q:" + d.k; openEntry(r.item.id); break; }
     case "qt": S.qt = d.k || null; render(); break;
     case "qf": S.qf = d.k; render(); break;
@@ -1716,7 +1807,7 @@ document.addEventListener("click", e => {
       c.accent = w.accent; D().cols.push(c); S.wiz = null; S.col = id; S.cst = c.shape === "object" ? "fields" : "settings"; S.csField = null; S.csUndo = null; go("customize");
       toast(c.shape === "object" ? `${c.name} is made. These are its fields; change anything, then add your first ${lower(c.label)}.` : `${c.name} is made.`); break; }
 
-    case "go": if (d.k === "note") { S.item = DB[S.field].page; S.ed = null; go("note"); } else if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") go("colls"); else if (d.k === "studio") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; S.cst = S.cst || "card"; S.csUndo = null; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
+    case "go": if (d.k === "note") { S.item = DB[S.field].page; S.ed = null; go("note"); } else if (d.k === "board") { S.board = S.board && I(S.board) ? S.board : DB[S.field].start; go("board"); } else if (d.k === "cols") go("colls"); else if (d.k === "tpl") go("tpl"); else if (d.k === "studio") { S.col = (S.col && COL(S.col)?.shape === "object") ? S.col : D().cols.find(c => c.shape === "object").id; S.cst = S.cst || "card"; S.csUndo = null; go("customize"); } else if (d.k === "qg") go("qg"); else { if (d.k === "wall") { S.type = "all"; S.col = null; } go("wall"); } break;
     case "type": S.type = d.k; S.col = null; go("wall"); break;
     case "col": S.col = d.id; S.type = COL(d.id).shape === "image" ? "image" : COL(d.id).shape; go("wall"); break;
     case "view": COL(S.col).view = d.k; render(); break;
