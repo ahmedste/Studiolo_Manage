@@ -267,7 +267,7 @@ Indexes: `(account_id, host_item_id, position)`; `(account_id, kind, status)`; `
   - **Inside, its questions as small rows.** An amber **?** is open. A green **✓** is answered, struck through. A grey **–** is parked. Each opens where it was written, highlighted.
   - **One Next line:** the first open question, so every goal says what to do now. When all are answered, it reads *Every question answered. Mark it reached?*
   - **The foot:** where the goal was written (an icon and a title, which opens it) and its status button.
-  - **The background** is a soft accent wash, which turns green when the goal is reached.
+  - **The card** is plain paper with a thin accent line along its top, which turns green when the goal is reached. No gradients.
 - **Questions not under a goal** form a wall of cards, grouped by topic. Each card has:
   - an amber top edge and the **?** mark;
   - the question large, in Newsreader;
@@ -284,7 +284,7 @@ Indexes: `(account_id, host_item_id, position)`; `(account_id, kind, status)`; `
 |---|---|---|
 | **?** open question | `--pick` amber, on `--pick-soft` | the inline row in writing, a card's foot count, a board's question card, the page's cards and goal rows, Appears in |
 | **◎** goal | `--accent`, on `--accent-soft` | the inline row, a board's goal card, the goal cards |
-| **✓** answered or reached | `--ok` green | goal rows (struck through), answered cards, a reached goal's ring and wash |
+| **✓** answered or reached | `--ok` green | goal rows (struck through), answered cards, a reached goal's ring and top line |
 | **–** parked, paused or dropped | `--ink-3` | rows and cards, faded |
 | **Progress ring** | the accent; green when reached | the goal cards (46 px with "1/2"); a small 18 px ring with "1 of 2 answered" beside a goal in writing and on a board's goal card |
 

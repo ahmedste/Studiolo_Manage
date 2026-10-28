@@ -5041,8 +5041,8 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .qg-sec > h2 { margin: 0 0 12px; font: 400 24px/1.2 var(--read); } .qg-sec > h2 span { font: 13px var(--ui); color: var(--ink-3); margin-left: 4px; }
 .qg-sub { margin: -6px 0 6px; }
 .gc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; align-items: start; }
-.gc { display: grid; gap: 12px; padding: 18px 18px 14px; border-radius: 10px; background: linear-gradient(180deg, var(--accent-soft), var(--panel) 120px); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-pic); }
-.gc.reached { background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 12%, var(--panel)), var(--panel) 120px); }
+.gc { display: grid; gap: 12px; padding: 18px 18px 14px; border-radius: 8px; background: var(--panel); border-top: 2px solid var(--accent); box-shadow: inset 0 0 0 1px var(--line); }
+.gc.reached { border-top-color: var(--ok); }
 .gc.paused, .gc.dropped { opacity: .7; }
 .gc-top { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 14px; align-items: start; }
 .gc-k { margin: 0 0 4px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; color: var(--accent-strong); }
