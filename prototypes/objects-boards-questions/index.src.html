@@ -561,6 +561,86 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .how kbd { font: 12px ui-monospace, Menlo, monospace; padding: 0 4px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--line); }
 @media (max-width: 699.98px) { .how-two { grid-template-columns: 1fr; } }
 
+/* the board as a learning space */
+.arrows .pth { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 2 9; stroke-linecap: round; fill: none; opacity: .45; }
+.arrows .sl { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 2 4; fill: none; opacity: .7; }
+.stopn { position: absolute; left: -12px; top: -12px; z-index: 3; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--accent), var(--shadow-pic); font: 600 12px var(--ui); color: var(--accent-strong); }
+.bpl.next .stopn { background: var(--accent); color: var(--on-accent, #fff); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent); }
+.bpl.next .qcard > .ci { box-shadow: inset 0 0 0 1px var(--pick-rule), 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.bpl .stopn.done { box-shadow: inset 0 0 0 1.5px var(--ok); color: var(--ok); }
+.mcard.lcard > .ci { background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-top: 2px solid var(--accent); }
+.mcard.lcard .kicker { color: var(--accent-strong); } .mcard.lcard .mcard-title { font: 400 17px/1.25 var(--read); }
+.lc-s { font-size: 12.5px; color: var(--ink-2); margin: 4px 0 0; }
+.lc-play { padding: 3px 10px; font-size: 12px; }
+.lp-prog { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 10px; align-items: center; }
+.lp-prog b { display: block; font-size: 13px; font-weight: 500; } .lp-prog small { font-size: 12px; color: var(--ink-2); }
+.lp-start { width: 100%; justify-content: center; }
+.lp-free { margin: -4px 0 0; }
+.lp-stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lp-stop { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 8px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.lp-stop .stopn { position: static; width: 24px; height: 24px; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--ink-2); }
+.lp-stop.next { box-shadow: inset 0 0 0 1.5px var(--accent); } .lp-stop.next .stopn { background: var(--accent); color: #fff; box-shadow: none; }
+.lp-stop.answered .stopn { color: var(--ok); box-shadow: inset 0 0 0 1.5px var(--ok); } .lp-stop.answered .lp-q { color: var(--ink-2); }
+.lp-q { all: unset; cursor: pointer; font: 14px/1.35 var(--read); color: var(--ink); } .lp-q:hover { color: var(--accent); }
+.lp-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 4px; font-size: 11.5px; color: var(--ink-3); align-items: center; }
+.lp-l { all: unset; cursor: pointer; font-size: 11.5px; color: var(--accent-strong); padding: 1px 7px; border-radius: 9px; background: var(--accent-soft); }
+.lp-l.make { background: none; box-shadow: inset 0 0 0 1px var(--status-1); }
+.lp-ord { display: flex; gap: 2px; } .lp-ord button { all: unset; cursor: pointer; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-3); font-size: 12px; } .lp-ord button:hover { background: var(--hover-fill); color: var(--ink); }
+.lp-all { width: 100%; justify-content: center; }
+body:has(.ln) .proto { display: none; }
+.ln-scrim { position: fixed; inset: 0; z-index: 87; background: color-mix(in srgb, var(--ink) 30%, transparent); backdrop-filter: blur(3px); }
+.ln { position: fixed; z-index: 88; inset: 18px; max-width: 1240px; margin: 0 auto; background: var(--surface-page, var(--paper)); border-radius: 12px; box-shadow: var(--shadow-float); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
+.ln-top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.ln-goal { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 220px; }
+.ln-goal small { display: block; font-size: 11px; color: var(--accent-strong); } .ln-goal b { font: 400 15px/1.3 var(--read); }
+.ln-dots { display: flex; align-items: center; gap: 0; }
+.ln-dots > i { width: 14px; height: 2px; background: var(--line); }
+.ln-dot { border: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); box-shadow: inset 0 0 0 1.5px var(--line); font: 600 12px var(--ui); color: var(--ink-2); cursor: pointer; }
+.ln-dot.answered { color: var(--ok); box-shadow: inset 0 0 0 1.5px var(--ok); }
+.ln-dot.next { box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent-strong); }
+.ln-dot.on { background: var(--accent); color: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+.ln-dot.end { color: var(--accent); }
+.ln-body { display: grid; grid-template-columns: minmax(0, 1fr) 330px; min-height: 0; }
+.ln-main { overflow: auto; padding: 26px 34px 30px; }
+.ln-side { overflow: auto; padding: 20px 20px 24px; border-left: 1px solid var(--line); background: var(--panel); display: grid; gap: 10px; align-content: start; }
+.ln-side h3 { margin: 8px 0 0; font: 600 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); } .ln-side h3 span { color: var(--ink-3); font-weight: 400; }
+.ln-side textarea, .ln-nq input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); font: 14px/1.5 var(--ui); color: var(--ink); resize: vertical; }
+.ln-note { padding: 8px 10px; border-radius: 4px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); border-left: 2px solid var(--accent); } .ln-note p { margin: 0; font: 14.5px/1.45 var(--read); }
+.ln-ar { margin: 0; font-size: 13px; } .ln-ar span { font-size: 11px; padding: 1px 6px; border-radius: 8px; background: var(--hover-fill); color: var(--ink-2); margin-right: 4px; } .ln-ar small { display: block; color: var(--ink-2); font-style: italic; margin-top: 2px; }
+.ln-nq { display: flex; gap: 6px; }
+.ln-k { margin: 0 0 6px; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+.ln-q { margin: 0 0 18px; font: 400 clamp(26px, 3vw, 34px)/1.2 var(--read); color: var(--ink); max-width: 30ch; }
+.ln-empty { padding: 20px; border-radius: 10px; border: 1.5px dashed var(--line); max-width: 680px; } .ln-empty > p:first-child { margin: 0 0 12px; font-size: 14.5px; }
+.ln-fmts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.ln-fmts button { border: 0; display: grid; gap: 2px; text-align: left; padding: 12px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--ink); }
+.ln-fmts button:hover { box-shadow: inset 0 0 0 1.5px var(--accent); } .ln-fmts b { font: 400 18px var(--read); } .ln-fmts small { font-size: 12px; color: var(--ink-2); }
+.lpl { max-width: 720px; display: grid; gap: 12px; }
+.lpl.making { display: flex; gap: 12px; align-items: center; padding: 30px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); } .lpl.making p { margin: 0; color: var(--ink-2); }
+.spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin 0.8s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+.lpl-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; } .lpl-top .ln-k { margin: 0; text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--accent-strong); }
+.lpl-slide { min-height: 240px; padding: 34px 36px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-pic); border-top: 2px solid var(--accent); }
+.lpl-slide h3 { margin: 0 0 12px; font: 400 26px/1.2 var(--read); } .lpl-slide p:last-child { margin: 0; font: 19px/1.55 var(--read); color: var(--ink); max-width: 52ch; }
+.lpl-k { margin: 0 0 10px; font-size: 11.5px; color: var(--ink-3); letter-spacing: .05em; text-transform: uppercase; }
+.lpl-video { border-radius: 10px; overflow: hidden; background: #141b21; color: #eef0ea; }
+.lpl-frame { aspect-ratio: 16 / 8; display: grid; place-items: center; padding: 20px; background: radial-gradient(circle at 70% 30%, #2a3a4c, #141b21 70%); } .lpl-frame b { font: 400 30px/1.2 var(--read); text-align: center; }
+.lpl-cap { margin: 0; padding: 12px 18px; font: 16px/1.45 var(--ui); background: rgba(0, 0, 0, .35); }
+.lpl-bar { display: flex; gap: 10px; align-items: center; padding: 10px 14px; font-size: 12px; } .lpl-bar i { flex: 1; height: 3px; background: rgba(255, 255, 255, .2); border-radius: 2px; display: block; overflow: hidden; } .lpl-bar i b { display: block; height: 100%; background: #9db0f3; }
+.lpl-audio { padding: 26px 30px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.lpl-wave { display: flex; gap: 3px; align-items: center; height: 40px; margin-bottom: 16px; } .lpl-wave i { width: 4px; border-radius: 2px; background: var(--line); } .lpl-wave i.on { background: var(--accent); }
+.lpl-tr { margin: 0; font: 18px/1.55 var(--read); }
+.lpl-nav { display: flex; justify-content: space-between; align-items: center; }
+.lpl-dots { display: flex; gap: 6px; } .lpl-dots button { border: 0; width: 8px; height: 8px; border-radius: 50%; padding: 0; background: var(--line); cursor: pointer; } .lpl-dots button.on { background: var(--accent); width: 22px; border-radius: 4px; }
+.ln-check { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); max-width: 720px; }
+.ln-check p { margin: 0 8px 0 0; font: 17px var(--read); } .ln-check.done { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ok) 40%, transparent); } .ln-check.done p { color: var(--ok); }
+.ln-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); background: var(--panel); } .ln-foot .small { margin: 0; text-align: center; }
+.ln-recall { overflow: auto; padding: 26px 34px; }
+.rc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+.rc { display: grid; gap: 8px; padding: 14px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); } .rc.got { box-shadow: inset 0 0 0 1.5px var(--ok); } .rc.not { box-shadow: inset 0 0 0 1.5px var(--pick); }
+.rc-q { margin: 0; font-size: 13px; color: var(--ink-2); }
+.rc-cover { border: 0; text-align: left; padding: 12px; border-radius: 6px; background: var(--board); font: 16px/1.45 var(--read); color: var(--ink); cursor: pointer; min-height: 48px; }
+.rc-b { display: flex; gap: 6px; } .rc-b button { border: 0; flex: 1; padding: 6px; border-radius: 6px; background: var(--hover-fill); cursor: pointer; font: 13px var(--ui); color: var(--ink); }
+@media (max-width: 900px) { .ln-top { display: grid; grid-template-columns: auto 1fr; } .ln-dots { justify-self: end; } .ln-goal { grid-column: 1 / -1; order: 3; } .ln-goal b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; } .ln { inset: 0; border-radius: 0; } .ln-body { grid-template-columns: minmax(0, 1fr); overflow: auto; } .ln-main, .ln-side { overflow: visible; } .ln-side { border-left: 0; border-top: 1px solid var(--line); } .ln-main { padding: 20px 16px; } .ln-fmts { grid-template-columns: 1fr; } .ln-goal { min-width: 0; } .ln-foot .small { display: none; } }
+
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
   .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 380px; }
@@ -735,7 +815,7 @@ const DB = makeDB();
 /* ---------- state ---------- */
 const S = { field: "architect", screen: "wall", type: "all", col: null, has: null, q: "", board: null, item: null, from: "wall", qf: "open", phases: false, sel: null, tool: "select", drawer: false, dtab: "objects", editing: null, view: { x: 20, y: 10, z: .8 }, fieldLinks: true, cfgOpen: "all", hist: [], details: false, ed: null };
 const D = () => DB[S.field];
-const I = id => D().items.find(x => x.id === id);
+const I = id => D().items.find(x => x.id === id) || (D().lumens || []).find(x => x.id === id);
 const COL = id => D().cols.find(c => c.id === id);
 const FLD = (c, id) => c.fields.find(f => f.id === id);
 const boards = () => D().items.filter(x => x.type === "board");
@@ -784,7 +864,7 @@ function fieldText(f, v) {
 }
 const cardLine = o => { const c = COL(o.col); return c.card.map(id => FLD(c, id)).filter(Boolean).map(f => fieldText(f, o.v[f.id])).filter(Boolean).join(" · "); };
 const onBoards = it => boards().filter(b => b.pl.some(p => p.ref === "i:" + it.id));
-const kindLabel = it => it.type === "object" ? COL(it.col).label : it.type === "note" ? (it.title ? "Long note" : "Note") : it.type === "quote" ? "Quote" : it.type === "image" ? "Photo" : it.type === "board" ? "Board" : ({ pdf: "PDF", book: "Book", video: "Video", link: "Link" })[it.kind];
+const kindLabel = it => it.type === "object" ? COL(it.col).label : it.type === "note" ? (it.title ? "Long note" : "Note") : it.type === "quote" ? "Quote" : it.type === "image" ? "Photo" : it.type === "board" ? "Board" : it.type === "lumen" ? "Lumen" : ({ pdf: "PDF", book: "Book", video: "Video", link: "Link" })[it.kind];
 const initials = s => (s || "?").split(/\s+/).filter(w => /^[A-ZÀ-Ý]/.test(w)).slice(0, 2).map(w => w[0]).join("") || "?";
 const topicFt = it => { const t = it.topics[0]; return t ? `<span class="dot s${t.s}"></span><span class="visually-hidden">${["Not started", "Learning", "Learned"][t.s]}: </span><a class="topic-tag" href="#">${esc(t.n)}</a>${it.topics.length > 1 ? `<span class="topic-more">+${it.topics.length - 1}</span>` : ""}` : ""; };
 const notesFt = it => { const n = it.margin.length; return n ? `<span class="ft-notes">${n} note${n > 1 ? "s" : ""}</span>` : ""; };
@@ -1215,6 +1295,94 @@ const longSec = (c, it, id) => { const f = FLD(c, id); return f && !f.hidden && 
 const propF = (f, html, ph) => `<div class="prop"${ph ? ` data-ph="${ph}"` : ""}><span><button class="prop-lab" type="button" data-act="editfield" data-f="${f.id}" title="Edit this field for the whole collection">${esc(f.label)}</button></span><div class="prop-value">${html}</div></div>`;
 
 /* ---------- board ---------- */
+/* ---------- A board as a learning space (LB1–LB3) ----------
+   Guided, never fenced in: the board's questions form a suggested path toward its goal. Each stop can be answered with
+   a Lumen (read, watch or listen), and your notes gather beside it. Learn mode walks the path one stop at a time, but
+   every stop is one click away, you can skip, reorder or add stops, and the canvas stays free the whole time. */
+const FMT = { read: "Read", watch: "Watch", listen: "Listen" };
+const LUMEN_TEXT = {
+  "Where does the cool night air come from?": ["Night air: where the cool comes from", [["The sky does the cooling", "After sunset, roofs and courtyard floors radiate heat to a clear desert sky and fall below the air's temperature."], ["The court fills like a basin", "Cool air is heavier. It slides off the roofs and pools in the court, pushing warm air up and out."], ["Mass keeps it", "Walls and floors cooled overnight stay cool into the morning. That's why shade comes first: it keeps the sun off the stored cool."], ["On your board", "Fathy's malqaf note and New Gourna say the same thing from the other end: catch the air high, let it down into the rooms."]]],
+  "Shade first, or air movement first?": ["Shade, mass, then air", [["Shade stops the gain", "Every square metre kept out of the sun is heat you never have to remove."], ["Mass spreads the day", "Heavy walls absorb the afternoon and give it back at night, when air can carry it away."], ["Air removes what's left", "Moving air cools people and flushes stored heat, but only works when the air is cooler than you."], ["When it's humid", "Humid air weakens mass and evaporation, so air movement moves up the list, as your malqaf note warns."]]],
+  "Which category does a contractor's duty to a neighbour fall in?": ["Duty of care: start from the categories", [["Start from what's established", "Robinson says courts begin with established categories of duty, and reason by analogy from them; Caparo's three stages are for genuinely new cases."], ["Positive acts that cause physical harm", "Carelessly causing physical damage by what you do is a long-established category."], ["A contractor's works", "Works that physically damage a neighbour's property usually fall inside it. Pure economic loss is a different question."], ["Example only", "This is a teaching sketch, not legal advice. Check the facts and the authorities for your matter."]]],
+  "What changes if the patient is pregnant?": ["Suspected PE in pregnancy: what changes", [["Same question, different tools", "The clinical question is unchanged, but some tests and imaging choices change, and so does how results are read."], ["The anticoagulant changes", "Some anticoagulants are avoided in pregnancy; low molecular weight heparin is commonly used instead."], ["Ask early", "Involve senior and obstetric colleagues early, and follow your local guideline."], ["Example only", "A teaching sketch, not clinical advice."]]]
+};
+function stopsOf(b) {
+  const all = [...b.inl.filter(x => x.kind === "question").map(x => `${b.id}:question:${x.id}`), ...b.pl.map(p => p.ref).filter(r => r.startsWith("q:")).map(r => r.slice(2))];
+  if (!b.path) b.path = all;
+  b.path = b.path.filter(k => INL(k));
+  return b.path;
+}
+function sideQs(b) {
+  const on = new Set(stopsOf(b)), own = [...b.inl.filter(x => x.kind === "question").map(x => `${b.id}:question:${x.id}`), ...b.pl.map(p => p.ref).filter(r => r.startsWith("q:")).map(r => r.slice(2))];
+  const inCards = b.pl.map(p => refOf(p.ref, b)).filter(r => r?.type === "item").flatMap(r => allInlines().filter(x => x.item === r.it && x.kind === "question").map(x => x.key));
+  return [...new Set([...own, ...inCards])].filter(k => !on.has(k) && INL(k));
+}
+function pidOfKey(b, key) { const r = INL(key); return b.pl.find(p => { const x = refOf(p.ref, b); return x?.type === "inline" && x.key === key; })?.id || (r && b.pl.find(p => p.ref === "i:" + r.item.id)?.id); }
+const lumensFor = key => (D().lumens || []).filter(l => l.forQ === key);
+const nextStop = b => stopsOf(b).find(k => st(k, "question").status === "open");
+const stopNotes = (b, key) => D().items.filter(x => x.stop === key);
+function makeLumen(b, key, fmt = "read") {
+  const r = INL(key), canned = LUMEN_TEXT[r.text], qp = b.pl.find(p => p.id === pidOfKey(b, key));
+  const whys = b.arrows.filter(a => qp && (a.to === qp.id || a.from === qp.id) && a.why).map(a => a.why);
+  const slides = canned ? canned[1].map(([h, t]) => ({ h, t })) : [{ h: "The question", t: r.text }, { h: "What your board already says", t: whys.length ? whys.map(w => cap(w) + ".").join(" ") : "Nothing on the board points at this question yet." }, { h: "The explanation", t: "In the app, Loci writes this part from your board, your Commonplace and trusted sources, at your level." }];
+  D().lumens = D().lumens || [];
+  const l = { id: "lm" + Date.now() + Math.floor(Math.random() * 99), type: "lumen", title: canned ? canned[0] : "On: " + r.text, forQ: key, fmt, slides, board: b.id, body: "", topics: b.topics || [], margin: [], col: null };
+  D().lumens.push(l);
+  if (qp) { const n = lumensFor(key).length - 1, pid = "p" + l.id; b.pl.push({ id: pid, ref: "l:" + l.id, x: qp.x + n * 30, y: qp.y + 200 + n * 30 }); b.arrows.push({ id: "a" + l.id, from: pid, to: qp.id, word: "explains", why: "made to answer it" }); }
+  return l;
+}
+function lumenCard(p, b) {
+  const l = I(p.ref.slice(2)); if (!l) return "";
+  const n = stopsOf(b).indexOf(l.forQ) + 1;
+  return `<div class="bpl lm${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body"><p class="kicker">▶ Lumen · ${FMT[l.fmt]} · ${l.slides.length} slides</p><h2 class="mcard-title">${esc(l.title)}</h2><p class="lc-s">${esc(l.slides[0].t.slice(0, 96))}…</p></div><div class="ft"><div class="ft-meta"><span>${n ? `Answers stop ${n}` : "Answers a side question"}</span></div><button class="button button-quiet lc-play" type="button" data-act="lplay" data-id="${l.id}">▶ Play</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
+}
+function pathPanel(b) {
+  const stops = stopsOf(b), nx = nextStop(b), d = stops.filter(k => st(k, "question").status === "answered").length, goal = allInlines().find(r => r.item === b && r.kind === "goal");
+  const noL = stops.filter(k => st(k, "question").status === "open" && !lumensFor(k).length);
+  return `<aside class="inside" aria-label="Learning on this board" data-ph="LB1"><h3>Goal</h3>${goal ? `<div class="row g" data-act="focuscard" data-pid="${pidOfKey(b, goal.key) || ""}"><span class="gl">◎</span><span class="tx">${esc(goal.text)}</span><span class="meta">${stBtn(goal)}</span></div>` : ""}
+    <div class="lp-prog">${ring(d, stops.length, 42)}<div><b>${d} of ${stops.length} stops answered</b><small>${nx ? `Suggested next: ${esc(INL(nx).text)}` : stops.length ? "Every stop answered. Recall, then mark the goal reached." : "Add a question to start a path."}</small></div></div>
+    <button class="button lp-start" type="button" data-act="lstart" ${stops.length ? "" : "disabled"}>${d ? "▶ Continue learning" : "▶ Start learning"}</button>
+    <p class="small lp-free">A suggested order, not a rule. Take the stops in any order, skip one, or add your own.</p>
+    <h3>Path to the goal <span>${stops.length}</span></h3><ol class="lp-stops">${stops.map((k, i) => { const r = INL(k), s = st(k, "question").status, ls = lumensFor(k), ns = stopNotes(b, k).length; return `<li class="lp-stop ${s}${k === nx ? " next" : ""}"><span class="stopn">${s === "answered" ? "✓" : i + 1}</span><div class="lp-b"><button class="lp-q" type="button" data-act="lgo" data-i="${i}" title="Learn this stop">${esc(r.text)}</button><div class="lp-meta">${ls.length ? ls.map(l => `<button class="lp-l" type="button" data-act="lplay" data-id="${l.id}">▶ ${esc(FMT[l.fmt])}</button>`).join("") : s === "open" ? `<button class="lp-l make" type="button" data-act="lans" data-k="${esc(k)}">▶ Answer with a Lumen</button>` : ""}${ns ? `<span>✎ ${ns}</span>` : ""}${r.item !== b ? `<span>from ${esc(r.item.title || "a note")}</span>` : ""}</div></div><span class="lp-ord">${i ? `<button type="button" data-act="pathup" data-i="${i}" aria-label="Move earlier">↑</button>` : ""}<button type="button" data-act="pathskip" data-k="${esc(k)}" aria-label="Take off the path" title="Take off the path; it stays on the board">×</button></span></li>`; }).join("")}</ol>
+    ${noL.length > 1 ? `<button class="button button-quiet lp-all" type="button" data-act="lansall">▶ Answer the ${noL.length} open stops with Lumens</button>` : ""}
+    <h3>Side questions <span>${sideQs(b).length}</span></h3>${sideQs(b).map(k => `<div class="row q"><span class="gl">?</span><span class="tx">${esc(INL(k).text)}</span><span class="meta">${stBtn(INL(k))}<button class="addv" type="button" data-act="pathadd" data-k="${esc(k)}">+ Add to path</button></span></div>`).join("") || `<p class="small">Questions you take off the path, and those inside its cards, wait here.</p>`}</aside>`;
+}
+function playerHTML(l) {
+  const s = Math.min(S.learn.s || 0, l.slides.length), last = s >= l.slides.length, sl = last ? { h: "Check", t: INL(l.forQ).text } : l.slides[s];
+  const dots = `<div class="lpl-dots">${l.slides.map((_, j) => `<button type="button" class="${j === s ? "on" : ""}" data-act="lslide" data-i="${j}" aria-label="Slide ${j + 1}"></button>`).join("")}<button type="button" class="${last ? "on" : ""}" data-act="lslide" data-i="${l.slides.length}" aria-label="Check"></button></div>`;
+  const nav = `<div class="lpl-nav"><button class="button button-quiet" type="button" data-act="lslide" data-i="${s - 1}" ${s ? "" : "disabled"}>←</button>${dots}<button class="button button-quiet" type="button" data-act="lslide" data-i="${s + 1}" ${last ? "disabled" : ""}>→</button></div>`;
+  let view;
+  if (l.fmt === "watch") view = `<div class="lpl-video"><div class="lpl-frame"><b>${esc(sl.h)}</b></div><p class="lpl-cap">${esc(sl.t)}</p><div class="lpl-bar"><span>▶</span><i><b style="width:${Math.round(100 * Math.min(s, l.slides.length) / l.slides.length)}%"></b></i><small>${Math.min(s + 1, l.slides.length)}:00 / ${l.slides.length}:00</small></div></div>`;
+  else if (l.fmt === "listen") view = `<div class="lpl-audio"><div class="lpl-wave">${Array.from({ length: 48 }, (_, j) => `<i style="height:${8 + ((j * 37) % 26)}px" class="${j < Math.round(48 * s / l.slides.length) ? "on" : ""}"></i>`).join("")}</div><p class="lpl-k">${esc(sl.h)}</p><p class="lpl-tr">${esc(sl.t)}</p></div>`;
+  else view = `<div class="lpl-slide"><p class="lpl-k">${last ? "Check" : `${s + 1} / ${l.slides.length}`}</p><h3>${esc(sl.h)}</h3><p>${esc(sl.t)}</p></div>`;
+  return `<div class="lpl" data-ph="LB2"><div class="lpl-top"><span class="ln-k">▶ ${esc(l.title)}</span><span class="cph-views" role="group" aria-label="How to take it">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="lfmt" data-k="${k}" aria-pressed="${l.fmt === k}">${t}</button>`).join("")}</span></div>${view}${nav}</div>`;
+}
+function learnHTML() {
+  if (!S.learn) return "";
+  const b = I(S.learn.b); if (!b) return "";
+  const stops = stopsOf(b), goal = allInlines().find(r => r.item === b && r.kind === "goal"), nx = nextStop(b), d = stops.filter(k => st(k, "question").status === "answered").length;
+  const top = `<header class="ln-top"><button class="button button-quiet" type="button" data-act="lexit">← Back to the board</button><div class="ln-goal">${ring(d, stops.length, 34)}<div><small>◎ Goal · ${esc(b.title)}</small><b>${esc(goal?.text || b.title)}</b></div></div><nav class="ln-dots" aria-label="Stops">${stops.map((k, j) => { const s = st(k, "question").status; return `<button type="button" class="ln-dot ${s}${!S.learn.recall && j === S.learn.i ? " on" : ""}${k === nx ? " next" : ""}" data-act="lgo" data-i="${j}" title="${esc(INL(k).text)}">${s === "answered" ? "✓" : j + 1}</button>`; }).join("<i></i>")}<i></i><button type="button" class="ln-dot end${S.learn.recall ? " on" : ""}" data-act="lrecall" title="Recall, then the goal">◎</button></nav></header>`;
+  if (S.learn.recall) {
+    const items = [...stops.flatMap(k => stopNotes(b, k).map(n => ({ q: INL(k).text, t: plainBody(n), id: n.id }))), ...b.arrows.filter(a => a.why && !a.why.startsWith("made to")).map(a => { const nm = pid => { const o = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); const t = o ? (o.type === "item" ? o.it.title || plainBody(o.it) : INL(o.key)?.text) : "?"; return t.length > 44 ? t.slice(0, 42).replace(/\s+\S*$/, "") + "…" : t; }; return { q: `${nm(a.from)} → ${a.word} → ${nm(a.to)}. Why?`, t: a.why, id: a.id }; })];
+    return `<div class="ln-scrim"></div><div class="ln" role="dialog" aria-modal="true" aria-label="Learning: ${esc(b.title)}" data-ph="LB3">${top}<div class="ln-recall"><p class="ln-k">Recall</p><h2 class="ln-q">What do you remember?</h2><p class="small">Your own words, covered. Say each one, then check. <b>Not yet</b> goes to To revisit on Loci.</p>
+      <div class="rc-grid">${items.map(x => `<div class="rc ${S.rc?.[x.id] || ""}"><p class="rc-q">${esc(x.q)}</p><button class="rc-cover" type="button" data-act="rcshow" data-id="${x.id}">${S.rc?.[x.id] ? esc(x.t) : "Show"}</button>${S.rc?.[x.id] ? `<div class="rc-b"><button type="button" data-act="rcset" data-id="${x.id}" data-v="got">Got it</button><button type="button" data-act="rcset" data-id="${x.id}" data-v="not">Not yet</button></div>` : ""}</div>`).join("") || `<p class="small">Write notes on the stops first; Recall covers your own words.</p>`}</div>
+      <div class="ln-check">${nx ? `<p>${stops.length - d} stop${stops.length - d > 1 ? "s" : ""} still open.</p><button class="button button-quiet" type="button" data-act="lgo" data-i="${stops.indexOf(nx)}">Go to the open stop</button>` : `<p>Every stop answered.</p><button class="button" type="button" data-act="lreach" ${goal ? "" : "disabled"}>◎ Mark the goal reached</button>`}<button class="button button-link" type="button" data-act="toast" data-msg="Make a Lumen from the whole board (B3): it follows your path and arrows, and your notes become its check.">Make one Lumen of the whole board</button></div></div></div>`;
+  }
+  const i = Math.max(0, Math.min(S.learn.i, stops.length - 1)), key = stops[i];
+  if (!key) return `<div class="ln-scrim"></div><div class="ln">${top}<p class="small" style="padding:30px">Add a question to the board to start a path.</p></div>`;
+  const r = INL(key), s = st(key, "question"), ls = lumensFor(key), l = ls.find(x => x.id === S.learn.l) || ls.at(-1), qp = b.pl.find(p => p.id === pidOfKey(b, key));
+  const around = qp ? b.arrows.filter(a => (a.to === qp.id || a.from === qp.id) && !String(a.from).startsWith("plm")).map(a => { const o = refOf(b.pl.find(p => p.id === (a.to === qp.id ? a.from : a.to))?.ref || "", b); return o ? { t: o.type === "item" ? o.it.title || plainBody(o.it).slice(0, 50) : INL(o.key)?.text, w: a.word, why: a.why, id: o.type === "item" ? o.it.id : null } : null; }).filter(Boolean) : [];
+  const notes = stopNotes(b, key), ni = stops.indexOf(nx);
+  return `<div class="ln-scrim"></div><div class="ln" role="dialog" aria-modal="true" aria-label="Learning: ${esc(b.title)}" data-ph="LB3">${top}
+    <div class="ln-body"><section class="ln-main"><p class="ln-k">Stop ${i + 1} of ${stops.length}${key === nx ? " · suggested next" : s.status === "answered" ? " · answered" : ""}${r.item !== b ? ` · from ${esc(r.item.title || "a note")}` : ""}</p><h2 class="ln-q">${esc(r.text)}</h2>
+      ${l ? (l.making ? `<div class="lpl making"><span class="spin"></span><p>Loci is making a Lumen from your board and your Commonplace…</p></div>` : playerHTML(l)) : `<div class="ln-empty" data-ph="LB2"><p>Answer it with a Lumen: Loci explains it from this board and your Commonplace, at your level.</p><div class="ln-fmts">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="lmake" data-k="${esc(key)}" data-f="${k}"><b>${t}</b><small>${k === "read" ? "Slides you go through" : k === "watch" ? "A short video, narrated" : "Listen, with a transcript"}</small></button>`).join("")}</div><p class="small">Or answer it yourself in your notes, or <button class="button button-link" type="button" data-act="toast" data-msg="Find resources (Q5): books, videos and papers that answer it, placed on the board.">find resources</button>.</p></div>`}
+      ${s.status === "answered" ? `<div class="ln-check done"><p>✓ Answered${s.ans.length ? ` in ${s.ans.map(I).filter(Boolean).map(x => esc(x.title)).join(", ")}` : ""}.</p><button class="button button-link" type="button" data-act="ldid" data-v="reopen">Reopen</button></div>` : l && !l.making ? `<div class="ln-check"><p>Did this answer it?</p><button class="button" type="button" data-act="ldid" data-v="yes">Yes, mark answered</button><button class="button button-quiet" type="button" data-act="ldid" data-v="partly">Partly: ask a follow-up</button><button class="button button-quiet" type="button" data-act="ldid" data-v="no">Not yet</button></div>` : ""}</section>
+    <aside class="ln-side"><h3>Your notes on this stop <span>${notes.length}</span></h3>${notes.map(n => `<div class="ln-note">${renderBody(n)}</div>`).join("")}<textarea id="lnote" rows="4" placeholder="Write what you're learning, in your words. Saved to Commonplace and placed beside the question."></textarea><button class="button button-quiet" type="button" data-act="lnote">Keep note</button>
+      ${around.length ? `<h3>Around it on the board</h3>${around.map(x => `<p class="ln-ar"><span>${esc(x.w)}</span> ${esc(x.t)}${x.why && !x.why.startsWith("made to") ? `<small>“${esc(x.why)}”</small>` : ""}</p>`).join("")}` : ""}
+      <h3>A new question?</h3><div class="ln-nq"><input id="lnq" type="text" placeholder="Ask it; it joins the path after this stop"><button class="button button-quiet" type="button" data-act="lnewq">Add</button></div></aside></div>
+    <footer class="ln-foot"><button class="button button-quiet" type="button" data-act="lgo" data-i="${i - 1}" ${i ? "" : "disabled"}>← Previous</button><span class="small">${nx && nx !== key ? `Suggested next: ${esc(INL(nx).text)}` : !nx ? "Every stop answered: Recall is next" : "Take your time; every stop stays one click away"}</span><button class="button" type="button" data-act="${!nx ? "lrecall" : "lgo"}" data-i="${nx && nx !== key ? ni : Math.min(i + 1, stops.length - 1)}">${!nx ? "Recall →" : "Next stop →"}</button></footer></div>`;
+}
+
 function refOf(ref, b = I(S.board)) {
   if (ref.startsWith("i:")) { const it = I(ref.slice(2)); return it ? { type: "item", it } : null; }
   if (ref.startsWith("b:")) { const x = b?.inl.find(y => y.id === ref.slice(2)); return x ? { type: "inline", kind: x.kind, key: `${b.id}:${x.kind}:${x.id}`, own: true } : null; }
@@ -1222,9 +1390,11 @@ function refOf(ref, b = I(S.board)) {
   return null;
 }
 function placed(p, b) {
+  if (p.ref.startsWith("l:")) return lumenCard(p, b);
   const r = refOf(p.ref, b); if (!r) return "";
   const dot = `<span class="dot-c" data-dot="${p.id}" title="Drag onto another card to connect"></span>`;
-  const wrap = (cls, inner) => `<div class="bpl${cls}${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${inner}${dot}</div>`;
+  const si = r.type === "inline" && r.kind === "question" ? stopsOf(b).indexOf(r.key) : -1, isNext = si >= 0 && nextStop(b) === r.key, sAns = si >= 0 && st(r.key, "question").status === "answered";
+  const wrap = (cls, inner) => `<div class="bpl${cls}${isNext ? " next" : ""}${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${si >= 0 ? `<span class="stopn${sAns ? " done" : ""}" title="Stop ${si + 1} on the path${isNext ? ", suggested next" : ""}">${sAns ? "✓" : si + 1}</span>` : ""}${inner}${dot}</div>`;
   if (r.type === "inline") {
     const row = INL(r.key), s = st(r.key, r.kind);
     if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span class="gprog" style="margin:0">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span></div>${stBtn(row)}</div></div></article>`); }
@@ -1262,12 +1432,12 @@ function renderBoard() {
   const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Drag a card's blue dot onto another card to connect. Click an arrow for its word and why.";
   return `${header("wall", `Boards / ${esc(b.title)}`)}
     <div class="bhead"><div><p class="ip-kicker" data-ph="B1">Board</p><h2>${esc(b.title)}</h2><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="drawer">+ Place</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen follows your arrows; the board's questions become its check.">Make a Lumen</button></div></div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="drawer">+ Place</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button><button class="button" type="button" data-act="lstart" data-ph="LB3">${stopsOf(b).some(k => st(k, "question").status === "answered") ? "▶ Continue learning" : "▶ Start learning"}</button></div></div>
     <div class="bwrap"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>
       <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="drawer" title="Place from Commonplace (+)" aria-label="Place">+</button></div>
       <div class="bhint"><span>${hint}</span></div>
       <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div>
-      ${S.drawer ? drawerHTML(b) : ""}</div>${insidePanel(b)}</div>`;
+      ${S.drawer ? drawerHTML(b) : ""}</div>${pathPanel(b)}</div>`;
 }
 function drawArrows() {
   const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
@@ -1275,6 +1445,8 @@ function drawArrows() {
   const center = a => ({ x: a.x + a.w / 2, y: a.y + a.h / 2 });
   const edge = (a, c) => { const m = center(a), dx = c.x - m.x, dy = c.y - m.y, s = Math.min(Math.abs((a.w / 2) / (dx || 1e-6)), Math.abs((a.h / 2) / (dy || 1e-6))); return { x: m.x + dx * s, y: m.y + dy * s }; };
   let out = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--ink-3)"/></marker></defs>`;
+  { const pts = stopsOf(b).map(k => box(pidOfKey(b, k))).filter(Boolean), g = box(b.pl.find(p => p.ref === "b:g")?.id); if (g) pts.push(g); if (pts.length > 1) out += `<polyline class="pth" points="${pts.map(c => { const m = center(c); return m.x + "," + m.y; }).join(" ")}"/>`; }
+  for (const p of b.pl) { const it = p.ref.startsWith("i:") ? I(p.ref.slice(2)) : null; if (!it?.stop) continue; const a = box(p.id), q = box(pidOfKey(b, it.stop)); if (!a || !q) continue; const s0 = edge(a, center(q)), e0 = edge(q, center(a)); out += `<line class="sl" x1="${s0.x}" y1="${s0.y}" x2="${e0.x}" y2="${e0.y}"/>`; }
   if (S.fieldLinks) {
     const objs = b.pl.map(p => ({ p, r: refOf(p.ref, b) })).filter(x => x.r?.type === "item" && x.r.it.type === "object");
     for (const A of objs) for (const f of COL(A.r.it.col).fields.filter(f => f.t === "rel")) for (const id of arr(A.r.it.v[f.id])) { const B = objs.find(x => x.r.it.id === id); if (!B) continue; const a = box(A.p.id), bb = box(B.p.id); if (!a || !bb) continue; const s = edge(a, center(bb)), e = edge(bb, center(a)); out += `<line class="fl" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><text class="flt" x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 + 14}" text-anchor="middle">${esc(f.label)} (field)</text>`; }
@@ -1625,7 +1797,7 @@ function render() {
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
-  $("#wiz").innerHTML = wizHTML() + howHTML();
+  $("#wiz").innerHTML = wizHTML() + howHTML() + learnHTML();
   if (S.jump) requestAnimationFrame(doJump);
 }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
@@ -1702,12 +1874,12 @@ function addOnCanvas(tool, x, y) {
 }
 
 /* ---------- clicks ---------- */
-function go(screen, keep) { if (!keep) S.hist = []; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
+function go(screen, keep) { if (!keep) S.hist = []; if (screen !== "board") S.learn = null; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
 document.addEventListener("click", e => {
   if (S.skipClick) { S.skipClick = false; return; }
   const a = e.target.closest("[data-act]");
   if (a && a.tagName === "A") e.preventDefault();
-  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick", "nbmenu", "aboutpick", "sellink", "addmargin", "csswitch", "csfdel", "csmerge"].includes(a.dataset.act))) closeMenu();
+  if (!e.target.closest("#menu") && !(a && ["stmenu", "hasmenu", "relpick", "lans", "nbmenu", "aboutpick", "sellink", "addmargin", "csswitch", "csfdel", "csmerge"].includes(a.dataset.act))) closeMenu();
   const line = e.target.closest("[data-arrow]");
   if (line && S.screen === "board") { openArrow(line.dataset.arrow, e.clientX, e.clientY); return; }
   if (!e.target.closest("#apop") && !$("#apop").hidden) closeApop();
@@ -1748,6 +1920,31 @@ document.addEventListener("click", e => {
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
     case "openat": S.jump = d.t; openEntry(d.id); break;
+    case "lstart": { const b = I(S.board), st0 = stopsOf(b), nx = nextStop(b); S.learn = { b: b.id, i: nx ? st0.indexOf(nx) : 0, s: 0 }; render(); break; }
+    case "lgo": { if (!S.learn) { S.learn = { b: S.board, i: +d.i, s: 0 }; } else { S.learn.i = +d.i; S.learn.s = 0; S.learn.l = null; S.learn.recall = false; } render(); document.querySelector(".ln")?.scrollTo(0, 0); break; }
+    case "lexit": { const b = I(S.learn.b), n = stopsOf(b).length, i = S.learn.i; S.learn = null; render(); requestAnimationFrame(drawArrows); toast(`You were on stop ${i + 1} of ${n}. Continue learning picks up there; the board is yours to rearrange.`); break; }
+    case "lrecall": S.learn = S.learn || { b: S.board, i: 0, s: 0 }; S.learn.recall = true; render(); break;
+    case "lplay": { const l = I(d.id); if (!l) break; const b = I(l.board); if (S.screen !== "board" || S.board !== b.id) { pushHist(); S.board = b.id; go("board", true); } S.learn = { b: b.id, i: Math.max(0, stopsOf(b).indexOf(l.forQ)), s: 0, l: l.id }; render(); break; }
+    case "lans": { e.stopPropagation(); menuKey = d.k; openMenu(a, mHead("Answer with a Lumen") + Object.entries(FMT).map(([k, t]) => mItem("lmake", `<b>${t}</b> <small style="color:var(--ink-3)">${k === "read" ? "slides" : k === "watch" ? "a short video" : "audio and transcript"}</small>`, false, `data-k="${esc(d.k)}" data-f="${k}"`)).join("") + `<p class="small" style="margin:6px 9px">From this board and your Commonplace. You decide if it answered the question.</p>`); break; }
+    case "lmake": { closeMenu(); const b = I(S.learn?.b || S.board), l = makeLumen(b, d.k, d.f); l.making = true; if (S.learn) { S.learn.l = l.id; S.learn.s = 0; } render(); setTimeout(() => { l.making = false; render(); if (!S.learn) toast(`“${l.title}” is beside its question. Play it, or Start learning.`); }, 900); break; }
+    case "lansall": { const b = I(S.board), ks = stopsOf(b).filter(k => st(k, "question").status === "open" && !lumensFor(k).length); ks.forEach(k => makeLumen(b, k, "read")); render(); toast(`${ks.length} Lumens made, one beside each open stop. Nothing is marked answered until you say so.`); break; }
+    case "lfmt": { const l = I(S.learn.l) || lumensFor(stopsOf(I(S.learn.b))[S.learn.i]).at(-1); if (l) { l.fmt = d.k; S.learn.l = l.id; } render(); break; }
+    case "lslide": { const b = I(S.learn.b), l = I(S.learn.l) || lumensFor(stopsOf(b)[S.learn.i]).at(-1); S.learn.l = l.id; S.learn.s = Math.max(0, Math.min(+d.i, l.slides.length)); render(); break; }
+    case "ldid": { const b = I(S.learn.b), key = stopsOf(b)[S.learn.i], s = st(key, "question"), l = I(S.learn.l) || lumensFor(key).at(-1);
+      if (d.v === "yes") { s.status = "answered"; if (l && !s.ans.includes(l.id)) s.ans.push(l.id); render(); toast(`Answered in “${l.title}”. It shows everywhere the question does.`); }
+      else if (d.v === "reopen") { s.status = "open"; render(); }
+      else if (d.v === "partly") { render(); const q = $("#lnq"); q.value = "What about "; q.focus(); toast("Ask what's still unclear: it joins the path right after this stop."); }
+      else toast("Kept open. Try it as Watch or Listen, or write what's unclear in your notes.");
+      break; }
+    case "lnote": { const t = $("#lnote")?.value.trim(); if (!t) break; const b = I(S.learn.b), key = stopsOf(b)[S.learn.i], qp = b.pl.find(p => p.id === pidOfKey(b, key)), k = stopNotes(b, key).length, nid = "n" + Date.now(); const n = note(nid, "notes", "", t, { topics: b.topics }); n.stop = key; D().items.unshift(n); if (qp) b.pl.push({ id: "p" + nid, ref: "i:" + nid, x: qp.x + 270, y: qp.y + 200 + k * 40 }); render(); toast("Kept in your Commonplace, and placed beside the question on the board."); break; }
+    case "lnewq": { const t = $("#lnq")?.value.trim(); if (!t || t === "What about") break; const b = I(S.learn.b), id = "q" + Date.now(), key = `${b.id}:question:${id}`, cur = stopsOf(b)[S.learn.i], qp = b.pl.find(p => p.id === pidOfKey(b, cur)); b.inl.push({ id, kind: "question", text: t }); b.path.splice(S.learn.i + 1, 0, key); b.pl.push({ id: "p" + id, ref: "b:" + id, x: (qp?.x ?? 60) - 20, y: (qp?.y ?? 60) + 420 }); render(); toast("Added as the next stop, and placed on the board. Go there now or later."); break; }
+    case "lreach": { const b = I(S.learn.b), g = allInlines().find(r => r.item === b && r.kind === "goal"); st(g.key, "goal").status = "reached"; render(); toast("Goal reached. It shows as reached on Questions and goals, and Loci remembers it for this place."); break; }
+    case "rcshow": S.rc = S.rc || {}; S.rc[d.id] = S.rc[d.id] || "shown"; render(); break;
+    case "rcset": S.rc[d.id] = d.v; render(); if (d.v === "not") toast("Added to To revisit on Loci, for this place."); break;
+    case "pathup": { const b = I(S.board), p = stopsOf(b), i = +d.i; [p[i - 1], p[i]] = [p[i], p[i - 1]]; render(); break; }
+    case "pathskip": { const b = I(S.board); b.path = stopsOf(b).filter(k => k !== d.k); render(); toast("Taken off the path. It's still on the board, under Side questions."); break; }
+    case "pathadd": { const b = I(S.board); stopsOf(b).push(d.k); render(); break; }
+
     case "tt": S.tt = d.k; render(); break;
     case "how": S.how = true; render(); break;
     case "howclose": S.how = false; render(); break;
@@ -1918,6 +2115,7 @@ document.addEventListener("keydown", e => {
   if (t.id === "mdedit" && e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveBody(); return; }
   if (t.dataset?.qedit && e.key === "Enter") { e.preventDefault(); t.blur(); return; }
   if (/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+  if (e.key === "Escape" && S.learn) { S.learn = null; render(); requestAnimationFrame(drawArrows); return; }
   if (e.key === "Escape") { closeMenu(); if (!$("#apop").hidden) closeApop(); if (S.drawer) { S.drawer = false; render(); } }
   if (e.key === "/" && S.screen === "wall") { e.preventDefault(); $("#q")?.focus(); }
   if (S.screen === "board") {
@@ -1935,7 +2133,7 @@ document.addEventListener("dragend", () => { S.drag = null; document.querySelect
 
 /* ---------- moving between entries: one history, so ← always names where it goes ---------- */
 function pushHist() { S.hist.push({ screen: S.screen, item: S.item, board: S.board }); }
-function openEntry(id) { const it = I(id); if (!it) return; closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
+function openEntry(id) { const it = I(id); if (!it) return; if (it.type === "lumen") { pushHist(); S.board = it.board; go("board", true); S.learn = { b: it.board, i: Math.max(0, stopsOf(I(it.board)).indexOf(it.forQ)), s: 0, l: it.id }; render(); return; } closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
 function mentionPop(el) {
   const x = I(el.dataset.mention), bi = el.closest(".nb-t")?.dataset.bi;
   menuKey = { bi: bi == null ? null : +bi, id: el.dataset.mention };
@@ -2016,6 +2214,8 @@ document.addEventListener("keydown", e => {
   render(); document.querySelector(t.dataset.cswadd ? "[data-cswadd]" : "[data-csopt]")?.focus();
 }, true);
 
+for (const f of Object.keys(DB)) { S.field = f; const b = I(DB[f].start), k = stopsOf(b)[0]; if (k) makeLumen(b, k, "read"); }
+S.field = "architect";
 S.board = DB[S.field].start;
 render();
 </script>

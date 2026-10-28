@@ -268,3 +268,139 @@ All four are hand-written SQL, applied only on the owner's word.
 The Palace and Map are the app's own code, bundled from `studiolo` main @ `6f8d396` (see `prototypes/boards/loci/README.md`).
 
 Nothing calls a model. Ask Loci's replies, the Lumen and its answers are written from the board's real contents.
+
+## 7. Addendum, 28 October: the board as a learning space
+
+**The owner's idea (28 Oct):**
+- a board starts from a goal ("learn X") and the questions that lead to it;
+- on the board, AI answers the questions with Lumens, to read, watch or listen to;
+- the learner takes notes around the same ideas;
+- so the board becomes a learning space with a linear learning process.
+
+**The owner's condition:** fluid, not restrictive, but guided.
+
+**Prototype:** [`prototypes/objects-boards-questions/`](../../../prototypes/objects-boards-questions/README.md). Open **Board**, then **▶ Start learning**. Each sample board (architect, lawyer, doctor) starts with one Lumen already made.
+
+### 7.1 Guided, never fenced in
+
+| What guides | What stays free |
+|---|---|
+| The questions form a **path to the goal**: numbered stops on the cards, joined by a faint dotted route that ends at the goal card | The canvas is unchanged: place, move, connect and write anywhere, at any time |
+| One stop is the **suggested next** (the first open one): its number is filled and its card glows softly | Any stop opens with one click, in any order. Nothing is locked, and nothing is greyed out |
+| **▶ Start learning** opens the suggested stop; **▶ Continue learning** returns to where you left off | **← Back to the board** at any moment; the board shows where you stopped |
+| **Answer with a Lumen** on each open stop | Answer it yourself in your notes, find resources, or leave it open |
+| **Did this answer it?** after a Lumen | Only you mark a question answered. *Partly* asks a follow-up; *Not yet* keeps it open with no penalty |
+| The goal's ring fills as stops are answered | Reorder stops (↑), take one off the path (×, it stays on the board under **Side questions**), add any question to the path (**+ Add to path**), or ask a new one mid-stop, which joins the path right after |
+| At the end: **Recall**, then **Mark the goal reached** | Recall can be opened any time from the last dot (◎) |
+
+The rule: **the path suggests an order, the learner owns it.** The app never hides, locks or reorders anything by itself.
+
+### 7.2 The loop at each stop
+
+```mermaid
+flowchart LR
+  Q["A stop: a question on the path"] --> A{"Answer it"}
+  A -- "Answer with a Lumen" --> L["Lumen: Read, Watch or Listen<br/>made from this board and your Commonplace"]
+  A -- "in your own words" --> N
+  L --> N["Your notes on this stop<br/>saved to Commonplace, placed beside the question"]
+  N --> C{"Did this answer it?"}
+  C -- "Yes" --> D["Answered in the Lumen<br/>the ring fills"]
+  C -- "Partly" --> F["A follow-up question<br/>joins the path next"]
+  C -- "Not yet" --> Q
+  D --> X["Suggested next stop, or any other"]
+  F --> X
+  X --> R["Recall, then the goal reached"]
+```
+
+### 7.3 On the board
+
+- **The path layer:**
+  - each question on the path carries its number (✓ once answered);
+  - a dotted route joins the stops in order, ending at the goal card;
+  - the suggested next stop is filled and glows softly.
+  
+  The path is drawn under the arrows, so arrows keep their meaning.
+- **The panel** (the board's right side) becomes **Learning on this board**:
+  - the goal, a progress ring ("1 of 3 stops answered") and the suggested next question;
+  - **▶ Start learning** or **▶ Continue learning**, with one line: *A suggested order, not a rule. Take the stops in any order, skip one, or add your own*;
+  - **Path to the goal**: each stop with its number, its Lumens (▶ Read, ▶ Listen) or **▶ Answer with a Lumen**, its note count, ↑ and ×;
+  - **Answer the open stops with Lumens**, when several have none;
+  - **Side questions**: questions taken off the path, and questions inside the board's cards, each with **+ Add to path**.
+- **A Lumen on the board** is a card:
+  - *▶ Lumen · Read · 4 slides*, its title, its first line, *Answers stop 1*, and **▶ Play**;
+  - placed under its question, with an *explains* arrow from the Lumen to the question;
+  - the arrow's why is "made to answer it", so Make a Lumen and Loci can read it.
+  
+  It is a placement of a Lumen (§2.3), not a copy. The Lumen also lives in Learn, tied to the board.
+- **Notes** written in Learn mode are ordinary Commonplace notes. Each is placed beside its question, joined by a faint dotted line, and remembers its stop.
+
+### 7.4 Learn mode
+
+A full-screen layer over the board, never a separate place. The board is always one click behind it.
+
+- **Top bar:**
+  - **← Back to the board**;
+  - the goal with its ring;
+  - the stops as numbered dots joined by a line (✓ answered, filled = where you are, outlined = suggested next);
+  - a final ◎ for Recall.
+  
+  Every dot opens its stop.
+- **The stop:**
+  - its number and state (*Stop 1 of 2 · suggested next*), and the question, large;
+  - the Lumen, with **Read · Watch · Listen** as a switch on the same Lumen: slides you step through; a narrated video frame with captions; or audio with a transcript;
+  - if there's no Lumen yet, three choices (**Read**, **Watch**, **Listen**), "or answer it yourself in your notes, or find resources";
+  - **Did this answer it?** **Yes, mark answered** · **Partly: ask a follow-up** · **Not yet**.
+- **Beside it:**
+  - **Your notes on this stop**: what you've written, plus a box ("Write what you're learning, in your words. Saved to Commonplace and placed beside the question");
+  - **Around it on the board**: the cards arrows join to this question, with their words and whys;
+  - **A new question?**: it joins the path after this stop.
+- **The footer:** **← Previous**, a line naming the suggested next stop, and **Next stop →**. Next goes to the suggested stop, not necessarily the following number.
+- **Recall:**
+  - your notes and your arrows' whys, covered ("Hassan Fathy → explains → New Gourna Village. Why?");
+  - **Show**, then **Got it** or **Not yet**; *Not yet* goes to *To revisit* on Loci (BD-5);
+  - **Mark the goal reached** once every stop is answered;
+  - **Make one Lumen of the whole board**, which is B3's *Make a Lumen*, now following the path.
+- **Leaving** keeps your place: "You were on stop 2 of 3. Continue learning picks up there; the board is yours to rearrange." Escape leaves too.
+
+### 7.5 What Loci does, and doesn't
+
+- **Answers only when asked**: one stop at a time, or **Answer the open stops** in one go. It never adds Lumens by itself (A2).
+- **Never marks a question answered.** Only *Did this answer it?* does, so the ring measures understanding, not viewing.
+- **A Lumen's brief is the question**, with the board as context:
+  - the cards and whys around the question;
+  - the goal;
+  - the learner's notes so far.
+  
+  It builds on Lumens already on the board and doesn't repeat them (B3). In law and medicine, a Lumen says it's a teaching sketch, not advice.
+- **Formats are views of one Lumen.** *Read* is its slides. *Watch* is the same slides narrated with captions (the voice Lumen design). *Listen* is narration with a transcript. Switching keeps your place.
+
+### 7.6 Data
+
+- **The path is the order of the board's question inlines**, plus questions placed from elsewhere:
+  - *new* `board_path(board_id, inline_id, position)`, part of B3's migration;
+  - a question off the path has no row, and stays on the board as a side question.
+- **A Lumen placement** is §2.3's existing kind. A Lumen made for a stop records its source as `{ board, inline }` (B3's *Lumen source*, widened by one field).
+- **Answered in** a Lumen is `inline_answers.explainer_id`, already in the Questions design.
+- **A note written at a stop** is a Note placed on the board. Its stop is kept in the placement (`board_placements.stop_inline_id`, *new*), not in the note, so the same note can sit on other boards too.
+
+### 7.7 Phases
+
+These replace B3's single phase with three. Stage 4 comes after B1 and B2, and needs Q5 (*Explain this*) and the Lumen formats.
+
+| ID | What | Tier | Migration |
+|---|---|---|---|
+| **LB1** | **The path**: numbers on question cards, the dotted route, the suggested next, the *Learning on this board* panel (reorder, take off, add, side questions) | MEDIUM | yes: `board_path` |
+| **LB2** | **Answer with a Lumen**: per stop or for all open stops; Lumen cards with *explains* arrows; Read, Watch, Listen; *Did this answer it?* | HIGH | yes: the Lumen's source |
+| **LB3** | **Learn mode**: the full-screen layer, notes at a stop, a new question mid-stop, Recall, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
+
+### 7.8 Decisions
+
+| ID | Decision | Recommendation |
+|---|---|---|
+| **LB-D1** | A board's questions form a suggested path; the canvas stays free | **Yes** |
+| **LB-D2** | Nothing is ever locked: any stop opens with one click, and the learner reorders, skips and adds | **Yes**: guided, not restrictive |
+| **LB-D3** | Loci answers with a Lumen only when asked | **Yes** |
+| **LB-D4** | Only the learner marks a stop answered (*Did this answer it?*) | **Yes**: the ring measures understanding |
+| **LB-D5** | Read, Watch and Listen are views of one Lumen | **Yes** |
+| **LB-D6** | Notes from Learn mode are ordinary Commonplace notes, placed beside their stop | **Yes** |
+| **LB-D7** | Learn mode is a layer over the board, not a separate page | **Yes**: the board is always one click behind it |

@@ -9,6 +9,7 @@ It opens on **Everything**. Three sample learners, each with a board: an **archi
 | Where | What it shows |
 |---|---|
 | **The board** | Object cards carry their fields and "? · ◎" counts. The goal card is a goal inline; question cards are question inlines. The **Inside** panel lists the goal, the board's questions and the questions inside its cards |
+| **Learning on a board** | **▶ Start learning** on the board. Its questions are a suggested path to the goal (numbered, with a dotted route; the suggested next one glows). Each stop: **Answer with a Lumen** (Read, Watch or Listen), your notes beside it, **Did this answer it?** Any stop opens with one click; reorder, skip or add stops in the panel; ask a new one mid-stop. **Recall** and **Mark the goal reached** at the end. **← Back to the board** at any time |
 | **Field links** | Dashed lines are relation fields already set between two placed Objects (*Architect*, *Cites*, *Recommends*). They aren't arrows and can't be edited on the board |
 | **Keep as a field** (architect) | Click the arrow *Hassan Fathy explains New Gourna Village*. It offers **Set New Gourna Village's Architect to Hassan Fathy**. Take it: a field link appears, and the Object's page shows the field |
 | **Mark answered** (lawyer, doctor) | Click the arrow *Robinson explains "Is Caparo still a test?"* (or *NG158 explains "When is a D-dimer enough?"*). It offers **Mark answered in Robinson**. Take it, then double-click Robinson: its page lists the question under **Answers** |

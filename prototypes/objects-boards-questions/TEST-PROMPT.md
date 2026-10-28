@@ -32,6 +32,7 @@ Read the plan first, then test the prototypes against it.
 - Open **Hassan Fathy**, the **Arcade and bay rhythm** photo and the **Climate and Architecture** PDF. Does **↩ Appears in** at the top tell you where each is used? Does each row open the exact spot, highlighted?
 - Open **Questions** (bar at the bottom). Do the goal cards, rings and **Next** lines make it clear what to do? Mark a question answered, then switch to **Answered**: does *What you've found out* read well? Does clicking a question open the exact place it was written?
 - **Templates** tab: use one collection, one long-note and one board template. Does each make what its picture shows? Open **? How Commonplace works**: after reading it, could a new user explain collections, topics and the three ways things link?
+- On a board, **▶ Start learning**. Read the Lumen, switch to Watch and Listen, keep a note, and answer **Did this answer it?** Jump to another stop out of order, add a question mid-stop, then leave and **Continue learning**. Did it feel guided without being restrictive? Was anything locked or confusing?
 - Is it always clear where to go to change a connection? Write down any moment when it wasn't.
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
 - On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
@@ -42,7 +43,7 @@ Read the plan first, then test the prototypes against it.
 **Then review the plan:**
 - Is the order sound? Questions and goals come first and Boards last. Are the dependencies right?
 - Can the lanes really run in parallel?
-- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9, CL-D1 to D13) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
+- Are any of the decisions (OQB-D1 to D8, LN-D1 to D9, CL-D1 to D13, LB-D1 to D7) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
 
 **Report in four parts:**
 1. Bugs, with steps to reproduce.
