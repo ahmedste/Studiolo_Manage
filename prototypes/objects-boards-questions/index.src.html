@@ -625,7 +625,7 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .sh-b { display: grid; gap: 2px; } .sh-b small { font-size: 10px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); } .sh-b b { font: 400 13px/1.25 var(--read); color: var(--ink); } .sh-b span { font-size: 11px; color: var(--ink-2); }
 .sh-t.q { background: var(--pick-soft); box-shadow: inset 0 0 0 1px var(--pick-rule); grid-column: span 2; } .sh-t.q p { margin: 0; font: 13.5px/1.3 var(--read); } .sh-t.q small { font-size: 11px; color: var(--ink-2); }
 .sh-gl { color: var(--pick); font-weight: 600; }
-.sh-t.on { opacity: .55; } .sh-on { position: absolute; bottom: 6px; right: 6px; font-style: normal; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--surface-float); color: var(--ink-2); }
+.sh-t.on { opacity: .55; } .sh-on { position: absolute; top: 6px; right: 6px; font-style: normal; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--surface-float); color: var(--ink-2); }
 .sh-foot { margin: 0; padding: 8px 12px 12px; border-top: 1px solid var(--line); }
 .viewport.dropping { box-shadow: inset 0 0 0 2px var(--accent); }
 .qp { position: absolute; z-index: 9; width: 340px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 8px; display: grid; gap: 6px; }
@@ -651,6 +651,40 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .rc-panel { display: grid; gap: 8px; } .rc-panel .rc { padding: 10px; } .rc-panel .rc-cover { font-size: 14px; min-height: 0; padding: 8px 10px; }
 @media (max-width: 1100px) { .bwrap.shelf { grid-template-columns: minmax(0, 1fr) 300px; } .bshelf { position: absolute; z-index: 7; left: 0; top: 0; bottom: 0; width: 250px; box-shadow: var(--shadow-float); } }
 @media (max-width: 860px) { .bwrap.shelf { grid-template-columns: minmax(0, 1fr); } .bpl.lm.open { width: 340px; } }
+
+/* the board is one infinite canvas, full size beside the rail; everything else floats on it (B1, revised 28 Oct) */
+body.board-full .main-stage { overflow: hidden; }
+.bfull .bwrap { position: fixed; top: 0; right: 0; bottom: 0; left: var(--rail-w, 58px); z-index: 10; display: block; height: auto; min-height: 0; border: 0; border-radius: 0; grid-template-columns: none; }
+.bfull .viewport { position: absolute; inset: 0; }
+.bfull .btop, .bfull .bright { position: absolute; top: 14px; z-index: 8; display: flex; gap: 8px; align-items: center; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 6px 8px; }
+.bfull .btop { left: 16px; max-width: calc(50% - 30px); padding-right: 12px; }
+.btop-back { border: 0; width: 34px; height: 34px; border-radius: 7px; background: none; font-size: 16px; color: var(--ink-2); cursor: pointer; flex: none; } .btop-back:hover { background: var(--hover-fill); color: var(--ink); }
+.btop-t { min-width: 0; } .btop-t .ip-kicker { margin: 0; font-size: 10px; } .btop-t b { display: block; font: 400 19px/1.15 var(--read); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bfull .btop .place { margin: 0 0 0 6px; flex: none; }
+.bfull .bright { right: 16px; }
+.bright label { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); padding: 0 6px; }
+.bright .button { min-height: 32px; padding: 4px 11px; font-size: 13px; }
+.bright .button[aria-pressed="true"] { background: var(--hover-fill); }
+.bfull .btools { left: 16px; top: 50%; transform: translateY(-50%); border-radius: 10px; }
+.bfull .bshelf { position: absolute; z-index: 7; left: 68px; top: 70px; bottom: 16px; width: 270px; border: 0; border-radius: 12px; box-shadow: var(--shadow-float); overflow: hidden; background: var(--surface-float); }
+.bfull .bpanel { position: absolute; z-index: 7; right: 16px; top: 70px; bottom: 16px; width: 320px; border-radius: 12px; box-shadow: var(--shadow-float); overflow: hidden; background: var(--surface-float); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.bfull .bpanel .inside { border: 0; background: none; min-height: 0; }
+.bp-h { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 4px; } .bp-h b { font: 400 16px var(--read); }
+.bpanel-chip { position: absolute; z-index: 7; right: 16px; top: 70px; border: 0; display: inline-flex; gap: 8px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 20px; background: var(--surface-float); box-shadow: var(--shadow-float); font: 13px var(--ui); color: var(--ink); cursor: pointer; }
+.bfull .bzoom { left: auto; right: 16px; bottom: 16px; border-radius: 10px; }
+.bfull .bwrap.has-panel .bzoom { right: 352px; }
+.bfull .bhint { left: 0; right: 0; bottom: 92px; }
+body.board-full .proto { left: 50%; bottom: 14px; }
+body.board-full .proto:not(:hover):not(:focus-within) > *:not(b) { display: none; }
+body.board-full .proto:not(:hover):not(:focus-within) b::after { content: " ▴"; }
+@media (max-width: 699.98px) {
+  .bfull .bwrap { left: 0; top: var(--m-bar, 56px); }
+  .bfull .btop { max-width: calc(100% - 32px); right: 16px; } .bfull .btop .place { display: none; } .bfull .bright { top: 66px; left: 16px; right: auto; flex-wrap: wrap; max-width: calc(100% - 32px); } .bright label { display: none; }
+  .bfull .btools { top: auto; bottom: 16px; transform: none; display: flex; }
+  .bfull .bshelf, .bfull .bpanel { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 58%; }
+  .bfull .bwrap.has-panel .bzoom, .bfull .bzoom { right: 16px; bottom: 16px; top: auto; }
+  .bpanel-chip, .bright [data-act="toast"] { display: none; } .bfull .bright { flex-wrap: nowrap; }
+}
 
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
@@ -1404,7 +1438,7 @@ function tileHTML(t, on) {
   if (t.r) return `<div class="sh-t q${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board"><span class="sh-gl">?</span><p>${esc(t.r.text)}</p><small>in ${esc(t.r.item.title || "a note")}</small></div>`;
   const x = t.x, pic = x.media ? `<img alt="" src="${MEDIA[x.media]}">` : "";
   const sub = x.type === "object" ? cardLine(x) : kindLabel(x);
-  return `<div class="sh-t${x.media ? " pic" : ""}${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board">${pic}<div class="sh-b"><small>${esc(kindLabel(x))}</small><b>${esc(x.title || plainBody(x).slice(0, 70))}</b>${x.type === "object" && sub ? `<span>${esc(sub)}</span>` : ""}</div>${on ? `<i class="sh-on">On board</i>` : ""}</div>`;
+  return `<div class="sh-t${x.media ? " pic" : ""}${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board">${pic}<div class="sh-b"><small>${esc(kindLabel(x))}${on && !x.media ? " · on board" : ""}</small><b>${esc(x.title || plainBody(x).slice(0, 70))}</b>${x.type === "object" && sub ? `<span>${esc(sub)}</span>` : ""}</div>${on && x.media ? `<i class="sh-on">On board</i>` : ""}</div>`;
 }
 function shelfHTML(b) {
   const on = new Set(b.pl.map(p => p.ref)), tab = S.shtab || "all", list = shelfItems(S.shq, tab);
@@ -1487,15 +1521,18 @@ function drawerHTML(b) {
 }
 function renderBoard() {
   const b = I(S.board) || boards()[0]; S.board = b.id;
+  if (S.shelf == null) S.shelf = innerWidth > 1100;
+  if (S.panel == null) S.panel = innerWidth > 900;
   const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click empty board to search and place · drag from the shelf · drag a blue dot to connect";
-  return `${header("wall", `Boards / ${esc(b.title)}`)}
-    <div class="bhead"><div><p class="ip-kicker" data-ph="B1">Board</p><h2>${esc(b.title)}</h2><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><label class="small" style="display:inline-flex;gap:6px;align-items:center" data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="shelf" aria-pressed="${S.shelf !== false}">${S.shelf !== false ? "Hide shelf" : "Your Commonplace"}</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button></div></div>
-    <div class="bwrap${S.shelf !== false ? " shelf" : ""}">${S.shelf !== false ? shelfHTML(b) : ""}<div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>
-      <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" title="Your Commonplace shelf (+)" aria-label="Show the shelf">+</button></div>${qpHTML()}
-      ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
-      <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div>
-      </div>${pathPanel(b)}</div>`;
+  const stops = stopsOf(b), d = stops.filter(k => st(k, "question").status === "answered").length;
+  return `<h1 class="visually-hidden">${esc(b.title)}</h1><div class="bwrap${S.panel ? " has-panel" : ""}" data-ph="B1"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>${qpHTML()}</div>
+    <div class="btop"><button class="btop-back" type="button" data-act="back" title="Back" aria-label="Back">←</button><div class="btop-t"><p class="ip-kicker">Board</p><b>${esc(b.title)}</b></div><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
+    <div class="bright"><label data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="shelf" aria-pressed="${!!S.shelf}">Your Commonplace</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button><button class="button button-quiet" type="button" data-act="bpanel" aria-pressed="${!!S.panel}">◎ Learning</button></div>
+    <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" aria-pressed="${!!S.shelf}" title="Your Commonplace shelf (+)" aria-label="Your Commonplace shelf">+</button></div>
+    ${S.shelf ? shelfHTML(b) : ""}
+    ${S.panel ? `<div class="bpanel"><div class="bp-h"><b>Learning on this board</b><button class="button button-link" type="button" data-act="bpanel">Hide</button></div>${pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Learning</button>`}
+    ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
+    <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div></div>`;
 }
 function drawArrows() {
   const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
@@ -1843,7 +1880,8 @@ function renderProto() {
 function render() {
   renderProto();
   const m = $("#main");
-  m.className = S.screen === "item" || S.screen === "note" ? "" : "library-page";
+  m.className = S.screen === "board" ? "bfull" : S.screen === "item" || S.screen === "note" ? "" : "library-page";
+  document.body.classList.toggle("board-full", S.screen === "board");
   hidePick(); $("#selbar").hidden = true;
   if (S.screen === "item") m.innerHTML = renderItem();
   else if (S.screen === "note") m.innerHTML = renderNote();
@@ -1888,7 +1926,7 @@ let drag = null;
 const toCanvas = (cx, cy) => { const r = $("#vp").getBoundingClientRect(); return { x: (cx - r.left - S.view.x) / S.view.z, y: (cy - r.top - S.view.y) / S.view.z }; };
 function applyView() { const cv = $("#cv"); if (cv) cv.style.transform = `translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})`; const z = document.querySelector(".bzoom span"); if (z) z.textContent = Math.round(S.view.z * 100) + "%"; }
 document.addEventListener("pointerdown", e => {
-  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,button,a,textarea,input,.st,select")) return;
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,.btop,.bright,.bshelf,.bpanel,.bpanel-chip,button,a,textarea,input,.st,select")) return;
   const dot = e.target.closest("[data-dot]"), pl = e.target.closest("[data-pid]");
   if (e.target.closest("[data-arrow]")) return;
   if (dot) { const p = I(S.board).pl.find(x => x.id === dot.dataset.dot), el = dot.parentElement; drag = { kind: "connect", from: p.id, sx: el.offsetLeft + el.offsetWidth, sy: el.offsetTop + el.offsetHeight / 2 }; e.preventDefault(); return; }
@@ -1913,16 +1951,18 @@ document.addEventListener("pointerup", e => {
   } else if (d.kind === "move" && !d.moved) { S.sel = d.p.id; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); d.el.classList.add("sel"); }
 });
 document.addEventListener("wheel", e => {
-  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer,.qp")) return;
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer,.qp,.bshelf,.bpanel")) return;
   e.preventDefault();
   if (e.ctrlKey || e.metaKey) zoomAt(e.deltaY < 0 ? 1.1 : 1 / 1.1, e.clientX, e.clientY); else { S.view.x -= e.deltaX; S.view.y -= e.deltaY; applyView(); }
 }, { passive: false });
 function zoomAt(f, cx, cy) { const r = $("#vp").getBoundingClientRect(); cx ??= r.left + r.width / 2; cy ??= r.top + r.height / 2; const z = Math.min(1.6, Math.max(.35, S.view.z * f)), px = cx - r.left, py = cy - r.top; S.view.x = px - (px - S.view.x) * z / S.view.z; S.view.y = py - (py - S.view.y) * z / S.view.z; S.view.z = z; applyView(); }
 function fit() {
   const b = I(S.board), vp = $("#vp"); if (!b || !vp) return;
-  const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 30, y0 = Math.min(...ys) - 30, x1 = Math.max(...xs) + 380, y1 = Math.max(...ys) + 300;
-  const z = Math.min(1, Math.max(vp.clientWidth < 600 ? .5 : .66, Math.min(vp.clientWidth / (x1 - x0), vp.clientHeight / (y1 - y0))));
-  S.view = { z, x: -x0 * z + Math.max(56, (vp.clientWidth - (x1 - x0) * z) / 2), y: -y0 * z + 10 }; applyView();
+  const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 30, y0 = Math.min(...ys) - 30, x1 = Math.max(...xs) + 340, y1 = Math.max(...ys) + 260;
+  const narrow = vp.clientWidth < 700, L = narrow ? 16 : S.shelf ? 356 : 76, R = narrow ? 16 : S.panel ? 352 : 24, T = narrow ? 120 : 76, B = 70;
+  const aw = Math.max(200, vp.clientWidth - L - R), ah = Math.max(200, vp.clientHeight - T - B);
+  const z = Math.min(1, Math.max(narrow ? .45 : .55, Math.min(aw / (x1 - x0), ah / (y1 - y0))));
+  S.view = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) }; applyView();
 }
 function addOnCanvas(tool, x, y) {
   const b = I(S.board);
@@ -1991,7 +2031,8 @@ document.addEventListener("click", e => {
       else toast("Kept open. Try it as Watch or Listen, or write what's unclear in a note.");
       break; }
     case "pnote": { const l = I(S.playing?.lid), b = I(l.board), lp = b.pl.find(x => x.ref === "l:" + l.id), w = document.querySelector(`[data-pid="${lp.id}"]`)?.offsetWidth || 440, n0 = stopNotes(b, l.forQ).length, nid = "n" + Date.now(), n = note(nid, "notes", "", "", { topics: b.topics }); n.stop = l.forQ; D().items.unshift(n); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x: lp.x + w + 40, y: lp.y + n0 * 60 }); S.editing = "note:" + nid; S.focusEdit = true; render(); break; }
-    case "shelf": S.shelf = !S.shelf; render(); break;
+    case "shelf": S.shelf = !S.shelf; if (S.shelf && innerWidth < 700) S.panel = false; render(); break;
+    case "bpanel": S.panel = !S.panel; if (S.panel && innerWidth < 700) S.shelf = false; render(); requestAnimationFrame(drawArrows); break;
     case "shtab": S.shtab = d.k; render(); break;
     case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + vp.width / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
     case "pathgo": { const b = I(S.board), nx = nextStop(b); if (!nx) break; const pid = pidOfKey(b, nx); centreOn(pid, Math.max(S.view.z, .9)); S.sel = pid; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${pid}"]`)?.classList.add("sel", "flash"); break; }
@@ -2182,7 +2223,7 @@ document.addEventListener("keydown", e => {
   if (S.screen === "board") {
     const k = e.key.toLowerCase();
     if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
-    else if (e.key === "+") { S.shelf = S.shelf === false; render(); } else if (k === "0") fit();
+    else if (e.key === "+") { S.shelf = !S.shelf; render(); } else if (k === "0") fit();
     else if ((e.key === "Delete" || e.key === "Backspace") && S.sel) { const b = I(S.board); b.pl = b.pl.filter(p => p.id !== S.sel); b.arrows = b.arrows.filter(a => a.from !== S.sel && a.to !== S.sel); S.sel = null; render(); toast("Removed from the board. It's still in your Commonplace."); }
   }
 });
@@ -2279,7 +2320,7 @@ for (const f of Object.keys(DB)) { S.field = f; const b = I(DB[f].start), k = st
 S.field = "architect";
 /* placing: double-click empty board to search; drag tiles from the shelf */
 document.addEventListener("dblclick", e => {
-  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest("[data-pid],.btools,.bzoom,.bhint,.qp")) return;
+  if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest("[data-pid],.qp")) return;
   const c = toCanvas(e.clientX, e.clientY), r = $("#vp").getBoundingClientRect();
   S.qp = { x: c.x - 120, y: c.y - 30, cx: Math.min(e.clientX - r.left, r.width - 360), cy: Math.min(e.clientY - r.top, r.height - 330), q: "", on: 0 }; render(); $("#qpi")?.focus();
 });

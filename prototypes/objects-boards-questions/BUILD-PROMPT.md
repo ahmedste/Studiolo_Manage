@@ -22,7 +22,7 @@ You're building the next part of **Studiolo**, a learning app (`ahmedste/studiol
 | `2026-10-25-objects-build-phases.md` | Lanes F, P, V, T: Object fields, pages, views (Table, Columns, Timeline), starter types |
 | `2026-10-28-long-notes-and-connections-design.md` | Lane N: the long-note page and editor (CodeMirror 6 live preview); the three connection kinds |
 | `2026-10-28-collections-and-linking-design.md` | Lane C: the collection studio, New collection, **Appears in** backlinks, Templates as a gallery to start from, *How Commonplace works*, the linking model |
-| `2026-10-24-boards-design.md` | Lane B: Boards, built last; §7 the board as a learning space (a guided path, Lumens that play in place, notes beside them) and placing by double-click search or a visual shelf |
+| `2026-10-24-boards-design.md` | Lane B: Boards, built last; §7 the board as a learning space (a guided path, Lumens that play in place, notes beside them) one full-screen infinite canvas with floating panels, and placing by double-click search or a visual shelf |
 
 The prototype's source is `prototypes/objects-boards-questions/index.src.html` in the same repository. Read it for exact wording, behaviour and edge cases. Don't port its code: it's a single-file sketch, and the designs name the real files and modules to change.
 
@@ -34,7 +34,7 @@ The prototype's source is `prototypes/objects-boards-questions/index.src.html` i
 - **Stage 3:** Q5, F3, T3, N3, N4.
 - **Stage 4:** Boards B1, B2, then the board as a learning space (LB1 the path, LB2 Lumens that play in their cards, LB3 notes and Recall on the board; no separate learning mode; Boards design §7), B4, with Q-B.
 
-The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D9, CL-D1–D13 and LB-D1–D8. Treat a recommendation as agreed unless the owner has said otherwise.
+The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D9, CL-D1–D13 and LB-D1–D9. Treat a recommendation as agreed unless the owner has said otherwise.
 
 **Your first task: phase Q1.**
 

@@ -340,7 +340,22 @@ flowchart LR
   - **Recall**: **Test yourself** covers your notes and your arrows' whys ("Hassan Fathy → explains → New Gourna Village. Why?"). Each has **Show**, then *Got it* or *Not yet*, and *Not yet* goes to *To revisit* (BD-5). Then **Mark the goal reached**.
 - **Make a Lumen** (of the whole board, B3) follows the path and the arrows, and its check is built from your notes.
 
-### 7.4 Placing things: double-click to search, or drag from the shelf
+### 7.4 One infinite canvas, full screen
+
+**The owner's direction (28 Oct):** one infinite screen, like Miro, not a canvas inside a box.
+
+- **The board fills the whole stage**, edge to edge beside the app's rail; on a phone, everything under the phone's top bar. Commonplace's header, tabs and page margins step aside while a board is open, and **←** goes back.
+- **Everything else floats on the canvas** as rounded panels with the app's float shadow:
+  - **top left:** ← and the board's title and place;
+  - **top right:** *Field links*, **Your Commonplace** (the shelf), **Make a Lumen** and **◎ Learning** (the panel);
+  - **left edge, centred:** the tools (↖ select, ✎ note, ? question, + shelf);
+  - **left:** the shelf;
+  - **right:** *Learning on this board*. Hidden, it leaves a small chip with the ring ("0 of 2 stops · Learning");
+  - **bottom right:** zoom and Fit;
+  - **bottom centre:** the hint.
+- **The canvas runs under the panels**, and **Fit** frames the cards in the space between them. Panels open by default on wide screens and hide with one tap. On a phone, the shelf and the panel open as sheets from the bottom, one at a time, and the tools move to the bottom.
+
+### 7.5 Placing things: double-click to search, or drag from the shelf
 
 This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever you're looking.
 
@@ -357,7 +372,7 @@ This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever y
   - a tile already on the board is faded and marked *On board*.
 - **The tools stay**: ✎ (N) and ? (Q), then click the board. Placed things are always placements, never copies, as §2.3 says.
 
-### 7.5 What Loci does, and doesn't
+### 7.6 What Loci does, and doesn't
 
 - **Answers only when asked**: one question at a time, or **Answer the open stops** in one go. It never adds Lumens by itself (A2).
 - **Never marks a question answered.** Only *Did this answer it?* does, so the ring measures understanding, not viewing.
@@ -369,7 +384,7 @@ This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever y
   It builds on Lumens already on the board and doesn't repeat them (B3). In law and medicine, a Lumen says it's a teaching sketch, not advice.
 - **Formats are views of one Lumen.** *Read* is its slides. *Watch* is the same slides narrated with captions (the voice Lumen design). *Listen* is narration with a transcript.
 
-### 7.6 Data
+### 7.7 Data
 
 - **The path:**
   - *new* `board_path(board_id, inline_id, position)`;
@@ -379,9 +394,9 @@ This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever y
 - **Answered in** a Lumen is `inline_answers.explainer_id`, already in the Questions design.
 - **A note written at a stop** is a Note placed on the board. Its stop is kept in the placement (`board_placements.stop_inline_id`, *new*), not in the note, so the same note can sit on other boards too.
 
-### 7.7 Phases
+### 7.8 Phases
 
-These replace B3's single phase with three, in Stage 4, after B1 and B2. They need Q5 (*Explain this*) and the Lumen formats. B1 gains the double-click search and the shelf in place of the Add drawer.
+These replace B3's single phase with three, in Stage 4, after B1 and B2. They need Q5 (*Explain this*) and the Lumen formats. B1 gains the full-screen canvas with floating panels (§7.4), and the double-click search and the shelf in place of the Add drawer.
 
 | ID | What | Tier | Migration |
 |---|---|---|---|
@@ -389,7 +404,7 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
 | **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
 
-### 7.8 Decisions
+### 7.9 Decisions
 
 | ID | Decision | Recommendation |
 |---|---|---|
@@ -401,3 +416,4 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB-D6** | Notes are ordinary Commonplace notes, placed beside their stop | **Yes** |
 | **LB-D7** | **No separate learning mode**: Lumens play inside their cards, and notes and Recall stay on the board | **Yes**: the board is the centre of learning |
 | **LB-D8** | Placing is a double-click search at the spot, or a drag from the visual shelf; the Add drawer goes | **Yes** |
+| **LB-D9** | A board opens as one full-screen, infinite canvas, with its title, tools, shelf, panel and zoom floating on it | **Yes**: like Miro, never a box inside a page |
