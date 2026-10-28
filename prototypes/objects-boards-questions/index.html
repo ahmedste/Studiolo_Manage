@@ -5024,6 +5024,68 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 }
 
 .prop-lab { all: unset; cursor: pointer; } .prop-lab:hover { color: var(--accent); text-decoration: underline; }
+/* Questions and goals as cards */
+.qg-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: -6px 0 16px; }
+.qg-tile { border: 0; display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: auto auto; gap: 0 10px; align-items: center; text-align: left; padding: 12px 14px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--ink); }
+.qg-tile:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.qg-tile.on { box-shadow: inset 0 0 0 2px var(--ink); }
+.qg-gl { grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 600 16px var(--ui); }
+.qg-tile b { font: 400 28px/1 var(--read); } .qg-tile > span:last-child { font-size: 12.5px; color: var(--ink-2); }
+.qg-tile.q .qg-gl { background: var(--pick-soft); color: var(--pick); } .qg-tile.g .qg-gl { background: var(--accent-soft); color: var(--accent); }
+.qg-tile.a .qg-gl { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); } .qg-tile.p .qg-gl { background: var(--hover-fill); color: var(--ink-2); }
+.qg-bar { margin-bottom: 22px; flex-wrap: wrap; row-gap: 8px; }
+.qg-topics { display: flex; flex-wrap: wrap; gap: 4px; }
+.qg-topics button { border: 0; padding: 4px 10px; border-radius: 12px; background: none; box-shadow: inset 0 0 0 1px var(--line); font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; }
+.qg-topics button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.qg-sec { margin: 0 0 34px; }
+.qg-sec > h2 { margin: 0 0 12px; font: 400 24px/1.2 var(--read); } .qg-sec > h2 span { font: 13px var(--ui); color: var(--ink-3); margin-left: 4px; }
+.qg-sub { margin: -6px 0 6px; }
+.gc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+.gc { display: grid; gap: 12px; padding: 18px 18px 14px; border-radius: 10px; background: linear-gradient(180deg, var(--accent-soft), var(--panel) 120px); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-pic); }
+.gc.reached { background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 12%, var(--panel)), var(--panel) 120px); }
+.gc.paused, .gc.dropped { opacity: .7; }
+.gc-top { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 14px; align-items: start; }
+.gc-k { margin: 0 0 4px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; color: var(--accent-strong); }
+.gc-k span:first-child { font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 10.5px; padding-top: 1px; }
+.gc-k span { display: inline-flex; gap: 5px; align-items: center; } .gc-k .dot { width: 7px; height: 7px; }
+.gc h3 { margin: 0; font: 400 20px/1.3 var(--read); color: var(--ink); text-wrap: pretty; }
+.gc-qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.gc-qs button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: baseline; width: 100%; padding: 7px 10px; border-radius: 6px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.gc-qs button:hover { box-shadow: inset 0 0 0 1px var(--pick-rule); }
+.gc-dot { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font: 600 11.5px var(--ui); background: var(--pick-soft); color: var(--pick); transform: translateY(3px); }
+.gc-qt { font: 15px/1.4 var(--read); color: var(--ink); }
+.gc-qs .answered .gc-dot { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.gc-qs .answered .gc-qt { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+.gc-qs .parked .gc-dot { background: var(--hover-fill); color: var(--ink-3); }
+.gc-next { margin: 0; display: flex; gap: 8px; align-items: baseline; font: 14px/1.4 var(--read); color: var(--ink); }
+.gc-next b { font: 600 10.5px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--pick); flex: none; }
+.gc-next.all b { color: var(--ok); }
+.gc-empty { margin: 0; }
+.gc-ft, .qc-ft { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); }
+.ring .rb { fill: none; stroke: var(--line); stroke-width: 3.4; } .ring .rf { fill: none; stroke: var(--accent); stroke-width: 3.4; stroke-linecap: round; transition: stroke-dasharray .4s ease; }
+.ring text { font: 600 9px var(--ui); fill: var(--accent-strong); }
+.gc.reached .ring .rf { stroke: var(--ok); }
+.hchip { all: unset; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; min-width: 0; max-width: 100%; font-size: 12px; color: var(--ink-2); padding: 3px 8px 3px 3px; border-radius: 12px; }
+.hchip:hover { background: var(--hover-fill); color: var(--ink); }
+.hchip-ic { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; background: var(--board); font-size: 11px; flex: none; }
+.hchip-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qt-h { display: flex; gap: 8px; align-items: center; margin: 18px 0 10px; font: 600 12px var(--ui); letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
+.qt-h span { font-weight: 400; color: var(--ink-3); } .qt-h .dot { width: 8px; height: 8px; }
+.qc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; align-items: start; }
+.qc { display: grid; gap: 8px; padding: 14px 14px 10px; border-radius: 8px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); border-top: 3px solid var(--pick); }
+.qc.answered { border-top-color: var(--ok); } .qc.parked { border-top-color: var(--ink-3); }
+.qc-head { display: flex; justify-content: space-between; align-items: center; }
+.qc-gl { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font: 600 14px var(--ui); background: var(--pick-soft); color: var(--pick); }
+.qc.answered .qc-gl { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); } .qc.parked .qc-gl { background: var(--hover-fill); color: var(--ink-3); }
+.qc-t { margin: 0; font: 18px/1.35 var(--read); color: var(--ink); text-wrap: pretty; }
+.qc-a { margin: 0; padding: 8px 10px; border-radius: 6px; background: color-mix(in srgb, var(--ok) 9%, var(--paper)); font-size: 13px; color: var(--ink); }
+.qc-a button { all: unset; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); } .qc-a button:hover { color: var(--accent); }
+.qc-goal { margin: 0; font-size: 12px; color: var(--accent-strong); }
+.qg-empty { display: flex; gap: 12px; align-items: center; padding: 18px; border-radius: 8px; border: 1.5px dashed var(--line); max-width: 640px; } .qg-empty p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.gprog { display: inline-flex; gap: 5px; align-items: center; margin-left: 8px; font: 12px var(--ui); color: var(--accent-strong); vertical-align: 1px; white-space: nowrap; }
+.gprog .ring { flex: none; }
+@media (max-width: 860px) { .qg-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gc-grid { grid-template-columns: minmax(0, 1fr); } }
+
 @media (max-width: 860px) {
   .bwrap { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(420px, 1fr) auto; height: auto; }
   .inside { border-left: 0; border-top: 1px solid var(--line); max-height: 380px; }
@@ -5232,7 +5294,7 @@ function ansLine(r) {
 }
 function inlRow(r, child) {
   const s = st(r.key, r.kind);
-  return `<div class="inl ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done(s.status) ? " done" : ""}"><span class="gl" aria-hidden="true">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx"><span class="visually-hidden">${r.kind === "goal" ? "Learning goal: " : "Question: "}</span>${esc(r.text)}</span>${stBtn(r)}${ansLine(r)}</div>`;
+  return `<div class="inl ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done(s.status) ? " done" : ""}"><span class="gl" aria-hidden="true">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx"><span class="visually-hidden">${r.kind === "goal" ? "Learning goal: " : "Question: "}</span>${esc(r.text)}${r.kind === "goal" ? goalProg(r.key) : ""}</span>${stBtn(r)}${ansLine(r)}</div>`;
 }
 function renderBody(it, mi) { return readHTML(mi == null ? it.body : it.margin[mi].body, mi == null ? it.id : `${it.id}/m${mi}`); }
 const plainBody = it => String(it.body || "").split(/\n\s*\n/).map(p => { const t = p.trim(), m = /^@(question|goal)\s+/i.exec(t); return (m ? (m[1].toLowerCase() === "goal" ? "◎ " : "? ") : "") + plainText(m ? t.slice(m[0].length) : t); }).filter(x => x.trim()).join(" ");
@@ -5394,16 +5456,57 @@ function qgRow(r, child) {
   const s = st(r.key, r.kind);
   return `<div class="qgrow ${r.kind === "goal" ? "g" : "q"}${child ? " child" : ""}${done(s.status) ? " done" : ""}"><span class="gl">${r.kind === "goal" ? "◎" : "?"}</span><span class="tx">${esc(r.text)}</span>${stBtn(r)}<div class="host">${hostLink(r)}</div>${s.answer || s.ans.length ? `<div class="host" style="color:var(--ok)">${ansLine(r).replace(/^<div class="ans">|<\/div>$/g, "")}</div>` : ""}</div>`;
 }
+/* ---------- Questions and goals, as cards (Q2, redesigned) ----------
+   Goals are cards with a progress ring and their questions inside; the other questions are a wall, by topic; answered
+   questions read as what you found out. The list stays as a view for people who like lists. One look everywhere:
+   ? is amber, ◎ is the accent, ✓ is green. */
+function ring(d, n, size = 46) {
+  const C = 2 * Math.PI * 15.9, p = n ? d / n : 0;
+  return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 36 36" role="img" aria-label="${d} of ${n} questions answered"><circle cx="18" cy="18" r="15.9" class="rb"/>${p ? `<circle cx="18" cy="18" r="15.9" class="rf" stroke-dasharray="${(p * C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 18 18)"/>` : ""}${size > 30 ? `<text x="18" y="21.6" text-anchor="middle">${d}/${n}</text>` : ""}</svg>`;
+}
+function goalProg(key) { const qs = allInlines().filter(x => x.goalKey === key); if (!qs.length) return ""; const d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return `<span class="gprog">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span>`; }
+const dueOf = t => (t.match(/\bby (the end of [a-z ]+|[A-Z][a-z]+)\b/) || [])[1];
+function hostChip(r) { const it = r.item; return `<button class="hchip" type="button" data-act="openq" data-k="${esc(r.key)}" title="Open where it was written"><span class="hchip-ic" aria-hidden="true">${hostIcon(it)}</span><span class="hchip-t">${esc(it.title || plainBody(it).slice(0, 40))}${r.at ? ` · ${esc(r.at)}` : ""}</span><span aria-hidden="true">↗</span></button>`; }
+function goalCard(g, all) {
+  const qs = all.filter(r => r.goalKey === g.key), d = qs.filter(r => st(r.key, r.kind).status === "answered").length, s = st(g.key, "goal");
+  const next = qs.find(r => st(r.key, "question").status === "open"), due = dueOf(g.text), topic = g.item.topics?.[0];
+  return `<article class="gc ${s.status}"><div class="gc-top">${ring(d, qs.length)}<div class="gc-h"><p class="gc-k"><span>◎ Learning goal</span>${due ? `<span>by ${esc(due)}</span>` : ""}${topic ? `<span><i class="dot s${topic.s}"></i>${esc(topic.n)}</span>` : ""}</p><h3>${esc(g.text)}</h3></div></div>
+    ${qs.length ? `<ul class="gc-qs">${qs.map(r => { const q = st(r.key, "question").status; return `<li class="${q}"><button type="button" data-act="openq" data-k="${esc(r.key)}"><span class="gc-dot" aria-hidden="true">${q === "answered" ? "✓" : q === "parked" ? "–" : "?"}</span><span class="gc-qt">${esc(r.text)}</span></button></li>`; }).join("")}</ul>` : `<p class="small gc-empty">No questions under it yet. Under the goal, type @ for one.</p>`}
+    ${next ? `<p class="gc-next"><b>Next</b>${esc(next.text)}</p>` : qs.length && s.status === "active" ? `<p class="gc-next all"><b>✓</b>Every question answered. Mark it reached?</p>` : ""}
+    <div class="gc-ft">${hostChip(g)}${stBtn(g)}</div></article>`;
+}
+function qCard(r) {
+  const s = st(r.key, "question"), g = r.goalKey ? INL(r.goalKey) : null, ans = s.answer || s.ans.length;
+  return `<article class="qc ${s.status}"><div class="qc-head"><span class="qc-gl" aria-hidden="true">${s.status === "answered" ? "✓" : s.status === "parked" ? "–" : "?"}</span>${stBtn(r)}</div><p class="qc-t">${esc(r.text)}</p>
+    ${ans ? `<p class="qc-a">${s.answer ? esc(s.answer) : ""}${s.ans.length ? `${s.answer ? " · " : ""}Answered in ${s.ans.map(I).filter(Boolean).map(x => `<button type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join(", ")}` : ""}</p>` : ""}
+    ${g ? `<p class="qc-goal">◎ ${esc(g.text.length > 64 ? g.text.slice(0, 62) + "…" : g.text)}</p>` : ""}<div class="qc-ft">${hostChip(r)}</div></article>`;
+}
 function renderQG() {
-  const all = allInlines(), want = s => S.qf === "all" || (S.qf === "open" ? ["open", "active"].includes(s) : S.qf === "answered" ? ["answered", "reached"].includes(s) : ["parked", "paused", "dropped"].includes(s));
-  const goals = all.filter(r => r.kind === "goal"), loose = all.filter(r => r.kind === "question" && !r.goalKey && want(st(r.key, r.kind).status));
-  return `${header("qg", "Questions and goals")}
-    <p class="small" style="max-width:70ch;margin:-10px 0 16px">Everything you're asking and aiming for, wherever you wrote it: in notes, in Objects, in margin notes and on boards. Each one stays in the thing it was written in.</p>
-    <div class="cph-bar" style="margin-bottom:18px"><div class="cph-seg">${[["open", "Open"], ["answered", "Answered"], ["parked", "Parked"], ["all", "All"]].map(([k, t]) => `<button type="button" data-act="qf" data-k="${k}" aria-pressed="${S.qf === k}">${t}</button>`).join("")}</div><span class="cph-fbtn"><button type="button">Topic ▾</button></span><span class="cph-grow"></span><span class="cph-count">${all.filter(r => r.kind === "question" && st(r.key, "question").status === "open").length} open questions · ${goals.filter(g => st(g.key, "goal").status === "active").length} active goals</span></div>
-    <div class="qglist">
-      <section class="qgsec"><h2>Goals</h2>${goals.map(g => { const qs = all.filter(r => r.goalKey === g.key), d = qs.filter(r => st(r.key, r.kind).status === "answered").length, shown = qs.filter(r => want(st(r.key, r.kind).status)); return (want(st(g.key, "goal").status) || shown.length) ? qgRow(g) + `<p class="qgprog">${d} of ${qs.length} answered</p>` + shown.map(r => qgRow(r, true)).join("") : ""; }).join("") || `<p class="small">No goals here.</p>`}</section>
-      <section class="qgsec"><h2>Other questions</h2>${loose.map(r => qgRow(r)).join("") || `<p class="small">Nothing here.</p>`}</section>
-    </div>`;
+  const all = allInlines(), goals = all.filter(r => r.kind === "goal"), qs = all.filter(r => r.kind === "question");
+  const n = { goals: goals.filter(g => st(g.key, "goal").status === "active").length, open: qs.filter(r => st(r.key, "question").status === "open").length, answered: qs.filter(r => st(r.key, "question").status === "answered").length, parked: qs.filter(r => st(r.key, "question").status === "parked").length };
+  const topicOf = r => r.item.topics?.[0]?.n || "No topic", topics = [...new Set(all.map(topicOf))];
+  const tOk = r => !S.qt || topicOf(r) === S.qt || all.some(q => q.goalKey === r.key && topicOf(q) === S.qt);
+  const want = s => S.qf === "all" || (S.qf === "open" ? ["open", "active"].includes(s) : S.qf === "answered" ? ["answered", "reached"].includes(s) : ["parked", "paused", "dropped"].includes(s));
+  const tiles = [["open", "?", n.open, "open questions", "q"], ["goals", "◎", n.goals, "active goals", "g"], ["answered", "✓", n.answered, "answered", "a"], ["parked", "–", n.parked, "parked", "p"]];
+  const bar = `<div class="qg-sum" data-ph="Q2">${tiles.map(([k, gl, v, t, c]) => `<button type="button" class="qg-tile ${c}${(S.qf === k || (k === "goals" && S.qf === "open")) && k !== "goals" ? " on" : ""}" data-act="qf" data-k="${k === "goals" ? "open" : k}"><span class="qg-gl">${gl}</span><b>${v}</b><span>${t}</span></button>`).join("")}</div>
+    <div class="cph-bar qg-bar"><div class="cph-seg">${[["open", "Open"], ["answered", "Answered"], ["parked", "Parked"], ["all", "All"]].map(([k, t]) => `<button type="button" data-act="qf" data-k="${k}" aria-pressed="${S.qf === k}">${t}</button>`).join("")}</div>
+      <div class="qg-topics" role="group" aria-label="Topic"><button type="button" data-act="qt" data-k="" aria-pressed="${!S.qt}">All topics</button>${topics.map(t => `<button type="button" data-act="qt" data-k="${esc(t)}" aria-pressed="${S.qt === t}">${esc(t)}</button>`).join("")}</div>
+      <span class="cph-grow"></span><span class="cph-views" role="group" aria-label="View"><button type="button" data-act="qv" data-k="cards" aria-pressed="${S.qv !== "list"}">Cards</button><button type="button" data-act="qv" data-k="list" aria-pressed="${S.qv === "list"}">List</button></span></div>`;
+  let body;
+  if (S.qv === "list") {
+    const loose = qs.filter(r => !r.goalKey && want(st(r.key, r.kind).status) && tOk(r));
+    body = `<div class="qglist"><section class="qgsec"><h2>Goals</h2>${goals.filter(tOk).map(g => { const q = all.filter(r => r.goalKey === g.key), d = q.filter(r => st(r.key, r.kind).status === "answered").length, shown = q.filter(r => want(st(r.key, r.kind).status)); return (want(st(g.key, "goal").status) || shown.length) ? qgRow(g) + `<p class="qgprog">${d} of ${q.length} answered</p>` + shown.map(r => qgRow(r, true)).join("") : ""; }).join("") || `<p class="small">No goals here.</p>`}</section><section class="qgsec"><h2>Other questions</h2>${loose.map(r => qgRow(r)).join("") || `<p class="small">Nothing here.</p>`}</section></div>`;
+  } else if (S.qf === "answered" || S.qf === "parked") {
+    const list = qs.filter(r => want(st(r.key, "question").status) && tOk(r)), reached = goals.filter(g => want(st(g.key, "goal").status) && tOk(g));
+    const groups = [...new Set(list.map(topicOf))];
+    body = `${reached.length ? `<section class="qg-sec"><h2>${S.qf === "answered" ? "Goals reached" : "Goals paused or dropped"}</h2><div class="gc-grid">${reached.map(g => goalCard(g, all)).join("")}</div></section>` : ""}
+      <section class="qg-sec"><h2>${S.qf === "answered" ? "What you've found out" : "Parked for now"}</h2>${list.length ? groups.map(t => `<h3 class="qt-h">${esc(t)} <span>${list.filter(r => topicOf(r) === t).length}</span></h3><div class="qc-grid">${list.filter(r => topicOf(r) === t).map(qCard).join("")}</div>`).join("") : `<div class="qg-empty"><span class="qc-gl">${S.qf === "answered" ? "✓" : "–"}</span><p>${S.qf === "answered" ? "Nothing answered yet. Open a question's <b>Open ▾</b> and choose <b>Mark answered</b>, or <b>Answered in</b> an entry." : "Nothing parked."}</p></div>`}</section>`;
+  } else {
+    const gs = goals.filter(g => want(st(g.key, "goal").status) && tOk(g)), loose = qs.filter(r => !r.goalKey && want(st(r.key, "question").status) && tOk(r)), groups = [...new Set(loose.map(topicOf))];
+    body = `<section class="qg-sec"><h2>Goals <span>${gs.length}</span></h2>${gs.length ? `<div class="gc-grid">${gs.map(g => goalCard(g, all)).join("")}</div>` : `<p class="small">No goals here. In any note, type <b>@</b> at the start of a line and choose <b>Learning goal</b>.</p>`}</section>
+      <section class="qg-sec"><h2>Questions <span>${loose.length}</span></h2><p class="small qg-sub">Not under a goal yet, by topic. Open one to go to where you wrote it.</p>${groups.map(t => { const tp = all.find(r => topicOf(r) === t)?.item.topics?.[0]; return `<h3 class="qt-h">${tp ? `<i class="dot s${tp.s}"></i>` : ""}${esc(t)} <span>${loose.filter(r => topicOf(r) === t).length}</span></h3><div class="qc-grid">${loose.filter(r => topicOf(r) === t).map(qCard).join("")}</div>`; }).join("") || `<p class="small">Nothing here.</p>`}</section>`;
+  }
+  return `${header("qg", "Questions and goals")}<div class="qg" data-ph="Q2">${bar}${body}</div>`;
 }
 
 /* ---------- collections: the Collections page, New collection, and the collection studio (C1–C3) ----------
@@ -5579,6 +5682,12 @@ function notesAboutSection(it) {
 /** After opening an entry from Appears in: scroll to the exact spot and flash it. */
 function doJump() {
   const t = S.jump; S.jump = null; if (!t) return;
+  if (t.startsWith("q:")) {
+    const sel = `[data-act="stmenu"][data-k="${CSS.escape(t.slice(2))}"]`;
+    if (S.screen === "board") { setTimeout(() => { const el = document.querySelector("#vp " + sel)?.closest(".bpl"), b = I(S.board), p = el && b.pl.find(q => q.id === el.dataset.pid); if (!p) return; const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 120) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); el.classList.add("sel", "flash"); }, 60); return; }
+    const box = document.querySelector("#main " + sel)?.closest(".nb, .inl, .mcard"); if (box) { box.scrollIntoView({ block: "center" }); box.classList.add("flash"); setTimeout(() => box.classList.remove("flash"), 2400); }
+    return;
+  }
   if (S.screen === "board") { const b = I(S.board), p = b?.pl.find(q => q.ref === "i:" + t); if (p) setTimeout(() => { const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 120) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); document.querySelector(`[data-pid="${p.id}"]`)?.classList.add("sel", "flash"); }, 60); return; }
   const it = I(t), el = document.querySelector(`#main [data-mention="${t}"]`) || document.querySelector(`#main .nb[data-ref="${t}"]`) || (it?.media && document.querySelector(`#main .nb[data-media="${it.media}"]`));
   const box = el?.closest(".nb, .mcard, .inl") || el;
@@ -5601,7 +5710,7 @@ function placed(p, b) {
   const wrap = (cls, inner) => `<div class="bpl${cls}${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${inner}${dot}</div>`;
   if (r.type === "inline") {
     const row = INL(r.key), s = st(r.key, r.kind);
-    if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span>${d} of ${qs.length} questions answered</span></div>${stBtn(row)}</div></div></article>`); }
+    if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span class="gprog" style="margin:0">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span></div>${stBtn(row)}</div></div></article>`); }
     const editing = S.editing === "inl:" + r.key;
     return wrap(" q", `<article class="mcard note qcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">? Question${r.own ? "" : ` · from ${esc(row.item.title || "a note")}`}</p>${editing ? `<textarea data-qedit="${esc(r.key)}">${esc(row.text)}</textarea>` : `<p class="nt">${esc(row.text)}</p>`}${s.ans.length || s.answer ? `<p class="ans-l">✓ ${s.ans.length ? "Answered in " + s.ans.map(I).filter(Boolean).map(x => esc(x.title)).join(", ") : esc(s.answer)}</p>` : ""}</div><div class="ft"><div class="ft-meta"></div>${stBtn(row)}</div></div></article>`);
   }
@@ -6121,6 +6230,10 @@ document.addEventListener("click", e => {
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
     case "openat": S.jump = d.t; openEntry(d.id); break;
+    case "openq": { const r = INL(d.k); if (!r) break; S.jump = "q:" + d.k; openEntry(r.item.id); break; }
+    case "qt": S.qt = d.k || null; render(); break;
+    case "qf": S.qf = d.k; render(); break;
+    case "qv": S.qv = d.k; render(); break;
     case "apjump": document.getElementById("appears")?.scrollIntoView({ behavior: "smooth", block: "start" }); break;
     case "apf": S.apf = d.k; render(); document.getElementById("appears")?.scrollIntoView({ block: "start" }); break;
     case "ck": S.ck = d.k; render(); break;

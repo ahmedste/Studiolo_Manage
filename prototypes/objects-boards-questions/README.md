@@ -24,7 +24,7 @@ It opens on **Everything**. Three sample learners, each with a board: an **archi
 | **Appears in** | **↩ Appears in 3 places** at the top of any entry, and the section at its foot: *Mentioned in* (with the sentence), *Shown as a card in*, *Shown in* (photos), *Quoted in* (sources), *Answers*, *On boards*. Each row opens the place at the exact spot, highlighted. Try Hassan Fathy, the arcade photo, or the lecture-notes PDF |
 | **Write about it** | On any Object, **Write about it** starts a long note about it, with its card and the collection's headings (set in **Customize › Page**). It's listed under **Notes about it** |
 | **A Source** | Open the lecture or the judgment: a question in a margin note at 12:40 or p. 21. **? Question** adds one at the current moment (phase Q3) |
-| **Questions and goals** | The list: goals with their questions under them, then other questions, each naming where it was written and which boards it's placed on |
+| **Questions and goals** | **Questions** in the bar. Four tiles (open, goals, answered, parked); goals as cards with a progress ring, their questions inside and a **Next** line; the other questions as a wall of cards by topic. **Answered** reads as *What you've found out*. Every card opens where it was written, highlighted. **List** keeps the old list |
 | **Everything** | The real wall: cards count what's open inside them (? and ◎); **Boards** is a type; **Has ▾** filters to open questions or goals |
 | **Collection views** | **Objects › Buildings** (or Cases, Guidelines): **Cards, Table, Columns, Timeline**. Drag a card between columns to change its Choice field |
 | **Customize** | Edit collection with the new field types (Choice, Relation, Long text…), up to 24 fields, the page's top, and Sensitivity |

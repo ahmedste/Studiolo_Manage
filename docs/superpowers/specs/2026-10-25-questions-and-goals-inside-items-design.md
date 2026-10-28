@@ -248,3 +248,55 @@ Indexes: `(account_id, host_item_id, position)`; `(account_id, kind, status)`; `
 - **Not a task manager.** There are no assignees, priorities or reminders. A goal's date is a horizon, not a deadline alarm.
 - **Not a new type.** Nothing is added to the type row, and nothing is added to the wall but a small count on a host's card.
 - **Not Loci's notes.** Loci never writes questions or goals into your writing. It only offers, and you tap.
+
+## 10. Addendum, 28 October: the Questions and goals page as cards, and one look everywhere
+
+**The owner's direction (28 Oct):** questions and goals should be visually coherent and nice to look at, not a long list.
+
+**Prototype:** [`prototypes/objects-boards-questions/`](../../../prototypes/objects-boards-questions/README.md), **Questions** in the bar at the bottom.
+
+### 10.1 The page
+
+- **Four tiles at the top**, each a number with its mark: **? 10 open questions · ◎ 3 active goals · ✓ 1 answered · – 0 parked**. Clicking one filters the page. You see where you stand before reading anything.
+- **One bar:**
+  - *Open · Answered · Parked · All*;
+  - **topic chips**, taken from the hosts' topics;
+  - a view switch, **Cards · List**. The list from §3 stays for people who prefer it.
+- **Goals as cards**, side by side.
+  - **The top:** a **progress ring** (answered of total), a kicker *◎ Learning goal · by March · Climate-responsive design*, and the goal in Newsreader.
+  - **Inside, its questions as small rows.** An amber **?** is open. A green **✓** is answered, struck through. A grey **–** is parked. Each opens where it was written, highlighted.
+  - **One Next line:** the first open question, so every goal says what to do now. When all are answered, it reads *Every question answered. Mark it reached?*
+  - **The foot:** where the goal was written (an icon and a title, which opens it) and its status button.
+  - **The background** is a soft accent wash, which turns green when the goal is reached.
+- **Questions not under a goal** form a wall of cards, grouped by topic. Each card has:
+  - an amber top edge and the **?** mark;
+  - the question large, in Newsreader;
+  - the goal it serves, if any;
+  - where it was written, which opens it.
+  
+  Answered cards turn green, with the answer and *Answered in* in a soft green box.
+- **Answered** turns the page into **What you've found out**: each question with its answer, by topic, and the goals reached above. A learner can read back what they've learned. **Parked** shows what's waiting.
+- **Every card opens where it was written**, at the exact spot, highlighted. On a board, the canvas centres on the card. This is the same jump as **Appears in** ([Collections and linking](2026-10-28-collections-and-linking-design.md) §3.2).
+
+### 10.2 One look, everywhere a question or goal appears
+
+| Mark | Colour | Where |
+|---|---|---|
+| **?** open question | `--pick` amber, on `--pick-soft` | the inline row in writing, a card's foot count, a board's question card, the page's cards and goal rows, Appears in |
+| **◎** goal | `--accent`, on `--accent-soft` | the inline row, a board's goal card, the goal cards |
+| **✓** answered or reached | `--ok` green | goal rows (struck through), answered cards, a reached goal's ring and wash |
+| **–** parked, paused or dropped | `--ink-3` | rows and cards, faded |
+| **Progress ring** | the accent; green when reached | the goal cards (46 px with "1/2"); a small 18 px ring with "1 of 2 answered" beside a goal in writing and on a board's goal card |
+
+No new colours: these are the tokens §8 already names.
+
+### 10.3 Decisions
+
+| ID | Decision | Recommendation |
+|---|---|---|
+| **IN-D10** | The page opens on **Cards**: goal cards with rings, and a question wall by topic; **List** stays as a view | **Yes** |
+| **IN-D11** | Every goal shows a **Next** question | **Yes**. It turns a goal into a next step |
+| **IN-D12** | **Answered** reads as *What you've found out*: question and answer cards | **Yes** |
+| **IN-D13** | The progress ring appears wherever a goal does (page, writing, board) | **Yes** |
+
+**Build:** in Q2 (the page) and Q-B (the board's goal card). No migration: everything shown is already in `item_inlines` and `inline_answers`.

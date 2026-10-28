@@ -30,6 +30,7 @@ Read the plan first, then test the prototypes against it.
 - **Collections** tab: make a new collection with **+ New collection**. Are the three steps clear? Then in the studio, try each tab: change the card layout, take a field off the card, hide a section, add a suggested field, delete a field that has values. Did anything feel overwhelming, or did you lose track of what you changed? Does **Undo** do what you expect?
 - On any Object page, click a property's name (e.g. *Architect*). Does it take you to the right place in the studio?
 - Open **Hassan Fathy**, the **Arcade and bay rhythm** photo and the **Climate and Architecture** PDF. Does **↩ Appears in** at the top tell you where each is used? Does each row open the exact spot, highlighted?
+- Open **Questions** (bar at the bottom). Do the goal cards, rings and **Next** lines make it clear what to do? Mark a question answered, then switch to **Answered**: does *What you've found out* read well? Does clicking a question open the exact place it was written?
 - Is it always clear where to go to change a connection? Write down any moment when it wasn't.
 - Use **+ Place → Questions** to place a question written in a note. Is it clear that it still belongs to the note?
 - On **Everything**, choose **Objects** then a collection, and try **Table**, **Columns** and **Timeline**. Do they read as the same Commonplace?
