@@ -1,4 +1,7 @@
-/* Routines (prototype, version 6): a Commonplace tab, with a page and an editor for each routine.
+/* Routines (prototype, version 7): a Commonplace tab, with a page and an editor for each routine, and Finds.
+   - Finds (version 7): a routine kind that checks sources for a subject on a schedule and brings what's new to a
+     Finds page. Each find has a summary and why it's for you (a question it may answer, a goal it serves, a topic),
+     and one decision: Save, Read later, Not for me (and why), or Ask Loci (and make a Lumen from it).
    - Routines is a tab of Commonplace, beside Questions and goals, and uses the same visual language:
      - summary tiles;
      - a segmented bar (Routines · Waiting · Activity);
@@ -58,7 +61,7 @@
   const KIND_WORD = { photo: "a photo", link: "a link", PDF: "a PDF", "voice note": "a voice note", reel: "a reel", video: "a video" };
   const KINDS_WORD = (k) => (k === "PDF" ? "PDFs" : k + "s");
   const IS_OPTS = ["a book", "a recipe", "a paper", "a lecture"];
-  const FILE_AS = ["Site photos", "Renders", "Precedents", "Books", "Papers", "Videos", "Specifications", "Notes", "Recipes"];
+  const FILE_AS = ["Site photos", "Renders", "Precedents", "Books", "Papers", "Articles", "Videos", "Tools", "Specifications", "Notes", "Recipes"];
   const UND = { describe: "describe it", transcribe: "write out what I said", title: "give it a title", links: "save the links in its caption", book: "find the book", text: "pull out the text", summary: "sum it up in three lines", recipe: "keep just the recipe" };
   const UND_VERB = { describe: "Describe it", transcribe: "Write out what I said", links: "Keep the links in its caption", book: "Find the book", summary: "Sum it up in three lines", recipe: "Keep just the recipe" };
   const LRN = { questions: "turn my questions into @questions", review: "add it to Review" };
@@ -85,6 +88,10 @@
       lately: [{ t: "3 questions on Precast", w: "2 right, 1 to revisit", when: "Fri, 17:00" }] },
     { id: "r" + ++rid, type: "schedule", kind: "pile", name: "Clear the To read pile", on: true, every: "month", time: "09:00", stat: "11 let go, 6 kept this year",
       lately: [{ t: "3 things in To read for over three months", w: "waiting for you", when: "1 Oct" }] },
+    { id: "rf1", type: "schedule", kind: "follow", name: "AI in architecture", on: true, every: "day", time: "07:30", place: "you", label: "AI in architecture", sources: ["Design-tools newsletter", "Building-science journal", "Architecture news site", "Conference channel"], kinds: ["article", "paper", "video", "tool"], count: 6, dest: "page", stat: "Kept 9 of 22 this month",
+      lately: [{ t: "6 finds", w: "on today's Finds page", when: "Today, 07:30" }, { t: "4 finds", w: "3 decided", when: "Yesterday, 07:30" }] },
+    { id: "rf2", type: "schedule", kind: "follow", name: "New papers on passive cooling", on: true, every: "w3", time: "08:00", place: "climate", label: "passive cooling", sources: ["Building-science journal", "A university lab's feed"], kinds: ["paper"], count: 5, dest: "page", stat: "Kept 2 of 3 this month",
+      lately: [{ t: "3 finds", w: "all decided", when: "Wed 21 Oct" }] },
     { id: "r" + ++rid, type: "after", kind: "lumen", name: "After a Lumen", on: true, delay: "three days later", stat: "12 checks this month",
       lately: [{ t: "The check for “How a malqaf moves air”", w: "came back · right", when: "Sat" }] },
     { id: "r" + ++rid, type: "after", kind: "dup", name: "Saved twice", on: true, stat: "3 caught this month",
@@ -102,6 +109,7 @@
     { id: "w" + ++wid, kind: "pile", rid: "r7", when: "1 Oct", items: [{ t: "Design with Climate, Victor Olgyay", k: "Book", since: "since June" }, { t: "Architecture for the Poor, Hassan Fathy", k: "PDF", since: "since May" }, { t: "Lecture: daylight in deep plans (example)", k: "Video", since: "since July" }] },
   ];
   const ACT = [
+    { day: "Today", t: "07:30", rid: "rf1", what: "brought 6 finds to a Finds page", state: "finds", iss: "i1" },
     { day: "Today", t: "07:52", rid: "r2", what: "suggests a place for “Climate Considerations in Building and Urban Design”", state: "waiting" },
     { day: "Today", t: "07:31", rid: "r3", what: "wrote out a voice note and suggests Precast", state: "waiting" },
     { day: "Yesterday", t: "21:12", rid: "r4", what: "filed “Za'atar flatbread” as Recipes on Home & family", state: "filed" },
@@ -145,6 +153,45 @@
   ];
   const SOURCES = ["Design-tools newsletter", "Building-science journal", "Architecture news site", "Conference channel", "A practice's blog you've saved from 6 times"];
 
+  /* ---------- Finds: what a finding routine brought back, as a page to look through (all examples) */
+  const FIND_KINDS = [["article", "Articles"], ["paper", "Papers"], ["video", "Videos and talks"], ["tool", "Tools and data"]];
+  const FK_ONE = { article: "Article", paper: "Paper", video: "Talk", tool: "Tool" };
+  const FK_PL = { article: "articles", paper: "papers", video: "talks", tool: "tools" };
+  const FK_AS = { article: "Articles", paper: "Papers", video: "Videos", tool: "Tools" };
+  const FK_ICON = { article: "doc", paper: "book", video: "play", tool: "grid" };
+  const kindsText = (r) => andJoin((r.kinds && r.kinds.length ? r.kinds : FIND_KINDS.map((k) => k[0])).map((k) => FK_PL[k]));
+  const fnd = (id, kind, src, len, title, sum, topic, why, extra) => ({ id, kind, src, len, title, sum, topic, why, st: null, as: FK_AS[kind], on: topic, ...extra });
+  const SAMPLE = [
+    fnd("s1", "paper", "Building-science journal", "12 min read", "A daylight model trained on 10,000 measured rooms (example)", "It predicts daylight in deep plans from a simple massing model, within 10% of measurements in most rooms. It's weakest in rooms lit from one side only.", "daylight", [{ t: "q", v: "Where does the light come from in each hall?" }], { top: true }),
+    fnd("s2", "article", "Architecture news site", "8 min read", "Five generative massing tools on one courtyard brief (example)", "The same hot, dry brief run through five tools. Two kept the courtyard shaded at noon; three never checked the shade.", "climate", [{ t: "g", v: "Understand how to keep the prayer hall's courtyard cool without machines" }]),
+    fnd("s3", "video", "Conference channel", "38 min talk", "What AI changes in early climate design (example talk)", "A practice shows where machine learning saved them time (sun and wind studies) and where it misled them (thermal comfort).", "climate", []),
+    fnd("s4", "tool", "Design-tools newsletter", "Open dataset", "A year of wind-tower measurements (example dataset)", "Air speeds and temperatures from 40 wind towers over a year, humid nights included.", "vernacular", [{ t: "q", v: "Does a malqaf still work when the night air is humid?" }]),
+    fnd("s5", "tool", "Design-tools newsletter", "Free plugin", "Daylight autonomy in the browser (example plugin)", "It reads a simple massing model and maps daylight autonomy in a few seconds. Free for students.", "daylight", []),
+    fnd("s6", "article", "A practice's blog you've saved from 6 times", "6 min read", "Why image models are poor at precedent research (example)", "Generated “precedents” mix real buildings with invented ones. The author argues for searching archives first, and using images only to sketch.", "islamic", [{ t: "n", v: "A different view from the precedents you saved this month" }]),
+    fnd("s7", "paper", "Building-science journal", "14 min read", "Wind towers on humid nights: a field study (example)", "Measured in four towers on the Gulf coast: on humid nights the air still moved, but it cooled the rooms by less than a degree.", "vernacular", [{ t: "q", v: "Does a malqaf still work when the night air is humid?" }]),
+    fnd("s8", "paper", "A university lab's feed", "10 min read", "Cross-ventilation through courtyards, modelled (example)", "Simulations of 30 courtyard plans: a narrow court with openings on two sides moved the most air.", "climate", [{ t: "g", v: "Understand how to keep the prayer hall's courtyard cool without machines" }]),
+  ];
+  const ISSUES = [
+    { id: "i1", rid: "rf1", date: "Monday 26 October", when: "Today, 07:30", sources: 4, checked: 41, left: [[3, "already in your Commonplace"], [11, "off your topics"], [3, "the same story twice"]], items: SAMPLE.slice(0, 6).map((f, i) => ({ ...clone(f), id: "f" + (i + 1) })) },
+    { id: "i2", rid: "rf1", date: "Sunday 25 October", when: "Yesterday, 07:30", sources: 4, checked: 36, left: [[2, "already in your Commonplace"], [9, "off your topics"]], items: [
+      fnd("f7", "article", "Architecture news site", "5 min read", "A school roof that shades its own courtyard (example)", "A deep timber roof with gaps tuned to the sun's path keeps the courtyard below in shade from 10 to 4.", "climate", [], { st: "saved", top: true }),
+      fnd("f8", "video", "Conference channel", "22 min talk", "Machine learning for natural ventilation (example talk)", "Fast airflow predictions for early design, checked against a wind tunnel.", "climate", [], { st: "later" }),
+      fnd("f9", "tool", "Design-tools newsletter", "Paid app", "An AI rendering app for interiors (example)", "Turns a sketch into a photoreal interior in seconds.", "home", [], { st: "no", reason: "Not this topic" }),
+      fnd("f10", "paper", "Building-science journal", "15 min read", "Predicting glare from a single photograph (example)", "A model that flags glare risk from a phone photo of a room, tested in 120 offices.", "daylight", []),
+    ] },
+    { id: "i3", rid: "rf2", date: "Wednesday 21 October", when: "Wed 21 Oct", sources: 2, checked: 14, left: [[1, "already in your Commonplace"]], items: [
+      fnd("f11", "paper", "Building-science journal", "18 min read", "Night flushing in heavy and light buildings (example)", "Heavy buildings cooled by night air stayed 2 to 3 degrees cooler the next afternoon; light ones barely changed.", "climate", [{ t: "q", v: "Why does mass alone fail in humid climates?" }], { st: "saved", top: true }),
+      fnd("f12", "paper", "A university lab's feed", "11 min read", "Evaporative cooling in courtyards, measured (example)", "Pools and planting in four courtyards; the cooling fell away when humidity rose above 60%.", "climate", [], { st: "saved" }),
+      fnd("f13", "paper", "Building-science journal", "9 min read", "Cool roofs in cold climates (example)", "A study of reflective roofs in northern cities.", "climate", [], { st: "no", reason: "Not this topic" }),
+    ] },
+  ];
+  const issueById = (id) => ISSUES.find((x) => x.id === id);
+  const issuesOf = (rid) => ISSUES.filter((x) => x.rid === rid);
+  const openOf = (iss) => iss.items.filter((x) => !x.st).length;
+  const newFinds = () => ISSUES.reduce((a, x) => a + openOf(x), 0);
+  const findById = (id) => { for (const iss of ISSUES) { const f = iss.items.find((x) => x.id === id); if (f) return [f, iss]; } return [null, null]; };
+  let iid = ISSUES.length;
+
   /* ---------- templates for New routine */
   const blank = (type) => type === "arrive"
     ? { id: "draft", type: "arrive", name: "", on: true, when: "any", ifs: [], then: thenOf({}), mode: "ask", right: [0, 0], filed: 0, lately: [] }
@@ -155,14 +202,14 @@
     { ...blank("arrive"), name: "Reels: keep the links", when: "share", ifs: [{ t: "kind", v: "reel" }], then: thenOf({ understand: ["links"] }) },
     { ...blank("arrive"), name: "Lectures to watch", ifs: [{ t: "is", v: "a lecture" }], then: thenOf({ fileAs: "Videos", status: "To read" }) },
     { ...blank("schedule"), name: "Sort Unsorted every evening" },
-    { ...blank("schedule"), kind: "follow", name: "Follow: AI in architecture", place: "you", label: "AI in architecture", sources: SOURCES.slice(0, 4), every: "w1", time: "08:00" },
+    { ...blank("schedule"), kind: "follow", name: "Talks on daylight", place: "daylight", label: "", sources: ["Conference channel", "A practice's blog you've saved from 6 times"], kinds: ["video"], count: 3, dest: "page", every: "w5", time: "18:00" },
     { ...blank("schedule"), kind: "review", name: "Morning review", place: "daylight", count: 3, every: "day", time: "07:30" },
   ];
 
   /* ================================================================ state */
-  const S = { view: "routines", seg: "routines", kind: "all", only: null, open: null, edit: null, newer: false, ptab: "all", pop: null, sendOpen: false, builder: false, sheet: false, flash: null, noticed: "open", sent: new Set() };
+  const S = { view: "routines", seg: "routines", kind: "all", only: null, open: null, edit: null, newer: false, ptab: "all", pop: null, sendOpen: false, builder: false, sheet: false, flash: null, noticed: "open", sent: new Set(), issue: null, issueFrom: null, findNo: null };
   const C = { all: [], per: {}, draft: null, previewed: false, q: [], cur: null, typing: null, input: "", pendingDelete: null, pendingSaid: null, srcOff: null, force: null, resetScroll: false };
-  const curId = () => S.open || (S.edit && !S.edit.isNew ? S.edit.id : null);
+  const curId = () => S.open || (S.issue ? issueById(S.issue)?.rid : null) || (S.edit && !S.edit.isNew ? S.edit.id : null);
 
   /* ================================================================ sentences, with tappable words */
   const chip = (id, f, label) => `<button type="button" class="rx-chip" data-act="chip" data-r="${id}" data-f="${f}">${esc(label)}</button>`;
@@ -198,7 +245,7 @@
     if (r.type === "schedule") {
       const ev = chip(id, "every", everyText(r));
       if (r.kind === "tidy") return `${ev}, go through Unsorted: ${chip(id, "tidymode", r.mode === "ask" ? "ask me about each thing" : "file what you're sure of, and ask me about the rest")}.`;
-      if (r.kind === "follow") return `${ev}, read ${chip(id, "sources", plural(r.sources.length, "source"))} and bring me what's new on ${chip(id, "place", r.label || PLACES[r.place].name)}, sorted onto my topics.`;
+      if (r.kind === "follow") return `${ev}, look through ${chip(id, "sources", plural(r.sources.length, "source"))} for new ${chip(id, "fkinds", kindsText(r))} on ${chip(id, "place", r.label || PLACES[r.place].name)}, and bring me up to ${chip(id, "count", `${r.count} finds`)} ${chip(id, "dest", r.dest === "toread" ? "in To read" : "on a Finds page")}.`;
       if (r.kind === "review") return `${ev}, ask me ${chip(id, "count", `${r.count} questions`)} on what slipped at ${chip(id, "place", PLACES[r.place].name)}.`;
       if (r.kind === "pile") return `${ev}, show me what's sat in To read for over three months.`;
     }
@@ -222,7 +269,8 @@
       return { when, loci, then };
     }
     if (r.type === "schedule") {
-      const L = { tidy: "Reads each thing in Unsorted", follow: `Reads ${plural(r.sources?.length || 0, "source")} for new things`, review: `Finds what slipped at ${PLACES[r.place]?.name}`, pile: "Finds what's sat in To read for three months" };
+      if (r.kind === "follow") return { when: [{ t: everyText(r) }], loci: [{ t: `Looks through ${plural(r.sources.length, "source")} for new ${kindsText(r)}`, loci: true }, { t: `Keeps what's about ${r.label || PLACES[r.place].name}`, loci: true }, { t: "Leaves out what you already have" }, { t: "Sums each one up, and says why it's for you", loci: true }], then: [{ t: r.dest === "toread" ? `Puts up to ${r.count} in To read` : `Brings up to ${r.count} to a Finds page` }, { t: "Puts a card on Today" }] };
+      const L = { tidy: "Reads each thing in Unsorted", review: `Finds what slipped at ${PLACES[r.place]?.name}`, pile: "Finds what's sat in To read for three months" };
       const T = { tidy: r.mode === "ask" ? "Asks you about each thing" : "Files what it's sure of, asks about the rest", follow: `Brings them to Today, each on its topic`, review: `Asks you ${r.count} questions in Today`, pile: "Asks you: read it, keep it, or let it go" };
       return { when: [{ t: everyText(r) }], loci: [{ t: L[r.kind], loci: true }], then: [{ t: T[r.kind] }] };
     }
@@ -244,6 +292,7 @@
       const to = [t.fileAs, t.on === "best" ? "its topic" : t.on ? PLACES[t.on].name : "", t.addTo === "project" ? "prayer hall project" : "", t.status].filter(Boolean).join(" · ");
       return [["when", what], ...(loci.length ? [["loci", loci.join(" · ")]] : []), ["then", cap(to || "where it is")]];
     }
+    if (r.kind === "follow") return [["when", everyText(r)], ["loci", `Looks through ${plural(r.sources.length, "source")} for ${r.label || PLACES[r.place].name}`], ["then", r.dest === "toread" ? `Up to ${r.count} new things in To read` : `Up to ${r.count} finds on a Finds page`]];
     const fl = flowOf(r);
     return [["when", fl.when[0].t], ["loci", fl.loci[0].t], ["then", fl.then[0].t]];
   }
@@ -262,7 +311,7 @@
   const countOf = (r) => (r.type === "arrive" ? (r.mode === "own" ? (r.filed || r.lately.length ? `${r.filed} filed this month` : "New") : r.right[1] ? `right ${r.right[0]} of ${r.right[1]}` : "New") : r.stat);
   const arrivePos = (r) => ROUTINES.filter((x) => x.type === "arrive").indexOf(r) + 1;
   const autoName = (d) => { const k = d.ifs.find((c) => c.t === "kind")?.v; return d.then.fileAs || `${k ? cap(KINDS_WORD(k)) : "Things"}${d.when !== "any" ? ` ${CH_PREP[d.when]} ${CH_WORD[d.when]}` : ""}`; };
-  const autoNameAny = (d) => d.type === "arrive" ? autoName(d) : d.type === "after" ? "After a Lumen" : ({ tidy: "Sort Unsorted", follow: `Follow: ${d.label || PLACES[d.place]?.name}`, review: `${PLACES[d.place]?.name} review`, pile: "Clear the To read pile" })[d.kind];
+  const autoNameAny = (d) => d.type === "arrive" ? autoName(d) : d.type === "after" ? "After a Lumen" : ({ tidy: "Sort Unsorted", follow: cap(d.label || (d.place && d.place !== "you" ? PLACES[d.place].name : "") || "New finds"), review: `${PLACES[d.place]?.name} review`, pile: "Clear the To read pile" })[d.kind];
 
   /* ================================================================ matching (plain rules in code; "is" needs Loci to read the item) */
   function fits(r, it) {
@@ -305,9 +354,14 @@
     close: '<path d="M6 6l12 12M18 6 6 18"/>',
     fold: '<path d="m6 9 6 6 6-6"/>',
     back: '<path d="m14.5 6-6 6 6 6"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+    doc: '<path d="M7 3.5h7l4 4v12.5a.5.5 0 0 1-.5.5h-10.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M9.5 12h5M9.5 15.5h5"/>',
+    book: '<path d="M3.5 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0zM20.5 6c-3-1.5-5.5-1.5-8.5 0v13c3-1.5 5.5-1.5 8.5 0z"/>',
+    play: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m10.5 9.5 4 2.5-4 2.5z"/>',
+    grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/>',
   };
   const svg = (k, s = 16) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
-  const iconOf = (r) => (r.type === "arrive" ? r.when : r.type === "schedule" ? "schedule" : r.kind === "lumen" ? "lumen" : "dup");
+  const iconOf = (r) => (r.type === "arrive" ? r.when : r.kind === "follow" ? "search" : r.type === "schedule" ? "schedule" : r.kind === "lumen" ? "lumen" : "dup");
   // the progress ring from Questions and goals: here, how often the routine was right when you checked
   function ring(d, n, size = 46) {
     const Cf = 2 * Math.PI * 15.9, p = n ? d / n : 0;
@@ -326,20 +380,20 @@
   /* ================================================================ the Routines tab: tiles, the bar, cards */
   const filedThisWeek = () => 23 + ACT.filter((a) => a.live && a.state === "filed").length;
   function tiles() {
-    const on = ROUTINES.filter((r) => r.on).length, paused = ROUTINES.length - on;
+    const on = ROUTINES.filter((r) => r.on).length;
     const T = [
       ["on", "g", svg("loop", 16), on, on === 1 ? "routine on" : "routines on", S.seg === "routines" && !S.only],
       ["waiting", "q", "?", W.length, W.length === 1 ? "thing waiting for you" : "things waiting for you", S.seg === "waiting"],
+      ["finds", "f", svg("search", 16), newFinds(), newFinds() === 1 ? "new find to look through" : "new finds to look through", S.seg === "finds"],
       ["activity", "a", "✓", filedThisWeek(), "filed for you this week", S.seg === "activity"],
-      ["paused", "p", "–", paused, "paused", S.only === "paused"],
     ];
     return `<div class="rx-tiles">${T.map(([k, c, gl, n, l, on2]) => `<button type="button" class="qg-tile ${c}${on2 ? " on" : ""}" data-act="tile" data-v="${k}"><span class="qg-gl" aria-hidden="true">${gl}</span><b>${n}</b><span>${l}</span></button>`).join("")}</div>`;
   }
   function bar() {
     const n = (t) => ROUTINES.filter((r) => r.type === t).length;
-    const segs = [["routines", "Routines", ROUTINES.length], ["waiting", "Waiting", W.length], ["activity", "Activity", null]];
+    const segs = [["routines", "Routines", ROUTINES.length], ["finds", "Finds", newFinds()], ["waiting", "Waiting", W.length], ["activity", "Activity", null]];
     const kinds = [["all", "All kinds"], ["arrive", `When I send · ${n("arrive")}`], ["schedule", `On a schedule · ${n("schedule")}`], ["after", `After I do something · ${n("after")}`]];
-    return `<div class="cph-bar rx-bar"><div class="cph-seg" role="group" aria-label="Show">${segs.map(([k, l, c]) => `<button type="button" data-act="seg" data-v="${k}" aria-pressed="${S.seg === k}">${l}${c != null ? `<span class="n${k === "waiting" && c ? " rx-hot" : ""}">${c}</span>` : ""}</button>`).join("")}</div>
+    return `<div class="cph-bar rx-bar"><div class="cph-seg" role="group" aria-label="Show">${segs.map(([k, l, c]) => `<button type="button" data-act="seg" data-v="${k}" aria-pressed="${S.seg === k}">${l}${c != null ? `<span class="n${k === "waiting" && c ? " rx-hot" : k === "finds" && c ? " rx-acc" : ""}">${c}</span>` : ""}</button>`).join("")}</div>
       ${S.seg === "routines" ? `<div class="qg-topics" role="group" aria-label="Kind">${kinds.map(([k, l]) => `<button type="button" data-act="kind" data-v="${k}" aria-pressed="${S.kind === k}">${l}</button>`).join("")}${S.only === "paused" ? `<button type="button" data-act="tile" data-v="on" aria-pressed="true">Paused only ×</button>` : ""}</div>` : ""}
       <span class="rx-grow"></span><button type="button" class="button rx-new" data-act="new">${svg("plus")}New routine</button></div>`;
   }
@@ -347,8 +401,9 @@
     const waiting = W.filter((w) => w.rid === r.id && w.kind === "single");
     const cls = ["rk", !r.on ? "paused" : waiting.length ? "waiting" : "", S.flash === r.id ? "flash" : ""].filter(Boolean).join(" ");
     const kick = r.type === "arrive" ? `${ord(arrivePos(r))} in line · ${CH_SHORT[r.when]}` : r.type === "schedule" ? (r.on ? `Next: ${fNext(nextRun(r))}` : "Scheduled") : "Follow-up";
-    const last = r.lately[0];
-    const next = waiting.length ? `<p class="rk-next wait"><b>Waiting</b><span>“${esc(waiting[0].newTitle || waiting[0].title)}”${waiting.length > 1 ? ` and ${waiting.length - 1} more` : ""}</span><button type="button" class="rk-go" data-act="seg" data-v="waiting">Check it</button></p>`
+    const last = r.lately[0], iss = r.kind === "follow" ? issuesOf(r.id)[0] : null;
+    const next = iss && openOf(iss) ? `<p class="rk-next finds"><b>Finds</b><span>${plural(openOf(iss), "new find")} · ${esc(iss.when)}</span><button type="button" class="rk-go" data-act="open-issue" data-v="${iss.id}">Look through</button></p>`
+      : waiting.length ? `<p class="rk-next wait"><b>Waiting</b><span>“${esc(waiting[0].newTitle || waiting[0].title)}”${waiting.length > 1 ? ` and ${waiting.length - 1} more` : ""}</span><button type="button" class="rk-go" data-act="seg" data-v="waiting">Check it</button></p>`
       : last ? `<p class="rk-next"><b>Last</b><span>${esc(last.t)} · ${esc(last.when)}</span></p>`
       : `<p class="rk-next new"><b>New</b><span>${r.type === "schedule" ? `Its first run is ${fNext(nextRun(r))}.` : "It starts with the next thing that fits."}</span></p>`;
     const stat = r.type === "arrive" && r.mode === "ask" && r.right[1] ? `<span class="gprog">${ring(r.right[0], r.right[1], 18)}right ${r.right[0]} of ${r.right[1]}</span>` : `<span class="rk-stat">${esc(countOf(r))}</span>`;
@@ -396,11 +451,60 @@
     const rows = ACT.map((a, i) => {
       const r = RR(a.rid), h = a.day !== day ? `<li class="rx-day">${esc(a.day)}</li>` : "";
       day = a.day;
-      const end = a.state === "waiting" ? btn("Check it", 'data-act="seg" data-v="waiting"', "link") : a.undo ? btn("Undo", `data-act="act-undo" data-i="${i}"`, "link") : a.state === "undone" ? `<span class="rx-dim">Undone</span>` : "";
+      const end = a.state === "finds" ? btn("Look through", `data-act="open-issue" data-v="${a.iss}"`, "link") : a.state === "waiting" ? btn("Check it", 'data-act="seg" data-v="waiting"', "link") : a.undo ? btn("Undo", `data-act="act-undo" data-i="${i}"`, "link") : a.state === "undone" ? `<span class="rx-dim">Undone</span>` : "";
       return `${h}<li class="rx-arow"><time>${esc(a.t)}</time><span>${r ? `<button type="button" class="rx-link" data-act="open-r" data-r="${a.rid}">${esc(r.name)}</button>` : "A routine"} ${esc(a.what)}</span>${end}</li>`;
     }).join("");
     return `<section class="rx-sec"><h2>Activity</h2><p class="rx-sub">Everything your routines did, newest first. Tap a routine's name to open it.</p><ol class="rx-act">${rows}</ol></section>`;
   }
+
+  /* ================================================================ Finds: a page per run, to look through */
+  function issueCard(iss) {
+    const r = RR(iss.rid), open = openOf(iss), n = iss.items.length, top = iss.items.find((f) => f.top) || iss.items[0];
+    return `<article class="rk fcard${open ? "" : " done"}"><button type="button" class="rx-hit" data-act="open-issue" data-v="${iss.id}" aria-label="Open the finds from ${esc(iss.date)}"></button>
+      <div class="rk-top"><span class="rk-gl">${svg("search", 18)}</span><div class="rk-h"><p class="rk-k">${esc(r ? r.name : "Finds")} · ${esc(iss.when)}</p><h3>${esc(iss.date)}</h3></div></div>
+      <ul class="rk-rows">${iss.items.slice(0, 3).map((f) => `<li class="${f.st ? "done" : ""}"><span class="rk-dot">${svg(FK_ICON[f.kind], 12)}</span><span class="rk-t">${esc(f.title)}</span></li>`).join("")}</ul>
+      <p class="rk-next finds"><b>Top pick</b><span>${esc(top.title)}</span></p>
+      <div class="rk-ft"><span class="gprog">${ring(n - open, n, 18)}${n - open} of ${n} decided</span><span class="st active">${open ? `${open} to look at ›` : "Done ›"}</span></div></article>`;
+  }
+  function findsSeg() {
+    const fr = ROUTINES.filter((r) => r.kind === "follow");
+    return `<section class="rx-sec"><h2>Finds <span>${newFinds()} new</span></h2><p class="rx-sub">What your finding routines brought back: one page per run. Keep what's useful; Loci learns from what you skip.</p>
+      <div class="rk-grid">${ISSUES.map(issueCard).join("")}<button type="button" class="rk ghost rx-addfind" data-act="new-follow"><span class="rk-gl">${svg("plus", 18)}</span><b>Something else to watch</b><span>A subject, the sources to read, and how often</span></button></div></section>
+      ${fr.length ? `<section class="rx-sec"><h2>What they watch <span>${fr.length}</span></h2><p class="rx-sub">Open one to change its subject, sources or timing.</p><div class="rk-grid">${fr.map(card).join("")}</div></section>` : ""}`;
+  }
+  function whyRow(w) {
+    if (w.t === "q") return `<li class="q"><span class="gc-dot" aria-hidden="true">?</span><span>May answer your question “${esc(w.v)}”</span></li>`;
+    if (w.t === "g") return `<li class="g"><span class="gc-dot" aria-hidden="true">◎</span><span>Serves your goal “${esc(w.v)}”</span></li>`;
+    return `<li class="n"><span class="gc-dot" aria-hidden="true">${svg("spark", 11)}</span><span>${esc(w.v)}</span></li>`;
+  }
+  function findCard(f, big) {
+    const place = PLACES[f.on] ? PLACES[f.on].name : "your whole map";
+    const state = f.st === "saved" ? `<p class="fd-done ok">✓ Saved as ${esc(f.as)} on ${esc(place)}${f.why.some((w) => w.t === "q") ? ", linked to your question" : ""}<button type="button" class="rk-go" data-act="f-undo" data-v="${f.id}">Undo</button></p>`
+      : f.st === "later" ? `<p class="fd-done">In To read<button type="button" class="rk-go" data-act="f-undo" data-v="${f.id}">Undo</button></p>`
+      : f.st === "no" ? `<p class="fd-done">Not for me${f.reason ? `: ${esc(f.reason.toLowerCase())}` : ""}<button type="button" class="rk-go" data-act="f-undo" data-v="${f.id}">Undo</button></p>`
+      : S.findNo === f.id ? `<div class="fd-acts fd-no"><span>Why not?</span>${["Not this topic", "Not from this source", "Too basic", "Just not now"].map((x) => `<button type="button" class="ed-chip" data-act="f-reason" data-v="${f.id}" data-r2="${x}">${x}</button>`).join("")}</div>`
+      : `<div class="fd-save"><span>Save as</span><select class="sm-select" data-fs="as" data-f="${f.id}" aria-label="Save as">${FILE_AS.map((x) => `<option${x === f.as ? " selected" : ""}>${esc(x)}</option>`).join("")}</select><span>on</span><select class="sm-select" data-fs="on" data-f="${f.id}" aria-label="Topic">${TOPICS.map((p) => `<option value="${p}"${p === f.on ? " selected" : ""}>${esc(PLACES[p].name)}</option>`).join("")}</select></div>
+        <div class="fd-acts">${btn("Save", `data-act="f-save" data-v="${f.id}"`)}${btn("Read later", `data-act="f-later" data-v="${f.id}"`, "quiet")}${btn("Not for me", `data-act="f-no" data-v="${f.id}"`, "quiet")}<span class="rx-grow"></span><button type="button" class="rk-go" data-act="f-ask" data-v="${f.id}">Ask Loci</button></div>`;
+    return `<article class="fd${big ? " big" : ""}${f.st ? " is-" + f.st : ""}" id="fd-${f.id}"><p class="fd-k"><span class="rk-dot">${svg(FK_ICON[f.kind], 12)}</span>${FK_ONE[f.kind]} · ${esc(f.src)} · ${esc(f.len)}</p>
+      <h3>${esc(f.title)}</h3><p class="fd-sum">${esc(f.sum)}</p>
+      <ul class="fd-why">${f.why.map(whyRow).join("")}${PLACES[f.topic] ? `<li class="t"><span class="gc-dot" aria-hidden="true">${svg("out", 11)}</span><span>Fits ${esc(PLACES[f.topic].name)}</span></li>` : ""}</ul>${state}</article>`;
+  }
+  function issuePage(iss) {
+    const r = RR(iss.rid), open = openOf(iss), n = iss.items.length, top = iss.items.find((f) => f.top) || iss.items[0];
+    const rest = iss.items.filter((f) => f !== top), topics = [...new Set(rest.map((f) => f.topic))];
+    const leftN = iss.left.reduce((a, [k]) => a + k, 0);
+    return `<article class="rp iss" aria-label="Finds, ${esc(iss.date)}">
+      <nav class="rp-back"><button type="button" class="rx-backbtn" data-act="iss-back">${svg("back", 14)}${S.issueFrom && S.issueFrom !== "finds" && r ? esc(r.name) : "Finds"}</button></nav>
+      <header class="rp-head"><span class="rk-gl lg">${svg("search", 22)}</span><div class="rp-h"><p class="rk-k">Finds · ${esc(r ? r.name : "")}</p><h1 class="rp-title">${esc(iss.date)}</h1>
+        <div class="rp-meta"><span>${plural(n, "find")} from ${plural(iss.sources, "source")} · Loci looked at ${iss.checked} · ${esc(iss.when)}</span></div></div>
+        <div class="iss-prog">${ring(n - open, n)}<span>${open ? `${open} to decide` : "All decided"}</span></div></header>
+      <p class="iss-how">For each one, <b>Save</b> it to your Commonplace, <b>Read later</b>, or say <b>Not for me</b>. Loci learns from what you skip.</p>
+      <section class="rp-sec"><h2 class="rp-sh">Top pick</h2>${findCard(top, true)}</section>
+      ${topics.map((t) => `<section class="rp-sec"><h2 class="qt-h">${esc(PLACES[t] ? PLACES[t].name : "Across your map")} <span>${rest.filter((f) => f.topic === t).length}</span></h2><div class="fd-grid">${rest.filter((f) => f.topic === t).map((f) => findCard(f)).join("")}</div></section>`).join("")}
+      <div class="iss-left"><p><b>Left out ${leftN}:</b> ${iss.left.map(([k, w]) => `${k} ${w}`).join(" · ")}.</p><button type="button" class="rk-go" data-act="left-see">See them</button></div>
+      <footer class="rp-foot">${open ? `${btn("Read the rest later", `data-act="iss-later" data-v="${iss.id}"`, "quiet")}${btn("Clear the rest", `data-act="iss-clear" data-v="${iss.id}"`, "quiet")}` : ""}<span class="rx-grow"></span>${r ? btn("Change what it looks for", `data-act="edit" data-r="${r.id}"`, "link") : ""}</footer></article>`;
+  }
+  function openIssue(id, from) { S.issue = id; S.issueFrom = from || S.open || "finds"; S.open = null; S.edit = null; S.newer = false; S.findNo = null; S.ptab = "this"; S.pop = null; C.resetScroll = true; }
 
   /* ================================================================ a routine's page */
   function routinePage(r) {
@@ -423,6 +527,7 @@
         <div class="rp-meta">${stBtn(r)}${r.type === "arrive" ? `<button type="button" class="st" data-act="chip" data-r="${r.id}" data-f="mode">${esc(modeLabel(r))} ▾</button>` : ""}<span>${esc(countOf(r))}</span></div></div>
         <div class="rp-acts">${btn("Edit", `data-act="edit" data-r="${r.id}"`, "quiet")}</div></header>
       ${waiting.length ? `<button type="button" class="rx-waitline" data-act="seg" data-v="waiting"><span aria-hidden="true" class="rk-gl q sm">?</span><span><b>${plural(waiting.length, "thing")} from this routine waiting for you</b><em>${esc(waiting.map((w) => w.newTitle || w.title || "The To read pile").join(" · "))}</em></span><span aria-hidden="true">›</span></button>` : ""}
+      ${r.kind === "follow" ? `<section class="rp-sec"><h2 class="rp-sh">Its Finds pages</h2>${issuesOf(r.id).length ? `<div class="rk-grid">${issuesOf(r.id).slice(0, 2).map(issueCard).join("")}</div>` : `<p class="rx-sub">None yet. The first comes ${r.on ? fNext(nextRun(r)) : "when you turn it back on"}.</p>`}<div>${btn("Check now", `data-act="check-now" data-r="${r.id}"`, "quiet")}</div></section>` : ""}
       <section class="rp-sec"><h2 class="rp-sh">What it does</h2><p class="rx-say rp-say">${sentence(r)}</p><p class="rp-note">Tap an underlined word to change it, or press <b>Edit</b> to see everything.</p></section>
       <section class="rp-flow" aria-label="How it works">${step("when", "When", fl.when, "in")}<span class="rp-arrow" aria-hidden="true">→</span>${step("loci", "Loci", fl.loci, "spark")}<span class="rp-arrow" aria-hidden="true">→</span>${step("then", "Then", fl.then, "out")}</section>
       ${S.builder ? builderNote(r) : ""}
@@ -435,7 +540,7 @@
 
   /* ================================================================ the editor: one short form, for Edit and for New routine */
   function startEdit(d, isNew, from) {
-    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null };
+    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null }; S.issue = null;
     S.newer = false; S.pop = null;
     if (isNew) { S.open = null; S.ptab = "all"; } else { S.open = d.id; S.ptab = "this"; }
     C.resetScroll = true;
@@ -474,18 +579,22 @@
         + section(4, "Before it files", `<div class="ed-radios">${[["ask", "Ask me first", "You check each one. Once it's right 9 times out of 10, Loci offers to stop asking."], ["own", "File on its own", "It files straight away. You can undo anything from Activity."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="mode" data-v="${v}" aria-pressed="${d.mode === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>`)
         + section(5, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="${esc(autoName(d))}" aria-label="Name">`);
     } else if (d.type === "schedule") {
-      const what = E.isNew ? section(1, "What it does", chips("skind", [["tidy", "Sort Unsorted"], ["follow", "Bring me what's new"], ["review", "Quiz me on what slipped"], ["pile", "Clear the To read pile"]], d.kind)) : "";
+      const what = E.isNew ? section(1, "What it does", chips("skind", [["follow", "Find new things for me"], ["tidy", "Sort Unsorted"], ["review", "Quiz me on what slipped"], ["pile", "Clear the To read pile"]], d.kind)) : "";
       const n0 = E.isNew ? 1 : 0;
-      const when = section(n0 + 1, "When it runs", chips("every", [["day", "Every day"], ["weekdays", "Weekdays"], ...[1, 2, 3, 4, 5, 6, 0].map((x) => ["w" + x, DAYLONG[x].slice(0, 3)]), ["month", "Monthly"]], d.every)
+      const fl = d.kind === "follow", when = section(n0 + (fl ? 2 : 1), "When it runs", chips("every", [["day", "Every day"], ["weekdays", "Weekdays"], ...[1, 2, 3, 4, 5, 6, 0].map((x) => ["w" + x, DAYLONG[x].slice(0, 3)]), ["month", "Monthly"]], d.every)
         + (d.every === "month" ? `<p class="ed-help">On the 1st, at 9:00.</p>` : `<label class="ed-time"><span>At</span><input class="sm-input" type="time" id="ed-time" value="${esc(d.time)}"></label>`));
       const spec = {
         tidy: () => field("When Loci is sure", chips("tidymode", [["own", "File it, and ask me about the rest"], ["ask", "Ask me about each thing"]], d.mode)),
-        follow: () => field("Subject", d.label ? `<input class="sm-input ed-in" id="ed-label" value="${esc(d.label)}" aria-label="Subject">` : select("place", [["you", "My whole map"], ...TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name])], d.place), d.label ? "Not a topic on your map yet. Loci sorts what it finds onto your topics." : "")
-          + field("Sources", toggles("src", SOURCES.map((x) => [x, x]), (v) => d.sources.includes(v))),
+        follow: () => field("Subject", `<input class="sm-input ed-in" id="ed-label" value="${esc(d.label || "")}" placeholder="e.g. AI in architecture" aria-label="Subject">`, "In your own words. Leave it empty to follow a topic as a whole.")
+          + field("Sort onto", select("place", [["you", "Whichever topic fits (my whole map)"], ...TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name])], d.place))
+          + field("Look for", toggles("fkind", FIND_KINDS, (v) => (d.kinds || []).includes(v)))
+          + field("Where to look", toggles("src", [...new Set([...SOURCES, ...d.sources])].map((x) => [x, x]), (v) => d.sources.includes(v)) + `<div class="ed-addsrc"><input class="sm-input ed-in" id="ed-src" placeholder="Add a website, newsletter, journal or channel" aria-label="Add a source">${btn("Add", 'data-act="ed-addsrc"', "quiet")}</div>`, "The sources you save from most are listed first.")
+          + field("How many", chips("count", [["3", "Up to 3"], ["6", "Up to 6"], ["10", "Up to 10"]], d.count))
+          + field("Bring them", `<div class="ed-radios">${[["page", "On a Finds page", "You look through them and keep what's useful. A card on Today says they're there."], ["toread", "Straight into To read", "Everything it finds is saved and marked To read."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="dest" data-v="${v}" aria-pressed="${(d.dest || "page") === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>`),
         review: () => field("Topic", select("place", TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name]), d.place)) + field("How many", chips("count", [["3", "3 questions, about two minutes"], ["5", "5 questions, about four minutes"]], d.count)),
         pile: () => `<p class="ed-help">Nothing to set. It shows what's sat in To read for over three months, and you decide: read it this week, keep it, or let it go.</p>`,
       }[d.kind]();
-      body = what + when + section(n0 + 2, "What it brings you", spec) + section(n0 + 3, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="${esc(autoNameAny(d))}" aria-label="Name">`);
+      body = what + (fl ? section(n0 + 1, "What to look for", spec) + when : when + section(n0 + 2, "What it brings you", spec)) + section(n0 + 3, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="${esc(autoNameAny(d))}" aria-label="Name">`);
     } else {
       body = d.kind === "lumen"
         ? section(1, "When it starts", `<p class="ed-fixed">When I finish a Lumen.</p>`) + section(2, "When the check comes back", chips("delay", [["the next day", "The next day"], ["three days later", "Three days later"], ["a week later", "A week later"]], d.delay)) + section(3, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="After a Lumen" aria-label="Name">`)
@@ -506,10 +615,11 @@
     else if (f === "every") { d.every = v; if (v === "month") d.time = "09:00"; else if (!d.time) d.time = "08:00"; }
     else if (f === "count") d.count = Number(v);
     else if (f === "delay") d.delay = v;
+    else if (f === "dest") d.dest = v;
     else if (f === "skind") {
       d.kind = v;
       if (v === "tidy") Object.assign(d, { mode: "own" });
-      if (v === "follow") Object.assign(d, { place: "you", label: "", sources: SOURCES.slice(0, 4) });
+      if (v === "follow") Object.assign(d, { place: "you", label: "", sources: SOURCES.slice(0, 4), kinds: FIND_KINDS.map((k) => k[0]), count: 6, dest: "page", time: "07:30" });
       if (v === "review") Object.assign(d, { place: "precast", count: 3 });
     }
   }
@@ -523,7 +633,7 @@
 
   /* ================================================================ New routine: three ways in */
   function newView() {
-    const types = [["arrive", "When I send something", "File what arrives from WhatsApp, email, your phone or the browser.", "any"], ["schedule", "On a schedule", "Sort Unsorted, bring in what's new, or quiz you.", "schedule"], ["after", "After I do something", "Follow up after a Lumen.", "lumen"]];
+    const types = [["arrive", "When I send something", "File what arrives from WhatsApp, email, your phone or the browser.", "any"], ["follow", "Find new things for me", "Watch sources for a subject, and bring finds to a page.", "search"], ["schedule", "On a schedule", "Sort Unsorted, or quiz you on what slipped.", "schedule"], ["after", "After I do something", "Follow up after a Lumen.", "lumen"]];
     const tplCard = (d, i) => `<article class="rk ghost tpl"><button type="button" class="rx-hit" data-act="tpl" data-v="${i}" aria-label="Use “${esc(d.name)}”"></button><div class="rk-top"><span class="rk-gl">${svg(iconOf(d), 18)}</span><div class="rk-h"><p class="rk-k">${esc(GROUP[d.type])}</p><h3>${esc(d.name)}</h3></div></div>
       <ul class="rk-rows">${cardRows(d).map(([k, t]) => `<li class="${k}"><span class="rk-dot">${svg({ when: "in", loci: "spark", then: "out" }[k], 12)}</span><span class="rk-t">${esc(t)}</span></li>`).join("")}</ul><div class="rk-ft"><span class="rk-stat">${d.type === "arrive" ? `${hitsOf(d).length} of your last 20 would fit` : "A template"}</span><span class="st active">Use ›</span></div></article>`;
     return `<article class="rp nr" aria-label="New routine">
@@ -584,10 +694,11 @@
     const ideas = [
       S.noticed === "open" ? { a: "noticed", b: "File dezeen.com links as Precedents", em: "You did this by hand 7 times this month", small: "Do it" } : null,
       { a: "idea", v: "Every evening, sort what I haven't sorted", b: "Sort Unsorted every evening", em: "9 things are sitting in Unsorted", small: "Set up" },
-      { a: "idea", v: "Keep me up to date on AI in architecture", b: "Follow a subject", em: "New things from sources you trust, sorted onto topics", small: "Set up" },
+      { a: "idea", v: "Every Monday, find new papers on Daylight & shading", b: "New papers on Daylight & shading", em: "You have 2 open questions there", small: "Set up" },
     ].filter(Boolean);
     return `<div class="cp-home"><h2 class="hello">Good morning, Layla.</h2>
       <div class="progress-card"><div class="rx-big" aria-hidden="true">${on}</div><div><b>${plural(on, "routine")} on</b><span>${filedThisWeek()} things filed for you this week</span></div></div>
+      ${newFinds() ? `<button type="button" class="rx-waitline rx-findline" data-act="seg" data-v="finds"><span aria-hidden="true" class="rk-gl sm">${svg("search", 13)}</span><span><b>${plural(newFinds(), "new find")} to look through</b><em>Top pick: ${esc((() => { const iss = ISSUES.find((x) => openOf(x)); return iss ? (iss.items.find((f) => f.top && !f.st) || iss.items.find((f) => !f.st)).title : ""; })())}</em></span><span aria-hidden="true">›</span></button>` : ""}
       ${W.length ? `<button type="button" class="rx-waitline" data-act="seg" data-v="waiting"><span aria-hidden="true" class="rk-gl q sm">?</span><span><b>${plural(W.length, "thing")} waiting for a quick look</b><em>Your routines weren't sure about these</em></span><span aria-hidden="true">›</span></button>` : ""}
       <div class="cp-sec"><div class="sec-h"><span>Ideas for you</span></div><div class="rx-rows">${ideas.map((x) => `<button type="button" class="cp-row" data-act="${x.a}" data-v="${esc(x.v || "")}"><span aria-hidden="true" class="dot rx-dot-ghost"></span><span><b>${esc(x.b)}</b><em>${esc(x.em)}</em></span><small>${esc(x.small)}</small></button>`).join("")}</div></div></div>`;
   }
@@ -603,9 +714,10 @@
     const body = inThis
       ? (threadOf(r.id).length ? "" : `<p class="cp-empty">${S.edit ? `Tell me what to change, and I'll change it in the form. Nothing is saved until you press Save.` : `Ask me anything about “${esc(r.name)}”, or tell me what to change. Changes show on the page, with Undo.`}</p>`) + threadHTML(r.id)
       : (S.edit && S.edit.isNew && !C.all.length ? `<p class="cp-empty">Tell me what this routine should do, and I'll fill in the form for you.</p>` : homeBody()) + threadHTML("all");
-    const prompts = inThis
+    const prompts = inThis && r.kind === "follow" ? ["What did you find today?", "Only papers", "Up to 10 finds", r.on ? "Pause it" : "Turn it back on", S.edit ? null : "Edit it"].filter(Boolean)
+      : inThis
       ? [S.edit ? null : "What did it do this week?", r.type === "arrive" ? (r.mode === "own" ? "Ask me before filing" : "Stop asking, just file them") : null, r.type === "arrive" && !S.edit ? "Why did it file the last one there?" : null, r.on ? "Pause it" : "Turn it back on", S.edit ? null : "Edit it"].filter(Boolean)
-      : ["What did my routines do this week?", "What's waiting for me?", "Why was something filed where it was?", "How do routines work?"];
+      : ["What did you find today?", "What did my routines do this week?", "What's waiting for me?", "Why was something filed where it was?", "How do routines work?"];
     const comp = `<div class="cp-comp"><div class="prompts">${prompts.map((p) => `<button type="button" data-act="prompt" data-v="${esc(p)}">${esc(p)}</button>`).join("")}</div>
       <form class="box" data-form="chat">${inThis ? `<span class="scope">About ${esc(r.name)}<button aria-label="Ask about all routines instead" type="button" data-act="ptab" data-v="all">×</button></span>` : ""}<label class="visually-hidden" for="rx-text">Ask Loci</label><textarea id="rx-text" maxlength="4000" rows="2" placeholder="${inThis ? (peek ? `Ask Loci about ${esc(r.name)}…` : `Ask about ${esc(r.name)}, or say what to change…`) : peek ? "Ask Loci about your routines…" : editing ? "Tell Loci what it should do…" : "Ask about your routines, or say what should happen…"}">${esc(C.input)}</textarea><div class="tools"><span class="grow"></span><button aria-label="Send" class="send" type="submit">${svg("send")}</button></div></form></div>`;
     return `${mobile() && S.sheet ? '<div class="rx-scrim" data-act="fold"></div>' : ""}<div class="cpwrap rx-cpwrap${mobile() ? " is-sheet" : ""}${S.sheet && mobile() ? " is-open" : ""}"${peek ? ' data-drawer="peek"' : ""}><section aria-label="Loci" class="cp" tabindex="-1">${peek ? "" : head + `<div class="cp-body gin" id="rx-body" role="tabpanel">${body}</div>`}${comp}</section></div>`;
@@ -620,6 +732,7 @@
     const day = DAYLONG.findIndex((n) => new RegExp(`\\b${n.toLowerCase()}s?\\b`).test(s));
     if (day >= 0) { d.every = "w" + day; said = true; if (!d.time) d.time = /morning/.test(s) ? "08:00" : "17:00"; }
     if (/every month|monthly/.test(s)) { d.every = "month"; d.time = "09:00"; said = true; }
+    if (/every week|weekly/.test(s) && !said) { d.every = "w1"; d.time = "08:00"; said = true; }
     const tm = s.match(TIME_RE);
     if (tm && d.every) {
       let h = Number(tm[1] || tm[4]); const m = Number(tm[2] || tm[5] || 0);
@@ -632,7 +745,7 @@
   const topicIn = (s) => TOPICS.find((p) => s.includes(PLACES[p].name.toLowerCase()) || s.includes(p));
   function intent(s) {
     if (/\b(sort|tidy|organi[sz]e|clean up)\b/.test(s) && /(unsorted|haven't sorted|not sorted|everything|my stuff|my inbox)/.test(s)) return "tidy";
-    if (/up to date|keep up|\bfollow\b|\bnews\b|what's new on|the latest/.test(s)) return "follow";
+    if (/up to date|keep up|\bfollow\b|\bnews\b|what's new on|the latest|find (me )?(new|the latest)|keep an eye on/.test(s)) return "follow";
     if (/quiz|test me|\breview\b|ask me (questions|about)|what slipped/.test(s)) return "review";
     if (/after i (finish|watch)|when i finish/.test(s)) return "after";
     if (/\bwhen i\b|\b(send|share|email|forward)\b.*\b(photo|picture|link|pdf|voice|audio|reel|recipe|book)|every time i (send|save)/.test(s)) return "arrive";
@@ -664,6 +777,14 @@
     if (/just (file|do|put)|automatically|on its own|without asking|don't ask/.test(s)) { d.mode = "own"; said.mode = true; }
     if (/ask me first|check with me/.test(s)) { d.mode = "ask"; said.mode = true; }
     return { d, said };
+  }
+  // "Keep me up to date on AI in architecture", "AI news in architecture", "find me new papers about wind towers"
+  function subjectOf(text) {
+    const t = text.replace(/[.!?]+$/, "").replace(/\b(every|each) (day|morning|evening|week|month|monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\b,?/gi, "").trim();
+    let m = t.match(/\b([\w-]+(?: [\w-]+)?) news (?:in|on|about|for) (.+)$/i);
+    if (m) return `${m[1]} in ${m[2]}`.trim();
+    m = t.match(/\b(?:on|about)\s+(.+)$/i) || t.match(/\bnews (?:in|for)\s+(.+)$/i);
+    return m ? m[1].replace(/^the latest\s+/i, "").trim() : "";
   }
   function offerFor(d) {
     const k = d.ifs.find((c) => c.t === "kind")?.v, is = d.ifs.find((c) => c.t === "is")?.v;
@@ -726,13 +847,18 @@
       lociSay("Got it: I'll go through what's in Unsorted and put each thing where it belongs.");
     }
     if (kind === "follow") {
-      const tp = topicIn(s), m = text.match(/(?:on|about) (.+?)(?:[.,!?]|$)/i);
-      Object.assign(d, { kind: "follow", place: tp || "you", label: !tp && m ? m[1].trim() : "", sources: SOURCES.slice(0, 4) });
-      d.name = `Follow: ${d.label ? cap(d.label) : PLACES[d.place].name}`;
-      if (!tp && !m) C.q.push("followTopic");
+      const tp = topicIn(s), subj = subjectOf(text);
+      const ks = [["paper", /\bpapers?\b|research|studies/], ["video", /videos?|talks?|lectures?/], ["tool", /\btools?\b|apps?\b|plugins?|datasets?/], ["article", /articles?|blogs?|posts?/]].filter(([, re]) => re.test(s)).map(([k]) => k);
+      Object.assign(d, { kind: "follow", place: tp || "you", label: tp ? "" : subj, sources: SOURCES.slice(0, 4), kinds: ks.length ? ks : FIND_KINDS.map((k) => k[0]), count: 6, dest: "page" });
+      const subject = d.label || PLACES[d.place].name;
+      d.name = ks.length === 1 ? `New ${FK_PL[ks[0]]} on ${subject}` : cap(subject);
+      if (!tp && !subj) C.q.push("followTopic");
       C.q.push("sources");
       if (!parseEvery(s, d)) C.q.push("followEvery");
-      lociSay(d.label ? `“${cap(d.label)}” isn't a topic on your map yet, so I'll watch for it across your whole map and sort what comes in onto the right topics. If it keeps coming up, I'll suggest a sub-topic.` : "Got it: I'll bring you what's new and sort it onto your topics.");
+      else if (!TIME_RE.test(s) && !/evening|night/.test(s)) d.time = d.every === "day" ? "07:30" : "08:00";
+      const twin = ROUTINES.find((r) => r.kind === "follow" && r.place === d.place && (r.label || "").toLowerCase() === (d.label || "").toLowerCase());
+      if (twin) { C.draft = d; lociSay(`You already have “${twin.name}”, which looks for this ${everyText(twin).toLowerCase().replace(/^every /, "every ")}. Open it?`, { opts: optsOf([[`Open “${twin.name}”`, "open", twin.id], ["Make a new one anyway", "anyway"]]) }); return; }
+      lociSay(d.label ? `Got it: I'll look for new ${kindsText(d)} on “${d.label}”. It isn't a topic on your map, so I'll sort what I find onto the topics it fits. If it keeps coming up, I'll suggest a sub-topic.` : `Got it: I'll look for new ${kindsText(d)} on ${subject}.`);
     }
     if (kind === "review") {
       Object.assign(d, { kind: "review", name: "", place: topicIn(s) || null, count: /\b5\b|five/.test(s) ? 5 : /\b3\b|three/.test(s) ? 3 : null });
@@ -753,9 +879,10 @@
     if (!d.name) d.name = autoNameAny(d);
     snapDrafts(); C.previewed = true;
     if (S.newer) { S.newer = false; S.seg = "routines"; S.kind = "all"; S.only = null; C.resetScroll = true; }
+    if (d.kind === "follow") lociSay(`This morning it would have found ${d.count} things. For example:`, { rows: SAMPLE.filter((f) => !d.kinds || d.kinds.includes(f.kind)).concat(SAMPLE).slice(0, 3).map((f) => ({ a: "noop", b: f.title, em: `${FK_ONE[f.kind]} · ${f.src}`, small: PLACES[f.topic]?.name || "", dot: "s2" })) });
     const lead = d.type === "arrive" ? "Here it is. It's on the left as a draft; nothing changes until you turn it on."
       : d.kind === "tidy" ? "Here it is. Last night it would have placed 4 of the 9 things in Unsorted, and asked you about 2."
-      : d.kind === "follow" ? "Here it is. This morning it would have brought you 5 things, each on its topic." : "Here it is. It's on the left as a draft.";
+      : d.kind === "follow" ? "Here it is. Each run gets its own Finds page, and nothing runs until you turn it on." : "Here it is. It's on the left as a draft.";
     lociSay(lead, { card: "draft" });
   }
   function turnOn() {
@@ -763,7 +890,7 @@
     const r = addRoutine(d);
     snapDrafts(true); clearDraft();
     S.seg = "routines"; S.kind = "all"; S.only = null; flash(r.id, 2400);
-    const first = r.type === "arrive" ? ` It's first in line under “When I send something”.${r.mode === "ask" ? " I'll ask you about the first few so you can check me." : ""}` : r.type === "schedule" ? ` First run: ${fNext(nextRun(r))}.` : "";
+    const first = r.type === "arrive" ? ` It's first in line under “When I send something”.${r.mode === "ask" ? " I'll ask you about the first few so you can check me." : ""}` : r.kind === "follow" ? ` Your first finds come ${fNext(nextRun(r))}, on a Finds page, with a card on Today.` : r.type === "schedule" ? ` First run: ${fNext(nextRun(r))}.` : "";
     lociSay(`Done. “${r.name}” is on.${first}`, { opts: optsOf([["Open it", "open", r.id], ["Make another", "another"]]) });
   }
 
@@ -787,6 +914,14 @@
       const site = s.match(/\b([a-z0-9-]+\.(?:com|org|net|io|edu))\b/);
       if (site) { const c = r.ifs.find((x) => x.t === "site"); if (c && !c.v.includes(site[1])) { c.v += `, ${site[1]}`; done.push(`it covers ${site[1]} too`); } }
     }
+    if (r.kind === "follow") {
+      const ks = [["paper", /\bpapers?\b/], ["video", /videos?|talks?/], ["tool", /\btools?\b|datasets?/], ["article", /articles?|\bnews\b/]].filter(([, re]) => re.test(s)).map(([k]) => k);
+      if (ks.length && /\b(only|just)\b/.test(s)) { r.kinds = ks; done.push(`it looks only for ${kindsText(r)}`); }
+      else if (ks.length && /\b(also|add|and|plus)\b/.test(s)) { r.kinds = [...new Set([...(r.kinds || []), ...ks])]; done.push(`it looks for ${kindsText(r)}`); }
+      const n = s.match(/\b(?:up to )?(\d{1,2}) (?:finds|things|items)\b/); if (n) { r.count = Number(n[1]); done.push(`it brings up to ${r.count}`); }
+      if (/(straight )?into to read/.test(s)) { r.dest = "toread"; done.push("its finds go straight into To read"); }
+      if (/finds page|let me choose/.test(s)) { r.dest = "page"; done.push("its finds go on a Finds page"); }
+    }
     if (r.type === "schedule" && parseEvery(s, r)) done.push(`it runs ${everyText(r).toLowerCase()}`);
     const nm = text.match(/(?:call it|rename it(?: to)?|name it) [“"']?([^”"']+)[”"']?/i);
     if (nm) { r.name = nm[1].trim().replace(/[.!]$/, ""); done.push(`it's called “${r.name}”`); }
@@ -801,6 +936,13 @@
     return `“${x.t}” was filed ${x.w.replace(/ · you checked it$/, "")} because ${andJoin(conds)}.${pos > 1 ? ` “${r.name}” is ${ord(pos)} in line, and none of the ${plural(pos - 1, "routine")} above it fit.` : ` “${r.name}” is first in line, so it gets the first look.`}\nIf it's wrong, undo it in Activity and I'll count it as a miss.`;
   }
   function answer(s, r) {
+    if (/\bfinds?\b|what's new|what did (you|it) find|\bnews\b/.test(s) && !(r && r.kind !== "follow")) {
+      const iss = r ? issuesOf(r.id)[0] : ISSUES.find((x) => openOf(x)) || ISSUES[0];
+      if (!iss) { lociSay(r ? `“${r.name}” hasn't run yet. Its first finds come ${fNext(nextRun(r))}.` : "No finds yet."); return true; }
+      const fr = RR(iss.rid);
+      lociSay(`${fr ? fr.name : "Finds"}, ${iss.when.toLowerCase()}: ${plural(iss.items.length, "find")}, ${openOf(iss) ? `${openOf(iss)} still to look at` : "all decided"}. The first three:`, { rows: iss.items.slice(0, 3).map((f) => ({ a: "open-issue", v: iss.id, b: f.title, em: `${FK_ONE[f.kind]} · ${f.src}${f.why.some((w) => w.t === "q") ? " · may answer a question of yours" : ""}`, small: f.st ? { saved: "Saved", later: "To read", no: "Skipped" }[f.st] : "", dot: f.st ? "s0" : "s2" })), opts: optsOf([["Open the Finds page", "open-issue-opt", iss.id]]) });
+      return true;
+    }
     if (/what did|what has|what's it done|this week|lately|activity|so far/.test(s)) {
       if (r) {
         lociSay(r.lately.length ? `Lately, “${r.name}”:` : `“${r.name}” hasn't done anything yet. It starts with the next thing that fits.`, r.lately.length ? { rows: r.lately.slice(0, 3).map((x) => ({ a: "noop", b: x.t, em: x.w, small: x.when })) } : {});
@@ -892,7 +1034,11 @@
         case "set-place": d.place = v; if (d.kind === "follow") d.name = `Follow: ${PLACES[v].name}`; break;
         case "set-count": d.count = Number(v); break;
         case "set-delay": d.delay = v; break;
-        case "anyway": queueArrive(C.pendingSaid || {}); lociSay(understood(C.draft)); ask(); return;
+        case "anyway": if (C.draft.type === "arrive") { queueArrive(C.pendingSaid || {}); lociSay(understood(C.draft)); } ask(); return;
+        case "open-issue-opt": openIssue(v, "finds"); lociSay("It's open on the left."); return;
+        case "find-lumen": { const [f] = findById(v); if (!f) return; f.st = "saved"; lociSay(`Saved, and I've started a Lumen from it: “${f.title.replace(/ \(example[^)]*\)$/, "")}”. It'll be in Learn in a few minutes, on ${PLACES[f.on]?.name || "your map"}.`); return; }
+        case "find-compare": { const [f] = findById(v); if (!f) return; lociSay(`Closest in your Commonplace, on ${PLACES[f.topic]?.name || "your map"}:`, { rows: [{ a: "noop", b: "Courtyard cooling study (example).pdf", em: "PDF · saved 12 Oct", small: "Agrees" }, { a: "noop", b: "Climate Considerations in Building and Urban Design", em: "Book · Baruch Givoni", small: "Older view" }] }); return; }
+        case "find-save": { const [f] = findById(v); if (!f) return; f.st = "saved"; lociSay(`Saved as ${f.as} on ${PLACES[f.on]?.name || "your map"}.`); return; }
         case "open": { const r = RR(v); if (!r) return; openRoutine(v); C.force = v; lociSay(`Here's “${r.name}”, open on the left. Tap an underlined word to change it, press Edit, or tell me what to change.`); return; }
         case "undo": { const r = RR(v); if (m.undo && r) Object.assign(r, JSON.parse(m.undo)); lociSay("Undone."); return; }
         case "del-yes": C.pendingDelete = null; deleteRoutine(RR(v)); return;
@@ -913,12 +1059,12 @@
     C.force = "all";
     lociSay(`Deleted “${r.name}”. What it filed stays where it is.`, { opts: optsOf([["Bring it back", "restore"]]) });
   }
-  function openRoutine(id) { S.open = id; S.edit = null; S.newer = false; S.ptab = "this"; S.seg = "routines"; S.pop = null; C.resetScroll = true; }
-  function goSeg(v) { S.seg = v; S.open = null; S.edit = null; S.newer = false; S.ptab = "all"; C.resetScroll = true; if (mobile()) S.sheet = false; }
+  function openRoutine(id) { S.issue = null; S.open = id; S.edit = null; S.newer = false; S.ptab = "this"; S.seg = "routines"; S.pop = null; C.resetScroll = true; }
+  function goSeg(v) { S.issue = null; S.seg = v; S.open = null; S.edit = null; S.newer = false; S.ptab = "all"; C.resetScroll = true; if (mobile()) S.sheet = false; }
   function flash(id, ms) { S.flash = id; setTimeout(() => { if (S.flash === id) { S.flash = null; render(); } }, ms); }
 
   /* ================================================================ tap a word to change it */
-  const POP_TITLE = { when: "Sent from", kind: "Which kind of thing", tag: "The tag", site: "From the site", words: "Mentioning", is: "Loci reads that it's", about: "About", fileAs: "File it as", on: "On", status: "Reading status", addTo: "Also add to", mode: "Before it files", onoff: "This routine is", every: "When", place: "Which topic", count: "How many", delay: "When it comes back", sources: "Sources", tidymode: "When Loci is sure" };
+  const POP_TITLE = { when: "Sent from", kind: "Which kind of thing", tag: "The tag", site: "From the site", words: "Mentioning", is: "Loci reads that it's", about: "About", fileAs: "File it as", on: "On", status: "Reading status", addTo: "Also add to", mode: "Before it files", onoff: "This routine is", every: "When", place: "Which topic", count: "How many", delay: "When it comes back", sources: "Sources", tidymode: "When Loci is sure", fkinds: "Look for", dest: "Bring them" };
   function popOpts(r, f) {
     const t = r.then || {};
     const O = {
@@ -929,8 +1075,10 @@
       every: [["day", "Every day"], ["weekdays", "Weekdays"], ...[1, 2, 3, 4, 5, 6, 0].map((d) => ["w" + d, `Every ${DAYLONG[d]}`]), ["month", "Every month"]],
       place: [["you", "My whole map"], ...TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name])], count: [["3", "3 questions, about two minutes"], ["5", "5 questions, about four minutes"]],
       delay: [["the next day", "The next day"], ["three days later", "Three days later"], ["a week later", "A week later"]],
+      dest: [["page", "On a Finds page, for me to choose"], ["toread", "Straight into To read"]],
     };
-    const cur = { when: r.when, kind: r.ifs?.find((c) => c.t === "kind")?.v, is: r.ifs?.find((c) => c.t === "is")?.v, about: r.ifs?.find((c) => c.t === "about")?.v, fileAs: t.fileAs, on: t.on, status: t.status, addTo: t.addTo, mode: r.mode, onoff: r.on ? "1" : "0", tidymode: r.mode, every: r.every, place: r.place, count: String(r.count), delay: r.delay }[f];
+    if (r.kind === "follow") O.count = [["3", "Up to 3"], ["6", "Up to 6"], ["10", "Up to 10"]];
+    const cur = { when: r.when, kind: r.ifs?.find((c) => c.t === "kind")?.v, is: r.ifs?.find((c) => c.t === "is")?.v, about: r.ifs?.find((c) => c.t === "about")?.v, fileAs: t.fileAs, on: t.on, status: t.status, addTo: t.addTo, mode: r.mode, onoff: r.on ? "1" : "0", tidymode: r.mode, every: r.every, place: r.place, count: String(r.count), delay: r.delay, dest: r.dest }[f];
     return [O[f], cur];
   }
   const popTarget = () => (S.pop.r === "draft" ? C.draft : RR(S.pop.r));
@@ -941,6 +1089,8 @@
     if (["tag", "site", "words"].includes(f)) {
       const c = r.ifs.find((x) => x.t === f);
       body = `<input class="sm-input" id="pop-text" value="${esc(c?.v || "")}" aria-label="${POP_TITLE[f]}"><div class="rx-popacts">${btn("Done", 'data-act="pop-text"')}${btn("Remove this condition", 'data-act="pop-remove"', "link")}</div>`;
+    } else if (f === "fkinds") {
+      body = FIND_KINDS.map(([v, l]) => `<button type="button" class="rx-opt" data-act="pop-fk" data-v="${v}" aria-pressed="${(r.kinds || []).includes(v)}">${l}</button>`).join("");
     } else if (f === "sources") {
       body = SOURCES.map((x) => `<button type="button" class="rx-opt" data-act="pop-src" data-v="${esc(x)}" aria-pressed="${r.sources.includes(x)}">${esc(x)}</button>`).join("");
     } else {
@@ -1008,7 +1158,7 @@
     const dl = $(".td-dayline", root); if (dl) dl.innerHTML = "<b>Today</b> · your routines filed 6 things overnight";
     const filed = 6 + ACT.filter((a) => a.live && a.state === "filed").length;
     $(".td-top", root)?.insertAdjacentHTML("afterend", `<section class="rx-today" aria-labelledby="rx-today-h"><div class="td-h is-plain"><h2 id="rx-today-h">From your routines</h2><span><a href="#routines" data-act="go-routines">All routines</a></span></div>
-      <button type="button" class="rx-todaycard" data-act="today-look"><span class="kicker">Since yesterday evening</span><b>Your routines filed ${filed} things for you.${W.length ? ` ${plural(W.length, "thing is", "things are")} waiting for a quick look.` : ""}</b><em>${W.length ? "Look now" : "See your routines"}</em></button></section>`);
+      <button type="button" class="rx-todaycard" data-act="today-look"><span class="kicker">Since yesterday evening</span><b>Your routines filed ${filed} things for you.${W.length ? ` ${plural(W.length, "thing is", "things are")} waiting for a quick look.` : ""}</b><em>${W.length ? "Look now" : "See your routines"}</em></button>${(() => { const iss = ISSUES.find((x) => openOf(x)); if (!iss) return ""; const fr = RR(iss.rid), top = iss.items.find((f) => f.top) || iss.items[0]; return `<button type="button" class="rx-todaycard finds" data-act="today-finds" data-v="${iss.id}"><span class="kicker">This morning's finds · ${esc(fr ? fr.name : "")}</span><b>${plural(openOf(iss), "new find")}. Top pick: “${esc(top.title)}”.</b><em>Look through them</em></button>`; })()}</section>`);
   }
   function everythingView() {
     shell("library");
@@ -1029,14 +1179,16 @@
   function canvas() {
     if (S.edit) return editorView();
     if (S.newer) return newView();
+    if (S.issue && issueById(S.issue)) return issuePage(issueById(S.issue));
     const r = S.open && RR(S.open);
     if (r) return routinePage(r);
-    return `${tiles()}${bar()}${S.seg === "waiting" ? waitingSeg() : S.seg === "activity" ? activitySeg() : routinesSeg()}`;
+    return `${tiles()}${bar()}${S.seg === "waiting" ? waitingSeg() : S.seg === "activity" ? activitySeg() : S.seg === "finds" ? findsSeg() : routinesSeg()}`;
   }
   function crumb() {
     const r = S.open && RR(S.open);
     if (S.edit) return ["Routines", S.edit.isNew ? "New routine" : `${RR(S.edit.id)?.name || ""}: editing`];
     if (S.newer) return ["Routines", "New routine"];
+    if (S.issue && issueById(S.issue)) return ["Routines", "Finds", issueById(S.issue).date];
     if (r) return ["Routines", r.name];
     return ["Routines"];
   }
@@ -1088,6 +1240,7 @@
   root.addEventListener("focusin", (ev) => { if (ev.target.id === "rx-text" && mobile() && !S.sheet) { S.sheet = true; render(); } });
   root.addEventListener("change", (ev) => {
     const t = ev.target;
+    if (t.dataset.fs) { const [f] = findById(t.dataset.f); if (f) f[t.dataset.fs] = t.value; return; }
     if (t.id === "pop-time" && S.pop) { const r = popTarget(), before = JSON.stringify(r); r.time = t.value || r.time; changed(r, before); render(); return; }
     if (!S.edit) return;
     const d = S.edit.d;
@@ -1119,17 +1272,18 @@
         else { toast(`In the app this opens ${t.textContent.trim()}. This prototype has Everything and Routines.`); }
         break;
       }
-      case "tile": { const v = t.dataset.v; if (v === "waiting" || v === "activity") goSeg(v); else { goSeg("routines"); S.only = v === "paused" ? "paused" : null; } break; }
+      case "tile": { const v = t.dataset.v; if (v === "waiting" || v === "activity" || v === "finds") goSeg(v); else { goSeg("routines"); S.only = v === "paused" ? "paused" : null; } break; }
       case "seg": goSeg(t.dataset.v); break;
       case "kind": S.kind = t.dataset.v; break;
       case "open-r": if (!r) return; openRoutine(r.id); break;
       case "back":
-        if (S.edit) { S.edit = null; }
+        if (S.issue) { const from = S.issueFrom; S.issue = null; if (from && from !== "finds" && RR(from)) S.open = from; else { S.seg = "finds"; S.ptab = "all"; } }
+        else if (S.edit) { S.edit = null; }
         else { S.open = null; S.newer = false; S.ptab = "all"; }
         C.resetScroll = true; break;
       case "ptab": S.ptab = t.dataset.v; break;
       case "fold": S.sheet = false; break;
-      case "new": S.newer = true; S.open = null; S.edit = null; S.ptab = "all"; C.resetScroll = true; break;
+      case "new": S.issue = null; S.newer = true; S.open = null; S.edit = null; S.ptab = "all"; C.resetScroll = true; break;
       case "tell": {
         if (mobile()) S.sheet = true;
         const lastMsg = C.all[C.all.length - 1];
@@ -1140,7 +1294,8 @@
         }
         render(); $("#rx-text", root)?.focus(); return;
       }
-      case "blank": startEdit(blank(t.dataset.v), true, "new"); break;
+      case "blank": { const v = t.dataset.v; const d = blank(v === "follow" ? "schedule" : v); if (v === "follow") { edSet(d, "skind", "follow"); d.every = "day"; } startEdit(d, true, "new"); break; }
+      case "new-follow": { const d = blank("schedule"); edSet(d, "skind", "follow"); d.every = "day"; startEdit(d, true, null); break; }
       case "tpl": startEdit(TPL[Number(t.dataset.v)], true, "new"); break;
       case "edit": if (!r) return; startEdit(r, false); break;
       case "dupe": if (!r) return; startEdit({ ...clone(r), id: "draft", name: `${r.name} (copy)`, lately: [] }, true, null); toast(`A copy of “${r.name}”. Change what you need, then turn it on.`); break;
@@ -1151,6 +1306,7 @@
         if (f === "und") { const u = d.then.understand; if (u.includes(v)) d.then.understand = u.filter((x) => x !== v && !(v === "summary" && x === "text")); else { u.push(v); if (v === "summary" && !u.includes("text")) u.unshift("text"); } }
         if (f === "learn") d.then.learn = d.then.learn.includes(v) ? [] : [v];
         if (f === "reply") d.then.reply = d.then.reply === v ? "" : v;
+        if (f === "fkind") { const ks = d.kinds || []; d.kinds = ks.includes(v) ? (ks.length > 1 ? ks.filter((x) => x !== v) : ks) : [...ks, v]; }
         if (f === "src") { const k = d.sources.indexOf(v); if (k >= 0) { if (d.sources.length > 1) d.sources.splice(k, 1); } else d.sources.push(v); }
         break;
       }
@@ -1225,11 +1381,12 @@
         S.pop = S.pop && S.pop.r === t.dataset.r && S.pop.f === t.dataset.f ? null : { r: t.dataset.r, f: t.dataset.f, x, y };
         break;
       }
-      case "pop-set": case "pop-text": case "pop-remove": case "pop-src": {
+      case "pop-set": case "pop-text": case "pop-remove": case "pop-src": case "pop-fk": {
         const P = S.pop, x = popTarget(), before = JSON.stringify(x);
         if (a === "pop-set") { setField(x, P.f, t.dataset.v); S.pop = null; }
         if (a === "pop-text") { const v = ($("#pop-text", root)?.value || "").trim(); if (v) setField(x, P.f, P.f === "tag" && !v.startsWith("#") ? "#" + v : v); S.pop = null; }
         if (a === "pop-remove") { x.ifs = x.ifs.filter((c) => c.t !== P.f); S.pop = null; }
+        if (a === "pop-fk") { const v = t.dataset.v, ks = x.kinds || []; x.kinds = ks.includes(v) ? (ks.length > 1 ? ks.filter((y) => y !== v) : ks) : [...ks, v]; }
         if (a === "pop-src") { const v = t.dataset.v, k = x.sources.indexOf(v); if (k >= 0) { if (x.sources.length > 1) x.sources.splice(k, 1); } else x.sources.push(v); }
         changed(x, before, P.f); break;
       }
@@ -1260,6 +1417,47 @@
       }
       case "act-undo": { const x = ACT[Number(t.dataset.i)], rr = RR(x.rid); x.state = "undone"; x.undo = false; if (rr) { rr.filed = Math.max(0, rr.filed - 1); rr.lately.shift(); } toast("Undone. It's back in Unsorted, and the routine counts it as a miss."); break; }
       case "goto": goSeg(t.dataset.v); break;
+      case "open-issue": openIssue(t.dataset.v); break;
+      case "iss-back": { const from = S.issueFrom; S.issue = null; S.findNo = null; if (from && from !== "finds" && RR(from)) { S.open = from; S.ptab = "this"; } else { S.seg = "finds"; S.ptab = "all"; } C.resetScroll = true; break; }
+      case "f-save": case "f-later": {
+        const [f] = findById(t.dataset.v); if (!f) return;
+        f.st = a === "f-save" ? "saved" : "later"; S.findNo = null;
+        const q = f.why.find((w) => w.t === "q");
+        toast(a === "f-save" ? `Saved “${f.title}” as ${f.as} on ${PLACES[f.on]?.name || "your map"}.${q ? " It's linked to your question." : ""}` : `“${f.title}” is in To read.`, () => { f.st = null; });
+        break;
+      }
+      case "f-no": S.findNo = t.dataset.v; break;
+      case "f-reason": { const [f] = findById(t.dataset.v); if (!f) return; f.st = "no"; f.reason = t.dataset.r2; S.findNo = null; toast(f.reason === "Not from this source" ? `Got it: fewer from ${f.src}.` : f.reason === "Just not now" ? "Skipped for now." : "Got it: fewer like this.", () => { f.st = null; f.reason = null; }); break; }
+      case "f-undo": { const [f] = findById(t.dataset.v); if (f) { f.st = null; f.reason = null; } break; }
+      case "f-ask": {
+        const [f, iss] = findById(t.dataset.v); if (!f) return;
+        if (mobile()) S.sheet = true;
+        S.ptab = "this"; C.force = iss.rid; meSay(`Tell me about “${f.title}”`);
+        const q = f.why.find((w) => w.t === "q");
+        think(() => lociSay(`${f.sum}\nIt fits ${PLACES[f.topic]?.name || "your map"}, beside 3 things you've saved there.${q ? ` It may answer your question “${q.v}”.` : ""}`, { opts: optsOf([["Save it and make a Lumen", "find-lumen", f.id], ["Compare with what I've saved", "find-compare", f.id], ["Just save it", "find-save", f.id]]) }), 500);
+        C.force = null; return;
+      }
+      case "iss-later": case "iss-clear": {
+        const iss = issueById(t.dataset.v), touched = iss.items.filter((f) => !f.st);
+        touched.forEach((f) => { f.st = a === "iss-later" ? "later" : "no"; });
+        toast(a === "iss-later" ? `${plural(touched.length, "find")} put in To read.` : `${plural(touched.length, "find")} cleared.`, () => touched.forEach((f) => { f.st = null; }));
+        break;
+      }
+      case "left-see": toast("In the app, this lists everything left out, in case Loci got one wrong."); break;
+      case "check-now": {
+        if (!r) return;
+        toast(`Looking through ${plural(r.sources.length, "source")}…`); render();
+        setTimeout(() => {
+          const pool = SAMPLE.filter((f) => !r.kinds || r.kinds.includes(f.kind)), items = (pool.length ? pool : SAMPLE).slice(0, r.count).map((f, i) => ({ ...clone(f), id: `f${r.id}-${iid}-${i}`, top: i === 0 }));
+          const iss = { id: "i" + ++iid, rid: r.id, date: "Monday 26 October", when: "Just now", sources: r.sources.length, checked: 27, left: [[2, "already in your Commonplace"], [8, "off your topics"]], items };
+          ISSUES.unshift(iss); r.lately.unshift({ t: plural(items.length, "find"), w: "on a new Finds page", when: "Just now" });
+          if (r.stat === "New") r.stat = "Ran once";
+          openIssue(iss.id, r.id); toast(`${plural(items.length, "find")} for “${r.name}”.`); render();
+        }, 900);
+        return;
+      }
+      case "today-finds": go("routines"); openIssue(t.dataset.v, "finds"); break;
+      case "ed-addsrc": { const v = ($("#ed-src", root)?.value || "").trim(); if (!v) return; if (!S.edit.d.sources.includes(v)) S.edit.d.sources.push(v); break; }
       case "today-look": go("routines"); goSeg(W.length ? "waiting" : "routines"); break;
       case "go-routines": go("routines"); goSeg("routines"); break;
       case "view": go(t.dataset.v); break;
@@ -1279,5 +1477,6 @@
   if (start === "everything") S.view = "everything";
   if (["waiting", "activity"].includes(start)) S.seg = start;
   if (start === "new") S.newer = true;
+  if (start === "finds") S.seg = "finds";
   render();
 })();

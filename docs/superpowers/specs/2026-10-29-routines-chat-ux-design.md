@@ -6,6 +6,7 @@ MEDIUM (a UX design for routines; the machinery is in the routines v3 spec)
 **Status:** Proposed. Claude, 29 October 2026. Version 6 (the tab, a routine's page, the editor and New routine, §0 and §1) replaces versions 4 and 5's pages; the conversation (§2 to §5) stays. Nothing here is approved until the owner says so in the conversation.
 **Prototype:** [`prototypes/routines/`](../../../prototypes/routines/README.md), published as **Studiolo Routines** (the same link as version 4; version 3 stays at its own).
 **Owner's direction (29 Oct):** "How to write a routine should be user friendly. It can be through a chat in the page. Have all of that, and have it less overwhelming. Clarity is key."
+**Owner's direction on version 6 (29 Oct):** "Can we have a type that works on checking resources and then suggests it in a page? Like AI news in a specific field."
 **Owner's direction on version 5 (29 Oct):** "Where are the screens to view or edit a routine? Also, can the cards get more interesting? Look at the goals and questions cards we designed in another chat."
 **Owner's direction on version 4 (29 Oct):** "Still very linear … overwhelming … It has to be properly segregated. … I ask my question, and this question has to be answered. And on the right, the Loci side panel has to be the same design we have everywhere. … Less overwhelmed, better UX and UI and clarity, so the user knows where to click. … Have the routine page similar to what we usually do in the app, rather than feeling like an add-on."
 **Builds on:** [Routines, version 3](2026-10-29-routines-filing-rules-design.md) for what routines can do (filing rules, schedules, events, trust, channels). This document changes **how the learner sees them, makes them and changes them**, not what they can do.
@@ -22,8 +23,8 @@ Version 6 answers two points from the owner:
 | | Questions and goals | Routines |
 |---|---|---|
 | Where | A Commonplace tab | A Commonplace tab, beside it |
-| Top of the page | Four tiles: open · goals · answered · parked | Four tiles: on · waiting for you · filed this week · paused |
-| The bar | *Open · Answered · Parked · All*, topic chips, Cards · List | *Routines · Waiting · Activity*, kind chips, **New routine** |
+| Top of the page | Four tiles: open · goals · answered · parked | Four tiles: on · waiting for you · new finds · filed this week |
+| The bar | *Open · Answered · Parked · All*, topic chips, Cards · List | *Routines · Finds · Waiting · Activity*, kind chips, **New routine** |
 | A card | A top line; the ring; a kicker; the goal in Newsreader; its questions as small rows; **Next**; a footer with where it was written and *Active ▾* | A top line; a round mark for what starts it; a kicker; the name in Newsreader; **When · Loci · Then** as small rows; **Last**, **Waiting** or **Next**; a footer with the ring or the count and *On ▾* |
 | Colours | ? amber open · ◎ accent goal · ✓ green answered · – grey parked | amber: waiting for you · accent: on · green: filed · grey: paused |
 | The ring | Questions answered of the goal's total | **How often it was right when you checked** (9 of 10). It's the routine's progress toward filing on its own |
@@ -41,9 +42,9 @@ What versions 4 and 5 got right stays:
 **Where it lives:** *Commonplace*, as a tab after *Everything · Collections · To read · Questions and goals · Templates*. When something waits for you, the tab shows an amber count.
 
 **Top to bottom:**
-1. **Four tiles**, each a number with its mark: *9 routines on · 3 things waiting for you · 23 filed for you this week · 0 paused*. Clicking one filters the tab or opens that view.
+1. **Four tiles**, each a number with its mark: *11 routines on · 3 things waiting for you · 7 new finds to look through · 23 filed for you this week*. Clicking one filters the tab or opens that view.
 2. **One bar:**
-   - *Routines 9 · Waiting 3 · Activity*;
+   - *Routines 11 · Finds 7 · Waiting 3 · Activity*;
    - kind chips (*All kinds · When I send · On a schedule · After I do something*);
    - **New routine**, the page's one primary button.
 3. **Cards in three groups**, each with a heading, a count and one line:
@@ -130,7 +131,78 @@ The same form serves **Edit**, **New routine**, *Edit in full* on a draft Loci m
    - *Follow: AI in architecture*;
    - *Morning review*.
 
-### 1.5 Tablets and phones
+### 1.5 Finds: a routine that checks sources and brings what's new to a page
+
+This is the *Follow sources* routine (routines v3 spec §1; 25 Oct design), made into its own kind. It watches sources for a subject, such as *AI in architecture*, and each run brings what's new to **a Finds page**, where the learner keeps what's useful.
+
+**Making one:**
+- *Keep me up to date on AI in architecture*, *AI news in architecture*, or *Every Monday, find new papers on wind towers*, said to Loci; or **New routine → Find new things for me**.
+- Loci asks only for the sources (your most-saved-from, each a tick) and how often. Before anything runs, it shows three things it would have found this morning.
+- The editor's sections:
+  1. **What to look for:**
+     - **Subject** in your own words (*AI in architecture*), or a topic as a whole;
+     - **Sort onto** whichever topic fits, or one topic;
+     - **Look for**: articles, papers, talks, tools and data;
+     - **Where to look**: your sources, plus **Add a website, newsletter, journal or channel**;
+     - **How many**: up to 3, 6 or 10;
+     - **Bring them**: on a Finds page (you choose), or straight into To read.
+  2. **When it runs:** day chips and a time.
+  3. **Name.**
+- Its sentence: *Every morning at 7:30, look through 4 sources for new articles, papers, talks and tools on AI in architecture, and bring me up to 6 finds on a Finds page.* Every underlined part is tappable.
+
+**Where finds show:**
+- **The tab:** a **new finds** tile, and **Finds** in the bar beside *Routines · Waiting · Activity*. Finds lists one card per run (*AI in architecture · Today, 07:30 · Monday 26 October*): the first three finds as rows, the top pick, and a ring for how many are decided.
+- **The routine's card:** *Finds: 6 new finds · Today, 07:30 · Look through*.
+- **The routine's page:** its latest Finds pages first, and **Check now**.
+- **Today:** *This morning's finds: 6 new. Top pick: "…"*. **Loci:** *What did you find today?*
+- **Activity:** *AI in architecture brought 6 finds to a Finds page · Look through*.
+
+**A Finds page:**
+- **The header:**
+  - *Finds · AI in architecture*;
+  - the date;
+  - *6 finds from 4 sources · Loci looked at 41 · Today, 07:30*;
+  - a ring: *6 to decide*.
+- **The top pick**, large; then the rest **grouped by topic** (as the question wall is).
+- **Each find:**
+  - its kind, source and length (*Paper · Building-science journal · 12 min read*);
+  - the title, in Newsreader;
+  - a two-line summary;
+  - **why it's for you**, in the Questions and goals marks:
+    - amber **?** *May answer your question "Where does the light come from in each hall?"*;
+    - accent **◎** *Serves your goal "…"*;
+    - a green dot *Fits Daylight & shading*;
+    - or a note, such as *A different view from the precedents you saved this month*.
+- **One decision each:**
+  - **Save**, as *Papers* on *Daylight & shading*, both changeable. A find that may answer a question is saved linked to it.
+  - **Read later** puts it in To read.
+  - **Not for me** asks why (*Not this topic · Not from this source · Too basic · Just not now*), and the next run uses the answer.
+  - Each has Undo.
+- **Ask Loci** on a find: Loci sums it up, says where it sits beside what you've saved, and offers *Save it and make a Lumen*, *Compare with what I've saved*, or *Just save it*. This is the step from finding to learning.
+- **Left out 17:** *3 already in your Commonplace · 11 off your topics · 3 the same story twice*, with **See them**, in case Loci got one wrong.
+- **The foot:** *Read the rest later · Clear the rest*; *Change what it looks for* opens the editor.
+
+**How it runs in the app:**
+- **Fetching:**
+  - A scheduled job (the Trigger.dev worker from the routines v3 spec, §7) runs at the routine's time.
+  - It fetches each source's feed: RSS or Atom for sites and journals, a newsletter's emails through the learner's own address, or a channel's feed.
+  - Items it has seen before are dropped by link, then by title similarity.
+- **Plain checks, in code:**
+  - already in the Commonplace (link, DOI or near-identical title);
+  - the same story from two sources;
+  - older than the last run.
+- **One small-model call per run,** with structured output, for what's left (often 20 to 40 items):
+  - the subject, the learner's topics, their open questions and goals, and the last 30 *Not for me* reasons;
+  - each item's title, source and first paragraphs.
+
+  It returns a relevance score, a two-line summary and the *why* for each, plus which question or goal it bears on. Code then keeps the top *N*, and it never invents a link.
+- **Cost:** scheduled runs go through the Batch API, with the learner's context cached. A run with nothing new makes no model call.
+- **Learning from decisions:** *Not from this source* lowers that source; *Not this topic* lowers that topic for this routine; Saved items raise both. These are plain weights in code, and the model call sees them.
+- **Suggesting sources** (later): Loci proposes a source the learner has saved from three or more times. Searching the open web for new sources is a separate decision (§6).
+
+In the prototype, finds are examples and **Check now** builds a page from them.
+
+### 1.6 Tablets and phones
 
 - The tab, the page and the editor fill the screen.
 - Loci folds to the composer at the foot, as the app's drawer does; typing or *Why?* raises it as a sheet.
@@ -228,5 +300,9 @@ In the prototype, a keyword reader stands in for the model call, so typing works
    - The real Loci panel, which answers questions and can make and change routines.
 2. **Where Routines live.** A Commonplace tab beside Questions and goals (as here), or their own place in the rail? Either way, Loci anywhere can make one ("Tell Loci what should happen…").
 3. **Which way in comes first on New routine:** *Tell Loci* (as here), or the form?
-4. **The waiting strip on Today:** just the count (as here), or the first card itself, so one decision can be made without leaving Today?
-5. **Starters and templates:** Loci's three starter chips, chosen from the learner's own activity (as here), or a fixed set?
+4. **Finds:**
+   - Is a page per run right, or one running list?
+   - Should Finds be in the Routines tab (as here), or its own Commonplace tab?
+   - Should Loci also search the open web for a subject, beyond the chosen sources? That costs more, and the results are less sure.
+5. **The waiting strip on Today:** just the count (as here), or the first card itself, so one decision can be made without leaving Today?
+6. **Starters and templates:** Loci's three starter chips, chosen from the learner's own activity (as here), or a fixed set?

@@ -1,4 +1,4 @@
-// Bundles the Routines prototype (version 6: a Commonplace tab with a page and an editor for each routine,
+// Bundles the Routines prototype (version 7: a Commonplace tab with a page and an editor for each routine, Finds,
 // and the real Loci panel).
 // It uses the real shell and Today screen with the app's compiled CSS (captured read-only from studiolo's
 // /dev/specimens; see ../live-lumens/capture/capture.cjs), the Settings and memory prototype's form styles
@@ -15,7 +15,7 @@ const appCss = snap.css.replace(/\/\* \[project\][^*]*\*\//g, "").replace(/<\/st
 const page = `<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Studiolo Routines</title>
-<meta name="description" content="Routines in Studiolo: a Commonplace tab of routine cards, a page and an editor for each routine, and the Loci panel beside them to ask, make and change.">
+<meta name="description" content="Routines in Studiolo: a Commonplace tab of routine cards, a page and an editor for each routine, Finds pages from the sources you follow, and the Loci panel beside them.">
 <!-- Screens and styles: studiolo /dev/specimens, captured read-only. Routines: src/routines.js. -->
 <style>${appCss}</style>
 <style>${base}</style>
