@@ -3,7 +3,7 @@ HIGH (a new kind of background work, new records, model calls without the learne
 # Loci routines: keeping the learning loop moving between sessions
 
 **For:** the owner, to decide the direction, and the agent who later builds it in `studiolo`.
-**Status:** Proposed. Claude, 25 October 2026. Nothing here is approved until the owner says so in the conversation.
+**Status:** Superseded on 29 October 2026 by [What Loci should do while you're away](2026-10-29-background-work-rethink.md). Its run mechanics (§4) still stand; its product shape (nine kinds, a Routines page, a sentence editor) does not.
 **Prototype:** [`prototypes/loci-routines/`](../../../prototypes/loci-routines/README.md), published as the claude.ai artifact **Studiolo Loci Routines**.
 **Started from:** Walling's "Everyday agents" (instructions, scope, trigger, delivery, run history, cost up front), which the owner shared on 25 October. The structure and the card here are Studiolo's own (§6).
 **Builds on, in this repo:**

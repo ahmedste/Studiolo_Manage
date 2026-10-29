@@ -1,5 +1,7 @@
 # Loci routines
 
+> **Superseded direction (29 Oct).** This prototype shows the 25 Oct routines design. The direction is now three jobs (Follow, Get ready, Keep it fresh) with no Routines page: see [`docs/superpowers/specs/2026-10-29-background-work-rethink.md`](../../docs/superpowers/specs/2026-10-29-background-work-rethink.md). Kept for reference until a new prototype replaces it.
+
 **Routines keep your learning moving between sessions.** Each one is a standing instruction to Loci, written as one sentence and tied to one place on the map. Its runs bring back things for you to keep, make or answer. It never changes your map or your memory.
 
 Design: [`docs/superpowers/specs/2026-10-25-loci-routines-design.md`](../../docs/superpowers/specs/2026-10-25-loci-routines-design.md). That spec covers what routines are for, the rules, how a run really works with Claude, the card, data and phases.
