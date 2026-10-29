@@ -7,6 +7,7 @@ HIGH (new field types, relation fields, a page layout per collection, collection
 **Checked against:** `studiolo` main @ `b5eeee2` (25 October 2026), read only. Every path below exists on that commit unless marked *new*.
 **Replaces:** §8–§10 (records, phases, decisions) of [`2026-10-25-objects-any-field-design.md`](2026-10-25-objects-any-field-design.md), which was written before the code could be read. Its §1 (topic / source / object) and §6 (three fields worked through) still stand.
 **Works with:** the Library lane of the MVP tracker (perf baseline → card projection and keyset paging → client cache; `project-docs/implementation/library-perf-baseline.md`), [Work in any field](2026-10-24-work-any-field-design.md) (one field engine), [Questions and goals inside items](2026-10-25-questions-and-goals-inside-items-design.md) (the `@` trigger), the photos roadmap's Views (one `library_views` table).
+**Order superseded (28 Oct):** [the programme](2026-10-28-objects-questions-boards-programme.md) puts questions and goals first and Boards last, and renames the grouped view *Columns* (OQB-D1). The detail below stands.
 **Prototype:** [`prototypes/objects-phases/`](../../../prototypes/objects-phases/README.md). The real Commonplace (rail, header, cards, item page, customizer) with a phase switch: **Today · Phase 1 · Phase 2 · Phase 3**. Each step adds what that phase builds.
 
 ## 0. In short
@@ -24,7 +25,7 @@ flowchart LR
     P0["P0 One Object page<br/>built from blocks"] --> P1["P1 Sections and<br/>chips"] --> P2["P2 Arrange page"]
   end
   subgraph V["Lane V · Views"]
-    V1["V1 Table"] --> V2["V2 Board, Timeline,<br/>saved views, sort by field"]
+    V1["V1 Table"] --> V2["V2 Columns, Timeline,<br/>saved views, sort by field"]
   end
   subgraph T["Lane T · Types and Loci"]
     T1["T1 Starter types<br/>per field"] --> T2["T2 Objects filter"] --> T3["T3 Sensitivity,<br/>Loci drafts a type"]
@@ -40,7 +41,7 @@ flowchart LR
 |---|---|---|---|
 | **0 · Groundwork** | Nothing visible. One descriptor for field types; one Object page built from blocks | F0, P0 | none |
 | **1 · Fields for any field** | Choice lists with colours, long text as page sections, checkboxes, year-only dates and ranges, units; a **Table** view; starter types for law, medicine and architecture | F1, P1, V1, T1 | 1 (F) |
-| **2 · Links, pages, views** | Relation fields shown on both sides (Cites ↔ Cited by), up to 24 fields in groups; **Arrange page**; **Board** and **Timeline**; saved views; sort by a field; an Objects filter | F2, P2, V2, T2 | 3 (F, P, V) |
+| **2 · Links, pages, views** | Relation fields shown on both sides (Cites ↔ Cited by), up to 24 fields in groups; **Arrange page**; **Columns** and **Timeline**; saved views; sort by a field; an Objects filter | F2, P2, V2, T2 | 3 (F, P, V) |
 | **3 · Every field** | Group, Place and Event bases; Confidential and Clinical collections; Loci drafts a collection from a sentence and fills fields from a link | F3, T3 | 2 (F, T) |
 
 ## 1. How Objects work today (b5eeee2)
@@ -130,11 +131,11 @@ The layout is per collection, never per object. `layout` (Portrait, Picture, Tex
 
 **V1 · Table.** A collection's page gets a view switch: **Cards** (today's wall) · **Table**. Columns are the active fields (choose which, in the column header's menu); choice and checkbox cells edit in place; the title opens the item. Same query, same keyset paging and page size (60) as the wall; sorted by date added or by title. No migration.
 
-**V2 · Board, Timeline, saved views, sort by field.**
+**V2 · Columns, Timeline, saved views, sort by field.**
 
-- **Board** groups by a Choice field; dragging a card sets the value (one `PATCH`, the same field write as the rail). Columns load 60 cards each, with "Load more".
+- **Columns** groups by a Choice field; dragging a card sets the value (one `PATCH`, the same field write as the rail). Columns load 60 cards each, with "Load more".
 - **Timeline** draws a Date field to scale (ranges as bars, open ranges fading to today). It reads a light projection (id, title, the date columns) for up to 500 items.
-- **Saved views** in `library_views` (Lane V's migration), the same table the photos roadmap proposes for Commonplace Views: `collection_id` (nullable), `layout` (`cards` / `table` / `board` / `timeline`), `group_by_field_id`, `sort jsonb`, `columns uuid[]`, `query jsonb`, `position`. A view can be pinned after its collection in the header's type row.
+- **Saved views** in `library_views` (Lane V's migration), the same table the photos roadmap proposes for Commonplace Views: `collection_id` (nullable), `layout` (`cards` / `table` / `columns` / `timeline`), `group_by_field_id`, `sort jsonb`, `columns uuid[]`, `query jsonb`, `position`. A view can be pinned after its collection in the header's type row.
 - **Sort by a field** waits for the perf lane's keyset work: ordering by `(value, id)` needs an index per type on `item_field_values (account_id, field_id, <value column>, item_id)`, measured on the perf branch's seeded account before it ships.
 
 ### 4.4 Types, filter, sensitivity, Loci (Lane T)
@@ -158,7 +159,7 @@ Each row is one branch and one handover. "Needs" are hard dependencies; everythi
 | **T1** | Types | Starter types per field; onboarding offer; Templates "Start from your field" | `collection-presets.ts`, `templates-page.tsx`, `onboarding/learner.ts` | — | F1 | LOW |
 | **F2** | Fields | Relation fields (both sides, several, symmetric), 24 fields, groups, item → relation | `relations.ts`, `relations-repository.ts`, `collection-fields-repository.ts`, `field-editor.tsx`, customizer | **F-2** | F1 | HIGH |
 | **P2** | Page | Arrange page; Slideshow and Document heroes; other-side blocks | `object-page.tsx`, `object-blocks.tsx`, `item-hero.tsx`, `collections-repository.ts` | **P-1** | P1 (other-side blocks need F2) | MEDIUM |
-| **V2** | Views | Board, Timeline, saved views, pinning, sort by field | `board-view.tsx` *new*, `timeline-view.tsx` *new*, `views-repository.ts` *new*, `search.ts` | **V-1** | V1; sort by field needs perf keyset | HIGH |
+| **V2** | Views | Columns, Timeline, saved views, pinning, sort by field | `columns-view.tsx` *new*, `timeline-view.tsx` *new*, `views-repository.ts` *new*, `search.ts` | **V-1** | V1; sort by field needs perf keyset | HIGH |
 | **T2** | Types | Objects' own filter in the header | `wall-chips.ts`, `header-model.ts` | — | F1 | LOW |
 | **F3** | Fields | Group, Place, Event bases | `item-kinds.ts`, `starter-collections.ts`, customizer | **F-3** | F2 | MEDIUM |
 | **T3** | Types | Sensitivity; Loci drafts a collection; fill from link; `@` linking | `collections-repository.ts`, copilot tools, `ai.md` | **T-1** | Learner memory, Copilot on | HIGH |

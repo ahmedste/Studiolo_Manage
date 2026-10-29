@@ -1,0 +1,1398 @@
+<title>Learner Memory Design</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Studiolo's learner memory as cards on the learner's own map, five layers, what the learner sees, and the Settings tabs.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Studiolo's own palette and faces (warm paper, fine rules, restrained ultramarine). Layout: a contents rail beside one reading column; diagrams and tables may run wider. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #8e99a1; --accent: #1e3e9e; --accent-soft: #e6ebf8;
+  --save: #2f6b4a; --call: #1e3e9e; --edit: #9a3b2e;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; } }
+:root[data-theme="dark"] { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --save: #84c9a2; --call: #9db0f3; --edit: #ec9c8d; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding-block: 40px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 960px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 24px 64px; } }
+nav.toc { position: sticky; top: calc(24px + env(safe-area-inset-top, 0px)); align-self: start; font-size: 13px; }
+nav.toc h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: flex; gap: 10px; padding: 4px 8px; margin-left: -8px; border-radius: 3px; color: var(--ink-2); text-decoration: none; }
+nav.toc a:hover { background: var(--panel); color: var(--ink); }
+nav.toc a span { color: var(--ink-3); font-variant-numeric: tabular-nums; min-width: 1ch; }
+@media (max-width: 960px) { nav.toc { position: static; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); } nav.toc ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { nav.toc ol { grid-template-columns: minmax(0, 1fr); } }
+main { min-width: 0; }
+.kicker { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+h1 { font-family: var(--read); font-weight: 400; font-size: clamp(30px, 5vw, 42px); line-height: 1.1; margin: 0 0 18px; text-wrap: balance; letter-spacing: -0.01em; }
+.intro { display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); font-size: 13.5px; color: var(--ink-2); max-width: 760px; }
+.intro p { margin: 0; }
+.intro strong { color: var(--ink); }
+.paths { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 18px 0 0; font-size: 13px; color: var(--ink-2); }
+.paths b { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.paths i { width: 22px; height: 0; border-top: 2px solid var(--save); display: inline-block; }
+.paths .c i { border-top: 2px dashed var(--call); } .paths .e i { border-top: 4px solid var(--edit); }
+main h2 { font-family: var(--read); font-weight: 500; font-size: 27px; line-height: 1.2; margin: 56px 0 14px; padding-top: 22px; border-top: 1px solid var(--line); text-wrap: balance; scroll-margin-top: 16px; }
+main h3 { font-size: 15px; font-weight: 600; margin: 32px 0 8px; text-wrap: balance; scroll-margin-top: 16px; }
+main p, main li { max-width: 68ch; }
+main p { margin: 0 0 12px; }
+main ol, main ul { padding-left: 22px; margin: 0 0 14px; display: grid; gap: 6px; }
+main li::marker { color: var(--ink-3); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+strong { font-weight: 600; }
+.tbl { overflow-x: auto; margin: 6px 0 18px; border: 1px solid var(--line); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.45; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); background: var(--paper); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td { font-variant-numeric: tabular-nums; min-width: 120px; }
+.dia { margin: 10px 0 22px; padding: 18px; border: 1px solid var(--line); background: var(--panel); overflow-x: auto; }
+.dia pre.mermaid { margin: 0; background: none; text-align: center; font-family: var(--ui); }
+.dia pre.mermaid svg { max-width: 100%; height: auto; }
+blockquote { margin: 0 0 14px; padding: 4px 16px; border-left: 2px solid var(--accent); font-family: var(--read); font-size: 17px; }
+.ref { border-bottom: 1px dotted var(--ink-3); }
+.foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#0-in-short"><span>0</span>In short</a></li><li><a href="#1-what-exists-today"><span>1</span>What exists today</a></li><li><a href="#2-whats-already-agreed-and-what-this-design-adds"><span>2</span>What's already agreed, and what this design adds</a></li><li><a href="#3-how-others-do-it"><span>3</span>How others do it</a></li><li><a href="#4-the-model-five-layers-and-the-hidden-or-visible-rule"><span>4</span>The model: five layers and the hidden-or-visible rule</a></li><li><a href="#5-the-memory-map-cards-that-follow-the-graph"><span>5</span>The memory map: cards that follow the graph</a></li><li><a href="#6-reading-memory-cheaply-the-context-slice"><span>6</span>Reading memory cheaply: the context slice</a></li><li><a href="#7-writing-memory-how-loci-fills-the-cards"><span>7</span>Writing memory: how Loci fills the cards</a></li><li><a href="#8-using-memory-the-right-thing-at-the-right-time-with-the-right-question"><span>8</span>Using memory: the right thing, at the right time, with the right question</a></li><li><a href="#9-settings-five-tabs"><span>9</span>Settings: five tabs</a></li><li><a href="#10-data-model-proposal"><span>10</span>Data model (proposal)</a></li><li><a href="#11-fit-with-the-learn-roadmap-and-the-course-engine"><span>11</span>Fit with the Learn roadmap and the course engine</a></li><li><a href="#12-build-order"><span>12</span>Build order</a></li><li><a href="#13-decisions-for-the-owner"><span>13</span>Decisions for the owner</a></li><li><a href="#14-sources"><span>14</span>Sources</a></li></ol></nav>
+  <main>
+    <p class="kicker">Studiolo · learner memory · proposed</p>
+    <h1>Learner memory: one map, five layers, and the Settings that show it</h1>
+    <div class="intro"><p>HIGH (a design system across Settings, Loci, Learn and every AI surface; it needs migrations and the owner&#39;s decisions in §13)</p><p></p><p></p><p><strong>For:</strong> the owner, to decide; then the agent building learner context in <code>studiolo</code> (Stage 4&#39;s &quot;Instructions for Loci, app-maintained editable memory entries and their default-on toggle, bounded evidence and context selection&quot;).</p><p><strong>Status:</strong> Proposed. Claude, 24 October 2026. Nothing here is approved until the owner says so in the conversation. An agent recommendation is not approval.</p><p><strong>Checked against:</strong> <code>studiolo</code> main @ <code>3c2f744</code> (24 Oct 2026), read only. Paths below exist on that commit unless marked <em>new</em>.</p><p><strong>Builds on, and must not contradict:</strong></p><p>- <a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/product/mvp-scope.md#learner-context-and-personalization" target="_blank" rel="noopener"><code>project-docs/product/mvp-scope.md</code> → Learner context and personalization</a> (agreed scope: three layers, memory on by default, no hidden profile);</p><p>- <a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/architecture/course-engine.md#6-learner-model" target="_blank" rel="noopener"><code>project-docs/architecture/course-engine.md</code> §6</a> (the proposed Learner Model: concept levels, learning records, the learner card);</p><p>- <a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/architecture/data-model.md#learner-context-and-explainer-records" target="_blank" rel="noopener"><code>project-docs/architecture/data-model.md</code> → Learner context and explainer records</a>;</p><p>- <a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/design/interface.md#learner-instructions-and-memory" target="_blank" rel="noopener"><code>project-docs/design/interface.md</code> → Learner instructions and memory</a>;</p><p>- Craft, Studilo space: <em>Learner context &amp; Memory</em>, <em>AI BRain</em>, <em>Settings &amp; Onboarding</em>, <em>Copilot</em>, <em>Features &amp; Ideas</em> (&quot;Agent layers: learning flows up topic to area to map, skill profiles per area&quot;, Ahmed), <em>Library - polishment Phase</em> (the owner&#39;s notes of 10 Oct), <em>Vision &amp; Principles</em> (read 24 Oct 2026).</p><p></p><p><strong>Prototype:</strong> <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener"><code>prototypes/settings-memory/</code></a>, the Settings tabs and the memory map on Studiolo&#39;s real shell and styles.</p><p><strong>System reference (diagrams):</strong> <a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener"><code>2026-10-24-learner-memory-system-reference.md</code></a>: every Save, Call and Edit step, its tables, its cost and its tests.</p><p><strong>Build brief (start here to build):</strong> <a href="https://claude.ai/artifact/NzT1Jssm9UVAEyoNNAKSyf" target="_blank" rel="noopener"><code>2026-10-28-learner-memory-build-brief.md</code></a>: the six phases and L1 in detail.</p></div>
+    
+    <h2 id="0-in-short">0. In short</h2>
+<p>Studiolo should feel like it knows you: what you&#39;re new to, what you already do every day, what you got wrong last week, and how you like things explained. To get there without a hidden profile and without sending the whole account to the model every time, memory is organised <strong>the same way as your map</strong>.</p>
+<p><strong>One map.</strong> Every place on your Loci map (You, an area, a topic, a sub-topic) can hold a small <strong>card</strong>: what Loci knows about you <em>there</em>. A card has fixed slots (your level, why you&#39;re learning it, what you&#39;re working on, what you know, what to revisit, how you like it taught, your words). When you&#39;re on <em>Precast</em>, Loci reads the Precast card in full, a line from each card above it (Facade systems, Envelope &amp; Facade, You), and nothing from Law or Cooking.</p>
+<p><strong>Five layers.</strong> Only the first three are things a person thinks about; the last two are plumbing.</p>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>Layer</th>
+<th>Who writes it</th>
+<th>You see it</th>
+<th>You change it</th>
+<th>Loci reads it</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td><strong>Profile</strong>: name, time zone, what you do, language</td>
+<td>You</td>
+<td>Settings → Profile</td>
+<td>Yes</td>
+<td>What it needs (never your name in a Lumen brief)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Instructions</strong>: how you want to be taught, in your words, for everything or for one topic</td>
+<td>You</td>
+<td>Settings → Learning, and on the topic</td>
+<td>Yes</td>
+<td>Always, and it <strong>wins</strong> over memory</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Memory</strong>: what Loci noticed, as cards on your map</td>
+<td>Loci (and you)</td>
+<td>Settings → Memory, and on the topic</td>
+<td>Edit, delete, or turn it all off</td>
+<td>When memory is on</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Evidence</strong>: what happened (watched, answered, said, saved)</td>
+<td>The app, automatically</td>
+<td>Behind <strong>Why?</strong> on any memory</td>
+<td>No (it&#39;s the record), but deleting a memory stops it being used</td>
+<td>Only through a memory that cites it, plus plain counts</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Working copies</strong>: compiled digests and caches of layers 1–4</td>
+<td>The app</td>
+<td>No</td>
+<td>No</td>
+<td>Yes: they are layers 1–4, pre-shortened</td>
+</tr>
+</tbody></table></div>
+<p><strong>The one rule for what&#39;s hidden: any sentence about you that Loci reads, you can read.</strong> The app may keep raw records, numbers worked out from them by fixed rules, and shortened copies, out of sight. It may never keep a judgement about you that you can&#39;t see, correct or delete. That is already the agreed scope (&quot;They must not become a separate hidden learner profile&quot;); this design makes it testable (§4.3).</p>
+<p><strong>Cheap to read and write.</strong> A card is compiled into a short digest when it changes, not when it&#39;s read, so assembling Loci&#39;s context is one query and no model call. The slice is about <strong>350–700 tokens</strong> (today&#39;s learner line is about 30), and a conversation sends it once, not every turn. Fixed rules handle facts, checks, taps and ratings; a small model reads only the learner&#39;s own free text. All of it comes to about <strong>US$0.05 per active learner a month</strong> (<a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q#7-what-it-costs" target="_blank" rel="noopener">system reference §7</a>).</p>
+<p><strong>Shows little.</strong> The learner sees exactly what Loci reads, and the token budget is the filter: a few short lines per place, written as sentences. While learning, they see almost nothing about memory, just Lumens that are pitched right. Settings opens on one paragraph about you and one line per area; the detail is one tap away; the records behind it are kept, not shown (§4.4).</p>
+<p><strong>Smart about when.</strong> Loci writes facts on its own, writes what you <em>tell</em> it with a visible &quot;Loci will remember…&quot; chip you can undo, and only <strong>suggests</strong> anything it infers. It asks <strong>at most one question a session</strong>, and only when the answer would change what it makes next (§8).</p>
+<p><strong>Settings gets five tabs:</strong> <strong>Profile · Learning · Memory · Usage · Privacy &amp; data</strong> (§9). Learning is what you tell Loci; Memory is what Loci noticed. Topic-level cards are also editable where they belong: on the topic in Loci.</p>
+<p><strong>Build order:</strong> six small steps, M0 (no migration: Settings tabs, onboarding answers moved into Profile) to M5 (Stage 4&#39;s quizzes and concept levels feeding the cards) (§12). M1–M3 improve every Lumen format at once, because they all share one brief.</p>
+<hr>
+<h2 id="1-what-exists-today">1. What exists today</h2>
+<p>Verified on <code>studiolo</code> main @ <code>3c2f744</code>.</p>
+<div class="tbl"><table><thead><tr>
+<th>Piece</th>
+<th>State</th>
+<th>Where</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Settings</strong></td>
+<td>One tab, <strong>Profile</strong>: display name and time zone (five zones in a select), saved with a version check; a <strong>Privacy</strong> row under it (analytics consent), shown only when analytics are on</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/src/app/(workspace)/settings/page.tsx" target="_blank" rel="noopener"><code>src/app/(workspace)/settings/page.tsx</code></a>, <a href="https://github.com/ahmedste/studiolo/tree/main/src/features/settings" target="_blank" rel="noopener"><code>src/features/settings/</code></a>, <code>destinationSections.settings</code> in <a href="https://github.com/ahmedste/studiolo/blob/main/src/components/shell/destinations.ts" target="_blank" rel="noopener"><code>destinations.ts</code></a></td>
+</tr>
+<tr>
+<td><strong>Appearance</strong></td>
+<td>Light/dark switch in the rail and the account menu, not in Settings</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/src/components/shell/account-menu.tsx" target="_blank" rel="noopener"><code>account-menu.tsx</code></a>, <a href="https://github.com/ahmedste/studiolo/blob/main/src/components/shell/navigation.tsx" target="_blank" rel="noopener"><code>navigation.tsx</code></a></td>
+</tr>
+<tr>
+<td><strong>Onboarding answers</strong></td>
+<td>One row per account: field, first interest, purpose (work, career, curiosity, course), level (new, basics, regular, deep). Edited on the map&#39;s note card, not in Settings</td>
+<td><code>studiolo.onboarding</code> (<a href="https://github.com/ahmedste/studiolo/blob/main/drizzle/0022_onboarding.sql" target="_blank" rel="noopener"><code>drizzle/0022_onboarding.sql</code></a>), <a href="https://github.com/ahmedste/studiolo/blob/main/src/features/onboarding/answers.ts" target="_blank" rel="noopener"><code>src/features/onboarding/answers.ts</code></a></td>
+</tr>
+<tr>
+<td><strong>The learner line</strong></td>
+<td>One or two sentences from those answers, read fresh into every copilot turn (<code>learner</code> in <code>&lt;studiolo_context&gt;</code>) and every Lumen brief (<code>Learner: …</code>). Never says &quot;memory&quot;</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/src/features/onboarding/answers.ts" target="_blank" rel="noopener"><code>learnerLine</code></a>, <a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/implementation/ai.md#the-learner-line-track-2-b3" target="_blank" rel="noopener">AI guide → The learner line</a></td>
+</tr>
+<tr>
+<td><strong>Scoped copilot chats</strong></td>
+<td>Map, area and topic chats. The context block carries the topic&#39;s path, description, status, My Focus, children, related topics and area outline</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/src/features/copilot/context.ts" target="_blank" rel="noopener"><code>src/features/copilot/context.ts</code></a>, <a href="https://github.com/ahmedste/studiolo/blob/main/src/features/copilot/levels.ts" target="_blank" rel="noopener"><code>levels.ts</code></a></td>
+</tr>
+<tr>
+<td><strong>Signals already stored</strong></td>
+<td>Topic status and My Focus (<code>topics.status</code>, <code>want_to_learn</code>); Lumen viewing (<code>explainer_views</code>: position, watched to end); Lumen feedback (<code>explainer_feedback</code>: rating, tags, comment); per-topic copilot conversations (<code>copilot_messages</code>); the topic journal (<code>copilot_journal_entries</code>); item tags with who added them (<code>content_topic_tags.added_by</code>)</td>
+<td><code>drizzle/0004</code>, <code>0017</code>, <code>0018</code></td>
+</tr>
+<tr>
+<td><strong>Memory, Instructions, Usage tabs</strong></td>
+<td>Designed in words only (&quot;Stage 4 design extension&quot;); no screens, no tables, no code</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/design/interface.md#learner-instructions-and-memory" target="_blank" rel="noopener"><code>interface.md</code></a></td>
+</tr>
+<tr>
+<td><strong>Concept levels, quizzes, learning records</strong></td>
+<td>Proposed for Stage 4 (course engine §6); not built. &quot;Watching is not evidence yet&quot;</td>
+<td><a href="https://github.com/ahmedste/studiolo/blob/main/project-docs/architecture/course-engine.md#6-learner-model" target="_blank" rel="noopener"><code>course-engine.md</code> §6</a></td>
+</tr>
+</tbody></table></div>
+<p>The old prototype&#39;s Settings (<code>studiolo-design-concept.html</code>, <code>#s-settings</code>) had <strong>Profile · Projects · AI providers · Calendar · Export</strong>. AI providers is BYOK, now deferred. §9.1 says where each of the others goes.</p>
+<h2 id="2-whats-already-agreed-and-what-this-design-adds">2. What&#39;s already agreed, and what this design adds</h2>
+<p><strong>Kept exactly</strong> (from the agreed scope, the interface guide and Craft):</p>
+<ol>
+<li>Three layers: learner-written <strong>Instructions</strong>, app-maintained <strong>Memory</strong> of separate editable entries, and <strong>supporting records</strong> the learner doesn&#39;t manage.</li>
+<li><strong>Instructions win over memory.</strong></li>
+<li>Memory is <strong>on by default</strong>, with a short explanation when it ships, and a visible toggle. Off stops creating and updating entries <em>and</em> stops using them; it keeps them for reading, editing and deleting.</li>
+<li><strong>No hidden profile.</strong> Supporting records &quot;must not become a separate hidden learner profile containing judgments the learner cannot inspect or correct&quot;. System data must not be &quot;a hidden route to recreate a learner-corrected or removed memory&quot;.</li>
+<li>Keep <strong>declared knowledge, completed activity and demonstrated understanding</strong> apart. &quot;Completion alone is not mastery.&quot;</li>
+<li><strong>Topic status stays manual.</strong> Memory never changes status, course structure, published lessons or schedules.</li>
+<li>Memory entries <strong>are not Graph nodes</strong>, and memory never creates topics.</li>
+<li><strong>Broad inference from incidental Library activity or hidden personal traits</strong> is not in the MVP.</li>
+<li>Onboarding answers <strong>become the first memory entries</strong> when Memory ships (onboarding decision 2).</li>
+<li>Store <strong>summaries</strong>, not whole chats.</li>
+</ol>
+<p><strong>What this design adds</strong> (each needs the owner&#39;s yes, §13):</p>
+<ul>
+<li><strong>A. Memory is scoped to places on the map.</strong> Entries <em>attach to</em> a topic (or to You); they don&#39;t <em>become</em> nodes. This answers the open grouping question (&quot;Exact grouping labels and boundaries remain to be designed&quot;) with the map the learner already owns, and it&#39;s the owner&#39;s own idea in Craft: &quot;learning flows up topic to area to map, skill profiles per area&quot;.</li>
+<li><strong>B. Instructions can be scoped too.</strong> &quot;Tell Loci about this topic…&quot; on any topic, like a project&#39;s instructions file.</li>
+<li><strong>C. Fixed card slots</strong> instead of free-form entries, so the model can read them cheaply and the learner can scan them.</li>
+<li><strong>D. Three visible bases on every entry:</strong> <em>You said</em>, <em>You did</em>, <em>You showed</em>, plus <em>Suggested</em> for anything inferred and waiting for your yes.</li>
+<li><strong>E. The one-question rule</strong> and a fixed catalogue of the questions Loci may ask (§8.2).</li>
+<li><strong>F. &quot;Show the text Loci reads&quot;</strong> on any place: the exact text Loci receives there, as plain text.</li>
+<li><strong>G. Five Settings tabs</strong> (§9).</li>
+</ul>
+<h2 id="3-how-others-do-it">3. How others do it</h2>
+<p><em>This section summarises the research brief; sources are listed in §14.</em></p>
+<p>Two kinds of product, two lessons. AI assistants show how to make memory <strong>visible and editable</strong>. Learning products show how to make a learner model <strong>useful</strong>, but they hide it. Studiolo needs both.</p>
+<div class="tbl"><table><thead><tr>
+<th>Product</th>
+<th>What you see and edit</th>
+<th>What&#39;s hidden</th>
+<th>How it&#39;s scoped</th>
+<th>What Studiolo takes</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Claude</strong> (claude.ai)</td>
+<td>Memory as separate <strong>topics</strong> you can view, edit and delete (Settings → Manage memory), or correct in chat; account-wide <strong>Instructions for Claude</strong>; per-Project instructions</td>
+<td>How it chooses what to save; ranking</td>
+<td><strong>Account → Project</strong>: a project uses its own memory plus the account&#39;s, never another project&#39;s; &quot;Use account memory&quot; can isolate it. <strong>Incognito</strong> neither reads nor writes. Sensitive topics aren&#39;t saved by default</td>
+<td>Separate entries, not one blob. Account plus place layers. A mode that neither reads nor writes</td>
+</tr>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td><code>CLAUDE.md</code> files you write; <strong>auto memory</strong> it writes, as plain files you can edit (<code>/memory</code>), and <code>/context</code> shows what loaded</td>
+<td>Nothing important: everything is a file</td>
+<td><strong>By location</strong>: files from the working folder upwards load at start; files in sub-folders load <strong>only when work happens there</strong>. An index of one line per memory (first 200 lines) loads always; detail loads on demand. Each memory has a type and a date</td>
+<td><strong>The closest match to the map.</strong> Load by where the learner is; a short always-on index; detail on demand; hard caps; type and date on every entry</td>
+</tr>
+<tr>
+<td><strong>ChatGPT</strong></td>
+<td>Personalisation (name, occupation, &quot;anything else&quot;, traits); <strong>saved memories</strong> list (delete one or all); a newer <strong>memory summary</strong> page (June 2026) where you correct facts and say which topics to bring up and when; a <strong>sources</strong> view of which memories shaped an answer</td>
+<td><strong>Reference chat history</strong>: implicit, &quot;not stored or shown in settings the way saved memories are&quot;; background &quot;dreaming&quot; consolidation. Critics call this hard to inspect</td>
+<td>Account; <strong>project-only memory</strong>; <strong>Temporary Chat</strong> neither reads nor writes</td>
+<td>Show what shaped an answer. Rewrite time-bound facts (&quot;exam on 12 Nov&quot; becomes &quot;had an exam on 12 Nov&quot;). Don&#39;t copy the hidden chat-history layer: Studiolo&#39;s agreed scope forbids it</td>
+</tr>
+<tr>
+<td><strong>Gemini</strong></td>
+<td>Personal context; &quot;past chats&quot; toggle (on by default); connected apps one at a time</td>
+<td>Ranking</td>
+<td>Account; Temporary Chat</td>
+<td>Outside sources are opt-in, one at a time, and named on each answer</td>
+</tr>
+<tr>
+<td><strong>Character.ai</strong></td>
+<td><strong>Pinned messages</strong>, kept word for word; a short memory box</td>
+<td>n/a</td>
+<td>Per chat</td>
+<td>Let the learner <strong>pin a moment</strong> (&quot;this analogy made it click&quot;) so it&#39;s kept, not summarised away</td>
+</tr>
+<tr>
+<td><strong>Duolingo</strong></td>
+<td>Progress, streaks, a proficiency score</td>
+<td>All the numbers: half-life regression (recall falls as 2^(−Δ/h)), Birdbrain&#39;s predicted chance of a correct answer</td>
+<td>Per skill and word</td>
+<td>Keep <strong>knowing</strong> and <strong>remembering</strong> apart. Pitch difficulty from evidence</td>
+</tr>
+<tr>
+<td><strong>Khan Academy</strong></td>
+<td><strong>Named levels per skill</strong> that can go down: Attempted, Familiar, Proficient, Mastered (Mastered needs a mixed or later check)</td>
+<td>Thresholds</td>
+<td>Per skill</td>
+<td>A few named levels, never raw probabilities. &quot;Mastered&quot; only after a delayed check</td>
+</tr>
+<tr>
+<td><strong>Anki / FSRS</strong></td>
+<td>One setting: desired retention</td>
+<td>Difficulty, stability, retrievability per card</td>
+<td>Per card</td>
+<td>One simple control; the maths underneath</td>
+</tr>
+<tr>
+<td><strong>Math Academy</strong></td>
+<td>A knowledge frontier</td>
+<td>Practice on an advanced topic gives partial credit to the simpler topics inside it</td>
+<td>A hand-built topic graph</td>
+<td>Evidence can flow along the graph (later, post-MVP)</td>
+</tr>
+</tbody></table></div>
+<p><strong>From research:</strong></p>
+<ul>
+<li><strong>Overlay models</strong> put an estimate on each node of a domain graph, which is exactly &quot;a card per place&quot;. They can&#39;t hold misconceptions, so tutoring systems add a <strong>bug library</strong> per node: Studiolo&#39;s <code>revisit</code> slot.</li>
+<li><strong>Open learner models</strong> (Bull and Kay): the learner can inspect, discuss and <strong>negotiate</strong> the model; learners are more motivated when they can see it. Studiolo&#39;s suggestions and Q4 are negotiation.</li>
+<li><strong>Confidence matters.</strong> High-confidence errors are the likeliest to be fixed after feedback (the hypercorrection effect), so they&#39;re the best moments to revisit.</li>
+<li><strong>Cheap memory in prompts</strong> comes from the same few moves everywhere: a small always-loaded core plus on-demand detail (MemGPT/Letta&#39;s core blocks, Claude Code&#39;s index), explicit <strong>add / update / delete / no-op</strong> write-backs (Mem0), and <strong>consolidation between sessions</strong> (Generative Agents&#39; reflection, Letta&#39;s sleep-time agents, ChatGPT&#39;s dreaming).</li>
+</ul>
+<p><strong>Rules from law, not taste:</strong> GDPR Article 9&#39;s special categories (ethnicity, politics, religion or beliefs, union membership, genetics, biometrics, health, sex life) should never be inferred. The EU AI Act (Article 5(1)(f), in force since February 2025) <strong>bans emotion recognition from biometric data in education</strong>, which covers Live&#39;s voice: Studiolo must never read mood from a learner&#39;s voice.</p>
+<p><strong>What this design takes, in one line each:</strong></p>
+<ol>
+<li>Scope memory <strong>by place</strong>, like Claude Code&#39;s folders (§5).</li>
+<li>Separate <strong>what you write</strong> from <strong>what Loci writes</strong>, and yours always wins (§4).</li>
+<li>A short core, always loaded, with detail on demand and hard budgets (§6).</li>
+<li>A basis and a date on every entry (§5.3).</li>
+<li>Write back as explicit add / update / delete, consolidated between sessions (§7).</li>
+<li>Show what shaped each Lumen (§8.1).</li>
+<li>An <strong>off the record</strong> mode that neither reads nor writes (§7.6).</li>
+<li>A never-infer list, <strong>enforced in code</strong>, not left to the model (§4.2, §7.4).</li>
+</ol>
+<p>Where Studiolo deliberately differs: no hidden chat-history layer (ChatGPT), no hidden numbers that the learner can&#39;t see as plain facts (Duolingo), and no statistical knowledge tracing in the MVP (course engine §6.6&#39;s &quot;deliberately excluded&quot; stands).</p>
+<h2 id="4-the-model-five-layers-and-the-hidden-or-visible-rule">4. The model: five layers and the hidden-or-visible rule</h2>
+<h3 id="41-the-layers-in-detail">4.1 The layers in detail</h3>
+<ol>
+<li><strong>Profile.</strong> Name, time zone, what you do (the onboarding field, editable here from M0), language of lessons (English only for now, <code>locale</code> already exists in briefs), units and spelling (metric, British). Facts you set.</li>
+<li><strong>Instructions.</strong> Your words, which Loci follows. Two forms of the same thing:<ul>
+<li><strong>Learning preferences</strong>: structured controls (default format, length, depth, examples from my field, checks). Cheap to read and easy to change.</li>
+<li><strong>Instructions for Loci</strong>: free text. <strong>About me</strong>, <strong>How I like to be taught</strong>, and per-topic <strong>notes for Loci</strong> (&quot;In Law, use UK cases&quot;; &quot;On Precast, I&#39;m the project architect, not the engineer&quot;).</li>
+</ul>
+</li>
+<li><strong>Memory.</strong> Cards on the map (§5). Each entry is short, has a basis and a date, and can be edited or deleted on its own.</li>
+<li><strong>Evidence.</strong> Append-only records of what happened: a Lumen finished, a Live &quot;simpler&quot; tap, a check answered, a sentence in a chat, a rating. It&#39;s how a memory can say <strong>Why?</strong>, and how rules can be replayed safely when they change (course engine §6.1).</li>
+<li><strong>Working copies.</strong> Each card&#39;s compiled digest, the ancestor chain cache, the per-run context snapshot (already planned in the data model). Rebuildable at any time from layers 1–4; they never add a claim.</li>
+</ol>
+<h3 id="42-the-hidden-or-visible-rule">4.2 The hidden-or-visible rule</h3>
+<blockquote>
+<p><strong>Any sentence about you that Loci reads, you can read, at the place it applies, with its reason.</strong></p>
+</blockquote>
+<p>So the app may hold out of sight:</p>
+<ul>
+<li><strong>raw records</strong> (layer 4), visible on demand behind <strong>Why?</strong>;</li>
+<li><strong>numbers from fixed rules</strong> (counts, dates, the course engine&#39;s concept levels and review dates), shown as plain facts wherever they&#39;re used (&quot;2 Lumens finished here&quot;, &quot;due for a quick check on Thursday&quot;);</li>
+<li><strong>compiled copies</strong> (layer 5).</li>
+</ul>
+<p>And it may never hold:</p>
+<ul>
+<li>a <strong>judgement</strong> about you (your level, a weakness, a preference, a trait) that isn&#39;t a visible memory entry;</li>
+<li>anything about <strong>health, religion, politics, sexuality, ethnicity, finances, family or emotional state</strong>, even if a chat touches it. Studying a subject never implies a trait: learning <em>Islamic architecture</em> says nothing about faith; learning <em>Parenting</em> says nothing about having children, unless you <em>say</em> so, and then it&#39;s a <em>You said</em> entry you can see;</li>
+<li>a &quot;real&quot; level the learner can&#39;t see, kept beside the one they corrected;</li>
+<li>anything read from <strong>how you sound or look</strong>: no mood, stress or confidence from Live&#39;s voice (the EU AI Act bans emotion recognition in education, §3).</li>
+</ul>
+<p>If you <em>write</em> something personal into your own Instructions, that&#39;s yours, and Loci follows it; it just never infers or files it.</p>
+<p><strong>The test</strong> (for the implementing agent; one integration test per surface): take any context snapshot; every claim in its learner slice must map to a visible entry, an instruction, a profile field, or a fact shown on screen. A sentence that doesn&#39;t is a defect.</p>
+<h3 id="43-who-sees-what">4.3 Who sees what</h3>
+<div class="tbl"><table><thead><tr>
+<th>What</th>
+<th>Example</th>
+<th>Stored as</th>
+<th>Loci reads</th>
+<th>You see it</th>
+<th>You change it</th>
+<th>Where you manage it</th>
+</tr>
+</thead><tbody><tr>
+<td>Name</td>
+<td>Ahmed</td>
+<td>Profile</td>
+<td>Copilot and Live greetings only; never in Lumen briefs (as today)</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Settings → Profile</td>
+</tr>
+<tr>
+<td>What you do</td>
+<td>Architect, 8 years in practice</td>
+<td>Profile (from onboarding)</td>
+<td>Everywhere</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Settings → Profile</td>
+</tr>
+<tr>
+<td>Learning preferences</td>
+<td>Watch first; short; examples from my field</td>
+<td>Instructions (structured)</td>
+<td>Everywhere</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Settings → Learning</td>
+</tr>
+<tr>
+<td>About me / How I like to be taught</td>
+<td>&quot;Diagrams before text. Define jargon once.&quot;</td>
+<td>Instructions (text)</td>
+<td>Everywhere</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Settings → Learning</td>
+</tr>
+<tr>
+<td>A note for one topic</td>
+<td>&quot;On Precast I&#39;m the architect, not the engineer&quot;</td>
+<td>Instructions (scoped)</td>
+<td>On that topic and below</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>On the topic, and Settings → Learning</td>
+</tr>
+<tr>
+<td>Your level in a topic</td>
+<td>Basics in Precast</td>
+<td>Memory (<em>You said</em> or <em>You showed</em>)</td>
+<td>On that topic and below</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>On the topic, and Settings → Memory</td>
+</tr>
+<tr>
+<td>Something to revisit</td>
+<td>Thermal bridging at panel fixings</td>
+<td>Memory (<em>You showed</em>)</td>
+<td>On that topic</td>
+<td>Yes, labelled <strong>To revisit</strong></td>
+<td>Delete or mark understood</td>
+<td>On the topic, Settings → Memory</td>
+</tr>
+<tr>
+<td>What you&#39;ve seen</td>
+<td>&quot;Precast joints&quot; finished</td>
+<td>Evidence, shown as a fact</td>
+<td>Titles only, on that topic</td>
+<td>Yes, as <strong>Seen here</strong></td>
+<td>Hide one from Loci</td>
+<td>On the topic</td>
+</tr>
+<tr>
+<td>A Live tap</td>
+<td>&quot;Simpler&quot; three times in Structures</td>
+<td>Evidence</td>
+<td>Never directly; only via a memory it supports</td>
+<td>Behind <strong>Why?</strong></td>
+<td>No, but deleting the memory drops it</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>An inferred pattern</td>
+<td>&quot;You often ask for simpler in Structures&quot;</td>
+<td><strong>Suggested</strong> memory, waiting</td>
+<td>No, not until you say yes</td>
+<td>Yes, in <strong>Waiting for you</strong></td>
+<td>Keep, edit or dismiss</td>
+<td>Settings → Memory, and a chip in context</td>
+</tr>
+<tr>
+<td>Concept levels (Stage 4)</td>
+<td><code>retrieved</code> for &quot;load path&quot;</td>
+<td>Evidence-derived numbers</td>
+<td>As the card&#39;s <strong>Known</strong> list</td>
+<td>Yes, as <strong>Known</strong> with <strong>You showed</strong></td>
+<td>Delete the entry; the numbers stay as history and stop being used</td>
+<td>On the topic</td>
+</tr>
+<tr>
+<td>Card digests, caches, snapshots</td>
+<td>&quot;Precast · basics (showed) · …&quot;</td>
+<td>Working copies</td>
+<td>Yes</td>
+<td>No, but <strong>Show the text Loci reads</strong> prints the same text</td>
+<td>No</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Usage</td>
+<td>42% of this month&#39;s allowance</td>
+<td>Usage ledger</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Settings → Usage</td>
+</tr>
+</tbody></table></div>
+<h3 id="44-show-less-what-the-learner-sees-and-whats-kept">4.4 Show less: what the learner sees, and what&#39;s kept</h3>
+<p>The risk with an honest memory is a wall of information. The answer is one rule, plus four depths.</p>
+<blockquote>
+<p><strong>The read set is the show set, and the budget is the filter.</strong> A learner can see every line Loci reads, and nothing else. Loci reads only a few short lines per place (§6.1&#39;s budgets), so there are only a few short lines to show. Everything else is a record, kept out of sight.</p>
+</blockquote>
+<div class="tbl"><table><thead><tr>
+<th>Depth</th>
+<th>Where</th>
+<th>What the learner sees</th>
+<th>How much</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>1. Felt</strong></td>
+<td>While learning: Lumens, chats, Live</td>
+<td>Nothing <em>about</em> memory. Lumens and replies are simply pitched right. At most three small signs: a <strong>For you</strong> tag on a Lumen (tap: one sentence and <strong>Too basic · Too advanced</strong>), a one-line <strong>Remembered: …</strong> with <strong>Undo</strong> when you told Loci something about yourself, and one question per session</td>
+<td>A few words, rarely</td>
+</tr>
+<tr>
+<td><strong>2. Glance</strong></td>
+<td>Settings → Memory as it opens; one line on a topic&#39;s panel in Loci</td>
+<td><strong>About you</strong>: one paragraph of up to three sentences. <strong>By area</strong>: one line per area that has something (&quot;Envelope &amp; Facade · regular, for work&quot;). <strong>Waiting for you</strong>: at most three</td>
+<td>Seconds to read</td>
+</tr>
+<tr>
+<td><strong>3. Open</strong></td>
+<td>Tap an area or topic</td>
+<td>That place&#39;s notes as short sentences, each with a faint source (&quot;you said&quot;, &quot;from a check&quot;) and a <strong>⋯</strong> menu (Why?, Edit, Delete); the <strong>level dial</strong>; your note for Loci; <strong>Show the text Loci reads</strong></td>
+<td>On purpose only</td>
+</tr>
+<tr>
+<td><strong>4. Kept</strong></td>
+<td>Nowhere as such</td>
+<td>Evidence rows, the scribe&#39;s runs, digests, tombstones, hashes, snapshots, token sizes, counts and the course engine&#39;s concept numbers</td>
+<td>Never shown; reachable only as a plain sentence behind <strong>Why?</strong></td>
+</tr>
+</tbody></table></div>
+<p><strong>The display rules</strong> (for every memory screen):</p>
+<ol>
+<li><strong>Sentences, not fields.</strong> Slots are for the machine. The learner reads &quot;You know the basics here, for work on the prayer hall&quot;, not <code>level: basics · why: work</code>.</li>
+<li><strong>No empty rows and no zeros.</strong> A slot with nothing in it isn&#39;t drawn. A place with nothing isn&#39;t listed.</li>
+<li><strong>Don&#39;t repeat what&#39;s on screen elsewhere.</strong> Seen-here, topic status and My Focus are already in Learn and on the map. A card says once, &quot;Loci also reads your status here and what you&#39;ve seen&quot;, and doesn&#39;t list them.</li>
+<li><strong>Sources in one word, details on request.</strong> &quot;you said&quot;, &quot;from a check&quot;, &quot;you agreed&quot;. The evidence is behind <strong>Why?</strong>, in one or two plain sentences.</li>
+<li><strong>Three waiting, at most.</strong> In Settings, the three newest suggestions; in context, one per session.</li>
+<li><strong>No technical words.</strong> Never <em>token, slice, digest, evidence, basis, scribe, confidence, snapshot</em> on a learner&#39;s screen.</li>
+<li><strong>Caps match the budget.</strong> A slot shows at most what the slice reads (§5.2&#39;s maximums); &quot;and 2 more&quot; opens the rest.</li>
+<li><strong>Builder detail stays with builders.</strong> Token sizes and the raw slice live in a <strong>Builder</strong> view (dev specimens, owner accounts), not in Settings. Learners get <strong>Show the text Loci reads</strong> as plain text, no numbers.</li>
+</ol>
+<p><strong>What the learner can steer</strong> is short on purpose, highest leverage first:</p>
+<ol>
+<li><strong>The level dial</strong> on any place: New · Basics · Regular · Deep. It&#39;s the single biggest lever on every Lumen and reply there.</li>
+<li><strong>Too basic · Too advanced</strong> on a Lumen. It&#39;s the same lever, pulled in the moment.</li>
+<li><strong>Instructions</strong>: two boxes in Settings → Learning, and a note on any topic.</li>
+<li><strong>Keep · Dismiss</strong> on what&#39;s waiting.</li>
+<li><strong>Edit · Delete</strong> any line; <strong>Forget this place</strong>.</li>
+<li><strong>Memory on/off</strong> and <strong>Off the record</strong>.</li>
+</ol>
+<p>Everything else is Loci&#39;s job, and the learner never has to manage it.</p>
+<h2 id="5-the-memory-map-cards-that-follow-the-graph">5. The memory map: cards that follow the graph</h2>
+<h3 id="51-places">5.1 Places</h3>
+<p>Memory has the same shape as the map, and uses the map&#39;s own ids:</p>
+<pre class="code"><code>You                          (the account: who you are and how you learn, everywhere)
+├── Envelope &amp; Facade        (an area: a top-level topic)
+│   └── Facade systems       (a topic)
+│       └── Precast          (a sub-topic: any depth up to the map's 10 levels)
+├── Culture &amp; Context
+│   └── Climate-responsive design
+└── Structures</code></pre>
+<ul>
+<li><strong>A card exists only where something is known.</strong> Most topics have none and simply inherit from above. An empty map has one card: <strong>You</strong>, seeded from onboarding.</li>
+<li><strong>Entries attach to a place; they never create one.</strong> Something Loci learns that has no place on the map (you&#39;re working on a hospital competition) goes on <strong>You</strong>. If it deserves a topic, Loci proposes one through the copilot&#39;s normal ghost-topic path, which the learner keeps or dismisses.</li>
+<li><strong>Related topics</strong> aren&#39;t parents, so nothing inherits across them; a related topic&#39;s <strong>headline</strong> (one line) can be read for analogies (§6.1).</li>
+</ul>
+<h3 id="52-the-card">5.2 The card</h3>
+<p>Every card has the same slots, so the model always knows where to look and the learner can scan any card in seconds. Slots are optional.</p>
+<div class="tbl"><table><thead><tr>
+<th>Slot</th>
+<th>Shows as</th>
+<th>Kind</th>
+<th>Max here</th>
+<th>Bases allowed</th>
+<th>Example on <em>Precast</em></th>
+</tr>
+</thead><tbody><tr>
+<td><code>level</code></td>
+<td><strong>Where you are</strong></td>
+<td>one of <code>new · basics · regular · deep</code> (onboarding&#39;s four, so one vocabulary everywhere)</td>
+<td>1</td>
+<td>said, showed</td>
+<td>Basics <em>(You said, 12 Oct)</em></td>
+</tr>
+<tr>
+<td><code>why</code></td>
+<td><strong>Why you&#39;re learning it</strong></td>
+<td><code>work · career · curiosity · course</code> + an optional line</td>
+<td>1</td>
+<td>said</td>
+<td>Work: &quot;the prayer hall&#39;s precast envelope&quot;</td>
+</tr>
+<tr>
+<td><code>working_on</code></td>
+<td><strong>Working on</strong></td>
+<td>short line</td>
+<td>3</td>
+<td>said</td>
+<td>Mihrab panel joint, coordinating with the precaster</td>
+</tr>
+<tr>
+<td><code>known</code></td>
+<td><strong>You know</strong></td>
+<td>short phrases; concept ids in Stage 4</td>
+<td>8</td>
+<td>said, showed</td>
+<td>Panel joints; tolerances</td>
+</tr>
+<tr>
+<td><code>revisit</code></td>
+<td><strong>To revisit</strong></td>
+<td>a misconception, gently put</td>
+<td>3</td>
+<td>showed</td>
+<td>Thermal bridging at fixings <em>(a check on 14 Oct)</em></td>
+</tr>
+<tr>
+<td><code>prefer</code></td>
+<td><strong>How you like it here</strong></td>
+<td>short line</td>
+<td>5</td>
+<td>said, (did → suggested)</td>
+<td>Sections before photos</td>
+</tr>
+<tr>
+<td><code>words</code></td>
+<td><strong>Your words</strong></td>
+<td>term + definition + &quot;avoid&quot; list (course engine §6.5)</td>
+<td>8</td>
+<td>said, showed</td>
+<td>&quot;Reveal&quot;, not &quot;return&quot;</td>
+</tr>
+<tr>
+<td><code>seen</code></td>
+<td><strong>Seen here</strong></td>
+<td>Lumen, Listen, Read, course lesson titles</td>
+<td>5 newest</td>
+<td>did (facts, not entries)</td>
+<td>&quot;Precast joints&quot; (finished)</td>
+</tr>
+<tr>
+<td><code>headline</code></td>
+<td>the card&#39;s first line</td>
+<td>compiled, ≤ 25 words</td>
+<td>1</td>
+<td>derived</td>
+<td>&quot;Basics, for work on the prayer hall; knows joints; revisit thermal bridging.&quot;</td>
+</tr>
+</tbody></table></div>
+<p><code>prefer</code> also holds <strong>What clicked</strong>: an analogy or explanation you pinned with <strong>This clicked</strong> in a Lumen or Live session, kept word for word (≤ 280 characters) and never summarised away (Character.ai&#39;s pinned messages, §3).</p>
+<p><strong>You</strong> has the same slots, read as &quot;everywhere&quot;: <code>level</code> is your general experience (&quot;8 years in practice&quot;), <code>why</code> your goals, <code>prefer</code> your teaching style, <code>words</code> your general vocabulary (British spelling).</p>
+<p>Every entry stores: id, place (topic id or You), slot, text (≤ 160 characters; <code>words</code> ≤ 280), basis, origin (<code>app | learner</code>), status (<code>active | suggested | dismissed | deleted</code>), created, updated, learner-edited time, version, and its evidence references. That is the agreed &quot;Memory entry&quot; record with three fields added: place, slot and basis.</p>
+<h3 id="53-bases-how-sure-and-why">5.3 Bases: how sure, and why</h3>
+<p>Every entry shows one of these. They are the agreed &quot;declared / completed / demonstrated&quot; distinction, in plain words:</p>
+<div class="tbl"><table><thead><tr>
+<th>Basis</th>
+<th>Means</th>
+<th>Written by</th>
+<th>Can it set a level?</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>You said</strong></td>
+<td>You told Loci (onboarding, a chat, a chip, Settings)</td>
+<td>Immediately, with a visible chip</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>You did</strong></td>
+<td>Activity: finished, opened, saved, tapped &quot;simpler&quot;</td>
+<td>Facts only; patterns become <em>Suggested</em></td>
+<td><strong>No.</strong> Completion is not mastery</td>
+</tr>
+<tr>
+<td><strong>You showed</strong></td>
+<td>Demonstrated: a correct check, a correct answer days later, notes using it correctly</td>
+<td>Rules (course engine §6.3)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>Suggested</strong></td>
+<td>Loci&#39;s inference from the above, waiting for your yes</td>
+<td>The scribe (§7)</td>
+<td>Only after you keep it</td>
+</tr>
+</tbody></table></div>
+<h3 id="54-reading-down-the-map-inheritance">5.4 Reading down the map: inheritance</h3>
+<p>When Loci works at a place, it reads that card fully and the cards above it in short. Conflicts resolve like this, first match wins:</p>
+<ol>
+<li><strong>What you say right now</strong>, in this message or Live session.</li>
+<li><strong>Instructions</strong>, nearest place first (a note on <em>Precast</em> beats &quot;About me&quot;).</li>
+<li><strong>Learning preferences</strong> (Settings → Learning).</li>
+<li><strong>Memory</strong>, nearest place first. For a one-value slot (<code>level</code>, <code>why</code>) the nearest card wins. For list slots, the nearest card&#39;s entries come first, then the parents&#39;, within the budget.</li>
+<li><strong>Profile and onboarding defaults.</strong></li>
+</ol>
+<p>Two consequences that make it feel right:</p>
+<ul>
+<li>Being <strong>deep</strong> in <em>Envelope &amp; Facade</em> doesn&#39;t make you deep in <em>Precast</em> if Precast says <strong>basics</strong>: the nearer card wins.</li>
+<li>A topic with no card <strong>inherits</strong>: a new sub-topic under <em>Precast</em> starts at basics, without a question.</li>
+</ul>
+<p>When memory contradicts an instruction (you wrote &quot;I&#39;m new to structures&quot;; three checks say otherwise), the instruction still wins, and Loci may ask its one question (§8.2, <em>Q4</em>).</p>
+<h3 id="55-reading-up-the-map-how-learning-rolls-up">5.5 Reading up the map: how learning rolls up</h3>
+<p>The owner&#39;s idea, &quot;learning flows up topic to area to map&quot;, made safe:</p>
+<ul>
+<li><strong>Facts roll up automatically</strong>, as facts: an area&#39;s card shows &quot;Basics or more in 3 of 7 topics; 6 Lumens finished&quot;. These are counts, not judgements.</li>
+<li><strong>Judgements roll up only as suggestions.</strong> When three or more children of a place agree (three sub-topics at <em>regular</em>), the scribe may suggest the same at the parent: &quot;You use Facade systems regularly. Set Envelope &amp; Facade to <em>regular</em>?&quot; Never averaged silently.</li>
+<li><strong>Patterns across areas rise to You as suggestions.</strong> The same preference noticed in two or more areas (&quot;asks for sections and diagrams&quot;) becomes a suggested <strong>You</strong> entry, and the per-area copies are folded into it if you keep it.</li>
+</ul>
+<h3 id="56-when-the-map-changes">5.6 When the map changes</h3>
+<div class="tbl"><table><thead><tr>
+<th>Map change</th>
+<th>What happens to memory</th>
+</tr>
+</thead><tbody><tr>
+<td>Rename</td>
+<td>Nothing: cards follow topic ids. Digests are recompiled.</td>
+</tr>
+<tr>
+<td>Move</td>
+<td>The card moves with its topic; it now inherits from its new parents.</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>The topic&#39;s cards and its sub-topics&#39; cards are deleted with it. The delete confirmation, which already names the Library items whose tags go, also says &quot;and what Loci noted here&quot;. (Owner decision M-D6, §13.)</td>
+</tr>
+<tr>
+<td>Merge (change plans, later)</td>
+<td>Cards merge slot by slot; for a one-value slot the learner-edited one wins, else the newer; the plan&#39;s preview shows it.</td>
+</tr>
+<tr>
+<td>A copilot proposal is kept</td>
+<td>No card until something is known.</td>
+</tr>
+</tbody></table></div>
+<h2 id="6-reading-memory-cheaply-the-context-slice">6. Reading memory cheaply: the context slice</h2>
+<h3 id="61-the-slice">6.1 The slice</h3>
+<p>Every AI surface asks one function (<em>new</em>: <code>learnerSlice(account, place, surface)</code>) for a <strong>slice</strong>: a few compiled lines, never whole cards of the whole map. It replaces the learner line where that line goes today (<code>learner</code> in the copilot&#39;s <code>&lt;studiolo_context&gt;</code>; <code>Learner:</code> in a Lumen brief), so the cached prefix doesn&#39;t change.</p>
+<div class="tbl"><table><thead><tr>
+<th>Part</th>
+<th>What</th>
+<th>Budget</th>
+<th>Read when</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>you</strong></td>
+<td>Profile line, learning preferences, About me / How I like to be taught (shortened), <strong>You</strong> card headline and <code>prefer</code></td>
+<td>≤ 120 tokens</td>
+<td>Always</td>
+</tr>
+<tr>
+<td><strong>path</strong></td>
+<td>One headline per ancestor that has a card, area first; instructions noted on those places</td>
+<td>≤ 25 tokens each, ≤ 100</td>
+<td>At an area or deeper</td>
+</tr>
+<tr>
+<td><strong>here</strong></td>
+<td>This place&#39;s full card: level, why, working on, known, revisit, prefer, words; its notes for Loci</td>
+<td>≤ 250 tokens</td>
+<td>At a topic or area</td>
+</tr>
+<tr>
+<td><strong>seen</strong></td>
+<td>Titles of what&#39;s been seen here, newest five</td>
+<td>≤ 60 tokens</td>
+<td>When making something (a Lumen, a lesson, a Live session)</td>
+</tr>
+<tr>
+<td><strong>below</strong></td>
+<td>One line per child with a card: name and level</td>
+<td>≤ 80 tokens</td>
+<td>Planning, &quot;what next&quot;, Home&#39;s goals</td>
+</tr>
+<tr>
+<td><strong>related</strong></td>
+<td>Up to three related topics&#39; headlines</td>
+<td>≤ 60 tokens</td>
+<td>When making something (for analogies)</td>
+</tr>
+<tr>
+<td><strong>rules</strong></td>
+<td>One fixed line: &quot;This is what the learner told Studiolo and what it noted; instructions win; don&#39;t mention memory unless asked; don&#39;t invent more&quot;</td>
+<td>fixed</td>
+<td>Always (it goes in the cached system prefix, once)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Trimming order</strong> when over budget: <code>related</code>, then <code>below</code>, then the oldest <code>seen</code>, then <code>path</code> beyond the area, then list slots in <code>here</code> from the end. <code>you</code> and the <code>here</code> one-value slots are never cut.</p>
+<h3 id="62-what-it-looks-like">6.2 What it looks like</h3>
+<p>At <em>Precast</em>, making a Lumen (about 300 tokens):</p>
+<pre class="code"><code>&lt;learner&gt;
+you: Architect, 8 years in practice. British English, metric. Prefers: diagrams before text; define jargon once; short.
+path: Envelope &amp; Facade · regular (you said) · for work
+path: Facade systems · regular (you showed: 4 checks)
+here: Precast · basics (you said, 12 Oct) · why: work, "the prayer hall's precast envelope"
+  working on: mihrab panel joint; coordinating with the precaster
+  knows: panel joints; tolerances (you showed)
+  revisit: thermal bridging at fixings (a wrong check, 14 Oct)
+  prefers here: sections before photos
+  words: "reveal", not "return"
+  note from the learner: "I'm the project architect, not the engineer."
+seen: "Precast joints" (finished); "Why precast cracks" (half)
+related: Concrete &amp; precast · basics
+&lt;/learner&gt;</code></pre>
+<p>At the map (no place selected), the copilot gets <code>you</code> plus one line per area with a card (≤ 18 areas, about 15 tokens each). At <em>Law</em>, nothing of the above except <code>you</code>.</p>
+<p>Format: plain labelled lines, not JSON. They take fewer tokens than the same data as JSON (no quotes, braces or repeated keys), read easily for the model, and the same text the learner sees with <strong>Show the text Loci reads</strong> (§9.2). Inside the copilot&#39;s JSON block it&#39;s one string field; learner text is escaped exactly as the learner line is today (<code>tagSafeJson</code>).</p>
+<h3 id="63-which-surface-reads-what">6.3 Which surface reads what</h3>
+<div class="tbl"><table><thead><tr>
+<th>Surface</th>
+<th>you</th>
+<th>path</th>
+<th>here</th>
+<th>seen</th>
+<th>below</th>
+<th>related</th>
+<th>Note</th>
+</tr>
+</thead><tbody><tr>
+<td>Copilot, map chat</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td></td>
+<td>area lines</td>
+<td></td>
+<td>Plus the <code>read_memory</code> tool for depth</td>
+</tr>
+<tr>
+<td>Copilot, area or topic chat</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td></td>
+<td><code>nowLookingAt</code> gets the focused topic&#39;s <code>here</code></td>
+</tr>
+<tr>
+<td>Make a Lumen (Watch, Listen, Read)</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td>Fills the brief&#39;s <strong>Learner</strong> and <strong>Already known</strong> rows (<span class="ref" title="Background only: a planning document you don't need for this build">learning forms §1</span>)</td>
+</tr>
+<tr>
+<td>Item Lumen (one Library item)</td>
+<td>✓</td>
+<td>✓ for the item&#39;s topic</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>No topic → <code>you</code> only</td>
+</tr>
+<tr>
+<td>Live session</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td>✓</td>
+<td>Passed at connect in <code>dynamicVariables</code>, as the learner line is in the <span class="ref" title="Background only: a planning document you don't need for this build">Live design</span></td>
+</tr>
+<tr>
+<td>Course planner, lessons (Stage 4)</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>Replaces course engine §6.6&#39;s learner card, keeping its ≤ 150-word rule for <code>here</code></td>
+</tr>
+<tr>
+<td>Learn Home &quot;Next for your goals&quot;, Today</td>
+<td></td>
+<td></td>
+<td><code>level</code>, <code>revisit</code> only</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td>No model call: ranking rules read the cards</td>
+</tr>
+</tbody></table></div>
+<h3 id="64-why-its-cheap">6.4 Why it&#39;s cheap</h3>
+<ul>
+<li><strong>Compiled on write, not on read.</strong> When an entry changes, its card&#39;s digest and headline are recompiled (a template, no model). Reading is: resolve the ancestor chain (already done for the copilot&#39;s <code>path</code>), fetch the digests for those ids, concatenate. One query.</li>
+<li><strong>No model call to read memory.</strong> Ever. The scribe (§7) is the only model that touches memory, and it writes.</li>
+<li><strong>Depth on demand.</strong> The map chat doesn&#39;t load every card. The copilot gets a <code>read_memory(topicId)</code> tool beside <code>read_topic</code>, for &quot;what do I know about Structures?&quot;.</li>
+<li><strong>Sent once per conversation.</strong> The copilot replays its history verbatim, so a slice sent in one turn is still in front of the model in later turns. A turn sends the full slice only when its hash changed or the earlier copy fell out of the replayed history; otherwise <code>learner: unchanged</code>. A 20-turn chat carries one or two slices, not twenty (<a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q#42-in-a-conversation-send-it-once" target="_blank" rel="noopener">reference §4.2</a>).</li>
+<li><strong>Names and paths are read live.</strong> A digest never holds its place&#39;s name, path or neighbours, so a rename or a move recompiles nothing, and an edit recompiles one row (<a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q#34-compile-the-one-step-every-save-and-edit-ends-with" target="_blank" rel="noopener">reference §3.4</a>).</li>
+<li><strong>Prompt caching unchanged.</strong> The slice is per-turn data in the user message, where the learner line already is; the six system blocks and tools stay byte-identical. The one fixed <code>rules</code> line joins the system prefix once, with a prompt version bump.</li>
+<li><strong>Snapshot per generation.</strong> Each Lumen or course run records which instructions and entries (ids and versions) it used: the agreed &quot;Learner context snapshot&quot;. That&#39;s what lets a Lumen&#39;s <strong>For you</strong> tag say what it used, later, and lets a deleted entry stay out of future runs.</li>
+</ul>
+<h3 id="65-what-it-costs">6.5 What it costs</h3>
+<p>From the app&#39;s own <a href="https://github.com/ahmedste/studiolo/blob/main/src/features/usage/rate-card.ts" target="_blank" rel="noopener">rate card</a> (2026-10-16):</p>
+<ul>
+<li><strong>Reading:</strong> a 500-token slice costs about <strong>US$0.001 per conversation</strong> (Sonnet 5.5 at $2 per million input tokens, sent once) and about <strong>US$0.0016 per Lumen</strong> (Opus 5.5 at $4).</li>
+<li><strong>Writing:</strong> rules cost nothing. A scribe run on Haiku 5.5 reads about 2,500 tokens and writes about 300: under <strong>US$0.0005</strong>, about ten times a month.</li>
+<li><strong>In all:</strong> about <strong>US$0.05 per active learner a month</strong>. The <a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q#7-what-it-costs" target="_blank" rel="noopener">reference&#39;s cost table</a> has the assumptions.</li>
+</ul>
+<h2 id="7-writing-memory-how-loci-fills-the-cards">7. Writing memory: how Loci fills the cards</h2>
+<h3 id="71-signals">7.1 Signals</h3>
+<div class="tbl"><table><thead><tr>
+<th>Signal</th>
+<th>Exists today?</th>
+<th>Can write</th>
+<th>Basis</th>
+</tr>
+</thead><tbody><tr>
+<td>Onboarding answers</td>
+<td>✓ <code>onboarding</code></td>
+<td><strong>You</strong>: field; first interest&#39;s place: <code>level</code>, <code>why</code></td>
+<td>said</td>
+</tr>
+<tr>
+<td>Settings, chips, &quot;Remember this&quot;</td>
+<td><em>new</em></td>
+<td>Any slot</td>
+<td>said</td>
+</tr>
+<tr>
+<td>A statement in a copilot chat (&quot;I already know Revit&quot;, &quot;I&#39;m the architect, not the engineer&quot;)</td>
+<td>✓ the messages; <em>new</em> the tool</td>
+<td>The chat&#39;s place: <code>level</code>, <code>known</code>, <code>working_on</code>, <code>prefer</code></td>
+<td>said, with a chip</td>
+</tr>
+<tr>
+<td>Topic status, My Focus</td>
+<td>✓ <code>topics</code></td>
+<td>Nothing. Read as facts beside the card; never turned into a level</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>A Lumen, Listen or Read finished</td>
+<td>✓ <code>explainer_views</code> (Lumens); reading state <em>new</em></td>
+<td><code>seen</code> (fact)</td>
+<td>did</td>
+</tr>
+<tr>
+<td>Live taps: simpler, deeper, from my field, skip, test me</td>
+<td>prototype (Live slice 1)</td>
+<td>Evidence; repeated patterns → suggested <code>prefer</code> or <code>level</code></td>
+<td>did → suggested</td>
+</tr>
+<tr>
+<td>Lumen feedback: rating and tags (&quot;too basic&quot;, &quot;too long&quot;)</td>
+<td>✓ <code>explainer_feedback</code></td>
+<td>Evidence; patterns → suggested <code>level</code> or <code>prefer</code></td>
+<td>did → suggested</td>
+</tr>
+<tr>
+<td>A <strong>Check yourself</strong> answer, a quiz, a spaced review</td>
+<td>Read&#39;s check (prototype); quizzes Stage 4</td>
+<td><code>known</code>, <code>revisit</code>, <code>level</code></td>
+<td>showed</td>
+</tr>
+<tr>
+<td>A note on a lesson (Stage 4 note analysis)</td>
+<td>Stage 4</td>
+<td><code>known</code>, <code>words</code>, <code>revisit</code></td>
+<td>showed</td>
+</tr>
+<tr>
+<td>Library items saved and tagged</td>
+<td>✓ <code>content_topic_tags</code></td>
+<td><strong>Nothing in the MVP</strong> (agreed: no inference from incidental Library activity)</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Time of day, session length, typing</td>
+<td>n/a</td>
+<td><strong>Never</strong></td>
+<td>n/a</td>
+</tr>
+</tbody></table></div>
+<h3 id="72-the-pipeline-rules-first-a-model-only-for-free-text">7.2 The pipeline: rules first, a model only for free text</h3>
+<figure class="dia"><pre class="mermaid">flowchart LR
+  E["Something happens&lt;br/&gt;a finish, a check, a tap,&lt;br/&gt;a rating, a chat line"] --&gt; V[("Evidence&lt;br/&gt;append-only, no model")]
+  V --&gt; R["Fixed rules&lt;br/&gt;no model"]
+  R --&gt;|"a fact"| F["Nothing more&lt;br/&gt;read at display time"]
+  R --&gt;|"a check"| M[("Memory entry&lt;br/&gt;you showed")]
+  R --&gt;|"a pattern crosses a threshold"| Q["Waiting for you&lt;br/&gt;suggested, template text"]
+  R --&gt;|"free text"| S["The scribe&lt;br/&gt;Haiku 5.5, per place,&lt;br/&gt;batched"]
+  CP["The copilot's own turn&lt;br/&gt;remember tool"] --&gt; C{"Validator"}
+  S --&gt; C
+  C --&gt;|"you said"| M
+  C --&gt;|"inferred"| Q
+  C --&gt;|"breaks a rule"| X["Dropped, logged"]
+  Q --&gt;|"Keep"| M
+  M --&gt; D["Digest recompiled&lt;br/&gt;template, one row"]</pre></figure>
+<ol>
+<li><strong>Evidence first, always cheap.</strong> Every signal writes an evidence row (account, place, kind, typed reference, a template summary, time). No model call.</li>
+<li><strong>Rules decide most things.</strong> Facts (finished, opened) stop there: seen-here is read from evidence when it&#39;s shown. Checks write <em>You showed</em> entries by the course engine&#39;s rules (§6.3 there). Taps and ratings write a <strong>suggestion with template text</strong> when they cross a threshold (&quot;3 Simpler taps at one place in 14 days&quot;). The thresholds are in the <a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q#31-something-happened-every-signal-no-model" target="_blank" rel="noopener">reference §3.1</a>.</li>
+<li><strong>The copilot catches what it hears.</strong> A statement the learner makes about themselves in a chat is written during the turn, through the tool <code>remember(slot, text)</code>, as <em>You said</em>, with the one-line <strong>Remembered</strong> sign (§8.1). No extra call.</li>
+<li><strong>The scribe reads only free text the copilot didn&#39;t catch.</strong> A small model (Haiku 5.5, thinking off, a strict tool) runs per place, in batches, on the learner&#39;s own chat and Live lines since its last run (as summaries, never whole transcripts), the place&#39;s card and its corrections. It returns <code>add | update | remove | noop</code>. With nothing new, it isn&#39;t called.</li>
+<li><strong>The validator</strong> (server, no model) enforces §7.4 for both the copilot and the scribe. It can only drop what they propose, never add.</li>
+<li><strong>Recompile</strong> the one digest that changed. The next call reads it.</li>
+</ol>
+<h3 id="73-when-the-scribe-runs">7.3 When the scribe runs</h3>
+<p>Never on page load, and never for facts, checks, taps or ratings. Free text queues its place in <code>scribe_queue</code>, one row per place, due 30 minutes after the last line, so a burst of messages makes one run. A weekly sweep handles roll-ups (§5.5) and <strong>time-bound entries</strong>: a <code>working_on</code> older than 60 days becomes a suggestion (&quot;Still working on the mihrab panel?&quot;), and dated facts move to the past tense (&quot;exam on 12 Nov&quot; → &quot;had an exam on 12 Nov&quot;). Both are rules, not model calls.</p>
+<p>Memory off: nothing is queued and no rule writes (evidence still records facts, as progress does today).</p>
+<h3 id="74-what-loci-may-write-on-its-own">7.4 What Loci may write on its own</h3>
+<div class="tbl"><table><thead><tr>
+<th>Kind</th>
+<th>Example</th>
+<th>Written</th>
+</tr>
+</thead><tbody><tr>
+<td>A fact</td>
+<td>Seen here: &quot;Precast joints&quot;, finished</td>
+<td>Automatically</td>
+</tr>
+<tr>
+<td>Something you said about yourself</td>
+<td>&quot;I&#39;m the project architect, not the engineer&quot;</td>
+<td>Automatically, <strong>with a visible chip and Undo</strong></td>
+</tr>
+<tr>
+<td>Something you showed by a rule</td>
+<td>Knows: tolerances (a check right twice, three days apart)</td>
+<td>Automatically, basis <em>You showed</em></td>
+</tr>
+<tr>
+<td>A pattern Loci infers</td>
+<td>&quot;You ask for simpler in Structures&quot;: level → new?</td>
+<td><strong>Suggested only.</strong> Waits in <strong>Waiting for you</strong></td>
+</tr>
+<tr>
+<td>A change to something you edited</td>
+<td>Changing your &quot;basics&quot; to &quot;regular&quot;</td>
+<td><strong>Suggested only</strong>, and only from evidence newer than your edit</td>
+</tr>
+<tr>
+<td>Anything sensitive (§4.2), or about other people</td>
+<td>&quot;Mentions a difficult client&quot;</td>
+<td><strong>Never</strong></td>
+</tr>
+<tr>
+<td>A new topic</td>
+<td>&quot;You should add Fire engineering&quot;</td>
+<td><strong>Never as memory.</strong> Only as the copilot&#39;s normal ghost proposal</td>
+</tr>
+</tbody></table></div>
+<p>Hard limits the validator enforces: slot maximums (§5.2); text ≤ 160 characters; at most <strong>five</strong> suggestions waiting per learner at once (the oldest expires); at most one new suggestion per place per week.</p>
+<h3 id="75-corrections-and-deletions">7.5 Corrections and deletions</h3>
+<p>These are the agreed rules, made concrete:</p>
+<ul>
+<li><strong>An edit locks the slot.</strong> A learner-edited entry carries <code>learner_edited_at</code>. The scribe may suggest a change only from evidence <em>newer</em> than that time.</li>
+<li><strong>Deleting leaves a tombstone.</strong> A deleted entry keeps its slot, place, a short hash of its text and the deletion time, nothing else. Evidence older than that time can never recreate it. Newer evidence can only <em>suggest</em> it again, never write it. A second dismissal of the same suggestion stops it for that place.</li>
+<li><strong>Delete is not off.</strong> Deleting an entry doesn&#39;t disable memory or ban a subject (agreed).</li>
+<li><strong>History is history.</strong> Deleting a memory doesn&#39;t delete the chat, the check or the usage row it came from (agreed). It just stops being <em>used</em>.</li>
+<li><strong>&quot;Forget this place&quot;</strong> on any card deletes all its entries (with tombstones). <strong>&quot;Delete all memory&quot;</strong> in Settings does the same for every place.</li>
+</ul>
+<h3 id="76-memory-off">7.6 Memory off</h3>
+<p>The toggle reads: <strong>Memory · On</strong>. &quot;Loci notes what you know and how you like to learn, and uses it to pitch Lumens and replies. Turning it off stops new notes and stops using the ones you have. Nothing is deleted; you can still read, edit or delete them here.&quot;</p>
+<p>When off, Loci uses <strong>Profile, Learning preferences and Instructions</strong>, plus plain facts shown on screen (topic status, My Focus, what&#39;s been seen). It doesn&#39;t rebuild a substitute from chat history (agreed). When turned back on, it doesn&#39;t process the backlog of what happened while off (owner decision M-D4, §13; recommended).</p>
+<p><strong>Off the record</strong> (one chat or one Live session, chosen before it starts, like Claude&#39;s incognito and ChatGPT&#39;s Temporary Chat): Loci neither reads memory nor writes evidence for it. Profile and Instructions still apply. The chat is kept as a normal chat unless deleted.</p>
+<h2 id="8-using-memory-the-right-thing-at-the-right-time-with-the-right-question">8. Using memory: the right thing, at the right time, with the right question</h2>
+<h3 id="81-personalisation-you-can-feel-and-see-when-you-want-to">8.1 Personalisation you can feel, and see when you want to</h3>
+<p>People feel personalisation when a Lumen lands at the right level, not when they read about it. So the signs are small, and most of the time there&#39;s nothing to see (§4.4, depth 1):</p>
+<ol>
+<li><strong>For you</strong> on a Lumen: a small tag beside the topic. Tap it for one sentence (&quot;Pitched at basics. Skips joints and tolerances. Uses your prayer hall.&quot;) and <strong>Too basic · Too advanced</strong>, each moving the level dial for that place at once, with Undo.</li>
+<li><strong>Remembered: …</strong> in a reply: one line, only when you told Loci something about yourself, with <strong>Undo</strong>. Like ChatGPT&#39;s &quot;Memory updated&quot;, but with the words.</li>
+<li><strong>One line on a topic&#39;s panel</strong> in Loci, under status and My Focus: <em>Loci: basics · for work ›</em>. It opens that place&#39;s card (depth 3) in place.</li>
+<li><strong>Openings that remember.</strong> A topic chat or Live session may open with one line drawn from <code>revisit</code> or <code>working_on</code>: &quot;Last time thermal bridging at the fixings was tricky. Two-minute check first, or straight on?&quot; At most once per place per week, and it counts as the session&#39;s one question.</li>
+</ol>
+<h3 id="82-the-one-question-rule">8.2 The one-question rule</h3>
+<p>Loci asks <strong>at most one memory question per session</strong>, and only when all three are true:</p>
+<ol>
+<li><strong>The answer changes what it makes next</strong> (a Lumen&#39;s level, a course&#39;s start).</li>
+<li><strong>It can&#39;t be read from evidence</strong> already there.</li>
+<li><strong>It hasn&#39;t been asked here in the last 30 days.</strong></li>
+</ol>
+<p>Questions are always chips, with <strong>Skip</strong> (and skipping is remembered, so it isn&#39;t asked again soon). The full catalogue:</p>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>When</th>
+<th>Question</th>
+<th>Chips</th>
+<th>Writes</th>
+</tr>
+</thead><tbody><tr>
+<td>Q1</td>
+<td>First Lumen, chat or course in an <strong>area with no card</strong></td>
+<td>&quot;How well do you know Structures?&quot;</td>
+<td>New · Basics · Use it regularly · Go deep · Skip</td>
+<td><code>level</code> at the area, <em>You said</em></td>
+</tr>
+<tr>
+<td>Q2</td>
+<td>A topic is added to <strong>My Focus</strong></td>
+<td>&quot;What&#39;s Precast for?&quot;</td>
+<td>For my work · Career change · Curiosity · A course or exam · Skip</td>
+<td><code>why</code> at the topic</td>
+</tr>
+<tr>
+<td>Q3</td>
+<td>Planning a <strong>course</strong></td>
+<td>&quot;Anything you&#39;re working on that this should help with?&quot;</td>
+<td>free text · Skip</td>
+<td><code>working_on</code></td>
+</tr>
+<tr>
+<td>Q4</td>
+<td>Evidence <strong>contradicts what you said</strong> (three checks right after &quot;new&quot;)</td>
+<td>&quot;These came easily. Skip the basics in Structures from now on?&quot;</td>
+<td>Yes · Keep as is</td>
+<td><code>level</code> (said)</td>
+</tr>
+<tr>
+<td>Q5</td>
+<td>A <strong>suggested pattern</strong> is ready (from Live taps or ratings)</td>
+<td>&quot;You often ask for it simpler in Structures. Start simpler there?&quot;</td>
+<td>Yes · No</td>
+<td><code>prefer</code> or <code>level</code></td>
+</tr>
+<tr>
+<td>Q6</td>
+<td>A pattern <strong>in two areas</strong></td>
+<td>&quot;You like sections and diagrams first in two areas. Make that your default?&quot;</td>
+<td>Everywhere · Just those · No</td>
+<td><code>prefer</code> at You</td>
+</tr>
+<tr>
+<td>Q7</td>
+<td>You say <strong>&quot;I already know this&quot;</strong> in a chat</td>
+<td>&quot;Noted. Want a 1-minute check so Loci can skip it with confidence?&quot;</td>
+<td>Check me · No need</td>
+<td><code>known</code> (said); a check can make it <em>showed</em></td>
+</tr>
+</tbody></table></div>
+<p>Q4–Q6 are the in-context form of <strong>Waiting for you</strong> in Settings: the same suggestion, shown where it matters, once. Unanswered, it stays in Settings.</p>
+<h3 id="83-rules-that-keep-it-from-feeling-creepy">8.3 Rules that keep it from feeling creepy</h3>
+<ul>
+<li><strong>Use, don&#39;t announce.</strong> Loci doesn&#39;t say &quot;I remember that you…&quot; unless you ask or it&#39;s §8.1&#39;s single opening line. It just pitches right.</li>
+<li><strong>Never surprise with the personal.</strong> No slot can hold the sensitive kinds in §4.2, so they can&#39;t come back.</li>
+<li><strong>Cite on request.</strong> &quot;Why did you assume that?&quot; always gets an answer: the entry, its basis, and <strong>Edit</strong>.</li>
+<li><strong>Shared Lumens carry no memory.</strong> A viewer of a shared Lumen sees no <strong>For you</strong> tag, and the share page never shows the snapshot.</li>
+</ul>
+<h2 id="9-settings-five-tabs">9. Settings: five tabs</h2>
+<h3 id="91-the-tabs-and-where-todays-things-go">9.1 The tabs, and where today&#39;s things go</h3>
+<p><strong>Profile · Learning · Memory · Usage · Privacy &amp; data</strong>, in the existing <code>DestinationHeader</code> tabs (<code>destinationSections.settings</code>), each its own route (<code>/settings</code>, <code>/settings/learning</code>, <code>/settings/memory</code>, <code>/settings/usage</code>, <code>/settings/privacy</code>).</p>
+<div class="tbl"><table><thead><tr>
+<th>From</th>
+<th>Goes to</th>
+</tr>
+</thead><tbody><tr>
+<td>Today&#39;s Profile (name, time zone)</td>
+<td><strong>Profile</strong></td>
+</tr>
+<tr>
+<td>Today&#39;s Privacy row (analytics)</td>
+<td><strong>Privacy &amp; data</strong></td>
+</tr>
+<tr>
+<td>Onboarding answers (field, level, purpose, first interest)</td>
+<td>Field → <strong>Profile</strong>. Level, purpose, interest → <strong>Memory</strong> entries (on You and on the interest&#39;s topic). The map&#39;s note card keeps <strong>Edit</strong>, which opens the same entries</td>
+</tr>
+<tr>
+<td>The light/dark switch</td>
+<td>Stays in the rail and the account menu; also in <strong>Profile</strong> as System · Light · Dark</td>
+</tr>
+<tr>
+<td>Old prototype: Projects</td>
+<td><strong>Working on</strong> entries in Memory (and &quot;Right now I&#39;m working on…&quot; in Learning)</td>
+</tr>
+<tr>
+<td>Old prototype: AI providers</td>
+<td>Deferred (BYOK). Not shown</td>
+</tr>
+<tr>
+<td>Old prototype: Calendar</td>
+<td>Later, with the learning planning calendar (Today T4): <strong>Learning → Study rhythm</strong></td>
+</tr>
+<tr>
+<td>Old prototype: Export</td>
+<td><strong>Privacy &amp; data</strong></td>
+</tr>
+</tbody></table></div>
+<h3 id="92-each-tab">9.2 Each tab</h3>
+<p><strong>Profile.</strong> Display name · Time zone (the full list with search, not five) · What you do (the field: chips plus your words) · Years in practice (optional) · Language of lessons (English; more later) · Spelling and units (British · American; Metric · Imperial) · Appearance (System · Light · Dark).</p>
+<p><strong>Learning</strong> (what you tell Loci).</p>
+<ul>
+<li><em>Four preferences</em>: <strong>Start with</strong> Watch · Listen · Read (the Home bar&#39;s default) · <strong>Length</strong> Short · Standard · Long · <strong>Quick checks</strong> Often · Sometimes · Never · <strong>Examples from my field</strong> on/off. Depth isn&#39;t here: the level dial in Memory does that job per place. Narrator voice and speed live in the player.</li>
+<li><em>Instructions for Loci</em>: two boxes, <strong>About me and my work</strong> and <strong>How I like to be taught</strong> (each ≤ 1,000 characters). Hints in the boxes suggest what helps: experience, goals, pace, what to skip.</li>
+<li><em>Notes on topics</em>: one collapsed line, &quot;Notes on 2 topics ›&quot;, opening the list (path, text, <strong>Edit</strong>, <strong>Delete</strong>, <strong>Open in Loci</strong>).</li>
+</ul>
+<p><strong>Memory</strong> (what Loci noticed), in the depths of §4.4.</p>
+<ul>
+<li><em>Glance, as it opens</em>: the toggle (§7.6) as one line; <strong>About you</strong>, one paragraph of up to three sentences with <strong>Change</strong>; <strong>Waiting for you</strong>, at most three, each with one reason and <strong>Keep · Dismiss</strong>; <strong>By area</strong>, one line per area that has something, with its level and why.</li>
+<li><em>Open, on a tap</em>: a place&#39;s page (area, then its topics with notes): the <strong>level dial</strong>, the place&#39;s lines as sentences, each with a faint source and <strong>⋯</strong> (Why?, Edit, Delete); your note for Loci; <strong>Show the text Loci reads</strong>; <strong>Forget this place</strong>.</li>
+<li><em>At the foot, small</em>: <strong>Off the record</strong> (what it is) and <strong>Delete all memory…</strong> (typed confirmation, as deleting many items in the Library already does).</li>
+<li>Not here: token sizes, the raw slice for every surface, evidence lists, counts. They&#39;re in the Builder view (§4.4, rule 8).</li>
+</ul>
+<p><strong>Usage.</strong> This month as a percentage of the allowance (Phase 3D), and what used it (Lumens, chats, Live minutes); until 3D, the tester cap. No per-call log.</p>
+<p><strong>Privacy &amp; data.</strong> Analytics and recordings (today&#39;s row) · What Loci never stores (the §4.2 list, in plain words) · Export my data (Library, map, memory, instructions; JSON and Markdown) · Delete my account.</p>
+<h3 id="93-outside-settings-where-memory-lives-in-context">9.3 Outside Settings, where memory lives in context</h3>
+<div class="tbl"><table><thead><tr>
+<th>Where</th>
+<th>What</th>
+</tr>
+</thead><tbody><tr>
+<td>Loci, a topic&#39;s panel</td>
+<td>One line, <em>Loci: basics · for work ›</em> (§8.1); opens the place&#39;s card in place, with the same controls as Settings</td>
+</tr>
+<tr>
+<td>Loci, the topic menu</td>
+<td><strong>Tell Loci about this topic…</strong> writes a scoped instruction</td>
+</tr>
+<tr>
+<td>The copilot reply</td>
+<td><strong>Remembered: …</strong> with <strong>Undo</strong>; at most one waiting question per session, as chips</td>
+</tr>
+<tr>
+<td>A Lumen&#39;s head</td>
+<td>A <strong>For you</strong> tag; tap for one sentence and <strong>Too basic · Too advanced</strong></td>
+</tr>
+<tr>
+<td>Learn Home and Today</td>
+<td>No new UI: &quot;Next for your goals&quot; ranks with <code>level</code>, <code>revisit</code> and <code>seen</code></td>
+</tr>
+<tr>
+<td>Onboarding</td>
+<td>The note line keeps its words until Memory ships; then its <strong>Edit</strong> opens the You card and the step adds &quot;Loci remembers this. Change it any time in Settings → Memory.&quot;</td>
+</tr>
+</tbody></table></div>
+<h3 id="94-states">9.4 States</h3>
+<p>Every tab uses the existing Settings frame (<code>.preferences-form</code>, <code>.field</code>) and states: saving, saved, conflict (the version check that Profile already has), unavailable, empty (a new account: &quot;Loci hasn&#39;t noted anything yet. It starts with what you told it when you joined.&quot;), and memory off (the map dims; entries stay editable; the preview shows what Loci reads <em>without</em> memory).</p>
+<h2 id="10-data-model-proposal">10. Data model (proposal)</h2>
+<p>Logical records; they extend the agreed ones in the data model and don&#39;t need a table each. All are account-owned, with same-account composite keys, as every private table is.</p>
+<div class="tbl"><table><thead><tr>
+<th>Record</th>
+<th>Fields</th>
+<th>Notes</th>
+</tr>
+</thead><tbody><tr>
+<td><code>account_preferences</code> (exists)</td>
+<td>+ <code>locale</code>, <code>spelling</code>, <code>units</code>, <code>appearance</code>, <code>field_text</code>, <code>years_in_practice</code>, <code>learning_prefs</code> (JSON, validated), <code>memory_enabled</code> (default true)</td>
+<td>One version for conflict checks, as today</td>
+</tr>
+<tr>
+<td><code>learner_instructions</code> <em>new</em></td>
+<td>id, place (topic id or null for You), kind (<code>about · teaching · working_on · topic_note</code>), text ≤ 1,000, version, timestamps</td>
+<td>Scoped notes cascade with their topic</td>
+</tr>
+<tr>
+<td><code>memory_entries</code> <em>new</em></td>
+<td>id, place, slot, text, basis, origin, status, learner_edited_at, version, timestamps, tombstone hash</td>
+<td>The agreed &quot;Memory entry&quot; + place, slot, basis</td>
+</tr>
+<tr>
+<td><code>learning_evidence</code> <em>new</em></td>
+<td>id, place, kind, typed reference (message, explainer, view, attempt, note, journal entry), summary ≤ 200, at</td>
+<td>Append-only. Course engine&#39;s <code>Evidence</code></td>
+</tr>
+<tr>
+<td><code>memory_entry_evidence</code> <em>new</em></td>
+<td>entry id, evidence id</td>
+<td>The agreed &quot;Memory evidence&quot;</td>
+</tr>
+<tr>
+<td><code>memory_digests</code> <em>new</em> (working copy)</td>
+<td>place, digest, headline, token estimate, source versions, compiled at</td>
+<td>Rebuildable; drop and rebuild at any time</td>
+</tr>
+<tr>
+<td><code>context_snapshots</code> (agreed)</td>
+<td>run, instruction ids and versions, entry ids and versions, memory on/off, slice hash</td>
+<td>No transcript text</td>
+</tr>
+</tbody></table></div>
+<p>Retention (owner decision M-D7): tombstones kept while the account exists; evidence kept with its source (a chat deleted → its evidence goes); snapshots kept with their Lumen.</p>
+<h2 id="11-fit-with-the-learn-roadmap-and-the-course-engine">11. Fit with the Learn roadmap and the course engine</h2>
+<ul>
+<li><strong>Learn roadmap</strong> (<span class="ref" title="Background only: a planning document you don't need for this build"><code>2026-10-23-learn-roadmap-design.md</code></span>): every phase&#39;s Lumen formats share one brief, so M1–M3 improve Watch, Listen, Read and Live at once. Phase 3&#39;s comments (&quot;too basic here&quot;) are evidence. Phase 5 Live&#39;s taps are the best early signal of level and preference.</li>
+<li><strong>Course engine</strong> (Stage 4): its Learner Model stays the <em>engine</em> for concept levels. This design is the <em>surface</em>: concept states show up as <code>known</code> and <code>revisit</code> entries with basis <em>You showed</em>, its learning records become those entries, its glossary becomes <code>words</code>, and its learner card becomes the <code>here</code> part of the slice. Its &quot;deliberately excluded&quot; list still stands: no statistical knowledge tracing, no embeddings, no fine-tuning.</li>
+<li><strong>Goals</strong>: the owner&#39;s choice of 16 Oct (&quot;goals as Library notes the copilot recognises, plus Settings&quot;) fits <code>why</code> and <code>working_on</code>. A goal note can be the evidence for a <code>why</code> entry. Goals&#39; own design stays open (L-D, A12).</li>
+</ul>
+<h2 id="12-build-order">12. Build order</h2>
+<p>Each step is useful alone. Tiers as in the Learn roadmap.</p>
+<div class="tbl"><table><thead><tr>
+<th>Step</th>
+<th>What the learner gets</th>
+<th>Tier</th>
+<th>Migration</th>
+<th>Switch</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>M0</strong></td>
+<td>Settings tabs: Profile (with what you do, full time zones, appearance), Privacy &amp; data; Learning, Memory and Usage as &quot;coming&quot; placeholders hidden behind the switch</td>
+<td>LOW</td>
+<td>no</td>
+<td><code>SETTINGS_TABS</code></td>
+</tr>
+<tr>
+<td><strong>M1</strong></td>
+<td><strong>Learning</strong>: preferences and Instructions for Loci (global), read into the copilot and every brief beside the learner line</td>
+<td>MEDIUM</td>
+<td>yes</td>
+<td><code>LEARNER_INSTRUCTIONS</code></td>
+</tr>
+<tr>
+<td><strong>M2</strong></td>
+<td><strong>Memory on You</strong>: the toggle, You card, onboarding answers turned into entries, the copilot&#39;s <code>remember</code> tool and chip, <strong>Delete all</strong></td>
+<td>HIGH</td>
+<td>yes</td>
+<td><code>LEARNER_MEMORY</code></td>
+</tr>
+<tr>
+<td><strong>M3</strong></td>
+<td><strong>Memory on the map</strong>: cards per place, <code>learnerSlice</code>, digests, the Glance and Open views, the topic panel line, <strong>Tell Loci about this topic…</strong>, <strong>For you</strong> on Lumens, snapshots, send-once in conversations</td>
+<td>HIGH</td>
+<td>yes</td>
+<td><code>LEARNER_MEMORY</code></td>
+</tr>
+<tr>
+<td><strong>M4</strong></td>
+<td><strong>Rules and the scribe</strong>: evidence from views, ratings and Live taps; rule-made suggestions, <strong>Waiting for you</strong>, the one-question rule (Q1, Q2, Q4–Q7), roll-ups; then the scribe for free text</td>
+<td>HIGH</td>
+<td>yes</td>
+<td><code>MEMORY_SCRIBE</code></td>
+</tr>
+<tr>
+<td><strong>M5</strong></td>
+<td><strong>Stage 4</strong>: checks, quizzes and notes write <em>You showed</em>; <code>known</code>, <code>revisit</code>, <code>words</code> from the Learner Model; Q3 in the planner</td>
+<td>HIGH</td>
+<td>yes (with Stage 4)</td>
+<td>with Stage 4</td>
+</tr>
+</tbody></table></div>
+<p><strong>Evaluation before M4 ships</strong> (a fixture set, as the copilot and explainers have): 20 scripted learner histories; for each, the expected entries and suggestions. Pass when no sensitive entry is ever written, no deleted entry returns, every slice line maps to a visible source (§4.2&#39;s test), and a blind owner review rates the personalised Lumen better than the unpersonalised one in at least 14 of 20.</p>
+<h2 id="13-decisions-for-the-owner">13. Decisions for the owner</h2>
+<div class="tbl"><table><thead><tr>
+<th>#</th>
+<th>Decision</th>
+<th>Recommendation</th>
+</tr>
+</thead><tbody><tr>
+<td>M-D1</td>
+<td>Memory attached to places on the map (design A), instead of free groups</td>
+<td><strong>Yes.</strong> It&#39;s the owner&#39;s &quot;learning flows up topic to area to map&quot; and it makes reading cheap. Entries still aren&#39;t nodes</td>
+</tr>
+<tr>
+<td>M-D2</td>
+<td>Fixed card slots (C)</td>
+<td><strong>Yes</strong>, the eight in §5.2</td>
+</tr>
+<tr>
+<td>M-D3</td>
+<td>The five Settings tabs and their names</td>
+<td><strong>Profile · Learning · Memory · Usage · Privacy &amp; data</strong></td>
+</tr>
+<tr>
+<td>M-D4</td>
+<td>Turning memory back on: process what happened while off?</td>
+<td><strong>No.</strong> Start fresh from the moment it&#39;s on</td>
+</tr>
+<tr>
+<td>M-D5</td>
+<td>The one-question rule and catalogue Q1–Q7</td>
+<td><strong>Yes</strong>, at most one per session</td>
+</tr>
+<tr>
+<td>M-D6</td>
+<td>Deleting a topic deletes its cards</td>
+<td><strong>Yes</strong>, named in the delete confirmation</td>
+</tr>
+<tr>
+<td>M-D7</td>
+<td>Retention: tombstones, evidence, snapshots</td>
+<td>As in §10</td>
+</tr>
+<tr>
+<td>M-D8</td>
+<td>Onboarding answers: edit in Settings as well as on the note card</td>
+<td><strong>Both</strong>, one record</td>
+</tr>
+<tr>
+<td>M-D9</td>
+<td>A <strong>For you</strong> tag on every Lumen</td>
+<td><strong>Yes</strong>, hidden on shared Lumens</td>
+</tr>
+<tr>
+<td>M-D10</td>
+<td>Live taps and Lumen ratings count as evidence</td>
+<td><strong>Yes</strong>, as <em>You did</em>, suggestions only</td>
+</tr>
+<tr>
+<td>M-D11</td>
+<td>Library saves and tags as a memory signal</td>
+<td><strong>Not in the MVP</strong> (as agreed); revisit post-MVP</td>
+</tr>
+<tr>
+<td>M-D12</td>
+<td>The scribe on Haiku 5.5</td>
+<td><strong>Yes</strong>, behind the evaluation in §12</td>
+</tr>
+<tr>
+<td>M-D13</td>
+<td>Show less: the four depths and eight display rules (§4.4)</td>
+<td><strong>Yes.</strong> Settings opens on one paragraph and one line per area</td>
+</tr>
+<tr>
+<td>M-D14</td>
+<td>Rules before the scribe: taps, ratings, checks and expiry by fixed rules; the scribe only for free text</td>
+<td><strong>Yes.</strong> Cheaper, and more predictable</td>
+</tr>
+<tr>
+<td>M-D15</td>
+<td>Send the slice once per conversation</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>M-D16</td>
+<td>Learning keeps four preferences and two instruction boxes; depth moves to the level dial</td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody></table></div>
+<h2 id="14-sources">14. Sources</h2>
+<p><code>studiolo</code> main @ <code>3c2f744</code>, read only: the paths linked in §1, §2, §6.5 and §10. Craft, Studilo space (read 24 Oct 2026): <em>Learner context &amp; Memory</em>, <em>AI BRain</em>, <em>Settings &amp; Onboarding</em>, <em>Copilot</em>, <em>Graph</em>, <em>Course engine (long-term)</em>, <em>Features &amp; Ideas</em>, <em>Library - polishment Phase</em>, <em>Vision &amp; Principles</em>, <em>Decisions</em>. Research sources for §3:</p>
+<ul>
+<li>Claude (read directly): <a href="https://support.claude.com/en/articles/11817273-using-claude-s-chat-search-and-memory-to-build-on-previous-context" target="_blank" rel="noopener">chat search and memory</a>, <a href="https://support.claude.com/en/articles/12123587-import-and-export-your-memory-from-claude" target="_blank" rel="noopener">import and export memory</a>, <a href="https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features" target="_blank" rel="noopener">personalisation</a>, <a href="https://support.claude.com/en/articles/12260368-use-incognito-chats" target="_blank" rel="noopener">incognito</a>, <a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener">Claude Code memory</a>.</li>
+<li>ChatGPT (from search summaries of the official pages; not fetched directly): <a href="https://help.openai.com/en/articles/8590148-memory-faq" target="_blank" rel="noopener">Memory FAQ</a>, <a href="https://help.openai.com/en/articles/10303002-how-does-memory-use-past-conversations" target="_blank" rel="noopener">how memory uses past conversations</a>, <a href="https://openai.com/index/chatgpt-memory-dreaming/" target="_blank" rel="noopener">dreaming</a>, <a href="https://techcrunch.com/2025/01/09/chatgpts-newest-feature-lets-user-assign-it-traits-like-chatty-and-gen-z/" target="_blank" rel="noopener">traits</a>, <a href="https://www.techradar.com/ai-platforms-assistants/chatgpt/chatgpt-project-only-memory-is-live-and-it-might-change-how-you-work-with-ai" target="_blank" rel="noopener">project-only memory</a>.</li>
+<li>Gemini and others: <a href="https://blog.google/products-and-platforms/products/gemini/temporary-chats-privacy-controls/" target="_blank" rel="noopener">Temporary chats</a>, <a href="https://9to5google.com/2025/08/13/gemini-personal-context/" target="_blank" rel="noopener">personal context</a>, <a href="https://intercom.help/perplexity-ai/en/articles/10968016-memory" target="_blank" rel="noopener">Perplexity memory</a>, <a href="https://blockchain.news/news/character-ai-enhances-user-experience-with-chat-memories-feature" target="_blank" rel="noopener">Character.ai chat memories</a>.</li>
+<li>Learning products: <a href="https://blog.duolingo.com/learning-how-to-help-you-learn-introducing-birdbrain" target="_blank" rel="noopener">Duolingo Birdbrain</a>, <a href="https://preview.aclanthology.org/fix_video/P16-1174.pdf" target="_blank" rel="noopener">Settles and Meeder 2016</a>, <a href="https://support.khanacademy.org/hc/en-us/articles/5548760867853" target="_blank" rel="noopener">Khan Academy mastery levels</a>, <a href="https://docs.ankiweb.net/faqs/what-spaced-repetition-algorithm" target="_blank" rel="noopener">Anki FSRS</a>, <a href="https://mathacademy.com/how-our-ai-works" target="_blank" rel="noopener">Math Academy</a>.</li>
+<li>Research: <a href="https://arxiv.org/pdf/1812.09628" target="_blank" rel="noopener">overlay and bug models (ITS survey)</a>, <a href="https://research.birmingham.ac.uk/en/publications/smili-a-framework-for-interfaces-to-learning-data-in-open-learner/" target="_blank" rel="noopener">SMILI open learner models</a>, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3970786" target="_blank" rel="noopener">hypercorrection</a>, <a href="https://arxiv.org/pdf/2304.03442" target="_blank" rel="noopener">Generative Agents</a>, <a href="https://docs.letta.com/concepts/memory-management" target="_blank" rel="noopener">Letta memory</a>, <a href="https://arxiv.org/pdf/2504.19413" target="_blank" rel="noopener">Mem0</a>.</li>
+<li>Law: <a href="https://advisera.com/eugdpracademy/gdpr/processing-of-special-categories-of-personal-data/" target="_blank" rel="noopener">GDPR Article 9</a>, <a href="https://fpf.org/blog/red-lines-under-eu-ai-act-unpacking-the-prohibition-of-emotion-recognition-in-the-workplace-and-education-institutions/" target="_blank" rel="noopener">EU AI Act emotion-recognition ban</a>.</li>
+</ul>
+<p>Not verified first-hand: everything about ChatGPT, Gemini, Duolingo and Khan Academy came through search summaries, because the research fetcher couldn&#39;t reach those sites. Exact current labels in ChatGPT&#39;s settings, and some reported figures, may differ.</p>
+
+    <p class="foot">The four pages: <a href="https://claude.ai/artifact/NzT1Jssm9UVAEyoNNAKSyf" target="_blank" rel="noopener">Build brief</a> · <b>Design spec</b> · <a href="https://claude.ai/artifact/Hw6sRsxA5h4ks4CmM4uV3Q" target="_blank" rel="noopener">System reference</a> · <a href="https://claude.ai/artifact/QhtegT5EWSw9thhd78HdWk" target="_blank" rel="noopener">Prototype</a></p>
+  </main>
+</div>

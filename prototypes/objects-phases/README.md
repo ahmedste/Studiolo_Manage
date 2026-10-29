@@ -8,7 +8,7 @@ A band on top switches **Today · Phase 1 · Phase 2 · Phase 3**. Each step add
 |---|---|
 | **Today** | Lawyer → Cases → Robinson: Area of law is plain text, the holding sits in the rail, Year is text, and two fields don't fit (8 at most). The customizer offers today's five types and presets |
 | **Phase 1** | The same case: choices are chips, Holding and Ratio are sections, the year is a year. **Table** view on the collection; the customizer's types and field settings; starter types per field |
-| **Phase 2** | Cases now show **Cites** as cards and **Cited by** on the other case; Buildings open with a **Slideshow**; ⋯ → **Arrange page**; **Board**, **Timeline**, **+ Save view**; the Objects filter; up to 24 fields in groups |
+| **Phase 2** | Cases now show **Cites** as cards and **Cited by** on the other case; Buildings open with a **Slideshow**; ⋯ → **Arrange page**; **Columns** (by typology, status…), **Timeline**, **+ Save view**; the Objects filter; up to 24 fields in groups |
 | **Phase 3** | Courts become a **Group** and Procedures an **Event**; Teaching cases are **Clinical** (try typing "Mrs Smith" into a field); customizer → **+ New collection** → Loci drafts one |
 
 All content is example data. The legal and clinical content is for illustration only: it is not legal or clinical advice. Pictures are drawn stand-ins for photos.

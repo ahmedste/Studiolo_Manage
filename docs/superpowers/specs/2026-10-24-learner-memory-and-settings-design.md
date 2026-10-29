@@ -14,6 +14,7 @@ HIGH (a design system across Settings, Loci, Learn and every AI surface; it need
 
 **Prototype:** [`prototypes/settings-memory/`](../../../prototypes/settings-memory/README.md), the Settings tabs and the memory map on Studiolo's real shell and styles.
 **System reference (diagrams):** [`2026-10-24-learner-memory-system-reference.md`](2026-10-24-learner-memory-system-reference.md): every Save, Call and Edit step, its tables, its cost and its tests.
+**Build brief (start here to build):** [`2026-10-28-learner-memory-build-brief.md`](2026-10-28-learner-memory-build-brief.md): the six phases and L1 in detail.
 
 ## 0. In short
 

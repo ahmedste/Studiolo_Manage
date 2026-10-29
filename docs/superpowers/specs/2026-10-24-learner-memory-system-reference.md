@@ -3,6 +3,7 @@
 **For:** whoever builds learner memory in `studiolo`. This is the reference to keep open while building: what runs, in what order, what it reads and writes, and what it costs.
 **Status:** Proposed with the [design](2026-10-24-learner-memory-and-settings-design.md) (Claude, 24 October 2026); not approved. Function and table names marked *new* don't exist yet; the rest exist on `studiolo` main @ `3c2f744`.
 **Prototype:** [`prototypes/settings-memory/`](../../../prototypes/settings-memory/README.md). Its **Builder** view shows the slice and its token size for any place.
+**Build brief (start here to build):** [`2026-10-28-learner-memory-build-brief.md`](2026-10-28-learner-memory-build-brief.md): the six phases and L1 in detail.
 
 ## 0. The system in six rules
 
