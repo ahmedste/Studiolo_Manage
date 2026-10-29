@@ -5216,6 +5216,39 @@ body:has(.wz) .proto { display: none; }
 .sh-t.on { opacity: .55; } .sh-on { position: absolute; top: 6px; right: 6px; font-style: normal; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: var(--surface-float); color: var(--ink-2); }
 .sh-foot { margin: 0; padding: 8px 12px 12px; border-top: 1px solid var(--line); }
 .viewport.dropping { box-shadow: inset 0 0 0 2px var(--accent); }
+/* board craft: the add-and-link menu, selection, guides, minimap, shortcuts (LB4) */
+.qp.lk { width: 320px; }
+.qp-from { margin: 0; padding: 2px 4px 0; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .qp-from b { font-weight: 500; color: var(--ink-2); }
+.qp-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
+.qp-acts button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 9px 4px 7px; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font: 12px var(--ui); color: var(--ink); text-align: center; transition: transform var(--dur-quick), box-shadow var(--dur-quick); }
+.qp-acts button i { font-style: normal; font-size: 17px; line-height: 1; color: var(--ink-2); }
+.qp-acts button.q i { color: var(--pick); } .qp-acts button.l i { color: var(--accent); }
+.qp-acts button:hover, .qp-acts button.on { box-shadow: inset 0 0 0 1.5px var(--accent); transform: translateY(-1px); }
+.qp-acts kbd { font: 10px var(--ui); color: var(--ink-3); }
+.qp-h { margin: 2px 4px -2px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.arrows .ghost-end { fill: var(--accent); }
+.arrows .gd { stroke: var(--pick); stroke-width: 1; stroke-dasharray: 3 3; }
+.marq { position: absolute; z-index: 6; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 2px; pointer-events: none; }
+.bpl.lk .mcard .ci { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.bpl.pop { animation: bpop .32s cubic-bezier(.2, .9, .3, 1.25); }
+@keyframes bpop { from { transform: scale(.86); opacity: 0; } }
+.stopn.burst { animation: burst .7s ease-out; }
+@keyframes burst { 0% { transform: scale(1); } 30% { transform: scale(1.45); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); } 100% { transform: scale(1); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 16px transparent; } }
+@media (prefers-reduced-motion: reduce) { .bpl.pop, .stopn.burst { animation: none; } }
+.cbar { position: absolute; z-index: 8; display: flex; gap: 2px; align-items: center; padding: 4px; border-radius: 9px; background: var(--surface-float); box-shadow: var(--shadow-float); white-space: nowrap; }
+.cbar button { all: unset; cursor: pointer; padding: 5px 9px; border-radius: 6px; font: 12.5px var(--ui); color: var(--ink); }
+.cbar button:hover { background: var(--hover-fill); } .cbar button.rm { color: var(--warn); }
+.cbar span { padding: 0 8px; font-size: 12px; color: var(--ink-3); } .cbar .sep { width: 1px; height: 18px; padding: 0; background: var(--line); }
+.bmap { position: absolute; z-index: 5; left: 16px; bottom: 16px; width: 168px; height: 108px; border-radius: 10px; background: var(--surface-float); box-shadow: var(--shadow-float); overflow: hidden; cursor: pointer; }
+.bmap svg { width: 100%; height: 100%; display: block; } .bmap rect { fill: var(--line); } .bmap rect.q { fill: var(--pick-rule); } .bmap rect.l, .bmap rect.g { fill: var(--status-1); } .bmap rect.s { fill: var(--accent); }
+.bmap rect.vw { fill: color-mix(in srgb, var(--accent) 7%, transparent); stroke: var(--accent); stroke-width: 1.5; }
+.bkeys { position: absolute; z-index: 9; right: 16px; bottom: 62px; width: 300px; padding: 14px 16px; border-radius: 12px; background: var(--surface-float); box-shadow: var(--shadow-float); font-size: 12.5px; }
+.bfull .bwrap.has-panel .bkeys { right: 352px; }
+.bkeys h3 { margin: 0 0 8px; font: 400 16px var(--read); display: flex; justify-content: space-between; } .bkeys h3 button { border: 0; background: none; color: var(--ink-3); cursor: pointer; font-size: 16px; }
+.bkeys dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 5px 12px; } .bkeys dt { text-align: right; } .bkeys dd { margin: 0; color: var(--ink-2); }
+.bkeys kbd, .bhint kbd { font: 11px var(--ui); padding: 1px 5px; border-radius: 4px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+body.focus .bmap, body.focus .bkeys { display: none !important; }
+@media (max-width: 760px) { .bmap, .bkeys { display: none; } }
 .qp { position: absolute; z-index: 9; width: 340px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 8px; display: grid; gap: 6px; }
 .qp-s { display: flex; gap: 6px; align-items: center; padding: 7px 9px; border-radius: 6px; box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--paper); color: var(--ink-3); }
 .qp-list { display: grid; gap: 1px; max-height: 250px; overflow: auto; }
@@ -5990,7 +6023,7 @@ function lumenCard(p, b) {
   const l = I(p.ref.slice(2)); if (!l) return "";
   if (S.playing?.lid === l.id) return lumenCardOpen(p, b, l);
   const n = stopsOf(b).indexOf(l.forQ) + 1;
-  return `<div class="bpl lm${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body"><p class="kicker">▶ Lumen · ${FMT[l.fmt]} · ${l.slides.length} slides</p><h2 class="mcard-title">${esc(l.title)}</h2><p class="lc-s">${esc(l.slides[0].t.slice(0, 96))}…</p></div><div class="ft"><div class="ft-meta"><span>${n ? `Answers stop ${n}` : "Answers a side question"}</span></div><button class="button button-quiet lc-play" type="button" data-act="lplay" data-id="${l.id}">▶ Play</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
+  return `<div class="bpl lm${isSel(p.id) ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body"><p class="kicker">▶ Lumen · ${FMT[l.fmt]} · ${l.slides.length} slides</p><h2 class="mcard-title">${esc(l.title)}</h2><p class="lc-s">${esc(l.slides[0].t.slice(0, 96))}…</p></div><div class="ft"><div class="ft-meta"><span>${n ? `Answers stop ${n}` : "Answers a side question"}</span></div><button class="button button-quiet lc-play" type="button" data-act="lplay" data-id="${l.id}">▶ Play</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
 }
 function recallItems(b) {
   const nm = pid => { const o = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); const t = o ? (o.type === "item" ? o.it.title || plainBody(o.it) : INL(o.key)?.text) : "?"; return t.length > 44 ? t.slice(0, 42).replace(/\s+\S*$/, "") + "…" : t; };
@@ -6024,7 +6057,7 @@ function playerIn(l) {
 }
 function lumenCardOpen(p, b, l) {
   const q = INL(l.forQ), s = q ? st(q.key, "question") : null;
-  return `<div class="bpl lm open${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard open" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body">
+  return `<div class="bpl lm open${isSel(p.id) ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px"><article class="mcard lcard open" data-frame="paper" data-ph="LB2"><div class="ci"><div class="body">
     <div class="lco-top"><p class="kicker">▶ Lumen · ${esc(l.title)}</p><button class="lco-x" type="button" data-act="pclose" aria-label="Close the player" title="Fold back to a card">×</button></div>
     <span class="cph-views lco-f" role="group" aria-label="How to take it">${Object.entries(FMT).map(([k, t]) => `<button type="button" data-act="pfmt" data-k="${k}" aria-pressed="${l.fmt === k}">${t}</button>`).join("")}</span>
     ${l.making ? `<div class="lpl making"><span class="spin"></span><p>Loci is making it from this board and your Commonplace…</p></div>` : playerIn(l)}</div>
@@ -6056,8 +6089,49 @@ function shelfHTML(b) {
     <div class="sh-tabs">${SHELF_TABS.map(([k, t]) => `<button type="button" data-act="shtab" data-k="${k}" aria-pressed="${tab === k}">${t}</button>`).join("")}</div>
     <div class="sh-list">${list.map(t => tileHTML(t, on.has(t.ref))).join("") || `<p class="small">Nothing matches.</p>`}</div><p class="small sh-foot">Drag onto the board, or click to place in the middle. Double-click empty board to search there.</p></aside>`;
 }
+function related(fr, b) {
+  const on = new Set(b.pl.map(p => p.ref)), ids = new Set(), tn = t => t?.n || t, tps = new Set((fr.type === "item" ? fr.it.topics || [] : INL(fr.key).item.topics?.length ? INL(fr.key).item.topics : b.topics || []).map(tn));
+  if (fr.type === "item" && fr.it.type === "object") {
+    for (const f of COL(fr.it.col).fields.filter(f => f.t === "rel")) arr(fr.it.v[f.id]).forEach(id => ids.add(id));
+    D().items.filter(x => x.type === "object" && x.col && COL(x.col).fields.some(f => f.t === "rel" && arr(x.v[f.id]).includes(fr.it.id))).forEach(x => ids.add(x.id));
+  }
+  D().items.filter(x => x.type !== "board" && x !== fr.it && (x.topics || []).some(t => tps.has(tn(t)))).forEach(x => ids.add(x.id));
+  return [...ids].map(I).filter(x => x && !on.has("i:" + x.id)).slice(0, 4).map(x => ({ ref: "i:" + x.id, x }));
+}
+const qpGlyph = t => t.r ? "?" : t.x.type === "object" ? "▣" : t.x.type === "image" ? "◫" : t.x.type === "source" ? "▤" : "¶";
+function linkHTML() {
+  const b = I(S.board), fp = b.pl.find(p => p.id === S.qp.from), fr = fp && refOf(fp.ref, b), q = S.qp.q.trim();
+  const name = fp?.ref.startsWith("l:") ? I(fp.ref.slice(2))?.title : fr ? (fr.type === "item" ? fr.it.title || plainBody(fr.it).slice(0, 40) : INL(fr.key).text) : "";
+  const acts = [{ k: "note", g: "✎", t: "Note", c: "" }, { k: "question", g: "?", t: fr?.type === "item" ? "Ask about it" : "Question", c: "q" }];
+  if (fr?.type === "inline" && fr.kind === "question" && st(fr.key, "question").status === "open") acts.push({ k: "lumen", g: "▶", t: "Lumen", c: "l" });
+  const on = new Set(b.pl.map(p => p.ref)), list = q ? shelfItems(q, "all").slice(0, 6) : fr ? related(fr, b) : [];
+  const found = list.map(t => ({ ref: t.ref, g: qpGlyph(t), t: t.r ? t.r.text : t.x.title || plainBody(t.x).slice(0, 60), s: t.r ? `in ${t.r.item.title || "a note"}` : kindLabel(t.x) + (on.has(t.ref) ? " · on this board" : "") }));
+  S.qp.rows = [...acts, ...found]; if (S.qp.on == null) S.qp.on = q && found.length ? acts.length : 0; S.qp.on = Math.min(S.qp.on, S.qp.rows.length - 1);
+  const ai = i => i === S.qp.on ? " on" : "";
+  return `<div class="qp lk" style="left:${S.qp.cx}px;top:${S.qp.cy}px" data-ph="LB4"><p class="qp-from">Add and link from <b>${esc(name)}</b></p>
+    <div class="qp-acts">${acts.map((a, i) => `<button type="button" class="${a.c}${ai(i)}" data-qpi="${i}"><i>${a.g}</i>${q && a.k !== "lumen" ? esc(a.k === "note" ? "Note" : "Question") : esc(a.t)}<kbd>${i + 1}</kbd></button>`).join("")}</div>
+    <label class="qp-s">${SVG.search}<input id="qpi" type="text" placeholder="…or find something in your Commonplace" value="${esc(S.qp.q)}" autocomplete="off"></label>
+    ${found.length ? `<p class="qp-h">${q ? "In your Commonplace" : "Related, not on this board"}</p><div class="qp-list">${found.map((r, i) => `<button type="button" class="${ai(i + acts.length)}" data-qpi="${i + acts.length}"><span class="gl">${r.g}</span><b>${esc(r.t)}</b>${r.s ? `<small>${esc(r.s)}</small>` : ""}</button>`).join("")}</div>` : q ? `<p class="qp-foot">Nothing matches. Enter makes it a note.</p>` : ""}
+    <p class="qp-foot">${q ? "Enter adds the highlighted one · " : "1–" + acts.length + " to add · "}Esc to cancel</p></div>`;
+}
+/** Slide a new card down until it no longer sits on another one. */
+function freeSpot(x, y, w, h, b) {
+  const bx = boardBoxes(); let ny = y;
+  for (let i = 0; i < 30; i++) { const hit = bx.find(o => x < o.x + o.w + 16 && x + w + 16 > o.x && ny < o.y + o.h + 16 && ny + h + 16 > o.y); if (!hit) break; ny = hit.y + hit.h + 24; }
+  return [Math.round(x), Math.round(ny)];
+}
+function openLinkMenu(pid, gx, gy) {
+  const vp = $("#vp"), r = vp.getBoundingClientRect(), b = I(S.board), p = b.pl.find(x => x.id === pid); if (!p) return;
+  const left = gx < p.x, z = S.view.z;
+  let cx = gx * z + S.view.x + (left ? -330 : 14), cy = gy * z + S.view.y - 40;
+  const dx = cx < 10 ? 10 - cx : cx > r.width - 340 ? r.width - 340 - cx : 0, dy = cy > r.height - 330 ? r.height - 330 - cy : cy < 70 ? 70 - cy : 0;
+  if (dx || dy) { S.view.x += dx; S.view.y += dy; cx += dx; cy += dy; applyView(); }
+  S.qp = { from: pid, gx, gy, x: left ? gx - 240 : gx, y: gy - 30, cx, cy, q: "", on: null };
+  S.selSet = new Set([pid]); S.sel = pid; render(); $("#qpi")?.focus();
+}
 function qpHTML() {
   if (!S.qp) return "";
+  if (S.qp.from) return linkHTML();
   const list = shelfItems(S.qp.q, "all").slice(0, 7), on = new Set(I(S.board).pl.map(p => p.ref)), acts = [["note", "✎", "A new note here"], ["question", "?", "A question here"]];
   const actRows = acts.map(([k, g, t]) => ({ k, g, t: S.qp.q && k === "note" ? `New note: “${S.qp.q}”` : S.qp.q && k === "question" ? `New question: “${S.qp.q.replace(/\?$/, "")}?”` : t, s: "" }));
   const found = list.map(t => ({ ref: t.ref, g: t.r ? "?" : t.x.type === "object" ? "▣" : t.x.type === "image" ? "◫" : t.x.type === "source" ? "▤" : "¶", t: t.r ? t.r.text : t.x.title || plainBody(t.x).slice(0, 60), s: t.r ? `in ${t.r.item.title || "a note"}` : kindLabel(t.x) + (on.has(t.ref) ? " · on this board" : "") }));
@@ -6067,16 +6141,32 @@ function qpHTML() {
 }
 function placeRef(ref, x, y) {
   const b = I(S.board);
-  if (b.pl.some(p => p.ref === ref)) { const p = b.pl.find(p => p.ref === ref); toast("Already on this board: showing it."); centreOn(p.id, S.view.z); S.sel = p.id; render(); return; }
-  b.pl.push({ id: "p" + Date.now(), ref, x: Math.round(x), y: Math.round(y) }); render();
+  if (b.pl.some(p => p.ref === ref)) { const p = b.pl.find(p => p.ref === ref); toast("Already on this board: showing it."); centreOn(p.id, S.view.z); S.sel = p.id; S.selSet = new Set([p.id]); render(); return; }
+  snap(); b.pl.push({ id: "p" + Date.now(), ref, x: Math.round(x), y: Math.round(y) }); render();
   toast(ref.startsWith("q:") ? "Placed. The question still belongs to where it was written." : "Placed, not copied: it's the same entry as in Commonplace.");
 }
 function chooseQp(i) {
+  const from = S.qp.from, b = I(S.board), r = S.qp.rows[i], n0 = b.pl.length;
+  if (from && r?.k === "lumen") {
+    const fp = b.pl.find(p => p.id === from), key = refOf(fp.ref, b).key, { x, y } = S.qp; S.qp = null; snap();
+    const l = makeLumen(b, key, "read"), lp = b.pl.find(p => p.ref === "l:" + l.id); lp.x = Math.round(x); lp.y = Math.round(y);
+    l.making = true; S.playing = { lid: l.id, s: 0 }; render(); requestAnimationFrame(() => centreOn(lp.id, Math.max(S.view.z, .9))); setTimeout(() => { l.making = false; render(); }, 900); return;
+  }
+  if (from && S.qp) { const w = r?.ref || r?.k ? 240 : 0; [S.qp.x, S.qp.y] = freeSpot(S.qp.x, S.qp.y, w, 120, b); }
+  pickQp(i);
+  if (!from || !r) return;
+  const to = b.pl.length > n0 ? b.pl.at(-1).id : r.ref ? b.pl.find(p => p.ref === r.ref)?.id : null;
+  if (!to || to === from || b.arrows.some(a => (a.from === from && a.to === to) || (a.from === to && a.to === from))) return;
+  if (b.pl.length === n0) snap();
+  b.arrows.push({ id: "a" + Date.now(), from, to, label: "" }); S.selSet = new Set([to]); S.sel = to; requestAnimationFrame(drawArrows);
+  toast(S.editing ? "Linked. Write it; Esc or a click away when done." : "Added and linked.");
+}
+function pickQp(i) {
   const r = S.qp.rows[i], { x, y } = S.qp, text = (S.qp.q || "").trim(); S.qp = null;
   if (!r) { render(); return; }
   if (r.k === "note" || r.k === "question") {
     if (!text) { addOnCanvas(r.k, x, y); return; }
-    const b = I(S.board);
+    const b = I(S.board); snap();
     if (r.k === "question") { const id = "q" + Date.now(); b.inl.push({ id, kind: "question", text: text.replace(/\?$/, "") + "?" }); b.pl.push({ id: "p" + id, ref: "b:" + id, x, y }); render(); toast("Asked here, and added to the path."); }
     else { const nid = "n" + Date.now(); D().items.unshift(note(nid, "notes", "", text, { topics: b.topics })); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x, y }); render(); toast("Saved to Commonplace as a note, and placed here."); }
     return;
@@ -6093,9 +6183,9 @@ function refOf(ref, b = I(S.board)) {
 function placed(p, b) {
   if (p.ref.startsWith("l:")) return lumenCard(p, b);
   const r = refOf(p.ref, b); if (!r) return "";
-  const dot = `<span class="dot-c" data-dot="${p.id}" title="Drag onto another card to connect"></span>`;
+  const dot = `<span class="dot-c" data-dot="${p.id}" title="Drag onto a card to link, or let go on empty space to add a linked card"></span>`;
   const si = r.type === "inline" && r.kind === "question" ? stopsOf(b).indexOf(r.key) : -1, isNext = si >= 0 && nextStop(b) === r.key, sAns = si >= 0 && st(r.key, "question").status === "answered";
-  const wrap = (cls, inner) => `<div class="bpl${cls}${isNext ? " next" : ""}${S.sel === p.id ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${si >= 0 ? `<span class="stopn${sAns ? " done" : ""}" title="Stop ${si + 1} on the path${isNext ? ", suggested next" : ""}">${sAns ? "✓" : si + 1}</span>` : ""}${inner}${dot}</div>`;
+  const wrap = (cls, inner) => `<div class="bpl${cls}${isNext ? " next" : ""}${isSel(p.id) ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${si >= 0 ? `<span class="stopn${sAns ? " done" : ""}" title="Stop ${si + 1} on the path${isNext ? ", suggested next" : ""}">${sAns ? "✓" : si + 1}</span>` : ""}${inner}${dot}</div>`;
   if (r.type === "inline") {
     const row = INL(r.key), s = st(r.key, r.kind);
     if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span class="gprog" style="margin:0">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span></div>${stBtn(row)}</div></div></article>`); }
@@ -6132,7 +6222,7 @@ function renderBoard() {
   const b = I(S.board) || boards()[0]; S.board = b.id;
   if (S.panel == null) S.panel = innerWidth > 900;
   const ptab = S.ptab || "learn";
-  const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click empty board to search and place · drag from the shelf · drag a blue dot to connect";
+  const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click to add · drag a blue dot to link · <kbd>?</kbd> shortcuts";
   const stops = stopsOf(b), d = stops.filter(k => st(k, "question").status === "answered").length;
   return `<h1 class="visually-hidden">${esc(b.title)}</h1><div class="bwrap${S.panel ? " has-panel" : ""}" data-ph="B1"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>${qpHTML()}</div>
     <div class="btop"><button class="btop-back" type="button" data-act="back" title="Back" aria-label="Back">←</button><div class="btop-t"><p class="ip-kicker">Board</p><b>${esc(b.title)}</b></div><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
@@ -6140,7 +6230,10 @@ function renderBoard() {
     <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" aria-pressed="${S.panel && ptab === "shelf"}" title="Your Commonplace (+)" aria-label="Your Commonplace">+</button></div>
     ${S.panel ? `<div class="bpanel"><div class="bp-tabs" role="tablist"><button role="tab" type="button" data-act="ptab" data-k="learn" aria-selected="${ptab === "learn"}">${ring(d, stops.length, 18)} Learning</button><button role="tab" type="button" data-act="ptab" data-k="shelf" aria-selected="${ptab === "shelf"}" data-ph="B1">Your Commonplace</button><button class="bp-x" type="button" data-act="bpanel" aria-label="Hide the panel" title="Hide the panel">×</button></div>${ptab === "shelf" ? shelfHTML(b) : pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Panel</button>`}
     ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
-    <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div></div>`;
+    <div class="cbar" id="cbar" role="toolbar" aria-label="Selected cards" hidden data-ph="LB4"></div>
+    <div class="bmap" id="bmap" title="Click to go there" data-ph="LB4"><svg id="bmapsvg"></svg></div>
+    ${S.keys ? keysHTML() : ""}
+    <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button><button type="button" data-act="bkeys" aria-pressed="${!!S.keys}" title="Shortcuts (?)" aria-label="Shortcuts">?</button></div></div>`;
 }
 function drawArrows() {
   const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
@@ -6156,7 +6249,9 @@ function drawArrows() {
   }
   for (const a of b.arrows) { const A = box(a.from), B = box(a.to); if (!A || !B) continue; const s = edge(A, center(B)), e = edge(B, center(A)); out += `<line class="hit" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><line class="a${S.selArrow === a.id ? " sel" : ""}" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" marker-end="url(#ah)"/><text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 - 6}" text-anchor="middle">${esc(a.label || "")}</text>`; }
   if (S.ghost) out += `<line class="ghost" x1="${S.ghost.x1}" y1="${S.ghost.y1}" x2="${S.ghost.x2}" y2="${S.ghost.y2}"/>`;
-  svg.innerHTML = out;
+  if (S.qp?.from) { const A = box(S.qp.from); if (A) { const g = { x: S.qp.gx, y: S.qp.gy }, s0 = edge(A, g); out += `<line class="ghost" x1="${s0.x}" y1="${s0.y}" x2="${g.x}" y2="${g.y}"/><circle class="ghost-end" cx="${g.x}" cy="${g.y}" r="4"/>`; } }
+  for (const g of S.guides || []) out += `<line class="gd" x1="${g[0]}" y1="${g[1]}" x2="${g[2]}" y2="${g[3]}"/>`;
+  svg.innerHTML = out; drawMap(); cardBar();
 }
 function offersFor(a, b) {
   const A = refOf(b.pl.find(p => p.id === a.from)?.ref || "", b), B = refOf(b.pl.find(p => p.id === a.to)?.ref || "", b), out = [];
@@ -6501,13 +6596,16 @@ function render() {
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
   else if (S.screen === "colls") m.innerHTML = renderColls();
   else if (S.screen === "tpl") m.innerHTML = renderTpl();
-  else if (S.screen === "board") { m.innerHTML = renderBoard(); requestAnimationFrame(drawArrows); }
+  else if (S.screen === "board") { m.innerHTML = renderBoard(); popNew(); requestAnimationFrame(drawArrows); }
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
   $("#wiz").innerHTML = wizHTML() + howHTML() + (document.body.classList.contains("focus") ? `<button class="focus-exit" type="button" data-act="${S.screen === "board" ? "bfocus" : "nfocus"}" title="Leave focus (${S.screen === "board" ? "F or " : ""}Esc)">Leave focus</button>` : "");
   if (S.jump) requestAnimationFrame(doJump);
 }
+/** New cards on a board arrive with a small pop. */
+const KNOWN = { b: null, ids: new Set() };
+function popNew() { const els = [...document.querySelectorAll("#cv .bpl")]; if (KNOWN.b === S.board) els.forEach(el => { if (!KNOWN.ids.has(el.dataset.pid)) el.classList.add("pop"); }); KNOWN.b = S.board; KNOWN.ids = new Set(els.map(el => el.dataset.pid)); }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
 function masonry() { const m = $("#mason"); if (!m) return; for (const el of m.children) { el.style.setProperty("--masonry-span", "1"); } for (const el of m.children) { const h = el.getBoundingClientRect().height; el.style.setProperty("--masonry-span", String(Math.ceil((h + 12) / 20))); } }
 window.addEventListener("resize", () => { if (S.screen === "wall") masonry(); if (S.screen === "board") drawArrows(); });
@@ -6535,21 +6633,121 @@ function stMenu(key) {
 
 /* ---------- board pointer handling ---------- */
 let drag = null;
+const isSel = id => S.sel === id || !!S.selSet?.has(id);
+const selIds = () => { const b = I(S.board); return [...new Set([...(S.selSet || []), ...(S.sel ? [S.sel] : [])])].filter(id => b?.pl.some(p => p.id === id)); };
+function setSel(ids) { S.selSet = new Set(ids); S.sel = ids.at(-1) || null; document.querySelectorAll("#cv .bpl").forEach(el => el.classList.toggle("sel", S.selSet.has(el.dataset.pid))); cardBar(); }
+/* undo and redo cover what you do on a board: place, add, move, link, remove, tidy */
+const UNDO = [], REDO = [];
+const boardState = b => ({ id: b.id, pl: structuredClone(b.pl), arrows: structuredClone(b.arrows), inl: structuredClone(b.inl), path: b.path ? [...b.path] : null });
+function snap() { const b = I(S.board); if (!b) return; UNDO.push(boardState(b)); if (UNDO.length > 80) UNDO.shift(); REDO.length = 0; }
+function undo(redo) {
+  const from = redo ? REDO : UNDO, s = from.pop(); if (!s) { toast(redo ? "Nothing to redo." : "Nothing to undo."); return; }
+  const b = I(s.id); (redo ? UNDO : REDO).push(boardState(b)); Object.assign(b, { pl: s.pl, arrows: s.arrows, inl: s.inl, path: s.path });
+  S.selSet = new Set(); S.sel = null; S.qp = null; render(); toast(redo ? "Redone." : "Undone. ⇧⌘Z to redo.");
+}
+function removeSel() {
+  const ids = selIds(); if (!ids.length) return; const b = I(S.board); snap();
+  b.pl = b.pl.filter(p => !ids.includes(p.id)); b.arrows = b.arrows.filter(a => !ids.includes(a.from) && !ids.includes(a.to)); S.selSet = new Set(); S.sel = null; render();
+  toast(`Removed ${ids.length > 1 ? ids.length + " cards" : ""} from the board. ${ids.length > 1 ? "They're" : "It's"} still in your Commonplace. ⌘Z to undo.`.replace("  ", " "));
+}
+/** Snap a moving card to the edges and centres of the others, and draw the guide it snapped to. */
+function guideSnap(el, nx, ny) {
+  const w = el.offsetWidth, h = el.offsetHeight, t = 6 / S.view.z; let bx = null, by = null;
+  for (const o of document.querySelectorAll("#cv .bpl")) {
+    if (o === el || isSel(o.dataset.pid) && drag?.group) continue;
+    const ox = o.offsetLeft, oy = o.offsetTop, ow = o.offsetWidth, oh = o.offsetHeight;
+    for (const [m, th] of [[0, 0], [0, ow], [w, ow], [w, 0], [w / 2, ow / 2]]) { const d = ox + th - (nx + m); if (Math.abs(d) < t && (!bx || Math.abs(d) < Math.abs(bx.d))) bx = { d, x: ox + th, o: [oy, oy + oh] }; }
+    for (const [m, th] of [[0, 0], [0, oh], [h, oh], [h, 0]]) { const d = oy + th - (ny + m); if (Math.abs(d) < t && (!by || Math.abs(d) < Math.abs(by.d))) by = { d, y: oy + th, o: [ox, ox + ow] }; }
+  }
+  if (bx) nx += bx.d; if (by) ny += by.d;
+  S.guides = [];
+  if (bx) S.guides.push([bx.x, Math.min(bx.o[0], ny) - 12, bx.x, Math.max(bx.o[1], ny + h) + 12]);
+  if (by) S.guides.push([Math.min(by.o[0], nx) - 12, by.y, Math.max(by.o[1], nx + w) + 12, by.y]);
+  return [Math.round(nx), Math.round(ny)];
+}
 const toCanvas = (cx, cy) => { const r = $("#vp").getBoundingClientRect(); return { x: (cx - r.left - S.view.x) / S.view.z, y: (cy - r.top - S.view.y) / S.view.z }; };
-function applyView() { const cv = $("#cv"); if (cv) cv.style.transform = `translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})`; const z = document.querySelector(".bzoom span"); if (z) z.textContent = Math.round(S.view.z * 100) + "%"; }
+function applyView() { const cv = $("#cv"); if (cv) cv.style.transform = `translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})`; const z = document.querySelector(".bzoom span"); if (z) z.textContent = Math.round(S.view.z * 100) + "%"; drawMap(); cardBar(); }
+/** The minimap: every card as a block, the visible area as a frame; click it to go there. */
+function boardBoxes() { return [...document.querySelectorAll("#cv .bpl")].map(el => ({ id: el.dataset.pid, x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight, c: el.classList.contains("q") ? "q" : el.classList.contains("lm") ? "l" : el.classList.contains("g") ? "g" : "" })); }
+function drawMap() {
+  const svg = $("#bmapsvg"), vp = $("#vp"); if (!svg || !vp) return;
+  const bx = boardBoxes(), z = S.view.z, v = { x: -S.view.x / z, y: -S.view.y / z, w: vp.clientWidth / z, h: vp.clientHeight / z };
+  if (!bx.length) { svg.innerHTML = ""; return; }
+  const x0 = Math.min(v.x, ...bx.map(b => b.x)) - 40, y0 = Math.min(v.y, ...bx.map(b => b.y)) - 40, x1 = Math.max(v.x + v.w, ...bx.map(b => b.x + b.w)) + 40, y1 = Math.max(v.y + v.h, ...bx.map(b => b.y + b.h)) + 40;
+  svg.setAttribute("viewBox", `${x0} ${y0} ${x1 - x0} ${y1 - y0}`); svg.setAttribute("preserveAspectRatio", "xMidYMid meet"); svg._vb = { x0, y0, w: x1 - x0, h: y1 - y0 };
+  const r = Math.max(4, (x1 - x0) / 120);
+  svg.innerHTML = bx.map(b => `<rect class="${isSel(b.id) ? "s" : b.c}" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${r}"/>`).join("") + `<rect class="vw" x="${v.x}" y="${v.y}" width="${v.w}" height="${v.h}" rx="${r}" vector-effect="non-scaling-stroke"/>`;
+}
+document.addEventListener("pointerdown", e => {
+  const m = e.target.closest?.("#bmap"); if (!m) return; e.preventDefault(); e.stopPropagation();
+  const go = ev => { const svg = $("#bmapsvg"), vb = svg._vb; if (!vb) return; const r = svg.getBoundingClientRect(), s = Math.min(r.width / vb.w, r.height / vb.h), ox = (r.width - vb.w * s) / 2, oy = (r.height - vb.h * s) / 2, x = vb.x0 + (ev.clientX - r.left - ox) / s, y = vb.y0 + (ev.clientY - r.top - oy) / s, vp = $("#vp"); S.view.x = vp.clientWidth / 2 - x * S.view.z; S.view.y = vp.clientHeight / 2 - y * S.view.z; applyView(); };
+  go(e); const mv = ev => go(ev), up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); }; addEventListener("pointermove", mv); addEventListener("pointerup", up);
+}, true);
+/** The bar over what's selected: one card, or several. */
+function cardBar() {
+  const bar = $("#cbar"); if (!bar) return;
+  const ids = selIds(), b = I(S.board);
+  if (!ids.length || S.qp || S.editing || drag?.moved || (S.playing && ids.length === 1 && b.pl.find(p => p.id === ids[0])?.ref === "l:" + S.playing.lid)) { bar.hidden = true; return; }
+  const bx = boardBoxes().filter(x => ids.includes(x.id)); if (!bx.length) { bar.hidden = true; return; }
+  let html;
+  if (ids.length === 1) {
+    const p = b.pl.find(x => x.id === ids[0]), r = p.ref.startsWith("l:") ? { type: "lumen" } : refOf(p.ref, b), openQ = r?.type === "inline" && r.kind === "question" && st(r.key, "question").status === "open";
+    html = (r?.type === "item" ? `<button type="button" data-act="cbopen">Open ↗</button>` : r?.type === "lumen" ? `<button type="button" data-act="cbopen">▶ Play</button>` : r?.own && r.kind === "question" ? `<button type="button" data-act="cbopen">Edit</button>` : "")
+      + `<button type="button" data-act="cblink" title="Add a linked card (Tab)">→ Add linked</button>`
+      + (r?.type === "item" ? `<button type="button" data-act="cbask" title="A question about it, linked">? Ask about it</button>` : "")
+      + (openQ && !lumensFor(r.key).length ? `<button type="button" data-act="lans" data-k="${esc(r.key)}">▶ Lumen</button>` : "")
+      + `<i class="sep"></i><button type="button" class="rm" data-act="cbrm" title="Remove from the board (Delete)">Remove</button>`;
+  } else html = `<span>${ids.length} selected</span><button type="button" data-act="cbalign" data-k="x" title="Line up their left edges">Align left</button><button type="button" data-act="cbalign" data-k="y" title="Line up their tops">Align top</button><button type="button" data-act="cbtidy" title="Arrange them in a neat grid">Tidy</button><button type="button" data-act="cbchain" title="Link them in reading order">Link in order</button><i class="sep"></i><button type="button" class="rm" data-act="cbrm">Remove</button>`;
+  if (bar._h !== html) { bar.innerHTML = html; bar._h = html; }
+  bar.hidden = false;
+  const z = S.view.z, minx = Math.min(...bx.map(x => x.x)), maxx = Math.max(...bx.map(x => x.x + x.w)), miny = Math.min(...bx.map(x => x.y)), vp = $("#vp");
+  const cx = ((minx + maxx) / 2) * z + S.view.x, top = miny * z + S.view.y - bar.offsetHeight - 12;
+  bar.style.left = Math.max(10, Math.min(cx - bar.offsetWidth / 2, vp.clientWidth - bar.offsetWidth - 10)) + "px"; bar.style.top = Math.max(70, top) + "px";
+}
+function keysHTML() {
+  const k = [["Double-click", "Add here: search, note or question"], ["Drag a dot", "Link to a card, or let go on empty space to add a linked card"], ["Tab", "Add a card linked to the selected one"], ["⇧ click / ⇧ drag", "Select several"], ["Drag", "Move; it snaps to the others (hold ⌥ to stop it)"], ["← → ↑ ↓", "Nudge (⇧ for more)"], ["Delete", "Remove from the board"], ["⌘Z · ⇧⌘Z", "Undo · redo"], ["⌘A", "Select all"], ["Enter", "Open or edit the selected card"], ["V · N · Q", "Select · note · question"], ["+", "Your Commonplace"], ["⇧1 · ⇧2", "Fit all · zoom to selection"], ["F", "Focus"]];
+  return `<div class="bkeys" role="dialog" aria-label="Board shortcuts" data-ph="LB4"><h3>Shortcuts <button type="button" data-act="bkeys" aria-label="Close">×</button></h3><dl>${k.map(([a, b]) => `<dt><kbd>${a}</kbd></dt><dd>${b}</dd>`).join("")}</dl></div>`;
+}
+function zoomToSel() { const bx = boardBoxes().filter(x => isSel(x.id)); if (!bx.length) { fit(); return; } const vp = $("#vp"), x0 = Math.min(...bx.map(b => b.x)), y0 = Math.min(...bx.map(b => b.y)), x1 = Math.max(...bx.map(b => b.x + b.w)), y1 = Math.max(...bx.map(b => b.y + b.h)), R = S.panel && vp.clientWidth > 700 ? 352 : 24, aw = vp.clientWidth - 24 - R, ah = vp.clientHeight - 150, z = Math.min(1.4, Math.max(.35, Math.min(aw / (x1 - x0 + 80), ah / (y1 - y0 + 80)))); S.view = { z, x: 24 + aw / 2 - (x0 + x1) / 2 * z, y: 90 + ah / 2 - (y0 + y1) / 2 * z }; applyView(); }
+/** A small lift when a stop is answered: the number turns to ✓ with a pulse, and the ring moves. */
+function celebrate(key) { if (S.screen !== "board") return; requestAnimationFrame(() => { const pid = pidOfKey(I(S.board), key), n = document.querySelector(`[data-pid="${pid}"] .stopn`); n?.classList.add("burst"); }); }
+function openPlaced(pid) {
+  const b = I(S.board), p = b.pl.find(x => x.id === pid); if (!p) return;
+  if (p.ref.startsWith("l:")) { playLumen(I(p.ref.slice(2))); return; }
+  const r = refOf(p.ref, b); if (!r) return;
+  if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
+  else if (r.type === "item" && r.it.type === "note" && !r.it.title) { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
+  else if (r.type === "item") openEntry(r.it.id);
+}
 document.addEventListener("pointerdown", e => {
   if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,.btop,.bright,.bshelf,.bpanel,.bpanel-chip,button,a,textarea,input,.st,select")) return;
   const dot = e.target.closest("[data-dot]"), pl = e.target.closest("[data-pid]");
   if (e.target.closest("[data-arrow]")) return;
   if (dot) { const p = I(S.board).pl.find(x => x.id === dot.dataset.dot), el = dot.parentElement; drag = { kind: "connect", from: p.id, sx: el.offsetLeft + el.offsetWidth, sy: el.offsetTop + el.offsetHeight / 2 }; e.preventDefault(); return; }
-  if (pl) { const p = I(S.board).pl.find(x => x.id === pl.dataset.pid), c = toCanvas(e.clientX, e.clientY); drag = { kind: "move", p, ox: c.x - p.x, oy: c.y - p.y, moved: false, el: pl }; e.preventDefault(); return; }
+  if (pl) {
+    const b = I(S.board), p = b.pl.find(x => x.id === pl.dataset.pid), c = toCanvas(e.clientX, e.clientY);
+    if (e.shiftKey || e.metaKey || e.ctrlKey) { const ids = selIds(); setSel(ids.includes(p.id) ? ids.filter(x => x !== p.id) : [...ids, p.id]); S.skipClick = true; e.preventDefault(); return; }
+    const ids = isSel(p.id) ? selIds() : [], group = ids.length > 1 ? ids.filter(x => x !== p.id).map(id => { const q = b.pl.find(z => z.id === id); return { q, x: q.x, y: q.y, el: document.querySelector(`[data-pid="${id}"]`) }; }) : null;
+    drag = { kind: "move", p, ox: c.x - p.x, oy: c.y - p.y, x0: p.x, y0: p.y, moved: false, el: pl, group }; e.preventDefault(); return;
+  }
+  if (e.shiftKey) { const c = toCanvas(e.clientX, e.clientY), m = document.createElement("div"); m.className = "marq"; $("#cv").appendChild(m); drag = { kind: "marq", c0: c, m, add: selIds() }; e.preventDefault(); return; }
   if (S.tool === "note" || S.tool === "question") { const c = toCanvas(e.clientX, e.clientY); addOnCanvas(S.tool, c.x - 120, c.y - 30); return; }
   drag = { kind: "pan", sx: e.clientX, sy: e.clientY, vx: S.view.x, vy: S.view.y }; $("#vp").classList.add("panning");
 });
 document.addEventListener("pointermove", e => {
   if (!drag) return;
   if (drag.kind === "pan") { S.view.x = drag.vx + e.clientX - drag.sx; S.view.y = drag.vy + e.clientY - drag.sy; applyView(); }
-  else if (drag.kind === "move") { const c = toCanvas(e.clientX, e.clientY), nx = Math.round(c.x - drag.ox), ny = Math.round(c.y - drag.oy); if (Math.abs(nx - drag.p.x) + Math.abs(ny - drag.p.y) > 2) drag.moved = true; drag.p.x = nx; drag.p.y = ny; drag.el.style.left = nx + "px"; drag.el.style.top = ny + "px"; drawArrows(); }
+  else if (drag.kind === "move") {
+    const c = toCanvas(e.clientX, e.clientY); let nx = Math.round(c.x - drag.ox), ny = Math.round(c.y - drag.oy);
+    if (!drag.moved && Math.abs(nx - drag.x0) + Math.abs(ny - drag.y0) > 2) { drag.moved = true; snap(); }
+    if (!drag.moved) return;
+    if (!e.altKey) [nx, ny] = guideSnap(drag.el, nx, ny); else S.guides = [];
+    const dx = nx - drag.x0, dy = ny - drag.y0;
+    drag.p.x = nx; drag.p.y = ny; drag.el.style.left = nx + "px"; drag.el.style.top = ny + "px";
+    for (const g of drag.group || []) { g.q.x = g.x + dx; g.q.y = g.y + dy; if (g.el) { g.el.style.left = g.q.x + "px"; g.el.style.top = g.q.y + "px"; } }
+    drawArrows();
+  }
+  else if (drag.kind === "marq") { const c = toCanvas(e.clientX, e.clientY), x = Math.min(c.x, drag.c0.x), y = Math.min(c.y, drag.c0.y), w = Math.abs(c.x - drag.c0.x), h = Math.abs(c.y - drag.c0.y); Object.assign(drag.m.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" }); drag.r = { x, y, w, h }; }
   else if (drag.kind === "connect") { const c = toCanvas(e.clientX, e.clientY); S.ghost = { x1: drag.sx, y1: drag.sy, x2: c.x, y2: c.y }; drawArrows(); }
 });
 document.addEventListener("pointerup", e => {
@@ -6559,8 +6757,12 @@ document.addEventListener("pointerup", e => {
   if (d.kind === "connect") {
     S.ghost = null;
     const tgt = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest?.("[data-pid]")).find(Boolean), b = I(S.board);
-    if (tgt && tgt.dataset.pid !== d.from) { const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, label: "" }; b.arrows.push(a); drawArrows(); if (offersFor(a, b).length) openArrow(a.id, e.clientX, e.clientY); else toast("Linked. Click the line to label it, if you like."); } else drawArrows();
-  } else if (d.kind === "move" && !d.moved) { S.sel = d.p.id; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); d.el.classList.add("sel"); }
+    if (tgt && tgt.dataset.pid !== d.from) { if (b.arrows.some(a => (a.from === d.from && a.to === tgt.dataset.pid) || (a.to === d.from && a.from === tgt.dataset.pid))) { toast("Already linked."); drawArrows(); return; } snap(); const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, label: "" }; b.arrows.push(a); drawArrows(); if (offersFor(a, b).length) openArrow(a.id, e.clientX, e.clientY); else toast("Linked. Click the line to label it, if you like."); }
+    else if (!tgt && e.target.closest?.("#vp")) { const c = toCanvas(e.clientX, e.clientY); openLinkMenu(d.from, Math.round(c.x), Math.round(c.y)); }
+    else drawArrows();
+  } else if (d.kind === "move") { S.guides = []; if (!d.moved) setSel([d.p.id]); else drawArrows(); }
+  else if (d.kind === "marq") { d.m.remove(); const r = d.r; if (r && r.w + r.h > 6) { const hit = [...document.querySelectorAll("#cv .bpl")].filter(el => el.offsetLeft < r.x + r.w && el.offsetLeft + el.offsetWidth > r.x && el.offsetTop < r.y + r.h && el.offsetTop + el.offsetHeight > r.y).map(el => el.dataset.pid); setSel([...new Set([...d.add, ...hit])]); if (hit.length) toast(`${selIds().length} selected. Drag one to move them all.`); } }
+  else if (d.kind === "pan" && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) <= 3 && selIds().length) setSel([]);
 });
 document.addEventListener("wheel", e => {
   if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer,.qp,.bshelf,.bpanel")) return;
@@ -6577,7 +6779,7 @@ function fit() {
   S.view = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) }; applyView();
 }
 function addOnCanvas(tool, x, y) {
-  const b = I(S.board);
+  const b = I(S.board); snap();
   if (tool === "question") { const id = "q" + (b.inl.length + 1) + "x" + (Date.now() % 1000); b.inl.push({ id, kind: "question", text: "" }); b.pl.push({ id: "p" + Date.now(), ref: "b:" + id, x, y }); S.editing = `inl:${b.id}:question:${id}`; }
   else { const nid = "n" + Date.now(); D().items.push(note(nid, "notes", "", "", { topics: b.topics })); b.pl.push({ id: "p" + Date.now(), ref: "i:" + nid, x, y }); S.editing = "note:" + nid; }
   S.tool = "select"; S.focusEdit = true; render();
@@ -6632,12 +6834,20 @@ document.addEventListener("click", e => {
     case "openat": S.jump = d.t; openEntry(d.id); break;
     case "lplay": { const l = I(d.id); if (!l) break; if (S.screen !== "board" || S.board !== l.board) { pushHist(); S.board = l.board; go("board", true); } setTimeout(() => playLumen(l), 40); break; }
     case "lans": { e.stopPropagation(); menuKey = d.k; openMenu(a, mHead("Answer with a Lumen") + Object.entries(FMT).map(([k, t]) => mItem("lmake", `<b>${t}</b> <small style="color:var(--ink-3)">${k === "read" ? "slides" : k === "watch" ? "a short video" : "audio and transcript"}</small>`, false, `data-k="${esc(d.k)}" data-f="${k}"`)).join("") + `<p class="small" style="margin:6px 9px">From this board and your Commonplace. You decide if it answered the question.</p>`); break; }
-    case "lmake": { closeMenu(); const b = I(S.board), l = makeLumen(b, d.k, d.f); l.making = true; S.playing = { lid: l.id, s: 0 }; render(); requestAnimationFrame(() => centreOn("p" + l.id, 1)); setTimeout(() => { l.making = false; render(); }, 900); break; }
+    case "lmake": { closeMenu(); snap(); const b = I(S.board), l = makeLumen(b, d.k, d.f); l.making = true; S.playing = { lid: l.id, s: 0 }; render(); requestAnimationFrame(() => centreOn("p" + l.id, 1)); setTimeout(() => { l.making = false; render(); }, 900); break; }
+    case "cbopen": openPlaced(selIds()[0]); break;
+    case "cblink": { const id = selIds()[0], p = I(S.board).pl.find(x => x.id === id), el = document.querySelector(`[data-pid="${id}"]`); if (p && el) openLinkMenu(id, p.x + el.offsetWidth + 90, p.y + 40); break; }
+    case "cbask": { const b = I(S.board), from = selIds()[0], p = b.pl.find(x => x.id === from), el = document.querySelector(`[data-pid="${from}"]`); addOnCanvas("question", ...freeSpot(p.x + (el?.offsetWidth || 240) + 90, p.y, 240, 120, b)); b.arrows.push({ id: "a" + Date.now(), from, to: b.pl.at(-1).id, label: "" }); S.selSet = new Set([b.pl.at(-1).id]); S.sel = b.pl.at(-1).id; requestAnimationFrame(drawArrows); toast("Ask it. It's linked, and joins the path."); break; }
+    case "cbrm": removeSel(); break;
+    case "cbalign": { const b = I(S.board), ps = b.pl.filter(p => isSel(p.id)); snap(); const k = d.k, v = Math.min(...ps.map(p => p[k])); ps.forEach(p => p[k] = v); render(); break; }
+    case "cbtidy": { const b = I(S.board), bx = boardBoxes().filter(x => isSel(x.id)).sort((a, c) => a.y - c.y || a.x - c.x); snap(); const n = Math.ceil(Math.sqrt(bx.length)), x0 = Math.min(...bx.map(x => x.x)), y0 = Math.min(...bx.map(x => x.y)); let y = y0; for (let i = 0; i < bx.length; i += n) { const row = bx.slice(i, i + n).sort((a, c) => a.x - c.x); let x = x0; for (const c of row) { const p = b.pl.find(q => q.id === c.id); p.x = x; p.y = y; x += c.w + 40; } y += Math.max(...row.map(c => c.h)) + 40; } render(); toast("Tidied. ⌘Z to undo."); break; }
+    case "cbchain": { const b = I(S.board), bx = boardBoxes().filter(x => isSel(x.id)).sort((a, c) => (a.y - c.y > 120 ? 1 : c.y - a.y > 120 ? -1 : a.x - c.x)); snap(); let n = 0; for (let i = 1; i < bx.length; i++) { const f = bx[i - 1].id, t = bx[i].id; if (!b.arrows.some(a => (a.from === f && a.to === t) || (a.from === t && a.to === f))) { b.arrows.push({ id: "a" + Date.now() + i, from: f, to: t, label: "" }); n++; } } drawArrows(); toast(n ? `${n} link${n > 1 ? "s" : ""} added, left to right, top to bottom.` : "They're already linked."); break; }
+    case "bkeys": S.keys = !S.keys; render(); break;
     case "pslide": { const l = I(S.playing?.lid); if (!l) break; S.playing.s = Math.max(0, Math.min(+d.i, l.slides.length)); render(); break; }
     case "pfmt": { const l = I(S.playing?.lid); if (l) { l.fmt = d.k; render(); } break; }
     case "pclose": S.playing = null; render(); requestAnimationFrame(drawArrows); break;
     case "pdid": { const l = I(S.playing?.lid), q = INL(l.forQ), s = st(q.key, "question"), b = I(l.board);
-      if (d.v === "yes") { s.status = "answered"; if (!s.ans.includes(l.id)) s.ans.push(l.id); render(); const nx = nextStop(b); toast(nx ? `Answered in “${l.title}”. Next on the path: ${INL(nx).text}` : `Answered. Every stop on the path is answered; Recall is in the panel.`); }
+      if (d.v === "yes") { s.status = "answered"; if (!s.ans.includes(l.id)) s.ans.push(l.id); render(); celebrate(q.key); const nx = nextStop(b); toast(nx ? `Answered in “${l.title}”. Next on the path: ${INL(nx).text}` : `Answered. Every stop on the path is answered; Recall is in the panel.`); }
       else if (d.v === "reopen") { s.status = "open"; render(); }
       else if (d.v === "partly") { const lp = b.pl.find(x => x.ref === "l:" + l.id); addOnCanvas("question", lp.x, lp.y + (document.querySelector(`[data-pid="${lp.id}"]`)?.offsetHeight || 300) + 40); const last = b.inl.at(-1), nk = `${b.id}:question:${last.id}`, p = stopsOf(b).filter(k => k !== nk); p.splice(p.indexOf(q.key) + 1, 0, nk); b.path = p; toast("Ask what's still unclear. It joins the path right after this one."); }
       else toast("Kept open. Try it as Watch or Listen, or write what's unclear in a note.");
@@ -6733,7 +6943,7 @@ document.addEventListener("click", e => {
     case "customize": if (S.screen === "item") { S.col = I(S.item).col; S.cst = "fields"; S.csField = "_add"; } else { S.cst = "card"; S.csField = null; } S.csUndo = null; go("customize"); break;
     case "ccol": S.col = d.id; render(); break;
     case "stmenu": e.stopPropagation(); menuKey = d.k; openMenu(a, stMenu(d.k)); break;
-    case "setst": { const r = INL(menuKey); st(menuKey, r.kind).status = d.v; closeMenu(); render(); toast(`${r.kind === "goal" ? "Goal" : "Question"} marked ${d.v}, everywhere it shows.`); break; }
+    case "setst": { const r = INL(menuKey), was = st(menuKey, r.kind).status; st(menuKey, r.kind).status = d.v; closeMenu(); render(); if (d.v === "answered" && was !== "answered") celebrate(menuKey); toast(`${r.kind === "goal" ? "Goal" : "Question"} marked ${d.v}, everywhere it shows.`); break; }
     case "ansin": { const k = menuKey, s = st(k, "question"); s.ans = s.ans.includes(d.id) ? s.ans.filter(x => x !== d.id) : [...s.ans, d.id]; if (s.ans.length) s.status = "answered"; render(); const anchor = document.querySelector(`[data-act="stmenu"][data-k="${CSS.escape(k)}"]`); if (anchor) { menuKey = k; openMenu(anchor, stMenu(k)); } else closeMenu(); break; }
     case "relpick": { e.stopPropagation(); const it = I(S.item), f = FLD(COL(it.col), d.f); menuKind = "rel"; menuKey = d.f; openMenu(a, mHead(`${f.label} → ${COL(f.o.to).name}`) + D().items.filter(x => x.col === f.o.to && x.id !== it.id).map(x => mItem("relset", esc(x.title), arr(it.v[f.id]).includes(x.id), `data-id="${x.id}"`)).join("")); break; }
     case "relset": { const it = I(S.item), f = FLD(COL(it.col), menuKey), cur = arr(it.v[f.id]); it.v[f.id] = cur.includes(d.id) ? cur.filter(x => x !== d.id) : f.o.many ? [...cur, d.id] : [d.id]; closeMenu(); render(); if (f.o.inv) toast(`${I(d.id).title}'s page now shows this under “${f.o.inv}”.`); break; }
@@ -6767,12 +6977,7 @@ document.addEventListener("click", e => {
 document.addEventListener("dblclick", e => {
   if (S.screen !== "board") return;
   const el = e.target.closest("[data-pid]"); if (!el) return;
-  const b = I(S.board), p = b.pl.find(x => x.id === el.dataset.pid), r = refOf(p.ref, b);
-  if (p.ref.startsWith("l:")) { playLumen(I(p.ref.slice(2))); return; }
-  if (!r) return;
-  if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
-  else if (r.type === "item" && r.it.type === "note" && !r.it.title) { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
-  else if (r.type === "item") openEntry(r.it.id);
+  openPlaced(el.dataset.pid);
 });
 document.addEventListener("change", e => {
   const t = e.target, c = COL(S.col);
@@ -6840,11 +7045,22 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") { closeMenu(); if (!$("#apop").hidden) closeApop(); if (S.drawer) { S.drawer = false; render(); } }
   if (e.key === "/" && S.screen === "wall") { e.preventDefault(); $("#q")?.focus(); }
   if (S.screen === "board") {
-    const k = e.key.toLowerCase();
-    if (k === "f" && !e.metaKey && !e.ctrlKey) { S.bfocus = !S.bfocus; render(); requestAnimationFrame(drawArrows); return; }
+    const k = e.key.toLowerCase(), mod = e.metaKey || e.ctrlKey;
+    if (mod && k === "z") { e.preventDefault(); undo(e.shiftKey); return; }
+    if (mod && k === "y") { e.preventDefault(); undo(true); return; }
+    if (mod && k === "a") { e.preventDefault(); setSel(I(S.board).pl.map(p => p.id)); return; }
+    if (mod) return;
+    if (e.key === "Tab" && selIds().length === 1) { e.preventDefault(); const id = selIds()[0], p = I(S.board).pl.find(x => x.id === id), el = document.querySelector(`[data-pid="${id}"]`); openLinkMenu(id, p.x + (el?.offsetWidth || 240) + 90, p.y + 40); return; }
+    if (e.key.startsWith("Arrow") && selIds().length) { e.preventDefault(); const n = e.shiftKey ? 40 : 8, ids = selIds(), b = I(S.board); if (Date.now() - (S.nudged || 0) > 700) snap(); S.nudged = Date.now(); for (const p of b.pl.filter(p => ids.includes(p.id))) { if (e.key === "ArrowLeft") p.x -= n; if (e.key === "ArrowRight") p.x += n; if (e.key === "ArrowUp") p.y -= n; if (e.key === "ArrowDown") p.y += n; const el = document.querySelector(`[data-pid="${p.id}"]`); if (el) { el.style.left = p.x + "px"; el.style.top = p.y + "px"; } } drawArrows(); return; }
+    if (e.key === "Enter" && selIds().length === 1) { e.preventDefault(); openPlaced(selIds()[0]); return; }
+    if (e.code === "Digit1" && e.shiftKey) { fit(); return; }
+    if (e.code === "Digit2" && e.shiftKey) { zoomToSel(); return; }
+    if (e.key === "?") { S.keys = !S.keys; render(); return; }
+    if (e.key === "Escape" && (S.keys || selIds().length)) { S.keys = false; S.selSet = new Set(); S.sel = null; render(); return; }
+    if (k === "f") { S.bfocus = !S.bfocus; render(); requestAnimationFrame(drawArrows); return; }
     if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
     else if (e.key === "+") { if (S.panel && S.ptab === "shelf") S.panel = false; else { S.panel = true; S.ptab = "shelf"; } render(); } else if (k === "0") fit();
-    else if ((e.key === "Delete" || e.key === "Backspace") && S.sel) { const b = I(S.board); b.pl = b.pl.filter(p => p.id !== S.sel); b.arrows = b.arrows.filter(a => a.from !== S.sel && a.to !== S.sel); S.sel = null; render(); toast("Removed from the board. It's still in your Commonplace."); }
+    else if ((e.key === "Delete" || e.key === "Backspace") && selIds().length) removeSel();
   }
 });
 /* drag cards between columns (V2) */
@@ -6945,17 +7161,21 @@ document.addEventListener("dblclick", e => {
   S.qp = { x: c.x - 120, y: c.y - 30, cx: Math.min(e.clientX - r.left, r.width - 360), cy: Math.min(e.clientY - r.top, r.height - 330), q: "", on: 0 }; render(); $("#qpi")?.focus();
 });
 document.addEventListener("input", e => {
-  if (e.target.id === "qpi") { S.qp.q = e.target.value; S.qp.on = 0; const pos = e.target.selectionStart; render(); const i = $("#qpi"); i.focus(); i.setSelectionRange(pos, pos); }
+  if (e.target.id === "qpi") { S.qp.q = e.target.value; S.qp.on = S.qp.from ? null : 0; const pos = e.target.selectionStart; render(); const i = $("#qpi"); i.focus(); i.setSelectionRange(pos, pos); }
   if (e.target.id === "shq") { S.shq = e.target.value; const pos = e.target.selectionStart; render(); const i = $("#shq"); i.focus(); i.setSelectionRange(pos, pos); }
 }, true);
 document.addEventListener("keydown", e => {
   if (e.target.id !== "qpi") return;
   if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); S.qp.on = (S.qp.on + (e.key === "ArrowDown" ? 1 : S.qp.rows.length - 1)) % S.qp.rows.length; const pos = e.target.selectionStart; render(); const i = $("#qpi"); i.focus(); i.setSelectionRange(pos, pos); }
-  else if (e.key === "Enter") { e.preventDefault(); chooseQp(S.qp.on); }
+  else if (e.key === "Enter") { e.preventDefault(); chooseQp(S.qp.on ?? 0); }
+  else if (S.qp.from && !S.qp.q && /^[1-3]$/.test(e.key) && S.qp.rows[+e.key - 1]?.k) { e.preventDefault(); chooseQp(+e.key - 1); }
   else if (e.key === "Escape") { e.preventDefault(); S.qp = null; render(); }
   e.stopPropagation();
 }, true);
 document.addEventListener("mousedown", e => { const b = e.target.closest?.("[data-qpi]"); if (b && S.qp) { e.preventDefault(); chooseQp(+b.dataset.qpi); } else if (S.qp && !e.target.closest?.(".qp")) { S.qp = null; render(); } }, true);
+/* hovering a link lights up the two cards it joins */
+document.addEventListener("mouseover", e => { const l = e.target.closest?.("[data-arrow]"); if (!l) return; const a = I(S.board)?.arrows.find(z => z.id === l.dataset.arrow); if (!a) return; [a.from, a.to].forEach(id => document.querySelector(`[data-pid="${id}"]`)?.classList.add("lk")); });
+document.addEventListener("mouseout", e => { if (e.target.closest?.("[data-arrow]")) document.querySelectorAll(".bpl.lk").forEach(x => x.classList.remove("lk")); });
 document.addEventListener("dragstart", e => { const t = e.target.closest?.("[data-dragref]"); if (!t) return; S.dragRef = t.dataset.dragref; e.dataTransfer.setData("text/plain", S.dragRef); e.dataTransfer.effectAllowed = "copy"; });
 document.addEventListener("dragover", e => { if (!S.dragRef || !e.target.closest?.("#vp")) return; e.preventDefault(); $("#vp").classList.add("dropping"); });
 document.addEventListener("dragleave", e => { if (e.target.id === "vp") $("#vp")?.classList.remove("dropping"); });

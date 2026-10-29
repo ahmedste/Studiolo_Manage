@@ -404,6 +404,7 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB1** | **The path**: numbers on question cards, the dotted route, the suggested next, the *Learning on this board* panel (reorder, take off, add, side questions) | MEDIUM | yes: `board_path` |
 | **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
 | **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
+| **LB4** | **Board craft**: Focus mode; the add-and-link menu; the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts (§7.11) | MEDIUM | no |
 
 ### 7.10 Links: a link and a backlink
 
@@ -418,6 +419,67 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
   - Recall covers labelled links ("A → B: how are they linked?");
   - Loci treats a link as `related`, and quotes its label when there is one.
 - **Data:** `board_arrows` keeps `from`, `to` and a nullable `label`. The `word` and `why` columns are dropped from B1's migration before it ships.
+
+### 7.11 Board craft: quick, forgiving, a little fun
+
+**The owner's direction (29 Oct):** dragging a link from a card and letting go should open a small menu of what can be added. Plus the small things that make a board quick, productive and a pleasure to work on. All of it is phase **LB4**; none of it needs a migration.
+
+**The add-and-link menu.** Drag a card's blue dot and let go on empty board (or select a card and press **Tab**, or **→ Add linked** in its bar). A small menu opens where you let go, with a dashed line from the card to that spot:
+
+```
+ Add and link from Hassan Fathy
+ ┌────────┐ ┌──────────────┐ ┌────────┐
+ │ ✎ Note │ │ ? Ask about it│ │ ▶ Lumen│   ← big tiles; 1, 2, 3 pick one
+ └────────┘ └──────────────┘ └────────┘     (Lumen only from an open question)
+ [⌕ …or find something in your Commonplace ]
+ RELATED, NOT ON THIS BOARD
+ ¶ Lecture notes: passive cooling, week 3
+ ▤ Natural Energy and Vernacular Architecture
+```
+
+- **Note**: a new note, saved to Commonplace, placed there, linked, and open to write.
+- **Question** (on an entry, **Ask about it**): a question that belongs to the board, linked, and on the path.
+- **Lumen**, offered only from an open question: it is made and plays in its card where you let go, linked as that question's answer.
+- **Related, not on this board**: up to four entries linked to it by a relation field, or sharing its topics. One click places and links it.
+- **Search**: typing finds anything in Commonplace, as double-click does. Enter places and links the highlighted result, or makes the text a note when nothing matches.
+- A new card never lands on another: it slides down to the first clear space. If the entry is already on the board, the menu links to that card instead of placing a copy.
+- Esc, or a click away, cancels; nothing is made.
+
+**Selecting.**
+- A click selects a card; **⇧ click** adds or removes one; **⇧ drag** on empty board draws a box; **⌘A** selects all. A click on empty board clears the selection.
+- **The selection bar** floats over what's selected.
+  - For one card: **Open ↗** (or **Edit** for a question, **▶ Play** for a Lumen), **→ Add linked**, **? Ask about it** on entries, **▶ Lumen** on open questions without one, and **Remove**.
+  - For several: **Align left**, **Align top**, **Tidy** (a neat grid in reading order), **Link in order** (links them left to right, top to bottom; useful for a path) and **Remove**.
+- Dragging any selected card moves them all.
+
+**Moving.**
+- A dragged card snaps to the edges and centres of the others, and a thin guide shows what it lined up with. Hold ⌥ to place it freely.
+- The arrow keys nudge the selection (⇧ for bigger steps).
+
+**Forgiving.**
+- **⌘Z** undoes, and **⇧⌘Z** redoes, anything done on the board: place, add, move, link, remove, tidy, align, a Lumen made.
+- Remove says what it did ("Removed from the board. It's still in your Commonplace. ⌘Z to undo.").
+- Linking two cards that are already linked says so, instead of drawing a second line.
+
+**Finding your way.**
+- **The minimap**, bottom left, shows every card as a block and the visible area as a frame. Click or drag it to go there. Questions, Lumens and the goal take their colours; the selection is blue.
+- **⇧1** fits everything, and **⇧2** zooms to the selection.
+- Hovering a link lights up the two cards it joins.
+- **?** (or the ? beside Fit) opens a short sheet of every shortcut.
+
+**A little fun, never in the way.**
+- New cards arrive with a small pop.
+- When a stop is answered, its number turns to ✓ with a short pulse, and the ring moves.
+- Both respect *reduce motion*.
+
+**On a phone:**
+- the add-and-link menu and the selection bar work by touch;
+- the minimap and the shortcut sheet are hidden;
+- selecting several, nudging and the keys need a keyboard and a pointer, and are left out.
+
+**Data.**
+- Undo is client-side: a stack of the board's placements, links and own questions. It goes back up to 80 steps and is lost on reload.
+- Nothing new is stored. *Related* reads relation fields and shared topics that already exist.
 
 ### 7.9 Decisions
 
@@ -435,3 +497,5 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB-D10** | Board links are just a line and a backlink, with an optional label; the fixed word list and *why* go | **Yes**: simple, like Miro and Scrintal |
 | **LB-D11** | The shelf is a tab of the one side panel, beside Learning; the left side stays clear | **Yes** |
 | **LB-D12** | A board has a **Focus mode** that hides everything but the canvas (F or Esc) | **Yes** |
+| **LB-D13** | Letting go of a link on empty board opens the **add-and-link menu**: Note, Question, Lumen (from an open question), related entries, search | **Yes** |
+| **LB-D14** | Board craft ships as **LB4**: the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts | **Yes** |
