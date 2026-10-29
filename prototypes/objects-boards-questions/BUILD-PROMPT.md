@@ -32,9 +32,9 @@ The prototype's source is `prototypes/objects-boards-questions/index.src.html` i
 - **Stage 1:** Q2, Q3, F1, P1, V1, T1, N1 (the long-note page), C1–C3 (collections).
 - **Stage 2:** Q4, Q-O, F2, P2, V2, T2, N2 (mentions, cards, images), C4 (Appears in), C5 (Templates; its Boards group arrives with B1).
 - **Stage 3:** Q5, F3, T3, N3, N4.
-- **Stage 4:** Boards B1, B2, then the board as a learning space (LB1 the path, LB2 Lumens that play in their cards, LB3 notes and Recall on the board; LB4 board craft: focus, the add-and-link menu, selection, undo, minimap; LB5 reading on the board: notes, photos, PDFs and videos open beside their card, to read, watch and write; no separate learning mode; Boards design §7), B4, with Q-B.
+- **Stage 4:** Boards B1, B2, then the board as a learning space (LB1 the path, LB2 Lumens that play in their cards, LB3 notes and Recall on the board; LB4 board craft: fluid movement and curved links, focus, the add-and-link menu, selection, undo, minimap; LB5 reading on the board: notes, photos, PDFs and videos open beside their card, to read, watch and write; no separate learning mode; Boards design §7), B4, with Q-B.
 
-The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D10, CL-D1–D14 and LB-D1–D16. Treat a recommendation as agreed unless the owner has said otherwise.
+The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D10, CL-D1–D14 and LB-D1–D17. Treat a recommendation as agreed unless the owner has said otherwise.
 
 **Your first task: phase Q1.**
 

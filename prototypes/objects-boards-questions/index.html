@@ -4664,13 +4664,16 @@ body { background: var(--surface-page); }
 .viewport.panning { cursor: grabbing; }
 .canvas { position: absolute; left: 0; top: 0; width: 2200px; height: 1400px; transform-origin: 0 0; }
 .arrows { position: absolute; inset: 0; width: 2200px; height: 1400px; overflow: visible; pointer-events: none; }
-.arrows .a { stroke: var(--ink-3); stroke-width: 1.6; fill: none; pointer-events: stroke; cursor: pointer; }
+.arrows .a { stroke: var(--ink-3); stroke-width: 1.6; fill: none; pointer-events: stroke; cursor: pointer; stroke-linecap: round; transition: stroke-width .15s, stroke .15s; }
 .arrows .a:hover, .arrows .a.sel { stroke: var(--accent); stroke-width: 2.4; }
 .arrows .hit { stroke: transparent; stroke-width: 14; fill: none; pointer-events: stroke; cursor: pointer; }
 .arrows .fl { stroke: var(--status-2); stroke-width: 1.2; stroke-dasharray: 4 5; fill: none; opacity: .8; }
 .arrows text { font: 500 11px var(--ui); fill: var(--ink-2); paint-order: stroke; stroke: var(--board); stroke-width: 4px; }
 .arrows text.flt { fill: var(--status-2); font-weight: 400; font-style: italic; }
-.arrows .ghost { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+.arrows .ghost { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; fill: none; stroke-linecap: round; animation: flow .6s linear infinite; }
+.arrows .a.sel { stroke-dasharray: 7 5; animation: flow .9s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -12; } }
+.arrows .pth, .arrows .sl, .arrows .fl { stroke-linecap: round; }
 .bpl { position: absolute; width: 240px; }
 .bpl.g { width: 320px; }
 .bpl .mcard { cursor: default; user-select: none; }
@@ -5231,6 +5234,13 @@ body:has(.wz) .proto { display: none; }
 .marq { position: absolute; z-index: 6; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); border-radius: 2px; pointer-events: none; }
 .bpl.lk .mcard .ci { box-shadow: inset 0 0 0 1.5px var(--accent); }
 .bpl.pop { animation: bpop .32s cubic-bezier(.2, .9, .3, 1.25); }
+/* fluid movement (LB4): a lifted card leans into the drag and settles with a small spring */
+.bpl .mcard { transition: transform .18s ease, box-shadow .18s ease; }
+.bpl:not(.lift):hover .mcard { transform: translateY(-1px); }
+.bpl.lift { z-index: 6; cursor: grabbing; transition: transform .12s ease; } .bpl.lift .mcard { cursor: grabbing; } .bpl.lift .mcard .ci, .bpl.lift .mcard[data-frame="picture"] .pic { box-shadow: var(--shadow-float); }
+.bpl.glide { transition: left .42s cubic-bezier(.2, .9, .25, 1.12), top .42s cubic-bezier(.2, .9, .25, 1.12), transform .3s ease; }
+.bpl.target .mcard .ci, .bpl.target .mcard[data-frame="picture"] .pic { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 6px color-mix(in srgb, var(--accent) 14%, transparent); }
+@media (prefers-reduced-motion: reduce) { .bpl.glide, .bpl.lift, .bpl .mcard { transition: none; } .arrows .ghost, .arrows .a.sel { animation: none; } }
 @keyframes bpop { from { transform: scale(.86); opacity: 0; } }
 .stopn.burst { animation: burst .7s ease-out; }
 @keyframes burst { 0% { transform: scale(1); } 30% { transform: scale(1.45); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); } 100% { transform: scale(1); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 16px transparent; } }
@@ -6112,7 +6122,7 @@ function lumenCardOpen(p, b, l) {
     ${l.making ? `<div class="lpl making"><span class="spin"></span><p>Loci is making it from this board and your Commonplace…</p></div>` : playerIn(l)}</div>
     <div class="lco-ft">${!q ? "" : s.status === "answered" ? `<span class="lco-done">✓ Answered</span><button class="button button-link" type="button" data-act="pdid" data-v="reopen">Reopen</button>` : l.making ? "" : `<span class="lco-q">Did this answer it?</span><button class="button" type="button" data-act="pdid" data-v="yes">Yes</button><button class="button button-quiet" type="button" data-act="pdid" data-v="partly">Partly</button><button class="button button-quiet" type="button" data-act="pdid" data-v="no">Not yet</button>`}<span class="cph-grow"></span><button class="button button-quiet" type="button" data-act="pnote" title="Write a note beside it">✎ Note</button></div></div></article><span class="dot-c" data-dot="${p.id}"></span></div>`;
 }
-function centreOn(pid, z = 1) { const b = I(S.board), p = b?.pl.find(x => x.id === pid), vp = $("#vp"); if (!p || !vp) return; S.view.z = z; const el = document.querySelector(`[data-pid="${pid}"]`), w = el?.offsetWidth || 300, h = el?.offsetHeight || 200; S.view.x = vp.clientWidth / 2 - (p.x + w / 2) * z; S.view.y = Math.max(20 - p.y * z, vp.clientHeight / 2 - (p.y + h / 2) * z); applyView(); requestAnimationFrame(drawArrows); }
+function centreOn(pid, z = 1) { const b = I(S.board), p = b?.pl.find(x => x.id === pid), vp = $("#vp"); if (!p || !vp) return; const el = document.querySelector(`[data-pid="${pid}"]`), w = el?.offsetWidth || 300, h = el?.offsetHeight || 200; animateView({ z, x: (vp.clientWidth - panelSpace()) / 2 - (p.x + w / 2) * z, y: Math.max(80 - p.y * z, vp.clientHeight / 2 - (p.y + h / 2) * z) }); requestAnimationFrame(drawArrows); }
 function playLumen(l) { const b = I(l.board); S.playing = { lid: l.id, s: 0 }; render(); const p = b.pl.find(x => x.ref === "l:" + l.id); if (p) requestAnimationFrame(() => centreOn(p.id, 1)); }
 
 /* ---------- Placing things: double-click to search, or drag from the shelf (B1, revised 28 Oct) ---------- */
@@ -6290,7 +6300,7 @@ function showCard(pid) {
   const el = document.querySelector(`[data-pid="${pid}"]`), vp = $("#vp"); if (!el || !vp) return;
   const z = S.view.z, x = el.offsetLeft * z + S.view.x, y = el.offsetTop * z + S.view.y, w = el.offsetWidth * z, h = el.offsetHeight * z, W = vp.clientWidth - panelSpace();
   if (x >= 80 && x + w <= W - 20 && y >= 70 && y + h <= vp.clientHeight - 20) return;
-  S.view.x = 80 + (W - 100 - w) / 2 - el.offsetLeft * z; S.view.y = Math.max(80, (vp.clientHeight - h) / 2) - el.offsetTop * z; applyView(); requestAnimationFrame(drawArrows);
+  animateView({ z, x: 80 + (W - 100 - w) / 2 - el.offsetLeft * z, y: Math.max(80, (vp.clientHeight - h) / 2) - el.offsetTop * z });
 }
 function rdNotes(it) {
   const at = rdAt(it);
@@ -6343,21 +6353,46 @@ function renderBoard() {
     ${S.keys ? keysHTML() : ""}
     <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button><button type="button" data-act="bkeys" aria-pressed="${!!S.keys}" title="Shortcuts (?)" aria-label="Shortcuts">?</button></div></div>`;
 }
+const ARR = { b: null, seen: new Set(), born: new Map() };
 function drawArrows() {
   const svg = $("#arrows"), b = I(S.board); if (!svg || !b) return;
   const box = pid => { const el = document.querySelector(`[data-pid="${pid}"]`); return el ? { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight } : null; };
   const center = a => ({ x: a.x + a.w / 2, y: a.y + a.h / 2 });
   const edge = (a, c) => { const m = center(a), dx = c.x - m.x, dy = c.y - m.y, s = Math.min(Math.abs((a.w / 2) / (dx || 1e-6)), Math.abs((a.h / 2) / (dy || 1e-6))); return { x: m.x + dx * s, y: m.y + dy * s }; };
-  let out = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--ink-3)"/></marker></defs>`;
-  { const pts = stopsOf(b).map(k => box(pidOfKey(b, k))).filter(Boolean), g = box(b.pl.find(p => p.ref === "b:g")?.id); if (g) pts.push(g); if (pts.length > 1) out += `<polyline class="pth" points="${pts.map(c => { const m = center(c); return m.x + "," + m.y; }).join(" ")}"/>`; }
-  for (const p of b.pl) { const it = p.ref.startsWith("i:") ? I(p.ref.slice(2)) : null; if (!it?.stop) continue; const a = box(p.id), q = box(pidOfKey(b, it.stop)); if (!a || !q) continue; const s0 = edge(a, center(q)), e0 = edge(q, center(a)); out += `<line class="sl" x1="${s0.x}" y1="${s0.y}" x2="${e0.x}" y2="${e0.y}"/>`; }
+  /* links are soft curves that leave a card from the side facing the other card */
+  const curve = (A, B) => {
+    const ca = center(A), cb = center(B), dx = cb.x - ca.x, dy = cb.y - ca.y, hz = Math.abs(dx) - (A.w + B.w) / 4 > Math.abs(dy) - (A.h + B.h) / 4;
+    const sx = Math.sign(dx) || 1, sy = Math.sign(dy) || 1;
+    const s0 = hz ? { x: sx > 0 ? A.x + A.w : A.x, y: ca.y } : { x: ca.x, y: sy > 0 ? A.y + A.h : A.y };
+    const e0 = hz ? { x: sx > 0 ? B.x : B.x + B.w, y: cb.y } : { x: cb.x, y: sy > 0 ? B.y : B.y + B.h };
+    const k = Math.max(28, Math.min(170, Math.hypot(e0.x - s0.x, e0.y - s0.y) * .42));
+    const c1 = hz ? { x: s0.x + sx * k, y: s0.y } : { x: s0.x, y: s0.y + sy * k }, c2 = hz ? { x: e0.x - sx * k, y: e0.y } : { x: e0.x, y: e0.y - sy * k };
+    const m = { x: (s0.x + 3 * c1.x + 3 * c2.x + e0.x) / 8, y: (s0.y + 3 * c1.y + 3 * c2.y + e0.y) / 8 };
+    return { d: `M${s0.x.toFixed(1)} ${s0.y.toFixed(1)}C${c1.x.toFixed(1)} ${c1.y.toFixed(1)} ${c2.x.toFixed(1)} ${c2.y.toFixed(1)} ${e0.x.toFixed(1)} ${e0.y.toFixed(1)}`, m };
+  };
+  const pt = (x, y) => ({ x, y, w: 0, h: 0 });
+  /* a smooth line through points (Catmull-Rom as Béziers), for the path to the goal */
+  const smooth = ps => ps.length < 2 ? "" : `M${ps[0].x} ${ps[0].y}` + ps.slice(1).map((p, i) => { const p0 = ps[i - 1] || ps[i], p1 = ps[i], p3 = ps[i + 2] || p; return `C${p1.x + (p.x - p0.x) / 6} ${p1.y + (p.y - p0.y) / 6} ${p.x - (p3.x - p1.x) / 6} ${p.y - (p3.y - p1.y) / 6} ${p.x} ${p.y}`; }).join("");
+  let out = `<defs><marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1.2L8.8 5L1 8.8L2.8 5z" style="fill:var(--ink-3)"/></marker><marker id="ahs" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1.2L8.8 5L1 8.8L2.8 5z" style="fill:var(--accent)"/></marker></defs>`;
+  { const pts = stopsOf(b).map(k => box(pidOfKey(b, k))).filter(Boolean), g = box(b.pl.find(p => p.ref === "b:g")?.id); if (g) pts.push(g); if (pts.length > 1) out += `<path class="pth" d="${smooth(pts.map(center))}"/>`; }
+  for (const p of b.pl) { const it = p.ref.startsWith("i:") ? I(p.ref.slice(2)) : null; if (!it?.stop) continue; const a = box(p.id), q = box(pidOfKey(b, it.stop)); if (!a || !q) continue; out += `<path class="sl" d="${curve(a, q).d}"/>`; }
   if (S.fieldLinks) {
     const objs = b.pl.map(p => ({ p, r: refOf(p.ref, b) })).filter(x => x.r?.type === "item" && x.r.it.type === "object");
-    for (const A of objs) for (const f of COL(A.r.it.col).fields.filter(f => f.t === "rel")) for (const id of arr(A.r.it.v[f.id])) { const B = objs.find(x => x.r.it.id === id); if (!B) continue; const a = box(A.p.id), bb = box(B.p.id); if (!a || !bb) continue; const s = edge(a, center(bb)), e = edge(bb, center(a)); out += `<line class="fl" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><text class="flt" x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 + 14}" text-anchor="middle">${esc(f.label)} (field)</text>`; }
+    for (const A of objs) for (const f of COL(A.r.it.col).fields.filter(f => f.t === "rel")) for (const id of arr(A.r.it.v[f.id])) { const B = objs.find(x => x.r.it.id === id); if (!B) continue; const a = box(A.p.id), bb = box(B.p.id); if (!a || !bb) continue; const c = curve(a, bb); out += `<path class="fl" d="${c.d}"/><text class="flt" x="${c.m.x}" y="${c.m.y + 14}" text-anchor="middle">${esc(f.label)} (field)</text>`; }
   }
-  for (const a of b.arrows) { const A = box(a.from), B = box(a.to); if (!A || !B) continue; const s = edge(A, center(B)), e = edge(B, center(A)); out += `<line class="hit" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><line class="a${S.selArrow === a.id ? " sel" : ""}" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" marker-end="url(#ah)"/><text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 - 6}" text-anchor="middle">${esc(a.label || "")}</text>`; }
-  if (S.ghost) out += `<line class="ghost" x1="${S.ghost.x1}" y1="${S.ghost.y1}" x2="${S.ghost.x2}" y2="${S.ghost.y2}"/>`;
-  if (S.qp?.from) { const A = box(S.qp.from); if (A) { const g = { x: S.qp.gx, y: S.qp.gy }, s0 = edge(A, g); out += `<line class="ghost" x1="${s0.x}" y1="${s0.y}" x2="${g.x}" y2="${g.y}"/><circle class="ghost-end" cx="${g.x}" cy="${g.y}" r="4"/>`; } }
+  /* a new link draws itself in */
+  if (ARR.b !== b.id) { ARR.b = b.id; ARR.seen = new Set(b.arrows.map(a => a.id)); }
+  const now = performance.now(); let drawing = false;
+  for (const a of b.arrows) {
+    const A = box(a.from), B = box(a.to); if (!A || !B) continue;
+    if (!ARR.seen.has(a.id)) { ARR.seen.add(a.id); if (!RM) ARR.born.set(a.id, now); }
+    const t = ARR.born.has(a.id) ? Math.min(1, (now - ARR.born.get(a.id)) / 420) : 1, k = ease3(t); if (t < 1) drawing = true; else ARR.born.delete(a.id);
+    const c = curve(A, B), sel = S.selArrow === a.id;
+    out += `<path class="hit" data-arrow="${a.id}" d="${c.d}"/><path class="a${sel ? " sel" : ""}" data-arrow="${a.id}" d="${c.d}"${t < 1 ? ` pathLength="1" stroke-dasharray="1" stroke-dashoffset="${(1 - k).toFixed(3)}"` : ` marker-end="url(#${sel ? "ahs" : "ah"})"`}/>${a.label ? `<text x="${c.m.x}" y="${c.m.y - 7}" text-anchor="middle" style="opacity:${k}">${esc(a.label)}</text>` : ""}`;
+  }
+  if (drawing) requestAnimationFrame(drawArrows);
+  if (S.ghost) { const A = box(S.ghost.from); if (A) { const B = S.ghost.to ? box(S.ghost.to) : null, c = curve(A, B || pt(S.ghost.x, S.ghost.y)); out += `<path class="ghost" d="${c.d}"/>${B ? "" : `<circle class="ghost-end" cx="${S.ghost.x}" cy="${S.ghost.y}" r="4"/>`}`; } }
+  if (S.qp?.from) { const A = box(S.qp.from); if (A) { const c = curve(A, pt(S.qp.gx, S.qp.gy)); out += `<path class="ghost" d="${c.d}"/><circle class="ghost-end" cx="${S.qp.gx}" cy="${S.qp.gy}" r="4"/>`; } }
   for (const g of S.guides || []) out += `<line class="gd" x1="${g[0]}" y1="${g[1]}" x2="${g[2]}" y2="${g[3]}"/>`;
   svg.innerHTML = out; drawMap(); cardBar();
 }
@@ -6705,7 +6740,7 @@ function render() {
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
   else if (S.screen === "colls") m.innerHTML = renderColls();
   else if (S.screen === "tpl") m.innerHTML = renderTpl();
-  else if (S.screen === "board") { const rb = $(".rd-body"), keep = rb ? [rb.dataset.id, rb.scrollTop] : null; m.innerHTML = renderBoard(); popNew(); if (keep) { const nb = $(".rd-body"); if (nb?.dataset.id === keep[0]) nb.scrollTop = keep[1]; } requestAnimationFrame(drawArrows); }
+  else if (S.screen === "board") { const rb = $(".rd-body"), keep = rb ? [rb.dataset.id, rb.scrollTop] : null, was = KNOWN.b === S.board && !RM ? new Map([...document.querySelectorAll("#cv .bpl")].map(el => [el.dataset.pid, [el.offsetLeft, el.offsetTop]])) : null; m.innerHTML = renderBoard(); if (was) glideFrom(was); popNew(); if (keep) { const nb = $(".rd-body"); if (nb?.dataset.id === keep[0]) nb.scrollTop = keep[1]; } requestAnimationFrame(drawArrows); }
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
@@ -6722,6 +6757,13 @@ document.addEventListener("pointerdown", e => {
 /* writing in the panel fills in the card on the board as you type */
 let rdT;
 document.addEventListener("input", e => { if (S.screen !== "board" || !e.target.closest?.(".rd-body")) return; clearTimeout(rdT); rdT = setTimeout(() => { const b = I(S.board), p = b.pl.find(x => x.ref === "i:" + S.ed?.id), el = p && document.querySelector(`[data-pid="${p.id}"]`); if (!el) return; const t = document.createElement("div"); t.innerHTML = placed(p, b); el.replaceWith(t.firstElementChild); drawArrows(); }, 300); });
+function glideFrom(was) {
+  const moved = [];
+  for (const el of document.querySelectorAll("#cv .bpl")) { const o = was.get(el.dataset.pid); if (!o) continue; const nx = el.offsetLeft, ny = el.offsetTop; if (Math.abs(o[0] - nx) + Math.abs(o[1] - ny) < 2) continue; moved.push([el, nx, ny]); el.style.left = o[0] + "px"; el.style.top = o[1] + "px"; }
+  if (!moved.length) return; document.body.offsetWidth;
+  moved.forEach(([el, nx, ny]) => { el.classList.add("glide"); el.style.left = nx + "px"; el.style.top = ny + "px"; });
+  arrowsFor(480); setTimeout(() => moved.forEach(([el]) => el.classList.remove("glide")), 490);
+}
 /** New cards on a board arrive with a small pop. */
 const KNOWN = { b: null, ids: new Set() };
 function popNew() { const els = [...document.querySelectorAll("#cv .bpl")]; if (KNOWN.b === S.board) els.forEach(el => { if (!KNOWN.ids.has(el.dataset.pid)) el.classList.add("pop"); }); KNOWN.b = S.board; KNOWN.ids = new Set(els.map(el => el.dataset.pid)); }
@@ -6752,6 +6794,34 @@ function stMenu(key) {
 
 /* ---------- board pointer handling ---------- */
 let drag = null;
+/* fluid motion: the view eases to where it's going, a flick keeps drifting, zoom glides, links redraw while things move */
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches, ease3 = t => 1 - Math.pow(1 - t, 3);
+let vA = 0, mA = 0, zA = 0, zT = null, aU = 0;
+function stopMotion() { cancelAnimationFrame(vA); cancelAnimationFrame(mA); cancelAnimationFrame(zA); zA = 0; zT = null; }
+function animateView(to, dur = 380) {
+  stopMotion();
+  if (RM) { Object.assign(S.view, to); applyView(); return; }
+  const from = { ...S.view }, t0 = performance.now();
+  const step = now => { const t = Math.min(1, (now - t0) / dur), k = ease3(t); for (const q of ["x", "y", "z"]) S.view[q] = from[q] + (to[q] - from[q]) * k; applyView(); if (t < 1) vA = requestAnimationFrame(step); };
+  vA = requestAnimationFrame(step);
+}
+function momentum(vx, vy) {
+  if (RM) return; cancelAnimationFrame(mA); let last = performance.now(); const sp = Math.hypot(vx, vy), cap = 1.6; if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
+  const step = now => { const dt = Math.min(32, now - last); last = now; S.view.x += vx * dt; S.view.y += vy * dt; const f = Math.pow(.94, dt / 16); vx *= f; vy *= f; applyView(); if (Math.hypot(vx, vy) > .02) mA = requestAnimationFrame(step); };
+  mA = requestAnimationFrame(step);
+}
+/** Keep redrawing the links for a moment, while cards glide to new places. */
+function arrowsFor(ms) { const end = performance.now() + ms; cancelAnimationFrame(aU); const f = () => { drawArrows(); if (performance.now() < end) aU = requestAnimationFrame(f); }; aU = requestAnimationFrame(f); }
+/** A dragged card follows the pointer a touch behind it, leaning the way it moves. */
+function dragLoop() {
+  const d = drag; if (!d || d.kind !== "move" || !d.moved) return;
+  const k = RM ? 1 : .42; d.cx += (d.p.x - d.cx) * k; d.cy += (d.p.y - d.cy) * k;
+  if (Math.abs(d.p.x - d.cx) < .3 && Math.abs(d.p.y - d.cy) < .3) { d.cx = d.p.x; d.cy = d.p.y; }
+  const lean = RM ? 0 : Math.max(-5, Math.min(5, (d.p.x - d.cx) * .12));
+  d.el.style.left = d.cx + "px"; d.el.style.top = d.cy + "px"; d.el.style.transform = `rotate(${lean.toFixed(2)}deg) scale(${RM ? 1 : 1.025})`;
+  for (const g of d.group || []) if (g.el) { g.el.style.left = g.x + d.cx - d.x0 + "px"; g.el.style.top = g.y + d.cy - d.y0 + "px"; }
+  drawArrows(); d.raf = requestAnimationFrame(dragLoop);
+}
 const isSel = id => S.sel === id || !!S.selSet?.has(id);
 const selIds = () => { const b = I(S.board); return [...new Set([...(S.selSet || []), ...(S.sel ? [S.sel] : [])])].filter(id => b?.pl.some(p => p.id === id)); };
 function setSel(ids) { S.selSet = new Set(ids); S.sel = ids.at(-1) || null; document.querySelectorAll("#cv .bpl").forEach(el => el.classList.toggle("sel", S.selSet.has(el.dataset.pid))); cardBar(); }
@@ -6827,7 +6897,7 @@ function keysHTML() {
   const k = [["Double-click", "Add here: search, note or question"], ["Drag a dot", "Link to a card, or let go on empty space to add a linked card"], ["Tab", "Add a card linked to the selected one"], ["⇧ click / ⇧ drag", "Select several"], ["Drag", "Move; it snaps to the others (hold ⌥ to stop it)"], ["← → ↑ ↓", "Nudge (⇧ for more)"], ["Delete", "Remove from the board"], ["⌘Z · ⇧⌘Z", "Undo · redo"], ["⌘A", "Select all"], ["Enter", "Open or edit the selected card"], ["V · N · Q", "Select · note · question"], ["+", "Your Commonplace"], ["⇧1 · ⇧2", "Fit all · zoom to selection"], ["F", "Focus"]];
   return `<div class="bkeys" role="dialog" aria-label="Board shortcuts" data-ph="LB4"><h3>Shortcuts <button type="button" data-act="bkeys" aria-label="Close">×</button></h3><dl>${k.map(([a, b]) => `<dt><kbd>${a}</kbd></dt><dd>${b}</dd>`).join("")}</dl></div>`;
 }
-function zoomToSel() { const bx = boardBoxes().filter(x => isSel(x.id)); if (!bx.length) { fit(); return; } const vp = $("#vp"), x0 = Math.min(...bx.map(b => b.x)), y0 = Math.min(...bx.map(b => b.y)), x1 = Math.max(...bx.map(b => b.x + b.w)), y1 = Math.max(...bx.map(b => b.y + b.h)), R = Math.max(24, panelSpace()), aw = vp.clientWidth - 24 - R, ah = vp.clientHeight - 150, z = Math.min(1.4, Math.max(.35, Math.min(aw / (x1 - x0 + 80), ah / (y1 - y0 + 80)))); S.view = { z, x: 24 + aw / 2 - (x0 + x1) / 2 * z, y: 90 + ah / 2 - (y0 + y1) / 2 * z }; applyView(); }
+function zoomToSel() { const bx = boardBoxes().filter(x => isSel(x.id)); if (!bx.length) { fit(); return; } const vp = $("#vp"), x0 = Math.min(...bx.map(b => b.x)), y0 = Math.min(...bx.map(b => b.y)), x1 = Math.max(...bx.map(b => b.x + b.w)), y1 = Math.max(...bx.map(b => b.y + b.h)), R = Math.max(24, panelSpace()), aw = vp.clientWidth - 24 - R, ah = vp.clientHeight - 150, z = Math.min(1.4, Math.max(.35, Math.min(aw / (x1 - x0 + 80), ah / (y1 - y0 + 80)))); animateView({ z, x: 24 + aw / 2 - (x0 + x1) / 2 * z, y: 90 + ah / 2 - (y0 + y1) / 2 * z }); }
 /** A small lift when a stop is answered: the number turns to ✓ with a pulse, and the ring moves. */
 function celebrate(key) { if (S.screen !== "board") return; requestAnimationFrame(() => { const pid = pidOfKey(I(S.board), key), n = document.querySelector(`[data-pid="${pid}"] .stopn`); n?.classList.add("burst"); }); }
 function openPlaced(pid) {
@@ -6840,6 +6910,7 @@ function openPlaced(pid) {
 }
 document.addEventListener("pointerdown", e => {
   if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,.btop,.bright,.bshelf,.bpanel,.bpanel-chip,button,a,textarea,input,.st,select")) return;
+  stopMotion();
   const dot = e.target.closest("[data-dot]"), pl = e.target.closest("[data-pid]");
   if (e.target.closest("[data-arrow]")) return;
   if (dot) { const p = I(S.board).pl.find(x => x.id === dot.dataset.dot), el = dot.parentElement; drag = { kind: "connect", from: p.id, sx: el.offsetLeft + el.offsetWidth, sy: el.offsetTop + el.offsetHeight / 2 }; e.preventDefault(); return; }
@@ -6847,31 +6918,41 @@ document.addEventListener("pointerdown", e => {
     const b = I(S.board), p = b.pl.find(x => x.id === pl.dataset.pid), c = toCanvas(e.clientX, e.clientY);
     if (e.shiftKey || e.metaKey || e.ctrlKey) { const ids = selIds(); setSel(ids.includes(p.id) ? ids.filter(x => x !== p.id) : [...ids, p.id]); S.skipClick = true; e.preventDefault(); return; }
     const ids = isSel(p.id) ? selIds() : [], group = ids.length > 1 ? ids.filter(x => x !== p.id).map(id => { const q = b.pl.find(z => z.id === id); return { q, x: q.x, y: q.y, el: document.querySelector(`[data-pid="${id}"]`) }; }) : null;
-    drag = { kind: "move", p, ox: c.x - p.x, oy: c.y - p.y, x0: p.x, y0: p.y, moved: false, el: pl, group }; e.preventDefault(); return;
+    drag = { kind: "move", p, ox: c.x - p.x, oy: c.y - p.y, x0: p.x, y0: p.y, cx: p.x, cy: p.y, moved: false, el: pl, group }; e.preventDefault(); return;
   }
   if (e.shiftKey) { const c = toCanvas(e.clientX, e.clientY), m = document.createElement("div"); m.className = "marq"; $("#cv").appendChild(m); drag = { kind: "marq", c0: c, m, add: selIds() }; e.preventDefault(); return; }
   if (S.tool === "note" || S.tool === "question") { const c = toCanvas(e.clientX, e.clientY); addOnCanvas(S.tool, c.x - 120, c.y - 30); return; }
-  drag = { kind: "pan", sx: e.clientX, sy: e.clientY, vx: S.view.x, vy: S.view.y }; $("#vp").classList.add("panning");
+  drag = { kind: "pan", sx: e.clientX, sy: e.clientY, vx: S.view.x, vy: S.view.y, lx: e.clientX, ly: e.clientY, lt: performance.now(), mvx: 0, mvy: 0 }; $("#vp").classList.add("panning");
 });
 document.addEventListener("pointermove", e => {
   if (!drag) return;
-  if (drag.kind === "pan") { S.view.x = drag.vx + e.clientX - drag.sx; S.view.y = drag.vy + e.clientY - drag.sy; applyView(); }
+  if (drag.kind === "pan") { const now = performance.now(), dt = Math.max(1, now - drag.lt); drag.mvx = drag.mvx * .6 + (e.clientX - drag.lx) / dt * .4; drag.mvy = drag.mvy * .6 + (e.clientY - drag.ly) / dt * .4; drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now; S.view.x = drag.vx + e.clientX - drag.sx; S.view.y = drag.vy + e.clientY - drag.sy; applyView(); }
   else if (drag.kind === "move") {
     const c = toCanvas(e.clientX, e.clientY); let nx = Math.round(c.x - drag.ox), ny = Math.round(c.y - drag.oy);
-    if (!drag.moved && Math.abs(nx - drag.x0) + Math.abs(ny - drag.y0) > 2) { drag.moved = true; snap(); }
+    if (!drag.moved && Math.abs(nx - drag.x0) + Math.abs(ny - drag.y0) > 2) { drag.moved = true; snap(); drag.el.classList.add("lift"); cardBar(); drag.raf = requestAnimationFrame(dragLoop); }
     if (!drag.moved) return;
     if (!e.altKey) [nx, ny] = guideSnap(drag.el, nx, ny); else S.guides = [];
     const dx = nx - drag.x0, dy = ny - drag.y0;
-    drag.p.x = nx; drag.p.y = ny; drag.el.style.left = nx + "px"; drag.el.style.top = ny + "px";
-    for (const g of drag.group || []) { g.q.x = g.x + dx; g.q.y = g.y + dy; if (g.el) { g.el.style.left = g.q.x + "px"; g.el.style.top = g.q.y + "px"; } }
-    drawArrows();
+    drag.p.x = nx; drag.p.y = ny;
+    for (const g of drag.group || []) { g.q.x = g.x + dx; g.q.y = g.y + dy; }
   }
   else if (drag.kind === "marq") { const c = toCanvas(e.clientX, e.clientY), x = Math.min(c.x, drag.c0.x), y = Math.min(c.y, drag.c0.y), w = Math.abs(c.x - drag.c0.x), h = Math.abs(c.y - drag.c0.y); Object.assign(drag.m.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" }); drag.r = { x, y, w, h }; }
-  else if (drag.kind === "connect") { const c = toCanvas(e.clientX, e.clientY); S.ghost = { x1: drag.sx, y1: drag.sy, x2: c.x, y2: c.y }; drawArrows(); }
+  else if (drag.kind === "connect") {
+    const c = toCanvas(e.clientX, e.clientY), tgt = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest?.("[data-pid]")).find(el => el && el.dataset.pid !== drag.from);
+    document.querySelectorAll(".bpl.target").forEach(x => x !== tgt && x.classList.remove("target")); tgt?.classList.add("target");
+    S.ghost = { from: drag.from, x: c.x, y: c.y, to: tgt?.dataset.pid }; drawArrows();
+  }
 });
 document.addEventListener("pointerup", e => {
   if (!drag) return;
-  const d = drag; drag = null; $("#vp")?.classList.remove("panning");
+  const d = drag; drag = null; $("#vp")?.classList.remove("panning"); document.querySelectorAll(".bpl.target").forEach(x => x.classList.remove("target"));
+  if (d.kind === "move" && d.moved) {
+    cancelAnimationFrame(d.raf); const els = [d.el, ...(d.group || []).map(g => g.el).filter(Boolean)];
+    els.forEach(el => { el.classList.remove("lift"); el.classList.add("glide"); el.style.transform = ""; });
+    d.el.style.left = d.p.x + "px"; d.el.style.top = d.p.y + "px"; for (const g of d.group || []) if (g.el) { g.el.style.left = g.q.x + "px"; g.el.style.top = g.q.y + "px"; }
+    arrowsFor(460); setTimeout(() => els.forEach(el => el.classList.remove("glide")), 470);
+  }
+  if (d.kind === "pan" && performance.now() - d.lt < 80 && Math.hypot(d.mvx, d.mvy) > .25) momentum(d.mvx, d.mvy);
   if (d.kind === "connect" || d.moved || (d.kind === "pan" && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) > 3)) S.skipClick = true;
   if (d.kind === "connect") {
     S.ghost = null;
@@ -6879,23 +6960,30 @@ document.addEventListener("pointerup", e => {
     if (tgt && tgt.dataset.pid !== d.from) { if (b.arrows.some(a => (a.from === d.from && a.to === tgt.dataset.pid) || (a.to === d.from && a.from === tgt.dataset.pid))) { toast("Already linked."); drawArrows(); return; } snap(); const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, label: "" }; b.arrows.push(a); drawArrows(); if (offersFor(a, b).length) openArrow(a.id, e.clientX, e.clientY); else toast("Linked. Click the line to label it, if you like."); }
     else if (!tgt && e.target.closest?.("#vp")) { const c = toCanvas(e.clientX, e.clientY); openLinkMenu(d.from, Math.round(c.x), Math.round(c.y)); }
     else drawArrows();
-  } else if (d.kind === "move") { S.guides = []; if (!d.moved) setSel([d.p.id]); else drawArrows(); }
+  } else if (d.kind === "move") { S.guides = []; if (!d.moved) setSel([d.p.id]); }
   else if (d.kind === "marq") { d.m.remove(); const r = d.r; if (r && r.w + r.h > 6) { const hit = [...document.querySelectorAll("#cv .bpl")].filter(el => el.offsetLeft < r.x + r.w && el.offsetLeft + el.offsetWidth > r.x && el.offsetTop < r.y + r.h && el.offsetTop + el.offsetHeight > r.y).map(el => el.dataset.pid); setSel([...new Set([...d.add, ...hit])]); if (hit.length) toast(`${selIds().length} selected. Drag one to move them all.`); } }
   else if (d.kind === "pan" && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) <= 3 && selIds().length) setSel([]);
 });
 document.addEventListener("wheel", e => {
   if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".bdrawer,.qp,.bshelf,.bpanel")) return;
   e.preventDefault();
-  if (e.ctrlKey || e.metaKey) zoomAt(e.deltaY < 0 ? 1.1 : 1 / 1.1, e.clientX, e.clientY); else { S.view.x -= e.deltaX; S.view.y -= e.deltaY; applyView(); }
+  if (e.ctrlKey || e.metaKey) zoomAt(Math.exp(-Math.max(-60, Math.min(60, e.deltaY)) * .006), e.clientX, e.clientY); else { cancelAnimationFrame(mA); cancelAnimationFrame(vA); S.view.x -= e.deltaX; S.view.y -= e.deltaY; applyView(); }
 }, { passive: false });
-function zoomAt(f, cx, cy) { const r = $("#vp").getBoundingClientRect(); cx ??= r.left + r.width / 2; cy ??= r.top + r.height / 2; const z = Math.min(1.6, Math.max(.35, S.view.z * f)), px = cx - r.left, py = cy - r.top; S.view.x = px - (px - S.view.x) * z / S.view.z; S.view.y = py - (py - S.view.y) * z / S.view.z; S.view.z = z; applyView(); }
-function fit() {
+function zoomAt(f, cx, cy) {
+  const r = $("#vp").getBoundingClientRect(); cx ??= r.left + (r.width - panelSpace()) / 2; cy ??= r.top + r.height / 2;
+  cancelAnimationFrame(vA); cancelAnimationFrame(mA);
+  zT = { z: Math.min(1.6, Math.max(.35, (zT?.z ?? S.view.z) * f)), px: cx - r.left, py: cy - r.top };
+  const step = () => { const { px, py } = zT, nz = RM || Math.abs(zT.z - S.view.z) < .002 ? zT.z : S.view.z + (zT.z - S.view.z) * .28; S.view.x = px - (px - S.view.x) * nz / S.view.z; S.view.y = py - (py - S.view.y) * nz / S.view.z; S.view.z = nz; applyView(); if (nz !== zT.z) zA = requestAnimationFrame(step); else { zA = 0; zT = null; } };
+  if (!zA) zA = requestAnimationFrame(step);
+}
+function fit(now) {
   const b = I(S.board), vp = $("#vp"); if (!b || !vp) return;
   const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 30, y0 = Math.min(...ys) - 30, x1 = Math.max(...xs) + 340, y1 = Math.max(...ys) + 260;
   const narrow = vp.clientWidth < 700, foc = S.bfocus, L = narrow || foc ? 24 : 76, R = narrow ? 24 : Math.max(24, panelSpace()), T = narrow ? 120 : foc ? 30 : 76, B = foc ? 30 : 70;
   const aw = Math.max(200, vp.clientWidth - L - R), ah = Math.max(200, vp.clientHeight - T - B);
   const z = Math.min(1, Math.max(narrow ? .45 : .55, Math.min(aw / (x1 - x0), ah / (y1 - y0))));
-  S.view = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) }; applyView();
+  const to = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) };
+  if (now) { stopMotion(); S.view = to; applyView(); } else animateView(to);
 }
 function addOnCanvas(tool, x, y) {
   const b = I(S.board); snap();
@@ -6905,7 +6993,7 @@ function addOnCanvas(tool, x, y) {
 }
 
 /* ---------- clicks ---------- */
-function go(screen, keep) { if (!keep) S.hist = []; if (screen !== "board") S.playing = null; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(fit); }
+function go(screen, keep) { if (!keep) S.hist = []; if (screen !== "board") S.playing = null; S.screen = screen; S.drawer = false; render(); document.getElementById("stage").scrollTo({ top: 0 }); window.scrollTo({ top: 0 }); if (screen === "board") requestAnimationFrame(() => fit(true)); }
 document.addEventListener("click", e => {
   if (S.skipClick) { S.skipClick = false; return; }
   const a = e.target.closest("[data-act]");
@@ -7101,7 +7189,7 @@ document.addEventListener("click", e => {
     case "place": { const b = I(S.board); if (b.pl.some(p => p.ref === d.ref)) { toast("Already on this board."); break; } const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + vp.width / 2, vp.top + vp.height / 2); b.pl.push({ id: "p" + Date.now(), ref: d.ref, x: Math.round(c.x - 120 + (b.pl.length % 4) * 24), y: Math.round(c.y - 60) }); render(); toast(d.ref.startsWith("q:") ? "Placed. The question still belongs to where it was written; its status is the same everywhere." : "Placed, not copied: it's the same entry as in Commonplace."); break; }
     case "zoom": zoomAt(+d.d > 0 ? 1.15 : 1 / 1.15); break;
     case "fit": fit(); break;
-    case "focuscard": { if (!d.pid) break; const p = I(S.board).pl.find(x => x.id === d.pid); if (!p) break; const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 120) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${p.id}"]`)?.classList.add("sel"); break; }
+    case "focuscard": { if (!d.pid) break; const p = I(S.board).pl.find(x => x.id === d.pid); if (!p) break; centreOn(p.id, S.view.z); setSel([p.id]); break; }
     case "arev": { const pop = $("#apop"), ar = I(S.board).arrows.find(z => z.id === pop._a); ar.label = $("#alabel").value.trim(); [ar.from, ar.to] = [ar.to, ar.from]; openArrow(ar.id, pop.offsetLeft + pop.offsetWidth / 2, pop.offsetTop - 12); break; }
     case "offer": { const o = $("#apop")._off[+d.i]; if (o.kind === "field") { const X = I(o.x), f = FLD(COL(X.col), o.f); X.v[f.id] = f.o.many ? [...arr(X.v[f.id]), o.y] : [o.y]; toast(`${X.title}: ${f.label} is now ${I(o.y).title}. It shows on the Object's page and as a field link here.`); } else { const s = st(o.key, "question"); s.ans.push(o.id); s.status = "answered"; toast(`Answered in ${I(o.id).title}. Its page now lists the question under Answers.`); } closeApop(); render(); break; }
     case "delarrow": { const b = I(S.board); b.arrows = b.arrows.filter(z => z.id !== $("#apop")._a); $("#apop").hidden = true; drawArrows(); break; }
@@ -7191,7 +7279,7 @@ document.addEventListener("keydown", e => {
     if (mod && k === "a") { e.preventDefault(); setSel(I(S.board).pl.map(p => p.id)); return; }
     if (mod) return;
     if (e.key === "Tab" && selIds().length === 1) { e.preventDefault(); const id = selIds()[0], p = I(S.board).pl.find(x => x.id === id), el = document.querySelector(`[data-pid="${id}"]`); openLinkMenu(id, p.x + (el?.offsetWidth || 240) + 90, p.y + 40); return; }
-    if (e.key.startsWith("Arrow") && selIds().length) { e.preventDefault(); const n = e.shiftKey ? 40 : 8, ids = selIds(), b = I(S.board); if (Date.now() - (S.nudged || 0) > 700) snap(); S.nudged = Date.now(); for (const p of b.pl.filter(p => ids.includes(p.id))) { if (e.key === "ArrowLeft") p.x -= n; if (e.key === "ArrowRight") p.x += n; if (e.key === "ArrowUp") p.y -= n; if (e.key === "ArrowDown") p.y += n; const el = document.querySelector(`[data-pid="${p.id}"]`); if (el) { el.style.left = p.x + "px"; el.style.top = p.y + "px"; } } drawArrows(); return; }
+    if (e.key.startsWith("Arrow") && selIds().length) { e.preventDefault(); const n = e.shiftKey ? 40 : 8, ids = selIds(), b = I(S.board); if (Date.now() - (S.nudged || 0) > 700) snap(); S.nudged = Date.now(); for (const p of b.pl.filter(p => ids.includes(p.id))) { if (e.key === "ArrowLeft") p.x -= n; if (e.key === "ArrowRight") p.x += n; if (e.key === "ArrowUp") p.y -= n; if (e.key === "ArrowDown") p.y += n; const el = document.querySelector(`[data-pid="${p.id}"]`); if (el) { el.classList.add("glide"); el.style.left = p.x + "px"; el.style.top = p.y + "px"; clearTimeout(el._g); el._g = setTimeout(() => el.classList.remove("glide"), 450); } } arrowsFor(450); return; }
     if (e.key === "Enter" && selIds().length === 1) { e.preventDefault(); openPlaced(selIds()[0]); return; }
     if (e.code === "Digit1" && e.shiftKey) { fit(); return; }
     if (e.code === "Digit2" && e.shiftKey) { zoomToSel(); return; }

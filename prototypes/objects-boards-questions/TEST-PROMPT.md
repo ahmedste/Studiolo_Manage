@@ -33,6 +33,7 @@ Read the plan first, then test the prototypes against it.
 - Open **Questions** (bar at the bottom). Do the goal cards, rings and **Next** lines make it clear what to do? Mark a question answered, then switch to **Answered**: does *What you've found out* read well? Does clicking a question open the exact place it was written?
 - **Templates** tab: are the three generic templates (People, Precedents, Cases) clear enough to fit any field? Use one, then one pre-made for another field. Use one long-note and one board template. Does each make what its picture shows? Open **? How Commonplace works**: after reading it, could a new user explain collections, topics and the three ways things link?
 - On a board, link two cards by dragging a blue dot. Is a plain link (with an optional label) enough? Does the link show on both entries' pages?
+- On a board, drag cards about, flick the canvas, zoom, Tidy, and draw a few links. Does it feel fluid and calm, or showy? Do the curved links stay readable?
 - On a board, double-click the PDF, the video, a photo and Hassan Fathy: each opens beside the board, as a tab. Write a note at a page and at a time, put one ↗ On the board, and write a Note beside it. Did you ever want to leave the board?
 - On a board, drag a card's blue dot and let go on empty space: is the add-and-link menu what you'd expect? Try Tab on a selected card, ⇧ drag to select several, Tidy, ⌘Z, the minimap, and ? for shortcuts. Does anything feel fiddly?
 - On a board, try **⤢ Focus** (F) and Esc; on a long note, **⤢ Focus** while writing. Does focus feel calm, and is the way back obvious?
@@ -48,7 +49,7 @@ Read the plan first, then test the prototypes against it.
 **Then review the plan:**
 - Is the order sound? Questions and goals come first and Boards last. Are the dependencies right?
 - Can the lanes really run in parallel?
-- Are any of the decisions (OQB-D1 to D8, LN-D1 to D10, CL-D1 to D14, LB-D1 to D16) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
+- Are any of the decisions (OQB-D1 to D8, LN-D1 to D10, CL-D1 to D14, LB-D1 to D17) wrong? Read the linking diagrams and the problems table (P1–P22) in the Collections and linking part: is any case missing or wrong? Is the three-kind connection model (mention, property, arrow) simple enough?
 
 **Report in four parts:**
 1. Bugs, with steps to reproduce.

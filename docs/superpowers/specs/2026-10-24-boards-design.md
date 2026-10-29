@@ -405,7 +405,7 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
 | **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
 | **LB5** | **Reading on the board**: entries open in the side panel beside their card; a long-note editor; a photo viewer; a PDF reader; a video player; notes at a page or a time; ↗ On the board; Note beside it (§7.12) | HIGH | no (uses `margin`, which exists) |
-| **LB4** | **Board craft**: Focus mode; the add-and-link menu; the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts (§7.11) | MEDIUM | no |
+| **LB4** | **Board craft**: fluid movement and curved links; Focus mode; the add-and-link menu; the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts (§7.11) | MEDIUM | no |
 
 ### 7.10 Links: a link and a backlink
 
@@ -461,6 +461,27 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 - **⌘Z** undoes, and **⇧⌘Z** redoes, anything done on the board: place, add, move, link, remove, tidy, align, a Lumen made.
 - Remove says what it did ("Removed from the board. It's still in your Commonplace. ⌘Z to undo.").
 - Linking two cards that are already linked says so, instead of drawing a second line.
+
+**Fluid, not rigid.** *(The owner's direction, 29 Oct: movement and links should feel less rigid.)*
+- **Cards have weight.**
+  - A picked-up card lifts: a deeper shadow and a touch larger.
+  - It follows the pointer a little behind it, leaning a few degrees the way it's moving.
+  - Let go, and it settles into place with a small spring.
+  - Selected cards move together the same way.
+- **Nothing jumps.**
+  - Tidy, align, nudge, undo and redo glide cards to their new places, and their links follow as they go.
+  - Fit, ⇧2, *Show me the next stop*, a card picked in the panel, and opening an entry beside its card all ease the view there instead of cutting to it.
+- **The board drifts.** Flick it while panning and it keeps moving, then slows to a stop. Zoom (pinch, ⌘ scroll, − and +) glides, too.
+- **Links are soft curves.**
+  - Each link leaves its card from the side facing the other card and arrives at the near side of that card. It bends gently, so links fan out rather than cross in straight spokes.
+  - The arrowhead is small and notched, and a label sits at the curve's middle.
+  - The path to the goal is one smooth dotted curve through its stops. Field links and the lines from notes to their stop curve the same way.
+- **Linking feels alive.**
+  - While you drag a blue dot, a dashed curve flows from the card. Over another card it snaps to that card's edge, and the card lights up to show where it will land.
+  - When you let go, the new link draws itself in.
+  - A selected link shows its direction with a slow flowing dash.
+- All of it respects *reduce motion*: cards and the view then move at once, and nothing leans, flows or draws in.
+- **In the app:** this is the canvas library's job (for example, CSS transforms with a spring, and SVG cubic paths for links). It needs no data, because only the final positions are saved.
 
 **Finding your way.**
 - **The minimap**, bottom left, shows every card as a block and the visible area as a frame. Click or drag it to go there. Questions, Lumens and the goal take their colours; the selection is blue.
@@ -551,4 +572,5 @@ The panel widens to 560 px. You can drag its edge to resize it, or use **Wider**
 | **LB-D13** | Letting go of a link on empty board opens the **add-and-link menu**: Note, Question, Lumen (from an open question), related entries, search | **Yes** |
 | **LB-D15** | On a board, opening an entry never leaves the board: it opens in the side panel beside its card, as a tab; **Full page ↗** is the way out | **Yes** |
 | **LB-D16** | You write where you read: the block editor for notes and Objects; notes at a page or a time for PDFs and videos; **↗ On the board** turns any of them into a linked card | **Yes** |
+| **LB-D17** | The board moves fluidly: cards lift, lean and settle; the view eases and drifts; links are soft curves that snap to their target and draw themselves in; everything respects *reduce motion* | **Yes** |
 | **LB-D14** | Board craft ships as **LB4**: the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts | **Yes** |
