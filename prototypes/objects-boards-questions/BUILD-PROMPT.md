@@ -34,7 +34,7 @@ The prototype's source is `prototypes/objects-boards-questions/index.src.html` i
 - **Stage 3:** Q5, F3, T3, N3, N4.
 - **Stage 4:** Boards B1, B2, then the board as a learning space (LB1 the path, LB2 Lumens that play in their cards, LB3 notes and Recall on the board; no separate learning mode; Boards design §7), B4, with Q-B.
 
-The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D9, CL-D1–D14 and LB-D1–D10. Treat a recommendation as agreed unless the owner has said otherwise.
+The decisions with their recommendations are OQB-D1–D8, IN-D1–D13, LN-D1–D10, CL-D1–D14 and LB-D1–D12. Treat a recommendation as agreed unless the owner has said otherwise.
 
 **Your first task: phase Q1.**
 

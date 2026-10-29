@@ -138,7 +138,15 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 - **Keys.** Enter splits a block (an empty list item or question returns to text). Backspace at a block's start turns it back into text, then joins it with the one above. ↑ and ↓ cross blocks. Ctrl or ⌘ B and I format. Pasting brings in plain text.
 - **Phones.** The handles go; a bar above the keyboard holds **+ Block**, **?**, **◎**, **@**, **⋮⋮** and **Done**, as the Questions design asked for touch.
 
-### 3.4 One editor everywhere you write
+### 3.4 Focus mode
+
+**⤢ Focus** in the note's top bar (or Ctrl or ⌘ Shift F) leaves only the title and the writing:
+- the app's rail, the top bar, *On this page*, *Details*, the meta line and the foot (Notes about it, Appears in) all step aside;
+- the column centres a little lower, and the text grows a step;
+- every editing feature still works: `/`, `@`, the selection bar and block handles;
+- a faint **Leave focus** sits in the corner, and Esc brings everything back, with the caret where it was.
+
+### 3.5 One editor everywhere you write
 
 An Object's **What I took from it**, a short note and a long note all use the same editor, with the same blocks, `@` and `/`. Only the page around it differs. This ends today's two modes (read, then **Edit**) and keeps one keyboard model. The capture box keeps its own composer (`capture-composer.tsx`) and gains `@` only (Q1).
 
@@ -231,6 +239,7 @@ The prototype draws its blocks with plain `contenteditable` to show the behaviou
 | **LN-D7** | Images in a note belong to the note, not the wall; **Add to Photos** promotes one | **Yes** |
 | **LN-D8** | Object writing, short notes and long notes share one editor | **Yes** |
 | **LN-D9** | Mentions are not drawn on boards | **Yes** |
+| **LN-D10** | A long note has a **Focus mode**: just the title and the writing (Ctrl or ⌘ Shift F, Esc to leave) | **Yes** |
 
 ## 9. What this is not
 

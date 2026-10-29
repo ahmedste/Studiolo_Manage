@@ -4755,6 +4755,24 @@ body { background: var(--surface-page); }
 /* the long note page and the block editor (N1–N4): Craft's calm column, on the app's tokens and faces */
 .np .ip-top { align-items: center; }
 .np-dbtn[aria-pressed="true"] { background: var(--hover-fill); }
+/* focus: everything but the work steps aside (LB4, N1) */
+body.focus .navigation-rail, body.focus .phone-tb, body.focus .proto, body.focus .toast-region { display: none !important; }
+body.focus .app-shell { grid-template-columns: minmax(0, 1fr); }
+body.focus .bfull .bwrap { left: 0; top: 0; }
+body.focus .btop, body.focus .bright, body.focus .bpanel, body.focus .bpanel-chip, body.focus .btools, body.focus .bzoom, body.focus .bhint { display: none !important; }
+body.focus .np .ip-top, body.focus .np-outline, body.focus .np-details, body.focus .np-meta, body.focus .np-doc > .ip-kicker, body.focus .np-doc > section, body.focus .np-tail ~ * { display: none !important; }
+body.focus .np-grid, body.focus .np.with-details .np-grid { grid-template-columns: minmax(0, 720px); justify-content: center; margin-top: 8vh; }
+body.focus .np-doc { padding-left: 56px; }
+body.focus .np .nb-t { font-size: 18px; }
+body.focus .main-stage { padding-bottom: 30vh; }
+.focus-exit { position: fixed; z-index: 96; top: 14px; right: 16px; border: 0; padding: 6px 12px; border-radius: 16px; background: var(--surface-float); box-shadow: var(--shadow-float); font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; opacity: .35; transition: opacity var(--dur-quick); }
+.focus-exit:hover, .focus-exit:focus-visible { opacity: 1; }
+.bp-tabs { display: flex; align-items: center; gap: 2px; padding: 8px 8px 0; border-bottom: 1px solid var(--line); }
+.bp-tabs [role="tab"] { border: 0; display: inline-flex; gap: 6px; align-items: center; padding: 8px 10px; background: none; font: 500 13px var(--ui); color: var(--ink-2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.bp-tabs [role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.bp-x { margin-left: auto; border: 0; background: none; font-size: 18px; color: var(--ink-3); cursor: pointer; padding: 4px 8px; } .bp-x:hover { color: var(--ink); }
+.bfull .bpanel .bshelf { position: static; width: auto; border-radius: 0; box-shadow: none; background: none; min-height: 0; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.bfull .bpanel .bshelf .sh-s { margin-top: 12px; }
 .np-grid { display: grid; grid-template-columns: 190px minmax(0, 700px) minmax(0, 1fr); gap: 0 48px; margin-top: 18px; }
 .np.with-details .np-grid { grid-template-columns: 170px minmax(0, 660px) 300px; }
 .np-outline { position: sticky; top: 24px; align-self: start; padding-top: 96px; display: grid; gap: 1px; }
@@ -6033,7 +6051,7 @@ function tileHTML(t, on) {
 }
 function shelfHTML(b) {
   const on = new Set(b.pl.map(p => p.ref)), tab = S.shtab || "all", list = shelfItems(S.shq, tab);
-  return `<aside class="bshelf" aria-label="Your Commonplace" data-ph="B1"><div class="sh-h"><b>Your Commonplace</b><button class="button button-link" type="button" data-act="shelf" title="Hide the shelf">Hide</button></div>
+  return `<aside class="bshelf" aria-label="Your Commonplace" data-ph="B1">
     <label class="sh-s">${SVG.search}<input id="shq" type="search" placeholder="Search to place…" value="${esc(S.shq || "")}"></label>
     <div class="sh-tabs">${SHELF_TABS.map(([k, t]) => `<button type="button" data-act="shtab" data-k="${k}" aria-pressed="${tab === k}">${t}</button>`).join("")}</div>
     <div class="sh-list">${list.map(t => tileHTML(t, on.has(t.ref))).join("") || `<p class="small">Nothing matches.</p>`}</div><p class="small sh-foot">Drag onto the board, or click to place in the middle. Double-click empty board to search there.</p></aside>`;
@@ -6112,16 +6130,15 @@ function drawerHTML(b) {
 }
 function renderBoard() {
   const b = I(S.board) || boards()[0]; S.board = b.id;
-  if (S.shelf == null) S.shelf = innerWidth > 1100;
   if (S.panel == null) S.panel = innerWidth > 900;
+  const ptab = S.ptab || "learn";
   const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click empty board to search and place · drag from the shelf · drag a blue dot to connect";
   const stops = stopsOf(b), d = stops.filter(k => st(k, "question").status === "answered").length;
   return `<h1 class="visually-hidden">${esc(b.title)}</h1><div class="bwrap${S.panel ? " has-panel" : ""}" data-ph="B1"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>${qpHTML()}</div>
     <div class="btop"><button class="btop-back" type="button" data-act="back" title="Back" aria-label="Back">←</button><div class="btop-t"><p class="ip-kicker">Board</p><b>${esc(b.title)}</b></div><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
-    <div class="bright"><label data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="shelf" aria-pressed="${!!S.shelf}">Your Commonplace</button><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and arrows; your notes become its check.">Make a Lumen</button><button class="button button-quiet" type="button" data-act="bpanel" aria-pressed="${!!S.panel}">◎ Learning</button></div>
-    <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" aria-pressed="${!!S.shelf}" title="Your Commonplace shelf (+)" aria-label="Your Commonplace shelf">+</button></div>
-    ${S.shelf ? shelfHTML(b) : ""}
-    ${S.panel ? `<div class="bpanel"><div class="bp-h"><b>Learning on this board</b><button class="button button-link" type="button" data-act="bpanel">Hide</button></div>${pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Learning</button>`}
+    <div class="bright"><label data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and links; your notes become its check.">Make a Lumen</button><button class="button button-quiet" type="button" data-act="bpanel" aria-pressed="${!!S.panel}" title="Show or hide the side panel">Panel</button><button class="button" type="button" data-act="bfocus" title="Focus: hide everything but the board (F)" data-ph="LB4">⤢ Focus</button></div>
+    <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" aria-pressed="${S.panel && ptab === "shelf"}" title="Your Commonplace (+)" aria-label="Your Commonplace">+</button></div>
+    ${S.panel ? `<div class="bpanel"><div class="bp-tabs" role="tablist"><button role="tab" type="button" data-act="ptab" data-k="learn" aria-selected="${ptab === "learn"}">${ring(d, stops.length, 18)} Learning</button><button role="tab" type="button" data-act="ptab" data-k="shelf" aria-selected="${ptab === "shelf"}" data-ph="B1">Your Commonplace</button><button class="bp-x" type="button" data-act="bpanel" aria-label="Hide the panel" title="Hide the panel">×</button></div>${ptab === "shelf" ? shelfHTML(b) : pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Panel</button>`}
     ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
     <div class="bzoom"><button type="button" data-act="zoom" data-d="-1" aria-label="Zoom out">−</button><span>${Math.round(S.view.z * 100)}%</span><button type="button" data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button type="button" data-act="fit">Fit</button></div></div>`;
 }
@@ -6327,7 +6344,7 @@ function renderNote() {
     ${it.col ? prop("Collection", `<a class="entity-link" href="#" data-act="col" data-id="${it.col}">${esc(COL(it.col).name)}</a> <button class="button button-link" type="button">Move to collection</button>`) : ""}
     ${prop("Blocks", esc(blockSummary(bl)))}
     <div class="row rail-actions"><a class="btn-open-graph" href="#">Open in Loci →</a></div><div class="rail-delete-row"><button class="button button-link rail-delete" type="button">Delete…</button></div>`;
-  return `<div class="ipage np${S.details ? " with-details" : ""}"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">Long note</span>${apChip(it)}<span class="ip-saved" id="saved" aria-live="polite"></span><button class="button button-quiet np-dbtn" type="button" data-act="details" aria-pressed="${!!S.details}">Details</button><button class="ip-more" type="button" aria-label="Actions for this note">${SVG.ipmore}</button></div>
+  return `<div class="ipage np${S.details ? " with-details" : ""}"><div class="ip-top"><a class="ip-back" href="#" data-act="back"><span aria-hidden="true" class="ip-arrow">←</span><span class="visually-hidden">Back to </span>${esc(backLabel())}</a><span class="ip-crumb">Long note</span>${apChip(it)}<span class="ip-saved" id="saved" aria-live="polite"></span><button class="button button-quiet np-dbtn" type="button" data-act="nfocus" title="Focus: just your writing (Ctrl or ⌘ Shift F)" data-ph="N1">⤢ Focus</button><button class="button button-quiet np-dbtn" type="button" data-act="details" aria-pressed="${!!S.details}">Details</button><button class="ip-more" type="button" aria-label="Actions for this note">${SVG.ipmore}</button></div>
     <div class="np-grid"><nav class="np-outline" aria-label="Outline">${heads.length >= 2 ? `<p class="np-ol-h">On this page</p>${heads.map(h => `<button type="button" class="${h.b.t}" data-act="olgo" data-i="${h.i}">${esc(plainText(h.b.text))}</button>`).join("")}` : ""}</nav>
       <article class="np-doc" data-ph="N1"><p class="ip-kicker">Long note${it.col ? ` · ${esc(COL(it.col).name)}` : ""}</p>${ipTitle(it.title)}
         <div class="np-meta">${ab ? `<span class="np-about" data-ph="N3">About <button class="entity-pill obj" type="button" data-act="open" data-id="${ab.id}">${esc(ab.title)}</button></span>` : `<button class="addv" type="button" data-act="aboutpick" data-ph="N3">+ What is it about?</button>`}${it.topics.map(t => `<span class="np-topic"><span class="dot s${t.s}"></span>${esc(t.n)}</span>`).join("")}<span class="np-count">${refs.length ? `${refs.length} entr${refs.length > 1 ? "ies" : "y"} · ` : ""}${ng ? `◎ ${ng} · ` : ""}${nq ? `? ${nq} · ` : ""}Saved as you type</span></div>
@@ -6429,6 +6446,7 @@ function blockMenu(i) {
   return h;
 }
 function edKey(e, el) {
+  if ((e.key === "Escape" && S.nfocus && !(pick && !$("#pick").hidden)) || ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f")) { e.preventDefault(); S.nfocus = e.key === "Escape" ? false : !S.nfocus; const i = +el.dataset.bi, off = caretOff(el); render(); focusBlock(i, off); return; }
   const i = +el.dataset.bi, bl = S.ed.blocks, b = bl[i];
   if (pick && !$("#pick").hidden) {
     const items = [...document.querySelectorAll("#pick [data-pk]")];
@@ -6474,6 +6492,8 @@ function render() {
   const m = $("#main");
   m.className = S.screen === "board" ? "bfull" : S.screen === "item" || S.screen === "note" ? "" : "library-page";
   document.body.classList.toggle("board-full", S.screen === "board");
+  const foc = (S.screen === "board" && S.bfocus) || (S.screen === "note" && S.nfocus);
+  document.body.classList.toggle("focus", !!foc);
   hidePick(); $("#selbar").hidden = true;
   if (S.screen === "item") m.innerHTML = renderItem();
   else if (S.screen === "note") m.innerHTML = renderNote();
@@ -6485,7 +6505,7 @@ function render() {
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
-  $("#wiz").innerHTML = wizHTML() + howHTML();
+  $("#wiz").innerHTML = wizHTML() + howHTML() + (document.body.classList.contains("focus") ? `<button class="focus-exit" type="button" data-act="${S.screen === "board" ? "bfocus" : "nfocus"}" title="Leave focus (${S.screen === "board" ? "F or " : ""}Esc)">Leave focus</button>` : "");
   if (S.jump) requestAnimationFrame(doJump);
 }
 /** The wall's masonry (use-masonry.ts): each card spans as many 8 px rows (plus the 12 px gap) as its height needs. */
@@ -6551,7 +6571,7 @@ function zoomAt(f, cx, cy) { const r = $("#vp").getBoundingClientRect(); cx ??= 
 function fit() {
   const b = I(S.board), vp = $("#vp"); if (!b || !vp) return;
   const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 30, y0 = Math.min(...ys) - 30, x1 = Math.max(...xs) + 340, y1 = Math.max(...ys) + 260;
-  const narrow = vp.clientWidth < 700, L = narrow ? 16 : S.shelf ? 356 : 76, R = narrow ? 16 : S.panel ? 352 : 24, T = narrow ? 120 : 76, B = 70;
+  const narrow = vp.clientWidth < 700, foc = S.bfocus, L = narrow || foc ? 24 : 76, R = narrow || foc ? 24 : S.panel ? 352 : 24, T = narrow ? 120 : foc ? 30 : 76, B = foc ? 30 : 70;
   const aw = Math.max(200, vp.clientWidth - L - R), ah = Math.max(200, vp.clientHeight - T - B);
   const z = Math.min(1, Math.max(narrow ? .45 : .55, Math.min(aw / (x1 - x0), ah / (y1 - y0))));
   S.view = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) }; applyView();
@@ -6623,10 +6643,13 @@ document.addEventListener("click", e => {
       else toast("Kept open. Try it as Watch or Listen, or write what's unclear in a note.");
       break; }
     case "pnote": { const l = I(S.playing?.lid), b = I(l.board), lp = b.pl.find(x => x.ref === "l:" + l.id), w = document.querySelector(`[data-pid="${lp.id}"]`)?.offsetWidth || 440, n0 = stopNotes(b, l.forQ).length, nid = "n" + Date.now(), n = note(nid, "notes", "", "", { topics: b.topics }); n.stop = l.forQ; D().items.unshift(n); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x: lp.x + w + 40, y: lp.y + n0 * 60 }); S.editing = "note:" + nid; S.focusEdit = true; render(); break; }
-    case "shelf": S.shelf = !S.shelf; if (S.shelf && innerWidth < 700) S.panel = false; render(); break;
-    case "bpanel": S.panel = !S.panel; if (S.panel && innerWidth < 700) S.shelf = false; render(); requestAnimationFrame(drawArrows); break;
+    case "shelf": if (S.panel && S.ptab === "shelf") S.panel = false; else { S.panel = true; S.ptab = "shelf"; } render(); requestAnimationFrame(drawArrows); break;
+    case "ptab": S.ptab = d.k; render(); break;
+    case "bfocus": S.bfocus = !S.bfocus; render(); requestAnimationFrame(() => { drawArrows(); }); if (S.bfocus) toast("Focus: just the board. F or Esc to come back."); break;
+    case "nfocus": S.nfocus = !S.nfocus; render(); if (S.nfocus) { focusBlock(S.ed?.blocks?.length ? S.ed.blocks.length - 1 : 0, "end"); toast("Focus: just your writing. Esc to come back."); } break;
+    case "bpanel": S.panel = !S.panel; render(); requestAnimationFrame(drawArrows); break;
     case "shtab": S.shtab = d.k; render(); break;
-    case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + vp.width / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
+    case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + (vp.width - (S.panel ? 340 : 0)) / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
     case "pathgo": { const b = I(S.board), nx = nextStop(b); if (!nx) break; const pid = pidOfKey(b, nx); centreOn(pid, Math.max(S.view.z, .9)); S.sel = pid; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${pid}"]`)?.classList.add("sel", "flash"); break; }
     case "precall": S.recallOpen = !S.recallOpen; render(); break;
     case "lansall": { const b = I(S.board), ks = stopsOf(b).filter(k => st(k, "question").status === "open" && !lumensFor(k).length); ks.forEach(k => makeLumen(b, k, "read")); render(); toast(`${ks.length} Lumens made, one beside each open stop. Nothing is marked answered until you say so.`); break; }
@@ -6812,12 +6835,15 @@ document.addEventListener("keydown", e => {
   if (t.dataset?.qedit && e.key === "Enter") { e.preventDefault(); t.blur(); return; }
   if (/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
   if (e.key === "Escape" && S.playing) { S.playing = null; render(); requestAnimationFrame(drawArrows); return; }
+  if (e.key === "Escape" && document.body.classList.contains("focus")) { if (S.screen === "board") S.bfocus = false; else S.nfocus = false; render(); requestAnimationFrame(drawArrows); return; }
+  if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f" && (S.screen === "board" || S.screen === "note")) { e.preventDefault(); if (S.screen === "board") S.bfocus = !S.bfocus; else S.nfocus = !S.nfocus; render(); requestAnimationFrame(drawArrows); return; }
   if (e.key === "Escape") { closeMenu(); if (!$("#apop").hidden) closeApop(); if (S.drawer) { S.drawer = false; render(); } }
   if (e.key === "/" && S.screen === "wall") { e.preventDefault(); $("#q")?.focus(); }
   if (S.screen === "board") {
     const k = e.key.toLowerCase();
+    if (k === "f" && !e.metaKey && !e.ctrlKey) { S.bfocus = !S.bfocus; render(); requestAnimationFrame(drawArrows); return; }
     if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
-    else if (e.key === "+") { S.shelf = !S.shelf; render(); } else if (k === "0") fit();
+    else if (e.key === "+") { if (S.panel && S.ptab === "shelf") S.panel = false; else { S.panel = true; S.ptab = "shelf"; } render(); } else if (k === "0") fit();
     else if ((e.key === "Delete" || e.key === "Backspace") && S.sel) { const b = I(S.board); b.pl = b.pl.filter(p => p.id !== S.sel); b.arrows = b.arrows.filter(a => a.from !== S.sel && a.to !== S.sel); S.sel = null; render(); toast("Removed from the board. It's still in your Commonplace."); }
   }
 });

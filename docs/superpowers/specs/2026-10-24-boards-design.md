@@ -348,13 +348,13 @@ flowchart LR
 - **The board fills the whole stage**, edge to edge beside the app's rail; on a phone, everything under the phone's top bar. Commonplace's header, tabs and page margins step aside while a board is open, and **←** goes back.
 - **Everything else floats on the canvas** as rounded panels with the app's float shadow:
   - **top left:** ← and the board's title and place;
-  - **top right:** *Field links*, **Your Commonplace** (the shelf), **Make a Lumen** and **◎ Learning** (the panel);
-  - **left edge, centred:** the tools (↖ select, ✎ note, ? question, + shelf);
-  - **left:** the shelf;
-  - **right:** *Learning on this board*. Hidden, it leaves a small chip with the ring ("0 of 2 stops · Learning");
+  - **top right:** *Field links*, **Make a Lumen**, **Panel** and **⤢ Focus**;
+  - **left edge, centred:** the tools (↖ select, ✎ note, ? question, + Your Commonplace);
+  - **right:** one side panel with two tabs, **Learning** (with its ring) and **Your Commonplace** (the shelf), and × to hide it. Hidden, it leaves a small chip with the ring ("0 of 2 stops · Panel"). **+** and the + key open it on *Your Commonplace*;
   - **bottom right:** zoom and Fit;
   - **bottom centre:** the hint.
-- **The canvas runs under the panels**, and **Fit** frames the cards in the space between them. Panels open by default on wide screens and hide with one tap. On a phone, the shelf and the panel open as sheets from the bottom, one at a time, and the tools move to the bottom.
+- **The canvas runs under the panels**, and **Fit** frames the cards in the space between them. The panel opens by default on wide screens and hides with one tap. On a phone, it opens as a sheet from the bottom, and the tools move to the bottom.
+- **Focus mode** (**⤢ Focus**, or F): everything but the canvas steps aside: the app's rail, the title, the panel, the tools, zoom and the hint. Only a faint **Leave focus** stays in the corner, and F or Esc brings everything back. Pan, zoom, double-click to place and drag dots to link all still work. **Fit** uses the whole screen.
 
 ### 7.5 Placing things: double-click to search, or drag from the shelf
 
@@ -366,7 +366,7 @@ This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever y
   - the last two rows are always **New note: "…"** and **New question: "…?"**, made from what you typed.
   
   ↑ ↓ choose, Enter places it at that spot, Esc closes. With nothing typed, the two *New* rows come first. Something already on the board isn't placed twice: the board shows where it is.
-- **The shelf: Your Commonplace**, on the left, always open on wide screens (hidden with **Hide**, shown with **+** or **Your Commonplace**):
+- **The shelf: Your Commonplace**, a tab of the side panel, beside *Learning* (opened with **+** or the + key):
   - a search box and kind chips (*All · Objects · Notes · Sources · Photos · Questions*);
   - visual tiles: photos show their picture; Objects their kind and card line; notes and quotes their words; questions as amber tiles;
   - **drag a tile onto the board** to place it where you drop it, or click to place it in the middle;
@@ -433,3 +433,5 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB-D8** | Placing is a double-click search at the spot, or a drag from the visual shelf; the Add drawer goes | **Yes** |
 | **LB-D9** | A board opens as one full-screen, infinite canvas, with its title, tools, shelf, panel and zoom floating on it | **Yes**: like Miro, never a box inside a page |
 | **LB-D10** | Board links are just a line and a backlink, with an optional label; the fixed word list and *why* go | **Yes**: simple, like Miro and Scrintal |
+| **LB-D11** | The shelf is a tab of the one side panel, beside Learning; the left side stays clear | **Yes** |
+| **LB-D12** | A board has a **Focus mode** that hides everything but the canvas (F or Esc) | **Yes** |
