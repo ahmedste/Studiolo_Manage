@@ -1,0 +1,162 @@
+/* Routines (prototype, version 4). On the app's own tokens (captured from studiolo): --paper, --panel, --line, --rule,
+   --ink, --ink-2, --ink-3, --accent, --accent-soft, --warn, --warn-soft, --board, --read, --ui, --focus-ring.
+   Layout: a quiet list beside the Loci chat on a desktop; the list alone on a phone, with the Loci bar at the foot
+   opening the chat as a sheet. Every tappable word is underlined; nothing else in a sentence is. */
+
+.rc-page { padding: 0 0 120px; min-width: 0; }
+.rc-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 32px; align-items: start; padding-top: 24px; }
+.rc-main { display: grid; gap: 28px; min-width: 0; align-content: start; }
+.rc-intro { display: grid; gap: 4px; }
+.rc-k { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); }
+.rc-note { margin: 0; font-size: 12px; color: var(--ink-3); }
+
+/* the one place for what needs you */
+.rc-waitbar { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; padding: 12px 16px; border: 1px solid var(--accent); background: var(--accent-soft); min-width: 0; }
+.rc-waitbar[data-empty] { cursor: default; border-color: var(--line); background: var(--panel); color: var(--ink-3); font-size: 13px; }
+.rc-waitbar b { font-weight: 600; font-size: 14px; }
+.rc-waitwhat { flex: 1 1 200px; min-width: 0; font-size: 13px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-waitbar em { font-style: normal; font-size: 13px; font-weight: 600; color: var(--accent); }
+.rc-waitbar:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.rc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.rc-waitbar[data-pulse] { animation: rc-pulse 0.5s ease 3; }
+@keyframes rc-pulse { 50% { box-shadow: 0 0 0 4px var(--accent-soft); } }
+.rc-wait { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--accent); background: var(--accent-soft); }
+.rc-wait-h { display: flex; justify-content: space-between; align-items: baseline; }
+.rc-wait-h h2 { margin: 0; font-family: var(--read); font-size: 19px; font-weight: 500; }
+.rc-w { display: grid; gap: 6px; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); min-width: 0; }
+.rc-wt { font-family: var(--read); font-size: 17px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+.rc-w p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.rc-wfile { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 13.5px; }
+.rc-sel { width: auto; max-width: 100%; padding: 5px 8px; font-size: 13px; }
+.rc-make { all: unset; cursor: pointer; justify-self: start; font-size: 13px; font-weight: 600; color: var(--accent); }
+.rc-make:hover { text-decoration: underline; }
+.rc-make:focus-visible { outline: var(--focus-ring); }
+.rc-pile { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid var(--line); font-size: 13.5px; }
+.rc-pile b { font-weight: 600; }
+
+/* the groups and the list */
+.rc-group { display: grid; gap: 8px; min-width: 0; }
+.rc-group-h { display: flex; flex-wrap: wrap; gap: 2px 12px; align-items: baseline; }
+.rc-group-h h2 { margin: 0; font-family: var(--read); font-size: 20px; font-weight: 500; }
+.rc-group-h span { font-size: 12.5px; color: var(--ink-3); }
+.rc-list { display: grid; border-top: 1px solid var(--line); }
+.rc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0 12px; padding: 14px 4px 12px; border-bottom: 1px solid var(--line); min-width: 0; transition: background 0.3s ease; }
+.rc-row[data-off] .rc-say, .rc-row[data-off] .rc-name { color: var(--ink-3); }
+.rc-row[data-flash] { background: var(--accent-soft); }
+.rc-ico { display: grid; place-items: center; width: 26px; height: 26px; margin-top: 1px; color: var(--ink-3); }
+.rc-n { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); font-size: 11.5px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rc-body { display: grid; gap: 4px; min-width: 0; }
+.rc-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.rc-name { all: unset; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; font-size: 14px; font-weight: 600; color: var(--ink); }
+.rc-name:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.rc-caret { font-size: 10px; color: var(--ink-3); }
+.rc-sw { gap: 0; }
+.rc-say { margin: 0; font-family: var(--read); font-size: 16px; line-height: 1.55; color: var(--ink-2); overflow-wrap: anywhere; }
+.rc-meta { margin: 0; font-size: 12.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: baseline; }
+.rc-meta .rc-chip { font-family: var(--ui); font-size: 12.5px; color: var(--ink-2); }
+
+/* a tappable word */
+.rc-chip { all: unset; cursor: pointer; color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; border-radius: 2px; }
+.rc-chip:hover { background: var(--accent-soft); }
+.rc-chip:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+.rc-reads { color: var(--ink); }
+:root[data-builder] .rc-reads { text-decoration: underline dotted var(--warn); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+/* a routine, opened */
+.rc-detail { display: grid; gap: 10px; margin-top: 8px; }
+.rc-lately { display: grid; gap: 4px; }
+.rc-late { display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; font-size: 13px; }
+.rc-late b { font-weight: 600; }
+.rc-late span { color: var(--ink-2); }
+.rc-acts { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-left: -5px; }
+.rc-try { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); background: var(--panel); font-size: 13px; }
+.rc-try p { margin: 0; color: var(--ink-2); }
+.rc-try p b { color: var(--ink); font-weight: 600; }
+.rc-try ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+.rc-try li { display: grid; gap: 0; }
+.rc-try li b { font-weight: 600; }
+.rc-try li span { color: var(--ink-2); font-size: 12.5px; }
+.rc-builder { margin: 0; padding: 6px 10px; border-left: 2px solid var(--warn); background: var(--warn-soft); font-size: 12.5px; color: var(--ink-2); }
+.rc-builder b { color: var(--ink); }
+
+/* the popover: choices for one word */
+.rc-pop { position: fixed; z-index: 80; width: 280px; max-width: calc(100vw - 24px); max-height: 300px; overflow: auto; display: grid; gap: 2px; padding: 10px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-lift); border-radius: 4px; }
+.rc-pop .rc-k { padding: 0 6px 4px; }
+.rc-opt { all: unset; box-sizing: border-box; cursor: pointer; display: flex; gap: 8px; align-items: center; width: 100%; padding: 7px 8px; border-radius: 3px; font-size: 13.5px; color: var(--ink); }
+.rc-opt::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.rc-opt[aria-pressed="true"]::before { background: var(--accent); box-shadow: inset 0 0 0 3px var(--paper), 0 0 0 1.5px var(--accent); }
+.rc-opt:hover { background: var(--panel); }
+.rc-opt:focus-visible { outline: var(--focus-ring); outline-offset: -2px; }
+.rc-opt[disabled] { opacity: 0.45; cursor: default; }
+.rc-pop .sm-input { width: 100%; box-sizing: border-box; }
+.rc-pop .sm-row { margin-top: 6px; }
+.rc-poptime { display: flex; gap: 8px; align-items: center; padding: 8px 8px 2px; font-size: 13px; }
+.rc-poptime .sm-input { width: auto; }
+
+/* the Loci chat */
+.rc-chat { position: sticky; top: 16px; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: calc(100vh - 140px); min-height: 460px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.rc-chat-h { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.rc-chat-h b { display: block; font-family: var(--read); font-size: 18px; font-weight: 500; }
+.rc-chat-h span { font-size: 12px; color: var(--ink-3); }
+.rc-chat-close { display: none; }
+.rc-msgs { overflow: auto; padding: 14px; display: grid; gap: 14px; align-content: start; }
+.rc-loci { display: grid; gap: 8px; }
+.rc-loci > p { margin: 0; }
+.rc-chips { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--ui); }
+.rc-answer { white-space: normal; text-align: left; padding: 5px 11px; font-size: 12.5px; line-height: 1.35; border-radius: 13px; }
+.rc-answer[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.rc-answer[aria-pressed="false"] { color: var(--ink-3); text-decoration: line-through; }
+.rc-tick { width: 9px; height: 9px; border-radius: 2px; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.rc-answer[aria-pressed="true"] .rc-tick { background: var(--accent); box-shadow: none; }
+.rc-draft { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--accent); background: var(--paper); font-family: var(--ui); }
+.rc-draft[data-snap] { border-color: var(--line); opacity: 0.75; }
+.rc-draft[data-snap] u { text-decoration-color: var(--line); }
+.rc-dname { font-family: var(--read); font-size: 17px; font-weight: 500; }
+.rc-draft .rc-say { font-size: 15px; }
+.rc-draft .rc-try { background: var(--panel); }
+.rc-typing { display: flex; gap: 4px; padding: 4px 0; }
+.rc-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); animation: rc-dots 1s ease-in-out infinite; }
+.rc-typing i:nth-child(2) { animation-delay: 0.15s; }
+.rc-typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes rc-dots { 50% { opacity: 0.25; transform: translateY(-2px); } }
+.rc-input { display: grid; gap: 6px; padding: 10px; border-top: 1px solid var(--line); background: var(--panel); }
+.rc-ctx { justify-self: start; display: inline-flex; gap: 6px; align-items: center; padding: 2px 4px 2px 9px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; }
+.rc-ctx button { all: unset; cursor: pointer; padding: 0 5px; font-size: 14px; line-height: 1; }
+.rc-box { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; padding: 8px 8px 8px 10px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule, var(--line)); border-radius: 10px; }
+.rc-box:focus-within { box-shadow: inset 0 0 0 1px var(--ink-3); }
+.rc-box textarea { all: unset; box-sizing: border-box; width: 100%; min-height: 40px; max-height: 120px; font-family: var(--ui); font-size: 14px; line-height: 1.45; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.rc-box textarea::placeholder { color: var(--ink-3); }
+.rc-send { all: unset; cursor: pointer; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--on-ink); }
+.rc-send:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+
+/* phone: the list, the Loci bar, and the chat as a sheet */
+.rc-bar { display: none; }
+@media (max-width: 900px) {
+  .rc-layout { grid-template-columns: minmax(0, 1fr); }
+  .rc-chat { display: none; }
+  .rc-chat.is-open { display: grid; position: fixed; inset: 0; z-index: 75; height: auto; min-height: 0; border: 0; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .rc-chat-close { display: inline-flex; }
+  .rc-bar { all: unset; box-sizing: border-box; cursor: pointer; position: fixed; z-index: 60; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(66px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 16px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--rule, var(--line)), var(--shadow-lift); border-radius: 22px; font-size: 14px; color: var(--ink-3); }
+  .rc-bar i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--on-ink); }
+  .rc-bar:focus-visible { outline: var(--focus-ring); }
+  .rc-proto { top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto !important; right: 8px; }
+}
+
+/* prototype controls sit bottom-left on a desktop, clear of the chat */
+@media (min-width: 901px) { .rc-proto { right: auto; left: calc(76px + env(safe-area-inset-left, 0px)); } .rc-sendpop { right: auto; left: calc(76px + env(safe-area-inset-left, 0px)); } }
+
+/* the prototype's Send something menu */
+.rc-sendpop { position: fixed; z-index: 81; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); width: 320px; max-width: calc(100vw - 24px); display: grid; gap: 2px; padding: 10px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-lift); border-radius: 4px; }
+.rc-sendpop .rc-opt::before { display: none; }
+.rc-sendpop .rc-note { padding: 6px 8px 0; }
+@media (max-width: 900px) { .rc-sendpop { top: calc(56px + env(safe-area-inset-top, 0px)); bottom: auto; right: 8px; } }
+
+/* Today */
+.rc-today { display: grid; gap: 10px; margin: 28px 0; }
+.rc-todaycard { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+.rc-todaycard b { font-family: var(--read); font-size: 17px; font-weight: 500; line-height: 1.35; }
+.rc-todaycard em { font-style: normal; font-size: 13px; font-weight: 600; color: var(--accent); }
+.rc-todaycard:hover { border-color: var(--ink-3); }
+.rc-todaycard:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+
+@media (prefers-reduced-motion: reduce) { .rc-typing i, .rc-waitbar[data-pulse] { animation: none; } .rc-row { transition: none; } }
