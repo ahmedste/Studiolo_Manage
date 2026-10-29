@@ -1,10 +1,19 @@
-# Routines (version 7): a Commonplace tab, a page and an editor for each routine, and Finds
+# Routines (version 8): a Loci place, a flow editor of a trigger and steps, Finds and Connections
 
-Routines is a tab of Commonplace, next to **Questions and goals**, and looks like it. The card language is the one designed for questions and goals in another session ([`prototypes/objects-boards-questions/`](https://github.com/ahmedste/Studiolo_Manage/tree/claude/gifted-cerf-w0cwoi/prototypes/objects-boards-questions) on branch `claude/gifted-cerf-w0cwoi`, Questions and goals design §10). Each routine has its own page and its own editor, and the Loci panel on the right is the app's own.
+Routines now live under **Loci**, in its own place in the rail after Graph (on a phone, a fifth tab): *Loci / Routines · Finds · Waiting · Activity · Connections*. Commonplace keeps its own tabs. The card language is the one designed for questions and goals in another session ([`prototypes/objects-boards-questions/`](https://github.com/ahmedste/Studiolo_Manage/tree/claude/gifted-cerf-w0cwoi/prototypes/objects-boards-questions) on branch `claude/gifted-cerf-w0cwoi`, Questions and goals design §10). Each routine has its own page and its own editor, and the Loci panel on the right is the app's own.
 
-- **The tab:**
+**New in version 8:**
+- **A flow editor,** as in Zapier: the trigger (*When*), then steps (*Only if*, *Loci*, *Then*, *Before it files*), joined by a line with a **+** between them. Click a card to open its settings; **×** removes a step.
+- **Pick a trigger:** "apps" in five groups: *Send to Studiolo* (WhatsApp, Email, Phone share, Browser, Anywhere), *Watch sources* (websites and journals, newsletters, YouTube), *On a schedule*, *In Studiolo* (Finish a Lumen, Save something twice) and *Connected apps* (Zotero, Readwise, Google Drive, Raindrop, Calendar: soon).
+- **A cost line** under the title: a share of the learner's monthly allowance (dollars in Builder view).
+- **Step by step** on a routine's page shows the flow read-only; clicking a step opens the editor there.
+- **Connections:** every way in, the sources you watch, and the apps to come.
+
+How it would run, on what, and at what cost per user: [`docs/superpowers/specs/2026-10-29-routines-system-and-cost-study.md`](../../docs/superpowers/specs/2026-10-29-routines-system-and-cost-study.md), with the cost model in [`routines-study/cost-model.mjs`](../../routines-study/cost-model.mjs).
+
+- **The Routines tab:**
   - four tiles: routines on, waiting for you, new finds, filed this week;
-  - a bar: *Routines · Finds · Waiting · Activity*, kind chips, and **New routine**;
+  - a bar: kind chips and **New routine** (Finds, Waiting, Activity and Connections are tabs of the Loci header);
   - cards in three groups: *When I send something*, *On a schedule*, *After I do something*.
 - **A card** is the same family as a goal card:
   - a top line: the accent when on, amber when something waits for you, grey when paused;
@@ -23,14 +32,15 @@ Routines is a tab of Commonplace, next to **Questions and goals**, and looks lik
   - what it would do with your last 20 things;
   - *Pause it · Duplicate · Delete routine*.
 - **The editor** (Edit, New routine, or *Edit in full* on a draft Loci made):
-  - five numbered sections: *When it starts · What Loci does with it · Where it goes · Before it files · Name*;
-  - a live **It will…** sentence at the top, with how many of your last 20 things it would have caught;
+  - the name, typed at the top;
+  - a live **It will…** sentence, with how many of your last 20 things it would have caught, and the cost line;
+  - the flow: the trigger card, then the step cards, with **+** between them;
   - **Save changes** or **Turn it on**.
 
-  Save stays off until the routine has a kind or a condition, so a routine can't catch everything by mistake. Schedules get *What it does · When it runs · What it brings you · Name*.
+  Save stays off until the routine has a kind or a condition, so a routine can't catch everything by mistake. Schedules get *What it does · When it runs · What it brings you* as their steps.
 - **New routine** offers three ways in:
   - **Tell Loci**;
-  - **Set it up yourself** (pick what starts it, then the form);
+  - **Set it up yourself** (pick a trigger, then add steps);
   - **one of six templates**.
 - **Finds** is a routine kind that checks sources and brings what's new to a page, for example *AI in architecture*, every morning.
   - Each run gets a **Finds page**: a top pick, then finds grouped by topic.
@@ -44,7 +54,7 @@ Design: [`docs/superpowers/specs/2026-10-29-routines-chat-ux-design.md`](../../d
 
 It's built on **Studiolo's real shell, Library and Today screens and styles**, captured read-only from `studiolo` (`../live-lumens/capture/snap.json`). Two parts come from the newer app.css used by the Questions and goals prototype: the segmented bar and the amber "needs you" colour. The sample learner, Layla, is an architect working on a prayer hall in Dubai. "Now" is Monday 26 October, 8:10.
 
-Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#waiting`, `#activity`, `#new`, `#everything`, `#today`.
+Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#waiting`, `#activity`, `#connections`, `#new`, `#everything`, `#today`.
 
 ## Try it
 
@@ -57,13 +67,13 @@ Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#w
    - Press **Stop asking, file on its own** under the ring.
    - Move it up or down the line.
    - Press **Why?** on a Lately item: Loci explains it on the right.
-3. **Edit it.** Press **Edit**.
-   - Change *Mark it* or add a condition (*+ has a tag*) and watch **It will…** change.
+3. **Edit it.** Press **Edit**, or click a card under *Step by step* on its page.
+   - Open the *Then* card and change *Mark it*, or press **+** and add *Tell me on WhatsApp*: watch **It will…** and the cost line change.
    - Then **Save changes**, and use **Undo** in the toast.
    - Or type *ask me first* to Loci while the form is open: Loci changes the form, not the routine.
-4. **New routine → Set it up yourself → When I send something.**
+4. **New routine → Set it up yourself.** Pick the *Email* trigger.
    - **Turn it on** is off until you choose a kind.
-   - Choose *Email* and *PDF*, then *+ Sum it up in three lines*, then a topic, then **Turn it on**. You land on its page.
+   - Choose *PDF* in the *Only if* card, press **+** and add *Sum it up*, choose a topic, then **Turn it on**. You land on its page.
 5. **New routine → a template** (*Morning review*): change the day and time, then **Turn it on**.
 6. **Tell Loci instead.** Type *When I send a reel from Instagram, save the links in its caption* and answer two questions.
    - A **draft card** appears in the grid, with **Edit** and **Turn it on**.
@@ -85,7 +95,8 @@ Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#w
    - *How do routines work?*
 10. **Waiting** (tile or bar): file the book, decide on the To read pile. **Send something…** → *a blog post on Japanese joinery*, then **Make a routine for things like this**: the form opens with the kind and the site filled in.
 11. **Activity:** the log, with *Undo* on anything just filed.
-12. **Builder** marks what needs Loci to read the item, and **Today** shows one card. On a phone, the page fills the screen and Loci is a sheet from the foot.
+12. **Connections** (a Loci tab): the ways in, the sources you watch (one has gone quiet), and the apps to come.
+13. **Builder** marks what needs Loci to read the item and shows each routine's cost in dollars, and **Today** shows one card. On a phone, the page fills the screen and Loci is a sheet from the foot.
 
 ## Real or simulated
 
@@ -93,7 +104,8 @@ Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#w
 - *What it would do* and the editor's count use the prototype's real matcher on 20 example arrivals.
 - Nothing is sent or received; *Send something…* simulates arrivals.
 - Every find is an example: no source is fetched. Sources are named generically, so no real publication is credited with an invented article.
-- Only the *Everything* and *Routines* tabs of Commonplace are in the prototype.
+- Only the *Everything* tab of Commonplace is in the prototype. Connected apps and the *soon* triggers can't be picked.
+- Costs are estimates from the cost model, not measured.
 - Book titles are real; links, reels and articles are examples.
 - Everything resets on reload.
 

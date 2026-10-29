@@ -64,7 +64,8 @@
   const FILE_AS = ["Site photos", "Renders", "Precedents", "Books", "Papers", "Articles", "Videos", "Tools", "Specifications", "Notes", "Recipes"];
   const UND = { describe: "describe it", transcribe: "write out what I said", title: "give it a title", links: "save the links in its caption", book: "find the book", text: "pull out the text", summary: "sum it up in three lines", recipe: "keep just the recipe" };
   const UND_VERB = { describe: "Describe it", transcribe: "Write out what I said", links: "Keep the links in its caption", book: "Find the book", summary: "Sum it up in three lines", recipe: "Keep just the recipe" };
-  const LRN = { questions: "turn my questions into @questions", review: "add it to Review" };
+  const LRN = { questions: "turn my questions into @questions", review: "add it to Review", lumen: "offer to make a Lumen from it" };
+  const LRN_VERB = { questions: "Turn my questions into @questions", lumen: "Offer to make a Lumen from it" };
   const COND_LABEL = { tag: "Has the tag", site: "From the site", words: "Mentions", is: "Loci reads that it's", about: "Is about" };
   const COND_ADD = { tag: "has a tag", site: "from a site", words: "mentions words", is: "Loci reads what it is", about: "is about a topic" };
   const DELAY_WAIT = { "the next day": "Waits a day", "three days later": "Waits three days", "a week later": "Waits a week" };
@@ -355,6 +356,9 @@
     fold: '<path d="m6 9 6 6 6-6"/>',
     back: '<path d="m14.5 6-6 6 6 6"/>',
     search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+    filter: '<path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"/>',
+    check: '<path d="M12 3 4.5 6v5.5c0 4.4 3.2 8.2 7.5 9.5 4.3-1.3 7.5-5.1 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7L11.5 6.8"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>',
     doc: '<path d="M7 3.5h7l4 4v12.5a.5.5 0 0 1-.5.5h-10.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M9.5 12h5M9.5 15.5h5"/>',
     book: '<path d="M3.5 6c3-1.5 5.5-1.5 8.5 0v13c-3-1.5-5.5-1.5-8.5 0zM20.5 6c-3-1.5-5.5-1.5-8.5 0v13c3-1.5 5.5-1.5 8.5 0z"/>',
     play: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m10.5 9.5 4 2.5-4 2.5z"/>',
@@ -371,10 +375,16 @@
   const stBtn = (r) => `<button type="button" class="st ${r.on ? "active" : "paused"}" data-act="chip" data-r="${r.id}" data-f="onoff" aria-label="${r.on ? "On" : "Paused"}: change">${r.on ? "On" : "Paused"} ▾</button>`;
 
   /* ================================================================ the page header: a Commonplace tab */
+  // Routines live under Loci: what Loci does for you. Commonplace keeps its own tabs; Finds and Waiting also reach Today.
   function header(tab, crumb) {
-    const tabs = [["everything", "Everything"], ["collections", "Collections"], ["toread", "To read"], ["qg", "Questions and goals"], ["templates", "Templates"], ["routines", "Routines"]];
-    return `<header class="destination-header"><div class="destination-crumb"><strong>Commonplace</strong>${crumb.map((c) => `<i aria-hidden="true">/</i><span>${esc(c)}</span>`).join("")}</div>
-      <nav aria-label="Commonplace sections" class="destination-tabs">${tabs.map(([k, l]) => `<a class="destination-tab" href="#${k}" data-act="dtab" data-v="${k}"${tab === k ? ' aria-current="page"' : ""}>${l}${k === "routines" && W.length ? `<span class="rx-count" title="${plural(W.length, "thing")} waiting">${W.length}</span>` : ""}</a>`).join("")}</nav></header>`;
+    if (tab === "everything") {
+      const tabs = [["everything", "Everything"], ["collections", "Collections"], ["toread", "To read"], ["qg", "Questions and goals"], ["templates", "Templates"]];
+      return `<header class="destination-header"><div class="destination-crumb"><strong>Commonplace</strong>${crumb.map((c) => `<i aria-hidden="true">/</i><span>${esc(c)}</span>`).join("")}</div>
+        <nav aria-label="Commonplace sections" class="destination-tabs">${tabs.map(([k, l]) => `<a class="destination-tab" href="#${k}" data-act="dtab" data-v="${k}"${tab === k ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav></header>`;
+    }
+    const tabs = [["routines", "Routines", null], ["finds", "Finds", newFinds()], ["waiting", "Waiting", W.length], ["activity", "Activity", null], ["connections", "Connections", null]];
+    return `<header class="destination-header"><div class="destination-crumb"><strong>Loci</strong>${crumb.map((c) => `<i aria-hidden="true">/</i><span>${esc(c)}</span>`).join("")}</div>
+      <nav aria-label="Loci sections" class="destination-tabs">${tabs.map(([k, l, n]) => `<a class="destination-tab" href="#${k}" data-act="seg" data-v="${k}"${S.seg === k && !S.edit && !S.newer && !S.open && !S.issue ? ' aria-current="page"' : S.seg === k ? ' aria-current="true"' : ""}>${l}${n ? `<span class="rx-count${k === "finds" ? " acc" : ""}">${n}</span>` : ""}</a>`).join("")}</nav></header>`;
   }
 
   /* ================================================================ the Routines tab: tiles, the bar, cards */
@@ -391,9 +401,8 @@
   }
   function bar() {
     const n = (t) => ROUTINES.filter((r) => r.type === t).length;
-    const segs = [["routines", "Routines", ROUTINES.length], ["finds", "Finds", newFinds()], ["waiting", "Waiting", W.length], ["activity", "Activity", null]];
     const kinds = [["all", "All kinds"], ["arrive", `When I send · ${n("arrive")}`], ["schedule", `On a schedule · ${n("schedule")}`], ["after", `After I do something · ${n("after")}`]];
-    return `<div class="cph-bar rx-bar"><div class="cph-seg" role="group" aria-label="Show">${segs.map(([k, l, c]) => `<button type="button" data-act="seg" data-v="${k}" aria-pressed="${S.seg === k}">${l}${c != null ? `<span class="n${k === "waiting" && c ? " rx-hot" : k === "finds" && c ? " rx-acc" : ""}">${c}</span>` : ""}</button>`).join("")}</div>
+    return `<div class="cph-bar rx-bar">
       ${S.seg === "routines" ? `<div class="qg-topics" role="group" aria-label="Kind">${kinds.map(([k, l]) => `<button type="button" data-act="kind" data-v="${k}" aria-pressed="${S.kind === k}">${l}</button>`).join("")}${S.only === "paused" ? `<button type="button" data-act="tile" data-v="on" aria-pressed="true">Paused only ×</button>` : ""}</div>` : ""}
       <span class="rx-grow"></span><button type="button" class="button rx-new" data-act="new">${svg("plus")}New routine</button></div>`;
   }
@@ -506,6 +515,24 @@
   }
   function openIssue(id, from) { S.issue = id; S.issueFrom = from || S.open || "finds"; S.open = null; S.edit = null; S.newer = false; S.findNo = null; S.ptab = "this"; S.pop = null; C.resetScroll = true; }
 
+  /* ================================================================ Connections: where things come from (the "apps", as in Zapier) */
+  const usedBy = (pred) => ROUTINES.filter(pred).map((r) => r.name);
+  function connectionsSeg() {
+    const tile = (ic, name, what, state, stTxt, detail, act, used) => `<article class="cn ${state}"><div class="rk-top"><span class="rk-gl">${ic}</span><div class="rk-h"><p class="rk-k">${esc(stTxt)}</p><h3>${esc(name)}</h3></div></div><p class="rk-found">${what}</p>${detail ? `<p class="cn-d">${detail}</p>` : ""}${used && used.length ? `<p class="cn-u">Used by ${esc(andJoin(used))}</p>` : ""}<div class="rk-ft"><span></span>${act}</div></article>`;
+    const sends = [
+      tile(svg("whatsapp", 18), "WhatsApp", "Send photos, voice notes, PDFs and links to Studiolo's number. Loci can reply.", "ok", "Connected", "Your number: +971 50 ••• 4127 · checked with a code on 12 Oct", btn("Disconnect", 'data-act="cn" data-v="Disconnected (prototype)."', "quiet"), usedBy((r) => r.when === "whatsapp")),
+      tile(svg("email", 18), "Email", "Forward PDFs, newsletters and links to your own address.", "ok", "Ready", `<code>layla.k7m2@in.studiolo.app</code>`, btn("Copy address", 'data-act="cn" data-v="Copied: layla.k7m2@in.studiolo.app"', "quiet"), usedBy((r) => r.when === "email" || (r.kind === "follow" && r.sources.some((x) => /newsletter/i.test(x))))),
+      tile(svg("share", 18), "Phone share", "Share from Instagram, YouTube or Safari straight to Studiolo.", "ok", "Set up on Android", "iPhone: add the Studiolo Shortcut once.", btn("Get the iPhone Shortcut", 'data-act="cn" data-v="In the app, this opens the Shortcut."', "quiet"), usedBy((r) => r.when === "share")),
+      tile(svg("browser", 18), "Browser", "Save the page you're on, with any text you selected.", "need", "Not set up", "", btn("Get the extension", 'data-act="cn" data-v="In the app, this opens the extension page."'), usedBy((r) => r.when === "browser")),
+    ];
+    const srcs = [...new Set(ROUTINES.filter((r) => r.kind === "follow").flatMap((r) => r.sources))];
+    const later = LATER_APPS.map(([k, l, h]) => tile(`<b>${l[0]}</b>`, l, h + ".", "soon", "Coming later", "", btn("I'd use this", `data-act="cn" data-v="Noted: you'd use ${l}."`, "quiet")));
+    return `<section class="rx-sec"><h2>Send to Studiolo</h2><p class="rx-sub">The ways things reach your Commonplace. Each one can start a routine.</p><div class="rk-grid">${sends.join("")}</div></section>
+      <section class="rx-sec"><h2>Sources you watch <span>${srcs.length}</span></h2><p class="rx-sub">What your Finds routines read. Loci checks each one is still alive.</p>
+        <ul class="cn-src">${srcs.map((x, i) => `<li><span class="rk-gl">${svg(/newsletter/i.test(x) ? "email" : /channel/i.test(x) ? "play" : "search", 15)}</span><span><b>${esc(x)}</b><em>${["New item 2 hours ago", "New item yesterday", "New item 3 days ago", "Quiet for 5 weeks: check it?"][i % 4]}</em></span><span class="rx-dim">${esc(andJoin(usedBy((r) => r.kind === "follow" && r.sources.includes(x))))}</span></li>`).join("")}</ul></section>
+      <section class="rx-sec"><h2>Connected apps</h2><p class="rx-sub">Later: other apps you keep things in, as triggers for routines. Tell us which you'd use.</p><div class="rk-grid">${later.join("")}</div></section>`;
+  }
+
   /* ================================================================ a routine's page */
   function routinePage(r) {
     const fl = flowOf(r), nA = ROUTINES.filter((x) => x.type === "arrive").length, pos = arrivePos(r);
@@ -529,9 +556,9 @@
       ${waiting.length ? `<button type="button" class="rx-waitline" data-act="seg" data-v="waiting"><span aria-hidden="true" class="rk-gl q sm">?</span><span><b>${plural(waiting.length, "thing")} from this routine waiting for you</b><em>${esc(waiting.map((w) => w.newTitle || w.title || "The To read pile").join(" · "))}</em></span><span aria-hidden="true">›</span></button>` : ""}
       ${r.kind === "follow" ? `<section class="rp-sec"><h2 class="rp-sh">Its Finds pages</h2>${issuesOf(r.id).length ? `<div class="rk-grid">${issuesOf(r.id).slice(0, 2).map(issueCard).join("")}</div>` : `<p class="rx-sub">None yet. The first comes ${r.on ? fNext(nextRun(r)) : "when you turn it back on"}.</p>`}<div>${btn("Check now", `data-act="check-now" data-r="${r.id}"`, "quiet")}</div></section>` : ""}
       <section class="rp-sec"><h2 class="rp-sh">What it does</h2><p class="rx-say rp-say">${sentence(r)}</p><p class="rp-note">Tap an underlined word to change it, or press <b>Edit</b> to see everything.</p></section>
-      <section class="rp-flow" aria-label="How it works">${step("when", "When", fl.when, "in")}<span class="rp-arrow" aria-hidden="true">→</span>${step("loci", "Loci", fl.loci, "spark")}<span class="rp-arrow" aria-hidden="true">→</span>${step("then", "Then", fl.then, "out")}</section>
+      <section class="rp-sec" aria-label="How it works"><h2 class="rp-sh">Step by step</h2>${flowHTML(r, false)}<p class="rp-note">Click a step to change it.</p></section>
       ${S.builder ? builderNote(r) : ""}
-      <section class="rp-stats" aria-label="How it's doing">${stats.join("")}</section>
+      <section class="rp-stats" aria-label="How it's doing">${stats.join("")}<div class="rp-tile"><span class="rk-gl">${svg("spark", 18)}</span><div><b>${esc(costText(r))}</b><span>${S.builder ? esc(costBuilder(r)) : "What it costs to run, from your AI allowance"}</span></div></div></section>
       <section class="rp-sec"><h2 class="rp-sh">Lately</h2>${late}</section>
       ${r.type === "arrive" ? `<section class="rp-sec"><h2 class="rp-sh">With your last 20 things</h2>${tryHTML(r, 5)}</section>` : ""}
       <footer class="rp-foot">${btn(r.on ? "Pause it" : "Turn it back on", `data-act="toggle" data-r="${r.id}"`, "quiet")}${btn("Duplicate", `data-act="dupe" data-r="${r.id}"`, "quiet")}<span class="rx-grow"></span>${btn("Delete routine", `data-act="del" data-r="${r.id}"`, "link")}</footer></article>`;
@@ -540,7 +567,7 @@
 
   /* ================================================================ the editor: one short form, for Edit and for New routine */
   function startEdit(d, isNew, from) {
-    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null }; S.issue = null;
+    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null, chosen: from !== "pick" }; S.issue = null; S.fnOpen = null; S.fnAdd = null;
     S.newer = false; S.pop = null;
     if (isNew) { S.open = null; S.ptab = "all"; } else { S.open = d.id; S.ptab = "this"; }
     C.resetScroll = true;
@@ -559,53 +586,133 @@
     };
     return `${cs.map(row).join("")}${free.length ? `<div class="ed-add"><span>Add:</span>${free.map((t) => `<button type="button" class="ed-chip ed-addc" data-act="ed-addc" data-v="${t}">+ ${COND_ADD[t]}</button>`).join("")}</div>` : ""}`;
   }
+  /* ---------- the flow: a routine as steps, like Zapier. One registry serves the builder, the cost line and (in the app)
+     the worker: a trigger, then steps that read the item (Loci), check it, and act on it. */
+  const SEND_APPS = [["whatsapp", "WhatsApp", "Photos, voice notes, PDFs, links"], ["email", "Email", "Forward PDFs, newsletters and links"], ["share", "Phone share", "From Instagram, YouTube, Safari…"], ["browser", "Browser", "The page you're on"], ["any", "Anywhere", "However it arrives"]];
+  const WATCH_APPS = [["watch:feeds", "Websites and journals", "New articles and papers", "search"], ["watch:newsletters", "Newsletters", "The ones you forward to Studiolo", "email"], ["watch:youtube", "YouTube channels", "New talks and videos", "play"]];
+  const TIME_APPS = [["schedule", "Schedule", "Every day, a weekday, or monthly", "schedule"]];
+  const IN_APPS = [["lumen", "Finish a Lumen", "Follow up when it's worth testing", "lumen"], ["dup", "Save something twice", "Catch what you already have", "dup"], ["question", "Add a question", "Look for answers to it", "doc", true], ["goal", "Set a goal", "Plan the steps toward it", "loop", true]];
+  const LATER_APPS = [["zotero", "Zotero", "Papers you add"], ["readwise", "Readwise", "Your highlights"], ["drive", "Google Drive", "Files in a folder"], ["raindrop", "Raindrop", "Your bookmarks"], ["calendar", "Calendar", "Before a meeting or site visit"]];
+  const CONN = { whatsapp: ["ok", "Connected"], email: ["ok", "Your address is ready"], share: ["ok", "Set up on Android"], browser: ["need", "Not set up"], any: ["ok", ""] };
+  const trigKey = (d) => (d.type === "arrive" ? d.when : d.kind === "follow" ? "watch:" + (d.watch || "feeds") : d.type === "schedule" ? "schedule" : d.kind);
+  const famOf = (k) => (SEND_APPS.some((a) => a[0] === k) ? "arrive" : k.startsWith("watch:") ? "follow" : k === "schedule" ? "schedule" : k === "lumen" || k === "dup" ? k : "other");
+  const famOfD = (d) => (d.type === "arrive" ? "arrive" : d.kind === "follow" ? "follow" : d.type === "schedule" ? "schedule" : d.kind);
+  function pickTrigger(E, k) {
+    const fam = famOf(k), keepName = E.d.name;
+    if (fam !== famOfD(E.d) || !E.chosen) {
+      if (fam === "arrive") E.d = blank("arrive");
+      else if (fam === "follow") { E.d = blank("schedule"); edSet(E.d, "skind", "follow"); E.d.every = "day"; }
+      else if (fam === "schedule") E.d = blank("schedule");
+      else E.d = { ...blank("after"), kind: k, name: k === "dup" ? "Saved twice" : "" };
+      if (!E.isNew) E.d.name = keepName;
+    }
+    const d = E.d;
+    if (fam === "arrive") d.when = k;
+    if (fam === "follow") { d.watch = k.slice(6); d.sources = { feeds: SOURCES.slice(0, 4), newsletters: ["Design-tools newsletter"], youtube: ["Conference channel"] }[d.watch]; if (d.watch === "youtube") d.kinds = ["video"]; }
+    E.chosen = true; S.fnOpen = null;
+  }
+  function trigPicker(d) {
+    const E = S.edit, cur = E && E.chosen ? trigKey(d) : null, fam = famOfD(d);
+    const tile = ([k, l, h, ic, soon], later) => {
+      const locked = later || soon || (E && !E.isNew && famOf(k) !== fam), st = CONN[k];
+      return `<button type="button" class="tp-app${cur === k ? " on" : ""}" data-act="ed-trig" data-v="${k}"${locked ? " disabled" : ""}${E && !E.isNew && !later && !soon && famOf(k) !== fam ? ' title="Make a new routine for this"' : ""}><span class="tp-ic">${later ? `<b>${l[0]}</b>` : svg(ic || k, 17)}</span><span class="tp-t"><b>${l}</b><em>${h}</em></span>${later || soon ? '<i class="tp-soon">Soon</i>' : st && st[1] ? `<i class="tp-st ${st[0]}">${st[1]}</i>` : ""}</button>`;
+    };
+    const grp = (title, list, later) => `<p class="tp-h">${title}</p><div class="tp-grid">${list.map((a) => tile(a, later)).join("")}</div>`;
+    return `<div class="tp">${grp("Send to Studiolo", SEND_APPS)}${grp("Watch sources", WATCH_APPS)}${grp("On a schedule", TIME_APPS)}${grp("In Studiolo", IN_APPS)}${grp("Connected apps", LATER_APPS, true)}</div>`;
+  }
+  const UND_HELP = { describe: "Loci looks at the photo and writes two lines, so you can search for it later.", transcribe: "Speech-to-text, then the questions you asked are pulled out.", summary: "The text is pulled out, then summed up in three lines.", book: "Loci reads the cover or page and looks the book up in a library catalogue.", recipe: "Keeps the ingredients and steps; leaves the rest of the post.", links: "Every link in the caption is saved as its own thing." };
+  const whatOf = (d) => {
+    const f = (t) => condOf(d, t), k = f("kind"), is = f("is");
+    let w = k ? cap(KIND_WORD[k]) : is ? `Anything that's ${is}` : "Anything";
+    if (f("tag")) w += ` with ${f("tag")}`; if (f("site")) w += ` from ${f("site")}`; if (f("words")) w += ` mentioning “${f("words")}”`;
+    if (k && is) w += `, if it's ${is}`; if (f("about")) w += ` about ${PLACES[f("about")].name}`;
+    return w;
+  };
+  // the steps of a routine, in order; each has a header (always shown) and a body (shown when open in the editor)
+  function flowNodes(d) {
+    const N = [], add = (n) => N.push(n), every = () => chips("every", [["day", "Every day"], ["weekdays", "Weekdays"], ...[1, 2, 3, 4, 5, 6, 0].map((x) => ["w" + x, DAYLONG[x].slice(0, 3)]), ["month", "Monthly"]], d.every) + (d.every === "month" ? `<p class="ed-help">On the 1st, at 9:00.</p>` : `<label class="ed-time"><span>At</span><input class="sm-input" type="time" id="ed-time" value="${esc(d.time)}"></label>`);
+    if (d.type === "arrive") {
+      const t = d.then;
+      add({ key: "trigger", cls: "trig", tag: "When", icon: d.when, title: { whatsapp: "I send something on WhatsApp", email: "I email something to Studiolo", share: "I share something from my phone", browser: "I save something from the browser", any: "I send something, from anywhere" }[d.when], body: () => trigPicker(d) });
+      add({ key: "filter", cls: "filt", tag: "Only if", icon: "filter", title: whatOf(d), warn: !d.ifs.length, body: () => field("What kind", chips("kind", [["", "Anything"], ...ITEM_KINDS.map((k) => [k, cap(k)])], condOf(d, "kind") || "")) + field("And", condsHTML(d), "Optional. Each one narrows it down. Dotted ones need Loci to read the item.") });
+      t.understand.filter((u) => UND_VERB[u]).forEach((u) => add({ key: "und:" + u, cls: "loci", tag: "Loci", icon: "spark", title: UND_VERB[u], body: () => `<p class="ed-help">${UND_HELP[u]}</p>`, remove: true }));
+      t.learn.forEach((l) => add({ key: "lrn:" + l, cls: "loci", tag: "Loci", icon: "spark", title: LRN_VERB[l] || l, body: () => `<p class="ed-help">${l === "lumen" ? "When something fits, Loci offers a Lumen on it. A Lumen costs more than a routine, so it always asks first." : "Questions you ask in it go to Questions and goals, linked to where you asked them."}</p>`, remove: true }));
+      add({ key: "file", cls: "act", tag: "Then", icon: "out", title: [t.fileAs ? `File it as ${t.fileAs}` : "File it", t.on === "best" ? "on the topic it's about" : t.on ? `on ${PLACES[t.on].name}` : "", t.addTo === "project" ? "in the prayer hall project" : "", t.status ? `mark it ${t.status}` : ""].filter(Boolean).join(", "), body: () => field("File it as", select("fileAs", [["", "Keep the kind it came as"], ...FILE_AS.map((x) => [x, x])], t.fileAs)) + field("On", select("on", [["best", "The topic it's about (Loci works it out)"], ...TOPICS.map((p) => [p, PLACES[p].name]), ["", "No topic"]], t.on)) + field("Mark it", chips("status", [["", "Nothing"], ["To read", "To read"], ["Reading", "Reading"]], t.status)) + field("Also add to", chips("addTo", [["", "Nothing else"], ["project", "The prayer hall project"]], t.addTo)) });
+      add({ key: "mode", cls: "chk", tag: "Before it files", icon: "check", title: d.mode === "ask" ? "Ask me first" : "File it on its own", body: () => `<div class="ed-radios">${[["ask", "Ask me first", "You check each one. Once it's right 9 times out of 10, Loci offers to stop asking."], ["own", "File on its own", "It files straight away. You can undo anything from Activity."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="mode" data-v="${v}" aria-pressed="${d.mode === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>` });
+      if (t.reply === "confirm") add({ key: "reply", cls: "act", tag: "Then", icon: "whatsapp", title: "Tell me on WhatsApp", body: () => `<p class="ed-help">A one-line reply once it's filed. Since October 2026 each reply costs Studiolo about half a cent, so replies are a step you add, not the default.</p>`, remove: true });
+    } else if (d.kind === "follow") {
+      add({ key: "trigger", cls: "trig", tag: "When", icon: "search", title: `${everyText(d)}, check ${plural(d.sources.length, "source")}`, body: () => trigPicker(d) + field("Sources", toggles("src", [...new Set([...SOURCES, ...d.sources])].map((x) => [x, x]), (v) => d.sources.includes(v)) + `<div class="ed-addsrc"><input class="sm-input ed-in" id="ed-src" placeholder="Add a website, newsletter, journal or channel" aria-label="Add a source">${btn("Add", 'data-act="ed-addsrc"', "quiet")}</div>`) + field("How often", every()) });
+      add({ key: "filter", cls: "filt", tag: "Only if", icon: "filter", title: `It's new, and about ${d.label || PLACES[d.place].name}: ${kindsText(d)}`, body: () => field("Subject", `<input class="sm-input ed-in" id="ed-label" value="${esc(d.label || "")}" placeholder="e.g. AI in architecture" aria-label="Subject">`, "In your own words. Leave it empty to follow a topic as a whole.") + field("Sort onto", select("place", [["you", "Whichever topic fits (my whole map)"], ...TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name])], d.place)) + field("Look for", toggles("fkind", FIND_KINDS, (v) => (d.kinds || []).includes(v))) + `<p class="ed-help">Anything already in your Commonplace, and the same story from two sources, is left out in code, before Loci reads anything.</p>` });
+      add({ key: "rank", cls: "loci", tag: "Loci", icon: "spark", title: `Keep the best ${d.count}, sum each one up, and say why it's for you`, body: () => field("How many", chips("count", [["3", "Up to 3"], ["6", "Up to 6"], ["10", "Up to 10"]], d.count)) + `<p class="ed-help">One small-model call per run, against your topics, open questions and goals. A run with nothing new makes no call.</p>` });
+      add({ key: "dest", cls: "act", tag: "Then", icon: "out", title: d.dest === "toread" ? "Save them all, marked To read" : "Bring them to a Finds page", body: () => `<div class="ed-radios">${[["page", "On a Finds page", "You look through them and keep what's useful."], ["toread", "Straight into To read", "Everything it finds is saved and marked To read."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="dest" data-v="${v}" aria-pressed="${(d.dest || "page") === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>` });
+      add({ key: "today", cls: "act", tag: "Then", icon: "loop", title: "Put a card on Today" });
+    } else if (d.type === "schedule") {
+      add({ key: "trigger", cls: "trig", tag: "When", icon: "schedule", title: everyText(d), body: () => trigPicker(d) + field("How often", every()) });
+      add({ key: "job", cls: "loci", tag: "Loci", icon: "spark", title: { tidy: "Go through what's in Unsorted", review: `Find what slipped at ${PLACES[d.place]?.name}`, pile: "Find what's sat in To read for three months" }[d.kind], body: () => (S.edit && S.edit.isNew ? field("Job", chips("skind", [["tidy", "Sort Unsorted"], ["review", "Quiz me on what slipped"], ["pile", "Clear the To read pile"]], d.kind)) : "") + (d.kind === "review" ? field("Topic", select("place", TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name]), d.place)) : "") });
+      add({ key: "act", cls: "act", tag: "Then", icon: "out", title: { tidy: d.mode === "ask" ? "Ask me about each thing" : "File what it's sure of, and ask me about the rest", review: `Ask me ${d.count} questions on Today`, pile: "Ask me: read it, keep it, or let it go" }[d.kind], body: () => (d.kind === "tidy" ? field("When Loci is sure", chips("tidymode", [["own", "File it, and ask me about the rest"], ["ask", "Ask me about each thing"]], d.mode)) : d.kind === "review" ? field("How many", chips("count", [["3", "3 questions, about two minutes"], ["5", "5 questions, about four minutes"]], d.count)) : `<p class="ed-help">Nothing to set.</p>`) });
+    } else if (d.kind === "lumen") {
+      add({ key: "trigger", cls: "trig", tag: "When", icon: "lumen", title: "I finish a Lumen", body: () => trigPicker(d) });
+      add({ key: "wait", cls: "chk", tag: "Wait", icon: "schedule", title: { "the next day": "Wait a day", "three days later": "Wait three days", "a week later": "Wait a week" }[d.delay], body: () => chips("delay", [["the next day", "A day"], ["three days later", "Three days"], ["a week later", "A week"]], d.delay) });
+      add({ key: "act", cls: "act", tag: "Then", icon: "out", title: "Bring its check back to Today" });
+    } else {
+      add({ key: "trigger", cls: "trig", tag: "When", icon: "dup", title: "I send something I already have", body: () => trigPicker(d) });
+      add({ key: "cmp", cls: "loci", tag: "Check", icon: "spark", title: "Compare it with my Commonplace (in code: link, DOI, title)" });
+      add({ key: "act", cls: "act", tag: "Then", icon: "out", title: "Keep the one I have, and tell me" });
+    }
+    return N;
+  }
+  // steps that can be added with +, for each kind of routine
+  function stepMenu(d) {
+    if (d.type !== "arrive") return [];
+    const t = d.then, o = [];
+    [["describe", "Describe it"], ["transcribe", "Write out what I said"], ["summary", "Sum it up in three lines"], ["book", "Find the book"], ["recipe", "Keep just the recipe"], ["links", "Keep the links in its caption"]].forEach(([v, l]) => { if (!t.understand.includes(v)) o.push(["und:" + v, l, "Loci reads it", "spark"]); });
+    if (!t.learn.includes("questions")) o.push(["lrn:questions", "Turn my questions into @questions", "Loci reads it", "spark"]);
+    if (!t.learn.includes("lumen")) o.push(["lrn:lumen", "Offer to make a Lumen from it", "Asks first", "spark"]);
+    if (d.when === "whatsapp" && t.reply !== "confirm") o.push(["reply", "Tell me on WhatsApp", "About half a cent a reply", "whatsapp"]);
+    if (t.addTo !== "project") o.push(["project", "Add it to a project", "Free", "out"]);
+    if (!t.status) o.push(["toread", "Mark it To read", "Free", "out"]);
+    return o;
+  }
+  // what a routine costs, from the study's unit costs (routines-study/cost-model.mjs); the learner sees a share of the allowance
+  const ALLOWANCE = 2; // dollars a month of a learner's AI allowance that routines may use (study, decision RT-7)
+  function costOf(d) {
+    if (d.type === "arrive") {
+      const n = Math.max(1, Math.round((hitsOf(d).length / 20) * 120)), t = d.then;
+      const U = { describe: 0.0003, transcribe: 0.0038, summary: 0.001, book: 0.0001, recipe: 0.0002, links: 0 };
+      let per = d.ifs.some((c) => c.t === "is" || c.t === "about") || t.on === "best" ? 0.0001 : 0;
+      t.understand.forEach((u) => { per += U[u] || 0; });
+      if (t.learn.includes("questions")) per += 0.0001;
+      if (t.learn.includes("lumen")) per += 0.013; // a Lumen is about $0.13; say 1 in 10 offers is taken
+      if (t.reply === "confirm") per += 0.005;
+      return { m: n * per, n, unit: "things a month" };
+    }
+    const runs = d.type === "after" ? 0 : d.every === "month" ? 1 : d.every === "day" ? 30 : d.every === "weekdays" ? 22 : 4;
+    const unit = d.kind === "follow" ? (0.0013 * (d.count || 6)) / 6 : d.kind === "tidy" || d.kind === "review" ? 0.0003 : 0;
+    return { m: runs * unit, n: runs, unit: "runs a month" };
+  }
+  const costText = (d) => { const c = costOf(d).m; if (c === 0) return "Free: plain rules, no AI"; const pct = (c / ALLOWANCE) * 100; return pct < 1 ? "Under 1% of your monthly allowance" : `About ${Math.round(pct)}% of your monthly allowance`; };
+  const costBuilder = (d) => { const c = costOf(d); return `$${c.m < 0.01 ? c.m.toFixed(4) : c.m.toFixed(2)} a month, at about ${c.n} ${c.unit}`; };
+  function flowHTML(d, edit) {
+    const nodes = flowNodes(d), E = S.edit, menu = edit ? stepMenu(d) : [];
+    const head = (n, i) => `<span class="fn-ic">${svg(n.icon === "filter" ? "filter" : n.icon === "check" ? "check" : n.icon, 18)}</span><span class="fn-txt"><em>${i + 1} · ${esc(n.tag)}</em><b>${esc(n.title)}</b></span>${n.warn ? '<i class="fn-warn">Needs a kind or a condition</i>' : n.cls === "loci" && n.key !== "cmp" ? '<i class="fn-tag">Loci reads it</i>' : ""}`;
+    if (edit && E.isNew && !E.chosen) return `<ol class="fl"><li class="fn trig open"><div class="fn-head static">${head({ icon: "plus", tag: "When", title: "Choose what starts it" }, 0)}</div><div class="fn-body">${trigPicker(d)}</div></li><li class="fn-link" aria-hidden="true"></li><li class="fn ghost"><div class="fn-head static"><span class="fn-ic">${svg("out", 18)}</span><span class="fn-txt"><em>2 · Then</em><b>Choose a trigger first</b></span></div></li></ol>`;
+    const plus = (i) => edit && menu.length ? `<li class="fn-link"><button type="button" class="fn-plus" data-act="fn-add" data-v="${i}" aria-label="Add a step here" aria-expanded="${S.fnAdd === i}">${svg("plus", 13)}</button></li>${S.fnAdd === i ? `<li class="fn-menu" role="menu"><p class="tp-h">Add a step</p>${menu.map(([v, l, h, ic]) => `<button type="button" class="fn-opt" role="menuitem" data-act="fn-step" data-v="${v}"><span class="tp-ic">${svg(ic, 15)}</span><span class="tp-t"><b>${esc(l)}</b><em>${esc(h)}</em></span></button>`).join("")}</li>` : ""}` : `<li class="fn-link" aria-hidden="true"></li>`;
+    return `<ol class="fl${edit ? "" : " ro"}">${nodes.map((n, i) => {
+      const open = edit && S.fnOpen === n.key && n.body;
+      const h = edit ? (n.body ? `<button type="button" class="fn-head" data-act="fn-open" data-v="${n.key}" aria-expanded="${!!open}">${head(n, i)}<span class="fn-chev" aria-hidden="true">${svg("fold", 15)}</span></button>` : `<div class="fn-head static">${head(n, i)}</div>`) : `<button type="button" class="fn-head" data-act="edit-at" data-r="${d.id}" data-v="${n.key}" title="Change this step">${head(n, i)}</button>`;
+      return `<li class="fn ${n.cls}${open ? " open" : ""}${n.warn ? " warn" : ""}">${h}${open ? `<div class="fn-body">${n.body()}${n.remove ? `<div><button type="button" class="button button-link rx-danger" data-act="fn-rm" data-v="${n.key}">Remove this step</button></div>` : ""}</div>` : ""}</li>${i < nodes.length - 1 ? plus(i) : ""}`;
+    }).join("")}${edit && menu.length ? plus(nodes.length) : ""}</ol>`;
+  }
   function editorView() {
     const E = S.edit, d = E.d, orig = E.isNew ? null : RR(E.id);
-    const ok = d.type !== "arrive" || d.ifs.length > 0;
+    const ok = !E.isNew || E.chosen ? d.type !== "arrive" || d.ifs.length > 0 : false;
     const hits = d.type === "arrive" && ok ? hitsOf(d).length : null;
-    let body = "";
-    if (d.type === "arrive") {
-      const t = d.then, kind = condOf(d, "kind") || "";
-      body = section(1, "When it starts", field("Sent from", chips("when", [["whatsapp", "WhatsApp"], ["email", "Email"], ["share", "Phone share"], ["browser", "Browser"], ["any", "Anywhere"]], d.when))
-          + field("What kind", chips("kind", [["", "Anything"], ...ITEM_KINDS.map((k) => [k, cap(k)])], kind))
-          + field("Only if", condsHTML(d), "Optional. Each one narrows it down. Dotted ones need Loci to read the item."))
-        + section(2, "What Loci does with it", toggles("und", [["describe", "Describe it"], ["transcribe", "Write out what I said"], ["summary", "Sum it up in three lines"], ["book", "Find the book"], ["recipe", "Keep just the recipe"], ["links", "Keep the links in its caption"]], (v) => t.understand.includes(v))
-          + toggles("learn", [["questions", "Turn my questions into @questions"]], (v) => t.learn.includes(v)), "Optional. Each of these needs Loci to read the item, so it uses a little of your allowance.")
-        + section(3, "Where it goes", field("File it as", select("fileAs", [["", "Keep the kind it came as"], ...FILE_AS.map((x) => [x, x])], t.fileAs))
-          + field("On", select("on", [["best", "The topic it's about (Loci works it out)"], ...TOPICS.map((p) => [p, PLACES[p].name]), ["", "No topic"]], t.on))
-          + field("Mark it", chips("status", [["", "Nothing"], ["To read", "To read"], ["Reading", "Reading"]], t.status))
-          + field("Also add to", chips("addTo", [["", "Nothing else"], ["project", "The prayer hall project"]], t.addTo))
-          + (d.when === "whatsapp" ? field("Tell me", toggles("reply", [["confirm", "Reply on WhatsApp when it's filed"]], (v) => t.reply === v)) : ""))
-        + section(4, "Before it files", `<div class="ed-radios">${[["ask", "Ask me first", "You check each one. Once it's right 9 times out of 10, Loci offers to stop asking."], ["own", "File on its own", "It files straight away. You can undo anything from Activity."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="mode" data-v="${v}" aria-pressed="${d.mode === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>`)
-        + section(5, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="${esc(autoName(d))}" aria-label="Name">`);
-    } else if (d.type === "schedule") {
-      const what = E.isNew ? section(1, "What it does", chips("skind", [["follow", "Find new things for me"], ["tidy", "Sort Unsorted"], ["review", "Quiz me on what slipped"], ["pile", "Clear the To read pile"]], d.kind)) : "";
-      const n0 = E.isNew ? 1 : 0;
-      const fl = d.kind === "follow", when = section(n0 + (fl ? 2 : 1), "When it runs", chips("every", [["day", "Every day"], ["weekdays", "Weekdays"], ...[1, 2, 3, 4, 5, 6, 0].map((x) => ["w" + x, DAYLONG[x].slice(0, 3)]), ["month", "Monthly"]], d.every)
-        + (d.every === "month" ? `<p class="ed-help">On the 1st, at 9:00.</p>` : `<label class="ed-time"><span>At</span><input class="sm-input" type="time" id="ed-time" value="${esc(d.time)}"></label>`));
-      const spec = {
-        tidy: () => field("When Loci is sure", chips("tidymode", [["own", "File it, and ask me about the rest"], ["ask", "Ask me about each thing"]], d.mode)),
-        follow: () => field("Subject", `<input class="sm-input ed-in" id="ed-label" value="${esc(d.label || "")}" placeholder="e.g. AI in architecture" aria-label="Subject">`, "In your own words. Leave it empty to follow a topic as a whole.")
-          + field("Sort onto", select("place", [["you", "Whichever topic fits (my whole map)"], ...TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name])], d.place))
-          + field("Look for", toggles("fkind", FIND_KINDS, (v) => (d.kinds || []).includes(v)))
-          + field("Where to look", toggles("src", [...new Set([...SOURCES, ...d.sources])].map((x) => [x, x]), (v) => d.sources.includes(v)) + `<div class="ed-addsrc"><input class="sm-input ed-in" id="ed-src" placeholder="Add a website, newsletter, journal or channel" aria-label="Add a source">${btn("Add", 'data-act="ed-addsrc"', "quiet")}</div>`, "The sources you save from most are listed first.")
-          + field("How many", chips("count", [["3", "Up to 3"], ["6", "Up to 6"], ["10", "Up to 10"]], d.count))
-          + field("Bring them", `<div class="ed-radios">${[["page", "On a Finds page", "You look through them and keep what's useful. A card on Today says they're there."], ["toread", "Straight into To read", "Everything it finds is saved and marked To read."]].map(([v, l, h]) => `<button type="button" class="ed-radio" data-act="ed-set" data-f="dest" data-v="${v}" aria-pressed="${(d.dest || "page") === v}"><b>${l}</b><span>${h}</span></button>`).join("")}</div>`),
-        review: () => field("Topic", select("place", TOPICS.slice(0, 5).map((p) => [p, PLACES[p].name]), d.place)) + field("How many", chips("count", [["3", "3 questions, about two minutes"], ["5", "5 questions, about four minutes"]], d.count)),
-        pile: () => `<p class="ed-help">Nothing to set. It shows what's sat in To read for over three months, and you decide: read it this week, keep it, or let it go.</p>`,
-      }[d.kind]();
-      body = what + (fl ? section(n0 + 1, "What to look for", spec) + when : when + section(n0 + 2, "What it brings you", spec)) + section(n0 + 3, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="${esc(autoNameAny(d))}" aria-label="Name">`);
-    } else {
-      body = d.kind === "lumen"
-        ? section(1, "When it starts", `<p class="ed-fixed">When I finish a Lumen.</p>`) + section(2, "When the check comes back", chips("delay", [["the next day", "The next day"], ["three days later", "Three days later"], ["a week later", "A week later"]], d.delay)) + section(3, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" placeholder="After a Lumen" aria-label="Name">`)
-        : section(1, "What it does", `<p class="ed-fixed">When I send something I already have, keep the one I have and tell me.</p>`) + section(2, "Name", `<input class="sm-input ed-name" id="ed-name" value="${esc(d.name)}" aria-label="Name">`);
-    }
     return `<article class="rp ed" aria-label="${E.isNew ? "New routine" : "Edit " + esc(orig.name)}">
       <nav class="rp-back"><button type="button" class="rx-backbtn" data-act="ed-cancel">${svg("back", 14)}${E.isNew ? "Back" : esc(orig.name)}</button></nav>
-      <header class="rp-head"><span class="rk-gl lg">${svg(iconOf(d), 22)}</span><div class="rp-h"><p class="rk-k">${E.isNew ? "New routine" : "Editing"} · ${esc(GROUP[d.type])}</p><h1 class="rp-title">${esc(d.name || autoNameAny(d))}</h1></div></header>
-      <div class="ed-live" aria-live="polite"><p class="ed-live-k">${svg("loop", 13)}It will</p><p class="rx-say">${still(d)}</p>${d.type === "arrive" ? `<p class="ed-live-n${ok ? "" : " warn"}">${ok ? `${hits} of your last 20 things would have fitted it.` : "Choose a kind or add a condition first. With neither, it would catch everything you send."}</p>` : ""}</div>
-      <div class="ed-form">${body}</div>
-      <div class="ed-bar">${btn(E.isNew ? "Turn it on" : "Save changes", `data-act="ed-save"${ok ? "" : " disabled"}`)}${btn("Cancel", 'data-act="ed-cancel"', "quiet")}<span class="rx-grow"></span><span class="ed-tip">Or tell Loci what to change →</span></div></article>`;
+      <header class="ed-head"><p class="rk-k">${E.isNew ? "New routine" : "Editing"}</p><input class="ed-title" id="ed-name" value="${esc(d.name)}" placeholder="${esc(E.chosen || !E.isNew ? autoNameAny(d) : "Name it, or let Loci name it")}" aria-label="Name"></header>
+      ${E.chosen || !E.isNew ? `<div class="ed-live" aria-live="polite"><p class="ed-live-k">${svg("loop", 13)}It will</p><p class="rx-say">${still(d)}</p><p class="ed-live-n${ok ? "" : " warn"}">${d.type === "arrive" ? (ok ? `${hits} of your last 20 things would have fitted it. ` : "Choose a kind or add a condition. With neither, it would catch everything you send. ") : ""}${ok ? `<span class="ed-cost">${esc(costText(d))}${S.builder ? ` · ${esc(costBuilder(d))}` : ""}</span>` : ""}</p></div>` : `<p class="iss-how">Start with what starts it, as in Zapier or Make: something you send, sources to watch, a time, or something you do in Studiolo. Then add what Loci does, and where it goes.</p>`}
+      ${flowHTML(d, true)}
+      <div class="ed-bar">${btn(E.isNew ? "Turn it on" : "Save changes", `data-act="ed-save"${ok ? "" : " disabled"}`)}${btn("Cancel", 'data-act="ed-cancel"', "quiet")}<span class="rx-grow"></span><span class="ed-tip">Click a step to change it, or tell Loci →</span></div></article>`;
   }
   function edSet(d, f, v) {
     if (f === "when") { d.when = v; if (v !== "whatsapp") d.then.reply = ""; }
@@ -643,7 +750,7 @@
         <section class="nr-way"><p class="rk-k">Easiest</p><h2>Tell Loci</h2><p>Say it the way you'd tell an assistant. Loci asks only what's missing, then shows you the routine.</p>
           <div class="ed-chips">${["When I email myself a PDF, sum it up in three lines and put it on its topic", "Every evening, sort what I haven't sorted"].map((x) => `<button type="button" class="ed-chip" data-act="idea" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>
           <div>${btn("Tell Loci", 'data-act="tell"')}</div></section>
-        <section class="nr-way"><p class="rk-k">Step by step</p><h2>Set it up yourself</h2><p>Choose what starts it, then fill in a short form.</p>
+        <section class="nr-way"><p class="rk-k">Step by step</p><h2>Set it up yourself</h2><p>Choose what starts it, then add steps: what Loci does, and where it goes. <button type="button" class="rk-go" data-act="pick">Choose a trigger ›</button></p>
           <div class="nr-types">${types.map(([t, l, h, ic]) => `<button type="button" class="nr-type" data-act="blank" data-v="${t}"><span class="rk-gl">${svg(ic, 18)}</span><span><b>${l}</b><em>${h}</em></span><span aria-hidden="true">›</span></button>`).join("")}</div></section>
       </div>
       <section class="rx-sec"><h2>Or start from one of these</h2><p class="rx-sub">Each opens in the form, ready to change.</p><div class="rk-grid">${TPL.map(tplCard).join("")}</div></section></article>`;
@@ -709,7 +816,7 @@
       ? `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Routine · ${esc(GROUP[r.type])}</span><button aria-label="Close this routine" class="icb" title="Close this routine" type="button" data-act="back">${svg("close", 15)}</button>${fold}</div>
         <div class="cp-title"><span aria-hidden="true" class="dot ${r.on ? "s2" : "s0"}"></span><h2>${esc(r.name)}</h2></div>
         <div aria-label="Conversation" class="cp-tabs" role="tablist"><button aria-selected="${!inThis}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="all"><span class="cp-tab-name">All routines</span></button><button aria-selected="${inThis}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="this"><span class="cp-tab-name">This routine</span></button></div></div>`
-      : `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Studiolo · Routines</span>${fold}</div><div class="cp-title cp-peek-title"><h2>Your routines</h2></div></div>`;
+      : `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Loci · Routines</span>${fold}</div><div class="cp-title cp-peek-title"><h2>Your routines</h2></div></div>`;
     const editing = S.edit && (S.edit.isNew ? !inThis : inThis);
     const body = inThis
       ? (threadOf(r.id).length ? "" : `<p class="cp-empty">${S.edit ? `Tell me what to change, and I'll change it in the form. Nothing is saved until you press Save.` : `Ask me anything about “${esc(r.name)}”, or tell me what to change. Changes show on the page, with Undo.`}</p>`) + threadHTML(r.id)
@@ -1173,6 +1280,14 @@
     $$(".account-name", root).forEach((x) => (x.textContent = "Layla Haddad"));
     $$(".account-avatar", root).forEach((x) => (x.textContent = "LH"));
     $$(".account-trigger", root).forEach((x) => { x.setAttribute("aria-label", "Account menu for Layla Haddad"); x.title = "Layla Haddad"; });
+    // Loci gets a place of its own in the rail and the phone's tab bar, after Graph
+    [[".navigation-rail .navigation-link[href='/graph']", ".rail-label"], [".tab-bar .tab-bar-link[href='/graph']", "span"]].forEach(([sel, lab]) => {
+      const g = $(sel, root); if (!g) return;
+      const a = g.cloneNode(true); a.setAttribute("href", "/loci"); a.removeAttribute("aria-current"); if (a.title) a.title = "Loci";
+      const sv = a.querySelector("svg"); if (sv) { const w = sv.getAttribute("width"); sv.outerHTML = svg("spark", Number(w) || 18).replace("<svg ", `<svg class="${sv.getAttribute("class") || ""}" `); }
+      const l = a.querySelector(lab); if (l) l.textContent = "Loci";
+      g.after(a);
+    });
   }
   let toastMsg = null, toastTimer = 0, undoFn = null;
   function toast(t, undo) { undoFn = undo || null; toastMsg = { t, undo: !!undo }; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastMsg = null; undoFn = null; $(".sm-toast", root)?.remove(); }, 5200); }
@@ -1182,15 +1297,19 @@
     if (S.issue && issueById(S.issue)) return issuePage(issueById(S.issue));
     const r = S.open && RR(S.open);
     if (r) return routinePage(r);
-    return `${tiles()}${bar()}${S.seg === "waiting" ? waitingSeg() : S.seg === "activity" ? activitySeg() : S.seg === "finds" ? findsSeg() : routinesSeg()}`;
+    if (S.seg === "waiting") return waitingSeg();
+    if (S.seg === "activity") return activitySeg();
+    if (S.seg === "finds") return findsSeg();
+    if (S.seg === "connections") return connectionsSeg();
+    return `${tiles()}${bar()}${routinesSeg()}`;
   }
   function crumb() {
     const r = S.open && RR(S.open);
     if (S.edit) return ["Routines", S.edit.isNew ? "New routine" : `${RR(S.edit.id)?.name || ""}: editing`];
     if (S.newer) return ["Routines", "New routine"];
-    if (S.issue && issueById(S.issue)) return ["Routines", "Finds", issueById(S.issue).date];
+    if (S.issue && issueById(S.issue)) return ["Finds", issueById(S.issue).date];
     if (r) return ["Routines", r.name];
-    return ["Routines"];
+    return [{ routines: "Routines", finds: "Finds", waiting: "Waiting", activity: "Activity", connections: "Connections" }[S.seg]];
   }
   function render() {
     const scroll = window.scrollY, active = document.activeElement?.id;
@@ -1200,7 +1319,7 @@
     else if (S.view === "everything") everythingView();
     else {
       shell("library");
-      $$(`.navigation-rail .navigation-link[href="/library"], .tab-bar .tab-bar-link[href="/library"]`, root).forEach((a) => a.setAttribute("aria-current", "page"));
+      $$(`.navigation-rail .navigation-link[href="/loci"], .tab-bar .tab-bar-link[href="/loci"]`, root).forEach((a) => a.setAttribute("aria-current", "page"));
       $("main", root).innerHTML = `<h1 class="visually-hidden">Routines</h1>${header("routines", crumb())}<div class="rx-split"><div class="rx-canvas">${canvas()}</div>${panel()}</div>`;
       const c = $(".rx-canvas", root); if (c) c.scrollTop = canvasScroll;
       const st = $(".main-stage", root); if (st) st.scrollTop = stageScroll;
@@ -1259,7 +1378,7 @@
     if (t.matches("a[href]") && !t.dataset.act) {
       ev.preventDefault();
       const h = t.getAttribute("href");
-      if (h === "/today") go("today"); else if (h === "/library") go("everything"); else { toast("Only Commonplace and Today are in this prototype."); render(); return; }
+      if (h === "/today") go("today"); else if (h === "/library") go("everything"); else if (h === "/loci") { go("routines"); goSeg("routines"); } else { toast("Only Loci, Commonplace and Today are in this prototype."); render(); return; }
       render(); return;
     }
     const a = t.dataset.act, r = t.dataset.r ? RR(t.dataset.r) : null;
@@ -1298,6 +1417,28 @@
       case "new-follow": { const d = blank("schedule"); edSet(d, "skind", "follow"); d.every = "day"; startEdit(d, true, null); break; }
       case "tpl": startEdit(TPL[Number(t.dataset.v)], true, "new"); break;
       case "edit": if (!r) return; startEdit(r, false); break;
+      case "edit-at": if (!r) return; startEdit(r, false); S.fnOpen = t.dataset.v; break;
+      case "pick": startEdit(blank("arrive"), true, "pick"); S.fnOpen = "trigger"; break;
+      case "fn-open": S.fnOpen = S.fnOpen === t.dataset.v ? null : t.dataset.v; S.fnAdd = null; break;
+      case "fn-add": { const i = Number(t.dataset.v); S.fnAdd = S.fnAdd === i ? null : i; break; }
+      case "fn-step": {
+        const d = S.edit.d, v = t.dataset.v, tt = d.then;
+        if (v.startsWith("und:")) { const u = v.slice(4); tt.understand.push(u); if (u === "summary" && !tt.understand.includes("text")) tt.understand.unshift("text"); }
+        else if (v.startsWith("lrn:")) tt.learn.push(v.slice(4));
+        else if (v === "reply") tt.reply = "confirm";
+        else if (v === "project") { tt.addTo = "project"; if (tt.on === "best") tt.on = ""; }
+        else if (v === "toread") tt.status = "To read";
+        S.fnAdd = null; S.fnOpen = v.includes(":") ? v : v === "reply" ? "reply" : "file"; break;
+      }
+      case "fn-rm": {
+        const d = S.edit.d, v = t.dataset.v, tt = d.then;
+        if (v.startsWith("und:")) { const u = v.slice(4); tt.understand = tt.understand.filter((x) => x !== u && !(u === "summary" && x === "text")); }
+        else if (v.startsWith("lrn:")) tt.learn = tt.learn.filter((x) => x !== v.slice(4));
+        else if (v === "reply") tt.reply = "";
+        S.fnOpen = null; break;
+      }
+      case "ed-trig": pickTrigger(S.edit, t.dataset.v); break;
+      case "cn": toast(t.dataset.v); break;
       case "dupe": if (!r) return; startEdit({ ...clone(r), id: "draft", name: `${r.name} (copy)`, lately: [] }, true, null); toast(`A copy of “${r.name}”. Change what you need, then turn it on.`); break;
       case "draft-edit": if (!C.draft) return; startEdit(C.draft, true, "draft"); break;
       case "ed-set": edSet(S.edit.d, t.dataset.f, t.dataset.v); break;
@@ -1312,10 +1453,10 @@
       }
       case "ed-addc": { const v = t.dataset.v; S.edit.d.ifs.push({ t: v, v: { tag: "#", site: "", words: "", is: "a book", about: "climate" }[v] }); render(); if (["tag", "site", "words"].includes(v)) $(`#ed-c-${v}`, root)?.focus(); return; }
       case "ed-rmc": S.edit.d.ifs = S.edit.d.ifs.filter((c) => c.t !== t.dataset.v); break;
-      case "ed-cancel": { const E = S.edit; S.edit = null; if (E.isNew && E.from === "new") S.newer = true; C.resetScroll = true; break; }
+      case "ed-cancel": { const E = S.edit; S.edit = null; if (E.isNew && (E.from === "new" || E.from === "pick")) S.newer = true; C.resetScroll = true; break; }
       case "ed-save": {
         const E = S.edit, d = E.d;
-        if (d.type === "arrive" && !d.ifs.length) return;
+        if ((E.isNew && !E.chosen) || (d.type === "arrive" && !d.ifs.length)) return;
         if (!d.name.trim()) d.name = autoNameAny(d);
         if (E.isNew) {
           const nr = addRoutine(d);
@@ -1477,6 +1618,6 @@
   if (start === "everything") S.view = "everything";
   if (["waiting", "activity"].includes(start)) S.seg = start;
   if (start === "new") S.newer = true;
-  if (start === "finds") S.seg = "finds";
+  if (["finds", "connections"].includes(start)) S.seg = start;
   render();
 })();

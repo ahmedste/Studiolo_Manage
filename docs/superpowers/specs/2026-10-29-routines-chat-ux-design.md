@@ -3,9 +3,10 @@ MEDIUM (a UX design for routines; the machinery is in the routines v3 spec)
 # Routines you make by talking to Loci: the user experience
 
 **For:** the owner, to judge the experience, and the agent who later builds it in `studiolo`.
-**Status:** Proposed. Claude, 29 October 2026. Version 6 (the tab, a routine's page, the editor and New routine, §0 and §1) replaces versions 4 and 5's pages; the conversation (§2 to §5) stays. Nothing here is approved until the owner says so in the conversation.
+**Status:** Proposed. Claude, 29 October 2026. Version 8 moves Routines under Loci and turns the editor into a flow of a trigger and steps (§1.7); version 6 (the tab, a routine's page, the editor and New routine, §0 and §1) replaced versions 4 and 5's pages; the conversation (§2 to §5) stays. How it runs, what it runs on and what it costs: [the system and cost study](2026-10-29-routines-system-and-cost-study.md). Nothing here is approved until the owner says so in the conversation.
 **Prototype:** [`prototypes/routines/`](../../../prototypes/routines/README.md), published as **Studiolo Routines** (the same link as version 4; version 3 stays at its own).
 **Owner's direction (29 Oct):** "How to write a routine should be user friendly. It can be through a chat in the page. Have all of that, and have it less overwhelming. Clarity is key."
+**Owner's direction on version 7 (29 Oct):** "How it starts needs some kind of integration, like Make.com or Zapier do … the same function, just more visual. … Is Routines the right name now? Where does this fit? Commonplace? Under Loci?"
 **Owner's direction on version 6 (29 Oct):** "Can we have a type that works on checking resources and then suggests it in a page? Like AI news in a specific field."
 **Owner's direction on version 5 (29 Oct):** "Where are the screens to view or edit a routine? Also, can the cards get more interesting? Look at the goals and questions cards we designed in another chat."
 **Owner's direction on version 4 (29 Oct):** "Still very linear … overwhelming … It has to be properly segregated. … I ask my question, and this question has to be answered. And on the right, the Loci side panel has to be the same design we have everywhere. … Less overwhelmed, better UX and UI and clarity, so the user knows where to click. … Have the routine page similar to what we usually do in the app, rather than feeling like an add-on."
@@ -209,6 +210,28 @@ In the prototype, finds are examples and **Check now** builds a page from them.
 - The flow stacks from top to bottom.
 - The editor's labels sit above their fields.
 
+### 1.7 Version 8: a flow of a trigger and steps, under Loci
+
+**Where it lives.** Routines leave Commonplace for **a Loci place in the rail**, after Graph (on a phone, a fifth tab). Its header reads *Loci / Routines*, with tabs **Routines · Finds · Waiting · Activity · Connections**. Commonplace keeps its own tabs. The name stays **Routines**. The reasons are in the [system and cost study](2026-10-29-routines-system-and-cost-study.md) §1.
+
+**The editor is a flow,** as in Zapier: a vertical line of cards, one per step, with a **+** between them.
+- **The title** is typed at the top, in the reading face. Under it, **It will…** (the sentence), how many of the last 20 things it would have caught, and **the cost line** (*Under 1% of your monthly allowance*; dollars in Builder view).
+- **The first card is the trigger** (*When*). An empty routine starts with **Pick a trigger**, a grid of "apps" in five groups:
+  - *Send to Studiolo*: WhatsApp, Email, Phone share, Browser, Anywhere;
+  - *Watch sources*: websites and journals, newsletters, YouTube;
+  - *On a schedule*;
+  - *In Studiolo*: Finish a Lumen, Save something twice (Add a question and Set a goal: soon);
+  - *Connected apps* (soon): Zotero, Readwise, Google Drive, Raindrop, Calendar.
+- **Then the steps,** each a card with its kind as a tag:
+  - **Only if** (the filters; dotted when Loci must read the item);
+  - **Loci** (what Loci does with it);
+  - **Then** (where it goes, and *Tell me on WhatsApp*);
+  - **Before it files** (ask first, or file on its own).
+- **Click a card** to open its settings in place; **×** removes a step; **+** offers only the steps that fit the trigger.
+- **On a routine's page**, *Step by step* shows the same flow read-only, and clicking a step opens the editor at that step.
+
+**Connections** lists every way in (Send to Studiolo: connected, ready or not set up), the sources the learner watches (with the routines using each, and one that has gone quiet), and the connected apps to come.
+
 ## 2. Making a routine: the conversation
 
 It happens in the Loci panel, under *All routines*: from **Tell Loci** on the New routine screen, from an idea, or by just typing. On a phone the panel rises as a sheet. Anyone who'd rather fill in a form has the editor (§1.3), and any draft Loci makes opens there with **Edit in full**.
@@ -298,11 +321,12 @@ In the prototype, a keyword reader stands in for the model call, so typing works
    - Cards in the Questions and goals look.
    - A page for each routine, and one form for editing and making.
    - The real Loci panel, which answers questions and can make and change routines.
-2. **Where Routines live.** A Commonplace tab beside Questions and goals (as here), or their own place in the rail? Either way, Loci anywhere can make one ("Tell Loci what should happen…").
+2. **Where Routines live.** Version 8 puts them under Loci, in its own place in the rail (§1.7), instead of a Commonplace tab beside Questions and goals (version 7). Either way, Loci anywhere can make one ("Tell Loci what should happen…").
 3. **Which way in comes first on New routine:** *Tell Loci* (as here), or the form?
 4. **Finds:**
    - Is a page per run right, or one running list?
-   - Should Finds be in the Routines tab (as here), or its own Commonplace tab?
+   - Finds is now a tab of the Loci place (§1.7).
    - Should Loci also search the open web for a subject, beyond the chosen sources? That costs more, and the results are less sure.
 5. **The waiting strip on Today:** just the count (as here), or the first card itself, so one decision can be made without leaving Today?
 6. **Starters and templates:** Loci's three starter chips, chosen from the learner's own activity (as here), or a fixed set?
+7. **The flow editor** (§1.7): a vertical list of a trigger and steps, as in Zapier, rather than Make's free canvas. The engine, models and costs behind it are decisions RT-1 to RT-10 in the [system and cost study](2026-10-29-routines-system-and-cost-study.md) §10.
