@@ -3,7 +3,7 @@ MEDIUM (a direction document; no build until the owner picks what goes first)
 # What Loci should do while you're away: three jobs, not an automation builder
 
 **For:** the owner, to decide the direction.
-**Status:** Proposed. Claude, 29 October 2026. Nothing here is approved until the owner says so in the conversation.
+**Status:** Partly superseded the same day. The owner keeps Routines (29 Oct): see [Routines, version 3](2026-10-29-routines-filing-rules-design.md). The cuts in §4 are reversed; the usefulness test in §2 stays, as the bar every routine is held to.
 **Replaces:** the direction of [Loci routines](2026-10-25-loci-routines-design.md) (25 Oct) and its prototype. Its run mechanics (§4 there: rules first, one structured model call, checks, skip when nothing is new) still stand; its product shape doesn't.
 **Read first:** Craft › 01 Vision & Strategy › *Vision & Principles* ("Today brings you back each day", "Propose, then confirm", "Grounded, not invented", "anything costly shows the cost first"); Craft › 02 Product › *Features & Ideas* › **Sources pulling** (the owner's idea of 17 Oct) and *Today* (T4, the learning-planning calendar, priority Next).
 

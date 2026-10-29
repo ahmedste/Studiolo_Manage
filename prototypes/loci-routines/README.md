@@ -1,61 +1,46 @@
-# Loci routines
+# Loci routines (version 3)
 
-> **Superseded direction (29 Oct).** This prototype shows the 25 Oct routines design. The direction is now three jobs (Follow, Get ready, Keep it fresh) with no Routines page: see [`docs/superpowers/specs/2026-10-29-background-work-rethink.md`](../../docs/superpowers/specs/2026-10-29-background-work-rethink.md). Kept for reference until a new prototype replaces it.
+**Simple to send, sorted your way.** Routines are small automations for a Commonplace, in three families by what starts them:
+- **When something arrives:** your filing rules. Everything you send, from WhatsApp, a phone share, email, the browser or Studiolo itself, comes through one door and meets your rules from the top.
+- **On a schedule:** tidy, bring in, bring back.
+- **When something happens:** small follow-ups to what you do.
 
-**Routines keep your learning moving between sessions.** Each one is a standing instruction to Loci, written as one sentence and tied to one place on the map. Its runs bring back things for you to keep, make or answer. It never changes your map or your memory.
+Design: [`docs/superpowers/specs/2026-10-29-routines-filing-rules-design.md`](../../docs/superpowers/specs/2026-10-29-routines-filing-rules-design.md). The scheduled routines are from [`2026-10-25-loci-routines-design.md`](../../docs/superpowers/specs/2026-10-25-loci-routines-design.md).
 
-Design: [`docs/superpowers/specs/2026-10-25-loci-routines-design.md`](../../docs/superpowers/specs/2026-10-25-loci-routines-design.md). That spec covers what routines are for, the rules, how a run really works with Claude, the card, data and phases.
+It's built on **Studiolo's real shell, Today, Library and Loci screens and styles**, captured read-only from `studiolo` (`../live-lumens/capture/snap.json`), with the Settings and memory prototype's form styles. The sample learner, Layla, is the architect working on a prayer hall in Dubai. "Now" is Monday 26 October, 8:10.
 
-It's built on **Studiolo's real shell, Today and Loci screens and styles**, captured read-only from `studiolo` (`../live-lumens/capture/snap.json`), with the Settings and memory prototype's form styles. The sample learner, Layla, is the architect working on a prayer hall in Dubai from the other prototypes. "Now" is Monday 26 October, 8:10.
-
-Open `dist/loci-routines-prototype.html`. Links: `#today`, `#routines`, `#runs`, `#loci`.
+Open `dist/loci-routines-prototype.html`. Links: `#routines`, `#inbox`, `#today`, `#runs`, `#loci`.
 
 ## Try it
 
-1. **Routines** (Today / Routines). The page opens on one sentence about this week, then the four jobs of the loop:
-   - **Bring in:** Watch: AI in architecture, and a weekly reading list.
-   - **Make sense:** Questions and goals, and Lumen of the week.
-   - **Bring back:** Friday review.
-   - **Bring forward:** the daily brief, and a board digest paused after three unopened runs.
-
-   Each card shows:
-   - the routine as a sentence;
-   - your words and its guidelines;
-   - its last eight runs as marks, and what came of it (kept, Lumens made, answered);
-   - a link to anything waiting;
-   - its place on Loci, with the place's status dot.
-
-   The dashed tiles start a new routine of that kind.
-2. **Run now** on *Questions and goals*. The card shows each step in plain words, then the run opens:
-   - the goal, with its progress;
-   - a question that becomes a **Lumen outline from your own saves** (Make this Lumen);
-   - a question your saves can't answer (Find readings for it);
-   - one you may have answered already (Mark answered).
-3. **Runs › Watch: AI in architecture.** Five arrivals, grouped by the topic each was sorted onto. One suggests a new sub-topic, dashed and not made. **Keep**, **Not this** (with a reason), or **Keep all**.
-4. **Builder** (in the prototype bar) shows how each run worked: every step, whether rules, search, a small model, the writing model or voice ran it, and the tokens, with how many came from the cache. Learners never see this.
-5. **How was this run?** A tap or a sentence becomes a guideline on the routine, *from the run on …*.
-6. **Edit.** The sentence is the editor: change how often, the time, the place and where it lands inside the sentence. Below it:
-   - sources (Watch only);
-   - in your words;
-   - guidelines from your runs;
-   - suggest only, or also file;
-   - skip when nothing is new.
-
-   The cost updates as you go.
-7. **Today:** *From your routines* lists what's waiting, and this morning's runs are in the timeline.
-8. **In Loci** (Climate-responsive design):
-   - *Routines here*;
-   - the Questions and goals finding as a message, with **Make it**;
-   - a prompt that creates a routine from a sentence.
+1. **Routines › When something arrives.**
+   - Eight filing rules, each one a sentence. **Dotted** parts are where Loci reads the item; the rest are plain rules that cost nothing.
+   - Each card shows whether it files on its own or asks first, and how often it's been right.
+   - *Books* has earned **Let it file on its own** (right 9 of 10).
+   - Two **suggestions from what you do** at the top: *Add it*, or *Make it a rule*.
+   - **Try it** on any rule shows what it would have filed from your last 20 arrivals, and when an earlier rule gets something first.
+   - **Move up / down** changes the order.
+   - **Anything else** is the last line: suggest a place, or leave it in Unsorted.
+2. **Inbox** (prototype bar, or *Open the Inbox*). Send things on the left and watch the rules act on the right:
+   - **WhatsApp:** a #site photo (files on its own and is described), a link from archdaily.com, a book cover (*Books* asks, with the book found), a voice note (written out, titled, a @question found, and a reply on WhatsApp), a **#explain** voice note (Studiolo asks on WhatsApp before making a Lumen: say **Yes**), and a book you already have (caught).
+   - **Phone share:** a reel (the links in its caption are saved) and a recipe reel (*keep just the recipe*, on Home & family).
+   - **Email:** a specification PDF (text pulled out, three-line summary, filed on Precast and the project).
+   - **Browser:** a joinery blog that no rule fits. Loci suggests a new sub-topic; try **Make a rule from this**.
+   - On every item: **File it**, or choose another topic, **Undo**, **Why**. Turn on **Builder** to see which steps used a model.
+3. **New rule › Say it.** Write a sentence, or tap an example, then **Make it a rule**. Check the parts, then **Try it on your last 20 arrivals**. New rules go to the top.
+4. **Routines › On a schedule.** The 25 Oct routines, grouped Store / Manage / Learn, plus three new Manage ones:
+   - **Tidy Unsorted:** last night's run shows what your rules filed, what Loci suggests (*Place all*) and what's left for you. **Run now** picks up anything left in the Inbox.
+   - **Clear the To read pile.**
+   - **Keep sources alive.**
+5. **When something happens.** Five follow-ups, each on or off.
+6. **Today:** the Inbox since yesterday, then what's waiting from routines. **In Loci** is as in version 2.
 
 ## Real or simulated
 
-- No model runs. Every run's content is written by hand from the sample learner.
-- The books and the article are real titles, but the prototype doesn't look them up.
-- **Watch items are invented examples**, and their sources are described rather than named.
-- No audio: a timer stands in for the two voices. No email and no scheduler.
-- Costs and token counts are example figures.
-- Everything resets on reload.
+- Nothing is sent or received: WhatsApp, the phone share and email are simulated panels, with no branding.
+- No model runs. *Say it* uses a keyword reader in place of the model call. Descriptions, transcripts and summaries are written by hand.
+- Book titles are real; links, reels, articles and the blog are examples.
+- Costs are example figures. Everything resets on reload.
 
 ## Build
 
