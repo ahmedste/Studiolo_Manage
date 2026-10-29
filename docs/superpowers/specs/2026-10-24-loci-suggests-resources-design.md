@@ -3,6 +3,7 @@ HIGH (a new Loci skill, outside catalogues and a migration; each phase states it
 # Loci suggests resources: books, PDFs, videos and links, saved to Commonplace in the right place
 
 **For:** the owner, to decide the direction, and the agent who later builds it in `studiolo`.
+**Prototype (29 Oct):** [`prototypes/loci-resources/`](../../../prototypes/loci-resources/README.md), published at `https://claude.ai/artifact/QZxKcs1UCTUbiTqvcmu4pk`. It shows R1 in Loci's chat. §14 maps R1 onto the code.
 **Status:** Proposed. Claude, 24 October 2026. Nothing here is approved until the owner says so in the conversation.
 **Checked against:** `studiolo` main @ `dfd4fbb` (24 Oct 2026), read only. Paths exist on that commit unless marked *new*.
 **Builds on, in `studiolo`:** decisions **A2, A4, A5, A8, A9, A15** in `docs/superpowers/specs/2026-10-05-ai-direction-graph-copilot-design.md` (agreed 5–7 Oct), and `project-docs/product/mvp-scope.md:48-54` ("Real resources only", "Suggestions stay on their topic"). **In this repo:** the Work loop (`2026-10-24-work-design.md` §0), learner memory (`2026-10-24-learner-memory-and-settings-design.md`), the unified Loci chat brief (`2026-10-24-unified-loci-chat-brief.md`) and the Commonplace photos design (`2026-10-24-commonplace-photos-design.md`, "three questions, never folders").
@@ -96,7 +97,7 @@ flowchart TB
 
 ### 3.1 The tool
 
-*New* `find_resources`, kind `read` (it changes nothing; see RS-D2 on cost), card tool. Its input from the model:
+*New* `find_resources`, kind `propose`, built like `propose_topics` (see §14: a `read` tool may not show a card, and the proposal pattern already gives each row its own Keep, Dismiss and Undo). Its input from the model:
 
 ```ts
 {
@@ -179,13 +180,13 @@ This is the part the owner asked for: Loci suggests, and the save lands in the r
 | Question | Answered by | Rule |
 |---|---|---|
 | **What is it?** | **Type** Source, and its **kind** | From the catalogue: Open Library gives `book`; YouTube gives `video`; a URL served as `application/pdf` gives `pdf`; a known podcast host or RSS feed gives `podcast`; a course or project home page gives `website`; anything else gives `article` |
-| **Which shelf?** | Its **collection** (one Sources collection at most) | In order: **(a)** the collection the learner last chose for this kind *in this area*; **(b)** else the one they last chose for this kind *anywhere*; **(c)** else a Sources collection whose name says the kind (Books, Videos, Lectures, Papers, Podcasts, Articles); **(d)** else **Not on a shelf**, plus a one-time offer: "Make a *Books* collection for these?" |
+| **Which shelf?** | Its **collection** (one Sources collection at most) | In order: **(a)** the collection the learner last chose for this kind *in this area*; **(b)** else the one they last chose for this kind *anywhere*; **(c)** else the **starter shelf** for the kind, the one capture already files into (`starterForSourceKind`: Books, Videos, PDFs, Links); **(d)** else, if the learner deleted that starter, **Not on a shelf** |
 | **What is it about?** | **Topic** and its **area** | The place it was suggested for. If Loci matched a sub-topic more closely, the card says so ("Courtyards › Shading") and files there. Tagged with `added_by = 'assistant'`. Never more than 20 topics (the existing cap) |
 | **Where is it in my reading?** | **Reading state** | `unread`, so it appears in **To read** at once |
 | **Why do I have it?** | **Provenance** | "Suggested by Loci for *Courtyards* · 24 Oct", plus the why line, from the suggestion row. `content_items.origin` stays `user`: the learner chose to keep it |
 | **For which piece of work?** | **Project reference** (once Work exists) | If it was found for a Work gap, it is also added as a reference to the project with the gap's question as its reason (Work W1 `project_refs`) |
 
-Rules (a) and (b) mean the learner teaches the filing by using it. Change one card's shelf from *Videos* to *Lectures*, and the next video in that area goes to *Lectures*. There is no settings page to keep. Rule (d) never makes a collection silently: making one is an addition, so it is a card with one tap (A2).
+Rules (a) and (b) mean the learner teaches the filing by using it. Change one card's shelf from *Videos* to *Lectures*, and the next video in that area goes to *Lectures*. There is no settings page to keep. Loci never makes a collection itself; **+ New collection…** in the card's shelf menu makes one only when the learner taps it.
 
 After the save, the existing pipeline runs as it does for a learner's own link: the link preview job (title, description, picture), the Open Library cover for a book, and the YouTube length for a video. Saving goes through the same validated library operation as capture (A8), so account isolation, limits and Undo come with it.
 
@@ -285,7 +286,7 @@ No new columns on `sources` or `content_items`: the key is worked out from `url`
 | ID | Question | Recommendation |
 |---|---|---|
 | **RS-D1** | Which catalogues first? | **Open Library, YouTube and web search in R1.** Add Google Books only if Open Library misses too often on a 50-book hand check. OpenAlex arrives with R4 |
-| **RS-D2** | Is a search a `read` (done straight away, under a daily cap) or `costly` (confirmed each time, A2)? | **`read` with a cap of 20 a day.** A run costs cents, and asking "Search the web? Yes" every time would kill the feature. The cap protects spend until 3D's allowance arrives |
+| **RS-D2** | Does a search run straight away (under a daily cap) or ask "Search the web?" each time (`costly`, A2)? | **Straight away, with a cap of 20 a day**, as a `propose` tool (§14). A run costs cents, and asking every time would kill the feature. The cap protects spend until 3D's allowance arrives |
 | **RS-D3** | How many cards per run? | **3 by default, up to 5 when asked**, with mixed kinds unless `prefer` says otherwise |
 | **RS-D4** | Shop links (A9 mentioned Amazon "afterwards")? | **None in R1.** Show *Free to borrow* (Open Library) and *Find in a library* (WorldCat). Revisit affiliate links only with a written rule that they never affect which books are chosen |
 | **RS-D5** | Save open PDFs as files (R4)? | **Yes, but only with an open licence or from the publisher's own open copy.** Everything else is saved as a link |
@@ -312,3 +313,32 @@ No new columns on `sources` or `content_items`: the key is worked out from `url`
 - **Not a shop.** No sponsored or affiliate results decide what is shown.
 - **Not a downloader.** Only openly licensed PDFs are copied; everything else stays a link to its owner's site.
 - **Not proof of learning.** Saving or finishing a resource never marks a topic Learned and never writes `known`.
+
+## 14. R1 in the code: what to reuse and what to build (checked 29 Oct, `studiolo` main @ `e5bf930`)
+
+The owner's direction (29 Oct): **start in Loci's chat, when the learner asks**, filed under the right type and the right collection. That is R1 alone. This section is what the building agent needs to start it.
+
+**Two corrections to §3 and §5, from the code:**
+1. **The tool is a `propose` tool, not a `read` card tool.** The registry refuses a card from a `read` or `propose` tool ("This tool cannot pause the turn.", `src/features/copilot/tools/registry.ts:219`). The closest existing shape is `propose_topics` (`tools/propose.ts:36-64`). It writes its own tables (`copilot_proposals`, `copilot_proposal_items`), returns `ui: { type: "proposal" }` without pausing the turn (`turn.ts:266-272`), and gives every row its own **Keep**, **Dismiss** and **Undo** routes with idempotency keys and journal lines (`src/app/api/copilot/proposals/[proposalId]/{keep,dismiss,undo}/route.ts`; `proposals.ts :: keepProposalItems` 181, `dismissProposalItems` 261, `undoKeep` 289). Resource cards are exactly that: Save is a Keep, per row.
+2. **Rule (c) uses the starter shelves.** Capture already files a new Source with no collection into the starter for its kind (`src/features/library/starter-collections.ts :: starterForSourceKind`: Videos, Links, PDFs, Books). So a learner always has a shelf, and the "make a collection" offer is not needed.
+
+| Need | Reuse | Change or build |
+|---|---|---|
+| The tool | `defineTool` and `copilotRegistry()` (`tools/registry.ts:121`, `tools/index.ts:19`; bump `COPILOT_TOOLS_VERSION`, `prompt/system.ts:28`); a service port in `tools/services.ts :: CopilotServices` | *New* `tools/resources.ts`, kind `propose`, following `propose.ts` |
+| The cards in the panel | `proposal-card.tsx:210-248` (rows, `Button data-act`, quiet buttons); "Looked at" steps (`copilot-message.tsx:79-82`, `.steps` in `styles/copilot.css:18-22`); `.cp-card` styles | *New* `resource-card.tsx`: cover, facts, why, **Files to** chips, Save · Save and open · Dismiss ▾ |
+| Save, Dismiss, Undo | The proposal routes' pattern: one route per action, a client-made key, Undo in the toast; `components/graph/loci-side/capture-undo.ts :: undoCaptured` → `deleteItem` | *New* `src/app/api/copilot/resources/[suggestionId]/{save,dismiss,undo}/route.ts` and `resources-repository.ts` |
+| Making the Source | `createItem` (`library/items-repository.ts:229`) with `sourceCreate` (`library/schema.ts:225`): it already takes `collectionId` (checked by `canFileIn`), `topicIds`, `source: { kind, url, creator, published, isbn }`, and `createKey` idempotency; `reading_state` defaults to unread | Tags are written with `added_by = 'learner'` (`items-repository.ts:431`): add an `addedBy` parameter (precedent: `plan-contents.ts:93`) so Loci's saves say `assistant` |
+| After the save | `withPreviews` (`links/refresh.ts:247`): title, picture, YouTube oEmbed; `bookCoverUrl(isbn)` (`library/media.ts:61`) | Nothing new |
+| Checking a candidate opens | `safeFetch` (`links/safe-fetch.ts:214`, SSRF-guarded); YouTube oEmbed (`links/oembed.ts`) | `safeFetch`'s `accept` is `html` · `image` · `json`: add `pdf`. Video length isn't known before watching; show it only when the search API gives it |
+| Filing (§5) | `readCollections` (`collections-repository.ts:55`); `starterForSourceKind`; the Objects precedent `readLastObjectCollection` (`:308`) | *New* `readLastSourceCollection(kind, areaId?)`, derived from `content_items.created_at` joined to `sources.kind`, then the pure `fileSuggestion` |
+| Not suggesting what you have | `normalizeIsbn`, `youtubeId` (`library/media.ts`); `urlHash` (`previews-repository.ts:15`, exact text only) | *New* `resourceKey` with URL normalisation (scheme, `www.`, trailing slash, tracking parameters) |
+| Journal | `recordJournalEntry` (`topics/journal.ts:14`). A tagged save already shows as "Saved **X** to this topic" (`journal-read.ts:108-118`) | Saves need nothing. `resources_suggested` and `resource_dismissed` need the kind check widened (migration) and `journalParts` |
+| Searching | **Nothing exists** (no web search, YouTube Data API or Open Library search) | *New* `src/features/resources/`: Open Library, YouTube and web-search clients, each with a usage purpose in `ai/purposes.ts` and the ledger |
+| A switch | `config/copilot.ts` has none | *New* `RESOURCE_SUGGESTIONS`, following `config/library.ts :: canSeeLibrarySwitch` |
+
+**R1 in four slices, each one shippable behind the switch:**
+1. **Save to the right place.** `resourceKey`, `readLastSourceCollection` and `fileSuggestion` (pure, unit-tested), plus `addedBy` on `createItem`. No AI and no migration. Tested with fixture candidates.
+2. **Cards in the chat.** The migration (`resource_suggestions`, `resource_searches`), the `find_resources` tool with **Open Library only** (free, no key), `resource-card.tsx`, and the Save, Dismiss and Undo routes. Books work end to end.
+3. **Videos and the web.** The YouTube client (needs a Google API key and the quota note in §3.2) and web search with the blocked list. The pre-save check accepts PDFs.
+4. **Measure.** The 30-request evaluation set in §12, tokens and cost per run, and the daily cap. The owner tests on the hosted app.
+
