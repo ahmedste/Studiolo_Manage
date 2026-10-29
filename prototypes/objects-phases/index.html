@@ -1014,7 +1014,7 @@ document.addEventListener("click", e => {
     case "prel": { const o = O(menuState.o), f = F_(C(o.c), menuState.f); setRel(o, f, d.v); if (f.o.many || f.o.sym) $("#menu").innerHTML = pickMenu(); else closeMenu(); render(); break; }
     case "addview": {
       e.stopPropagation();
-      const items = [...c.fields.filter(f => f.t === "choice").map(f => [`vb${f.id}`, `Board by ${f.label}`, "board", f.id]), ...c.fields.filter(f => f.t === "date").map(f => [`vt${f.id}`, `Timeline by ${f.label}`, "timeline", f.id])];
+      const items = [...c.fields.filter(f => f.t === "choice").map(f => [`vb${f.id}`, `Columns by ${f.label}`, "board", f.id]), ...c.fields.filter(f => f.t === "date").map(f => [`vt${f.id}`, `Timeline by ${f.label}`, "timeline", f.id])];
       openMenu(a, `<h5>Save a view of ${esc(lower(c.name))}</h5>${items.map(([id, n, l, by]) => `<button data-act="mkview" data-id="${id}" data-n="${esc(n)}" data-l="${l}" data-by="${by}"><i></i><span>${esc(n)}</span></button>`).join("")}`, { kind: "addview" }); break;
     }
     case "mkview": { const id = d.id + Date.now() % 1000; c.views.push({ id, name: d.n, l: d.l, by: d.by }); c.view = id; closeMenu(); render(); toast(`Saved “${d.n}”. Pin it to the header from its ⋯ menu.`); break; }

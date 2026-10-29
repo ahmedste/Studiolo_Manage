@@ -61,6 +61,13 @@
     target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8"/>',
     commonplace: '<rect x="4" y="4" width="7" height="9" rx="1.2"/><rect x="13" y="4" width="7" height="5" rx="1.2"/><rect x="4" y="15" width="7" height="5" rx="1.2"/><rect x="13" y="11" width="7" height="9" rx="1.2"/>',
     chevup: '<path d="M6 15l6-6 6 6"/>',
+    share: '<path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M6 11H5v10h14V11h-1"/>',
+    filter: '<path d="M4 7h16M7 12h10M10 17h4"/>',
+    grid: '<rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/>',
+    shelves: '<path d="M4 20h16M4 13h16M4 6h16"/><path d="M6 13V8M9 13V9M13 20v-5M16 20v-4"/>',
+    star: '<path d="M12 4l2.4 5 5.4.7-4 3.8 1 5.4L12 16.3 7.2 18.9l1-5.4-4-3.8 5.4-.7z"/>',
+    folder: '<path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18z"/>',
+    tag: '<path d="M4 4h7.5l8.5 8.5-7.5 7.5L4 11.5z"/><circle cx="8.5" cy="8.5" r="1.3"/>',
   };
   const FILLED = new Set(["play", "more"]);
   const ic = (n, cls = "") => `<svg class="m-ico ${FILLED.has(n) ? "fill " : ""}${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
@@ -68,10 +75,13 @@
   const STATUS = { not_started: { label: "Not started", cls: "" }, learning: { label: "Learning", cls: "s1" }, learned: { label: "Learned", cls: "s2" } };
 
   /* ---------- state ---------- */
+  // The card keeps the height the learner last left it at (peek, card or full), across places and visits.
+  const DETENT_KEY = "studiolo.loci.detent";
+  function savedDetent() { try { const d = localStorage.getItem(DETENT_KEY); return ["peek", "card", "full"].includes(d) ? d : "peek"; } catch { return "peek"; } }
   const S = {
     dest: "loci", view: "palace",
     topics: D.topics.map((t) => ({ ...t })), relations: D.relations, items: D.items.map((x) => ({ ...x })), lumens: D.lumens.map((l) => ({ ...l })),
-    trail: [], openId: null, extraArea: null, detent: "card",
+    trail: [], openId: null, extraArea: null, detent: savedDetent(),
     bar: { mode: "idle", parent: null, capture: null, listening: false, ptt: false },
     reply: null, thread: [], chat: false, ghosts: [], making: null, player: null,
     recents: [], theme: "auto", slowTurn: false, key: false, hinted: false, pop: new Set(), lastPlace: null,
@@ -123,11 +133,11 @@
     if (ref?.kind === "item") return openItem(ref.id);
     if (ref) { S.extraArea = ref.kind === "stack" ? ref.areaId : current().areaId; }
     if (!ref && !T.has(id)) return;
-    if (id === S.openId) { setDetent(S.detent === "peek" ? "card" : S.detent); return; }
+    if (id === S.openId) return;
     S.trail = LP.pushTrail(S.trail, id);
     S.openId = id;
     if (!ref) remember({ kind: "topic", id });
-    S.detent = opts.detent || "card";
+    if (opts.detent) S.detent = opts.detent;
     hideReplyIfStale();
     refresh();
   }
@@ -135,10 +145,9 @@
     if (!S.openId) return;
     const { trail, openId } = LP.backTrail(S.trail);
     S.trail = trail; S.openId = openId || null;
-    S.detent = "card";
     refresh();
   }
-  function goHome() { S.trail = []; S.openId = null; S.detent = "card"; refresh(); engine?.home(); }
+  function goHome() { S.trail = []; S.openId = null; refresh(); engine?.home(); }
   function remember(r) {
     S.recents = [r, ...S.recents.filter((x) => !(x.kind === r.kind && x.id === r.id))].slice(0, 5);
   }
@@ -225,7 +234,6 @@
       const r = wrap.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
       lastPoint = { x: e.clientX - app.getBoundingClientRect().left, y: e.clientY - app.getBoundingClientRect().top };
       downs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (S.detent === "full") setDetent("card");
       if (downs.size === 1) {
         moved = 0;
         clearTimeout(hold);
@@ -282,6 +290,7 @@
     } else {
       st.classList.add("is-page");
       st.innerHTML = pageHtml();
+      PAGES()[S.dest]?.mounted?.(st);
       st.onscroll = () => { const on = st.scrollTop > 44; $("#tb").classList.toggle("is-edge", on); $(".m-title .m-fade")?.style.setProperty("opacity", on ? "1" : "0"); };
     }
     paintTop();
@@ -306,6 +315,8 @@
 
   function paintTop() {
     const tb = $("#tb");
+    const own = PAGES()[S.dest]?.top?.();
+    if (own) { tb.className = "m-tb m-mat"; tb.innerHTML = `<button class="m-ib" type="button" data-act="drawer" aria-label="Open menu" aria-controls="drawer">${ic("menu")}</button>${own}`; return; }
     const view = { palace: "Palace", map: "Map", list: "List" }[S.view];
     const title = S.dest === "loci"
       ? `<button class="m-title" type="button" data-act="views" aria-haspopup="menu" aria-label="Loci, ${view}. Change view"><small>Loci</small><b>${view}${ic("down")}</b></button>`
@@ -335,11 +346,11 @@
     else if (mode === "naming") dtop.innerHTML = suggestHtml();
     else if (S.reply && !S.chat) dtop.innerHTML = replyHtml(S.reply);
     else { dtop.innerHTML = ""; dtop.hidden = true; }
-    const showCard = S.dest === "loci" && mode !== "find" && mode !== "naming" && !S.chat;
+    const showCard = S.dest === "loci" && mode !== "find" && mode !== "naming" && !S.chat && !window.MP_ROOM;
     card.hidden = !showCard;
     if (showCard) paintCard();
     const mk = $("#dmake");
-    mk.hidden = !(S.making && S.dest !== "loci" && !S.chat);
+    mk.hidden = !(S.making && S.dest !== "loci" && S.dest !== "learn" && !S.chat && !window.MP_ROOM);
     if (!mk.hidden) mk.innerHTML = makingHtml();
     const mini = $("#dmini");
     mini.hidden = !(S.player && S.player.mode === "mini") || mode === "find" || mode === "naming";
@@ -359,7 +370,7 @@
     if (!id) {
       const areas = kids(null), learned = S.topics.filter((t) => t.status === "learned").length;
       return {
-        kind: "home", kicker: "Loci", title: "Your whole map",
+        kind: "home", kicker: "Loci", title: "Your whole map", peek: `${plural(areas.length, "area")}`,
         meta: `${plural(areas.length, "area")} · ${plural(S.topics.length - areas.length, "topic")} · ${learned} learned`,
         acts: [["add", "plus", "Area"], ["focus", "target", "Focus"], ["ask", "spark", "Ask"], ["more", "more", "More"]],
         rail: areas.map((a) => ({ id: a.id, name: a.name, cls: STATUS[a.status].cls, n: descendants(a.id).length })),
@@ -368,13 +379,13 @@
     const ref = LP.parseExtraId(id);
     if (ref?.kind === "stack") {
       const area = T.get(ref.areaId), room = roomOf(ref.areaId), cp = ref.which === "commonplace";
-      return { kind: "stack", which: ref.which, areaId: ref.areaId, kicker: `${cp ? "Commonplace" : "Lumens"} in ${area.name}`, title: cp ? "Commonplace" : "Lumens", meta: cp ? plural(room.itemTotal, "item") : plural(room.lumenTotal, "Lumen"), acts: cp ? [["capture", "plus", "Capture"], ["lumen", "spark", "Lumen"], ["ask", "chat", "Ask"], ["more", "more", "More"]] : [["lumen", "spark", "New"], ["playall", "play", "Play"], ["ask", "chat", "Ask"], ["more", "more", "More"]], rail: [] };
+      return { kind: "stack", peek: area.name, which: ref.which, areaId: ref.areaId, kicker: `${cp ? "Commonplace" : "Lumens"} in ${area.name}`, title: cp ? "Commonplace" : "Lumens", meta: cp ? plural(room.itemTotal, "item") : plural(room.lumenTotal, "Lumen"), acts: cp ? [["capture", "plus", "Capture"], ["lumen", "spark", "Lumen"], ["ask", "chat", "Ask"], ["more", "more", "More"]] : [["lumen", "spark", "New"], ["playall", "play", "Play"], ["ask", "chat", "Ask"], ["more", "more", "More"]], rail: [] };
     }
     const t = T.get(id), area = !t.parentId, parent = T.get(t.parentId);
     const ch = kids(id), its = itemsOn(id), ls = lumensOn(id);
     const sub = parent && parent.parentId;
     return {
-      kind: area ? "area" : "topic", t,
+      kind: area ? "area" : "topic", t, peek: ch.length ? plural(ch.length, area ? "topic" : "sub-topic") : area ? "Area" : T.get(t.parentId).name,
       kicker: area ? `Area · ${plural(descendants(id).length, "topic")}` : `${sub ? "Sub-topic" : "Topic"} in ${parent.name}`,
       title: t.name, status: t.status,
       meta: [ch.length ? plural(ch.length, area ? "topic" : "sub-topic") : area ? "No topics yet" : "No sub-topics yet", its.length ? `${its.length} in Commonplace` : "", ls.length ? plural(ls.length, "Lumen") : ""].filter(Boolean).join(" · "),
@@ -396,7 +407,7 @@
     card.innerHTML = `<div class="m-grab" data-drag="card"></div>
       <div class="m-card-body" id="cardBody">
         <div class="m-card-head" data-drag="card">
-          <div class="m-names"><div class="m-kicker">${esc(m.kicker)}</div><h2>${esc(m.title)}</h2></div>
+          <div class="m-names"><div class="m-kicker">${esc(m.kicker)}</div><h2>${m.status ? `<i class="m-sd ${STATUS[m.status].cls} m-peek-only"></i>` : ""}<span>${esc(m.title)}</span><small class="m-peek-only">${esc(m.peek || "")}</small></h2></div>
           ${S.openId ? `<button class="m-close" type="button" data-act="back" aria-label="Close and go back">${ic("x", "xs")}</button>` : ""}
         </div>
         <div class="m-meta">${m.status && m.kind === "topic" ? `<button class="m-status-pill" type="button" data-act="status" aria-label="Status: ${STATUS[m.status].label}. Change"><i class="m-sd ${STATUS[m.status].cls}"></i>${STATUS[m.status].label}</button>` : ""}<span>${esc(m.meta)}</span></div>
@@ -441,7 +452,7 @@
     const card = $("#card"), body = $("#cardBody");
     if (!card || !body) return 0;
     const head = $(".m-card-head", body), rail = $(".m-rail", body), acts = $(".m-acts", body);
-    if (detent === "peek") return head.offsetTop + head.offsetHeight + 14;
+    if (detent === "peek") return head.offsetTop + head.offsetHeight + 11;
     const last = rail || acts;
     const cardH = last.offsetTop + last.offsetHeight + (rail ? 0 : 16);
     if (detent === "card") return cardH;
@@ -451,6 +462,7 @@
   const sab = () => parseFloat(getComputedStyle($("#dock")).paddingBottom) || 8;
   function setDetent(d) {
     S.detent = d;
+    try { localStorage.setItem(DETENT_KEY, d); } catch { /* private window: the height lasts this visit */ }
     const card = $("#card"); if (!card || card.hidden) return;
     card.dataset.detent = d;
     if (d !== "full") $("#cardBody").scrollTop = 0;
@@ -463,7 +475,9 @@
   function placeholder() {
     if (S.bar.mode === "naming") return S.bar.parent ? "Name a sub-topic" : "Name an area";
     if (S.bar.mode === "capture") return `${S.bar.capture === "link" ? "Paste a link" : "Write a note"}…`;
+    if (window.MP_ROOM?.placeholder) return window.MP_ROOM.placeholder();
     if (S.dest === "loci") return S.openId && T.has(S.openId) ? `Ask about ${T.get(S.openId).name}…` : "Find a place or ask Loci…";
+    if (PAGES()[S.dest]?.placeholder) return PAGES()[S.dest].placeholder();
     return { today: "Ask about your day…", learn: "What do you want to learn?", commonplace: "Capture, find or ask…" }[S.dest];
   }
   function paintBar() {
@@ -478,7 +492,7 @@
       if (document.activeElement === input || S.bar.listening) return;
       if (S.bar.mode === "find" && !input.value.trim()) { S.bar.mode = "idle"; paintDock(); }
     }, 180));
-    input.addEventListener("input", () => { if (S.bar.mode === "find") $("#dtop").innerHTML = findsHtml(); paintBarState(); });
+    input.addEventListener("input", () => { (window.MP_ROOM || PAGES()[S.dest])?.onBarInput?.(input.value); if (S.bar.mode === "find") $("#dtop").innerHTML = findsHtml(); paintBarState(); });
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") { e.preventDefault(); submitBar(); }
       if (e.key === "Escape") { e.stopPropagation(); input.value = ""; endBarMode(); input.blur(); }
@@ -516,6 +530,8 @@
     const input = $("#barInput"), text = input.value.trim(); if (!text) return;
     if (S.bar.mode === "naming") { addTopic(text); input.value = ""; paintBarState(); return; }
     if (S.bar.mode === "capture") { captureNote(text); input.value = ""; return; }
+    const own = window.MP_ROOM?.onSubmit ? window.MP_ROOM : PAGES()[S.dest]?.onSubmit ? PAGES()[S.dest] : null;
+    if (own && S.bar.mode !== "listen") { input.value = ""; input.blur(); S.bar.mode = "idle"; paintDock(); if (own.onSubmit(text)) return; }
     const first = S.bar.mode === "find" ? findHits(text)[0] : null;
     input.value = ""; input.blur(); S.bar.mode = "idle";
     if (first && first.name.toLowerCase() === text.toLowerCase()) { goTo(first.id); refresh(); return; }
@@ -532,6 +548,8 @@
   }
   function findsHtml() {
     const q = $("#barInput")?.value.trim() || "";
+    const own = window.MP_ROOM?.barPanel ? window.MP_ROOM : PAGES()[S.dest]?.barPanel ? PAGES()[S.dest] : null;
+    if (own) return own.barPanel(q);
     if (!q) {
       const sug = S.dest === "loci" && T.has(S.openId) ? [`Suggest sub-topics for ${T.get(S.openId).name}`, `Make a Lumen about ${T.get(S.openId).name}`, "What should I learn next?"] : ["What should I learn next?", "Open Daylight & shading", "Make a Lumen about passive design"];
       const rec = S.recents.filter((r) => r.kind === "topic" && T.has(r.id)).slice(0, 3);
@@ -769,10 +787,11 @@
       $("#lmake", el).addEventListener("click", () => { if (session) stopListening(false); closeSheet(); makeLumen(topicId, fmt, $("#lq", el).value.trim()); });
     });
   }
-  function makeLumen(topicId, format, question) {
-    const name = topicId ? T.get(topicId).name : "Your question";
-    const title = { listen: `${name}, talked through`, watch: `${name} in six slides`, read: `${name}: a long read` }[format];
-    S.making = { id: nextId("l"), topicId, format, title, question, progress: 0 };
+  function makeLumen(topicId, format, question, addTo) {
+    const name = topicId ? T.get(topicId).name : null;
+    const base = addTo ? S.lumens.find((l) => l.id === addTo) : null;
+    const title = base ? base.title : name ? { listen: `${name}, talked through`, watch: `${name} in six slides`, read: `${name}: a long read` }[format] : (question || "Your question").replace(/\?$/, "").replace(/^./, (c) => c.toUpperCase());
+    S.making = { id: base ? base.id : nextId("l"), topicId: topicId || base?.topic || null, format, title, question, progress: 0, addTo: base?.id || null };
     if (topicId && S.dest === "loci" && S.openId !== topicId) openThing(topicId); else refresh();
     const t0 = performance.now(), dur = 6000;
     const tick = setInterval(() => {
@@ -780,19 +799,23 @@
       S.making.progress = Math.min(1, (performance.now() - t0) / dur);
       $$(".m-making .m-bar-p i").forEach((i) => (i.style.width = `${Math.round(S.making.progress * 100)}%`));
       $$(".m-making > span:last-child").forEach((s) => (s.textContent = S.making.progress < 1 ? `${Math.max(1, Math.round((1 - S.making.progress) * 6))} s` : "Ready"));
+      PAGES().learn?.onMaking?.();
       if (S.making.progress >= 1) {
         clearInterval(tick);
         const m = S.making; S.making = null;
-        S.lumens.unshift({ id: m.id, title: m.title, format: m.format, min: FMT[m.format].len, topic: m.topicId || S.topics[0].id, progress: 0, state: "ready" });
+        if (m.addTo) { const l = S.lumens.find((x) => x.id === m.addTo); l.formats = { ...l.formats, [m.format]: { min: FMT[m.format].len } }; }
+        else S.lumens.unshift({ id: m.id, title: m.title, format: m.format, min: FMT[m.format].len, topic: m.topicId || S.topics[0].id, progress: 0, state: "ready", made: "2026-10-25", formats: { [m.format]: { min: FMT[m.format].len } }, lines: [], fresh: true });
+        if (S.dest !== "loci") render();
         refresh();
-        toast(`“${m.title}” is ready`, "Play", () => openPlayer(m.id));
+        toast(m.addTo ? `${FMT[m.format].label} is ready` : `“${m.title}” is ready`, m.format === "read" ? "Read" : "Play", () => openPlayer(m.id, { fmt: m.format }));
       }
     }, 250);
   }
 
   /* ---------- the player: full screen, swiped down to the mini player above the bar ---------- */
   let playTick = null;
-  function openPlayer(id) {
+  function openPlayer(id, opts) {
+    if (PAGES().learn?.openLumen) return PAGES().learn.openLumen(id, opts);
     const l = S.lumens.find((x) => x.id === id); if (!l) return;
     if (S.player?.id !== id) S.player = { id, pos: Math.round(l.progress * l.min * 60), playing: true, mode: "full" };
     else S.player.mode = "full";
@@ -825,13 +848,15 @@
     $$(".m-mini .m-prog i").forEach((i) => (i.style.width = w));
   }
   function miniHtml() {
-    const p = S.player, l = S.lumens.find((x) => x.id === p.id);
-    return `<div class="m-mini m-mat" role="group" aria-label="Now playing"><button class="m-cover" type="button" data-act="full" aria-label="Open player">${ic(FMT[l.format].ic, "sm")}</button><button class="m-txt" type="button" data-act="full"><b>${esc(l.title)}</b><small>${FMT[l.format].label} · ${mmss(p.pos)}</small></button>
+    const p = S.player, l = S.lumens.find((x) => x.id === p.id), f = p.fmt || l.format;
+    if (PAGES().learn?.miniHtml) return PAGES().learn.miniHtml();
+    return `<div class="m-mini m-mat" role="group" aria-label="Now playing"><button class="m-cover" type="button" data-act="full" aria-label="Open player">${ic(FMT[f].ic, "sm")}</button><button class="m-txt" type="button" data-act="full"><b>${esc(l.title)}</b><small>${FMT[f].label} · ${mmss(p.pos)}</small></button>
       <button class="m-ib" type="button" data-act="pp" aria-label="${p.playing ? "Pause" : "Play"}">${ic(p.playing ? "pause" : "play", "sm")}</button><button class="m-ib" type="button" data-act="stop" aria-label="Stop">${ic("x", "sm")}</button><span class="m-prog"><i style="width:${(p.pos / (l.min * 60)) * 100}%"></i></span></div>`;
   }
 
   /* ---------- an item (from the Palace's Commonplace stack, the card or the wall) ---------- */
   function openItem(id) {
+    if (PAGES().commonplace?.openItem) return PAGES().commonplace.openItem(id);
     const x = S.items.find((i) => i.id === id); if (!x) return;
     sheet(`<div class="m-grab" data-drag="sheet"></div><div class="m-sheet-head" data-drag="sheet"><h2>${esc(x.title)}</h2><button class="m-ib" type="button" data-act="sheetx" aria-label="Close">${ic("x")}</button></div>
       <div class="m-sheet-body">${x.img ? `<img alt="" src="${D.IMG[x.img]}" style="width:100%;border-radius:16px;display:block;margin-bottom:12px">` : x.kind === "Quote" ? `<p style="font:italic 22px/1.3 var(--read);margin:0 0 14px">${esc(x.title)}</p>` : ""}
@@ -851,7 +876,7 @@
   }
   function closeSheet() {
     if (session) stopListening(true);
-    const el = $("#sheet"); el.classList.remove("is-open"); el.setAttribute("aria-hidden", "true"); el.style.transform = "";
+    const el = $("#sheet"); el.classList.remove("is-open", "is-tall"); el.setAttribute("aria-hidden", "true"); el.style.transform = "";
     scrim(false); onSheetClose?.(); onSheetClose = null;
   }
   let scrimTap = null;
@@ -927,7 +952,8 @@
     const isLink = S.bar.capture === "link" || /^https?:\/\//.test(text);
     S.items.unshift({ id: nextId("i"), title: text, kind: isLink ? "Link" : "Note", topics: topic ? [topic] : [S.topics.find((t) => t.wantToLearn).id] });
     endBarMode();
-    toast(`Saved to Commonplace${topic ? ` · on ${T.get(topic).name}` : ""}`);
+    if (S.dest === "commonplace") render();
+    toast(`Saved to your Commonplace${topic ? ` · on ${T.get(topic).name}` : ""}.`);
   }
 
   /* ---------- the List: the same selection, drawn as rows ---------- */
@@ -942,7 +968,9 @@
 
   /* ---------- the other destinations: kept simple; the bar is the point ---------- */
   const DEST = { today: { label: "Today", ic: "sun" }, learn: { label: "Learn", ic: "grad" }, commonplace: { label: "Commonplace", ic: "library" }, loci: { label: "Loci", ic: "network" } };
+  const PAGES = () => window.MP_PAGES || {};
   function pageHtml() {
+    if (PAGES()[S.dest]) return PAGES()[S.dest].html();
     if (S.dest === "today") {
       const l = S.lumens.find((x) => x.progress > 0 && x.progress < 1);
       const focus = S.topics.filter((t) => t.wantToLearn);
@@ -988,7 +1016,15 @@
   }
 
   /* ---------- clicks ---------- */
+  // Pressing a control in the panel above the bar keeps the field focused (format, filters), as iOS keyboards' bars do.
+  app.addEventListener("mousedown", (e) => { if (e.target.closest("#dtop [data-keep]")) e.preventDefault(); }, true);
+  // Learn and Commonplace (learn.js, commonplace.js) handle their own [data-p] controls first.
   app.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-p]");
+    if (p && !p.closest("#pop")) { for (const pg of Object.values(PAGES())) if (pg.click?.(p, e)) return; }
+  });
+  app.addEventListener("click", (e) => {
+    if (e.target.closest("[data-p]")) return;
     const t = e.target.closest("[data-act],[data-open],[data-go],[data-ghost],[data-addname],[data-play],[data-item],[data-ask],[data-dest],[data-theme],[data-status],[data-reply],[data-pfmt]");
     if (!t || t.closest("#pop")) return;
     const d = t.dataset;
@@ -1042,9 +1078,9 @@
       case "replyx": S.reply = null; return refresh();
       case "sheetx": return closeSheet();
       case "mini": S.player.mode = "mini"; paintPlayer(); return refresh();
-      case "full": S.player.mode = "full"; paintPlayer(); return refresh();
+      case "full": return openPlayer(S.player.id, { fmt: S.player.fmt, course: S.player.course });
       case "pp": S.player.playing = !S.player.playing; paintPlayer(); return refresh();
-      case "stop": clearInterval(playTick); S.player = null; paintPlayer(); return refresh();
+      case "stop": clearInterval(playTick); S.player = null; paintPlayer(); PAGES().learn?.onStop?.(); return refresh();
       case "back15": S.player.pos = Math.max(0, S.player.pos - 15); return paintPlayerTime();
       case "fwd15": S.player.pos += 15; return paintPlayerTime();
       case "live": return toast("Live talks it through with you, from where you are, as in Learn.");
@@ -1091,7 +1127,7 @@
     const h = e.target.closest("[data-drag]");
     if (h && !e.target.closest("button")) return dragVertical(e, h.dataset.drag);
     const a = app.getBoundingClientRect();
-    if (e.clientX - a.left < 22 && !$("#drawer").classList.contains("is-open") && !$("#sheet").classList.contains("is-open") && !S.player?.mode?.startsWith("f")) {
+    if (e.clientX - a.left < 22 && !window.MP_ROOM && !$("#viewer")?.classList.contains("is-open") && !$("#drawer").classList.contains("is-open") && !$("#sheet").classList.contains("is-open") && !S.player?.mode?.startsWith("f")) {
       e.stopPropagation(); e.preventDefault(); dragDrawer(e);
     }
   }, true);
@@ -1165,6 +1201,13 @@
   }
   new ResizeObserver(() => { if (S.dest === "loci") { setDetent(S.detent); } }).observe(app);
 
+  // What learn.js and commonplace.js use from the shell.
+  window.MP = {
+    S, D, $, $$, esc, ic, plural, FMT, STATUS, P, T: () => T, kids, areaOf, descendants, nameOf,
+    toast, sheet, closeSheet, menu, closeMenu, anchor, scrim, render, refresh, paintDock, paintBarState, focusBar,
+    startListening, stopListening, openItem, openLumenSheet, goTo, askLoci, setDest, drawer, remember, nextId, makeLumen, paintBar, paintTop, mmss,
+    openThing: (id) => openThing(id), isTopic,
+  };
   render();
   // Open where the story starts: Environment & Services, so the card, its topics and its rooms show at once.
   setTimeout(() => { if (!S.openId) { const env = S.topics.find((t) => t.name === "Environment & Services"); remember({ kind: "topic", id: S.topics.find((t) => t.name === "Passive design").id }); openThing(env.id); } }, 1200);

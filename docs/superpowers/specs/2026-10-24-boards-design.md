@@ -96,6 +96,7 @@ flowchart LR
 - **A board is an entry.** It has a title, **one place** (an area, topic or sub-topic), a goal, and a pick. It shows up in search, Views, Picks and Group by like any other type.
 - **A placement points at something; it never holds a copy.** It can point at a Commonplace entry, a detail (a photo and one of its region notes), a Lumen, a course, one slide of a Lumen, a lecture's saved moment, a Loci topic, or another board. Removing a placement never deletes what it points at.
 - **Unpacking** places a course's parts, a Lumen's slides or a lecture's moments. Each one remembers its parent (a dotted line). *Fold* takes them back, except the ones you moved or connected.
+- *Superseded on 29 October by §7.10: a link is a line with an optional label; the fixed list below is withdrawn.*
 - **An arrow** has a word from a fixed list (*leads to, explains, example of, contrasts with, causes, raises, part of*) and an optional *why* of one line. The word lets Learn and Loci read it; the why is the learner's own sentence.
 - **Writing on a board** creates the Commonplace entry first, then places it.
 
@@ -238,7 +239,7 @@ All four are hand-written SQL, applied only on the owner's word.
 | BD-1 | **The name "board" is already taken.** The *Lumen board* proposal (19 Oct, branch `claude/serene-franklin-bif1cg`) uses *board* for a whiteboard-sketch slide | Keep **Board** for this, the learner's canvas. Call the slide type a **sketch** |
 | BD-2 | A board as a Commonplace **type**, or its own destination in the rail | A type. It keeps one library, and it inherits Search, Views, Picks and the viewer for free. Loci and Learn link into it |
 | BD-3 | One place per board, or several | One. It is where the board lives; its cards keep their own topics |
-| BD-4 | Arrow words: a fixed list, or free | A fixed list of seven, plus a free *why*. The list lets a Lumen and the map read arrows |
+| BD-4 | Arrow words: a fixed list, or free | *Withdrawn 29 Oct (LB-D10):* no list; a link is a line with an optional free label |
 | BD-5 | Does Recall's *Not yet* write to memory without asking? | Yes, as *To revisit*, the same as a missed check; the learner can remove it |
 | BD-6 | Size limit | At most 300 placements per board in v1; the canvas stays fast and the cover readable |
 | BD-7 | Sharing a board | Not in this programme. It follows Learn's sharing design (Learn roadmap phase 3) |
@@ -268,3 +269,308 @@ All four are hand-written SQL, applied only on the owner's word.
 The Palace and Map are the app's own code, bundled from `studiolo` main @ `6f8d396` (see `prototypes/boards/loci/README.md`).
 
 Nothing calls a model. Ask Loci's replies, the Lumen and its answers are written from the board's real contents.
+
+## 7. Addendum, 28 October: the board as a learning space
+
+**The owner's idea (28 Oct):**
+- a board starts from a goal ("learn X") and the questions that lead to it;
+- AI answers those questions with Lumens, to read, watch or listen to;
+- the learner takes notes around the same ideas;
+- so the board becomes a learning space with a linear learning process.
+
+**The owner's conditions:**
+- fluid, not restrictive, but guided;
+- **the board is the centre of learning**, so there's no separate learning window: Lumens play, and notes are written, on the board itself;
+- placing things must be quick: **double-click empty space and type to search**, or **drag from a visual shelf**.
+
+**Prototype:** [`prototypes/objects-boards-questions/`](../../../prototypes/objects-boards-questions/README.md). Open **Board**. Each sample board starts with one Lumen already made; press **▶ Play the Lumen** on its question.
+
+### 7.1 Guided, never fenced in
+
+| What guides | What stays free |
+|---|---|
+| The questions form a **path to the goal**: numbered stops on the cards, joined by a faint dotted route that ends at the goal card | The canvas is unchanged: place, move, connect and write anywhere, at any time |
+| One stop is the **suggested next** (the first open one): its number is filled and its card glows softly. **Show me the next stop** pans the board to it | Every card works at any time, in any order. Nothing is locked, greyed out or hidden |
+| **▶ Answer with a Lumen** on every open question card | Answer it yourself in a note, place a source that answers it, or leave it open |
+| **Did this answer it?** in the Lumen's card | Only you mark a question answered. *Partly* asks a follow-up; *Not yet* keeps it open with no penalty |
+| The goal's ring fills as stops are answered | Reorder stops (↑), take one off the path (×; it stays on the board under **Side questions**), add any question to the path (**+ Add to path**). A question you ask on the board joins the path on its own |
+| **Recall** in the board's panel, then **Mark the goal reached** | Recall is there whenever you want it |
+
+The rule: **the path suggests an order, the learner owns it.** The app never hides, locks or reorders anything by itself, and never takes the learner off the board.
+
+### 7.2 The loop at each stop, all on the board
+
+```mermaid
+flowchart LR
+  Q["A question card on the path"] --> A{"Answer it"}
+  A -- "Answer with a Lumen" --> L["A Lumen card under it<br/>opens in place: Read, Watch or Listen"]
+  A -- "in your own words" --> N
+  L --> N["A note card beside it<br/>saved to Commonplace"]
+  N --> C{"Did this answer it?<br/>in the Lumen's card"}
+  C -- "Yes" --> D["Answered in the Lumen<br/>the ring fills"]
+  C -- "Partly" --> F["A follow-up question card<br/>joins the path next"]
+  C -- "Not yet" --> Q
+  D --> X["The suggested next stop, or any card"]
+  F --> X
+  X --> R["Recall in the panel, then the goal reached"]
+```
+
+### 7.3 Learning in place
+
+- **The path layer:**
+  - each question on the path carries its number (✓ once answered);
+  - a dotted route joins the stops in order, ending at the goal card;
+  - the suggested next stop is filled and glows.
+  
+  The path is drawn under the arrows, so arrows keep their meaning.
+- **A question card** shows **▶ Answer with a Lumen** while it's open and has none, and **▶ Play the Lumen** once it has one. Answering offers *Read · Watch · Listen*. The new Lumen lands under the question with an *explains* arrow, whose why is "made to answer it".
+- **A Lumen card opens in place.** **▶ Play** (or a double-click) grows the card into a player, and the board zooms to 100% and centres it:
+  - *Read · Watch · Listen* switch views of the same Lumen: slides; a narrated video with captions; or audio with a transcript;
+  - ← → and dots step through it, ending at a *Check* slide with the question;
+  - the card's foot: **Did this answer it?** *Yes · Partly · Not yet*, and **✎ Note**;
+  - × or Escape folds it back to a card.
+  
+  Everything around it stays where it is.
+- **✎ Note** puts an empty note card beside the Lumen, with the caret in it. The note is an ordinary Commonplace note, remembers its stop, and is joined to its question by a faint dotted line.
+- **Partly** puts an empty question card under the Lumen, and it joins the path right after this stop.
+- **The panel** (right) is **Learning on this board**:
+  - the goal and its ring ("1 of 3 stops answered"), the suggested next question, and **Show me the next stop**;
+  - **Path to the goal**: each stop with its number, its Lumens (**▶ Watch**, **▶ Read**), or **▶ Answer with a Lumen**, its note count, ↑ and ×;
+  - **Answer the open stops with Lumens**, when several have none;
+  - **Side questions**, each with **+ Add to path**;
+  - **Recall**: **Test yourself** covers your notes and your labelled links ("Hassan Fathy → New Gourna Village: how are they linked?"). Each has **Show**, then *Got it* or *Not yet*, and *Not yet* goes to *To revisit* (BD-5). Then **Mark the goal reached**.
+- **Make a Lumen** (of the whole board, B3) follows the path and the arrows, and its check is built from your notes.
+
+### 7.4 One infinite canvas, full screen
+
+**The owner's direction (28 Oct):** one infinite screen, like Miro, not a canvas inside a box.
+
+- **The board fills the whole stage**, edge to edge beside the app's rail; on a phone, everything under the phone's top bar. Commonplace's header, tabs and page margins step aside while a board is open, and **←** goes back.
+- **Everything else floats on the canvas** as rounded panels with the app's float shadow:
+  - **top left:** ← and the board's title and place;
+  - **top right:** *Field links*, **Make a Lumen**, **Panel** and **⤢ Focus**;
+  - **left edge, centred:** the tools (↖ select, ✎ note, ? question, + Your Commonplace);
+  - **right:** one side panel with two tabs, **Learning** (with its ring) and **Your Commonplace** (the shelf), and × to hide it. Hidden, it leaves a small chip with the ring ("0 of 2 stops · Panel"). **+** and the + key open it on *Your Commonplace*;
+  - **bottom right:** zoom and Fit;
+  - **bottom centre:** the hint.
+- **The canvas runs under the panels**, and **Fit** frames the cards in the space between them. The panel opens by default on wide screens and hides with one tap. On a phone, it opens as a sheet from the bottom, and the tools move to the bottom.
+- **Focus mode** (**⤢ Focus**, or F): everything but the canvas steps aside: the app's rail, the title, the panel, the tools, zoom and the hint. Only a faint **Leave focus** stays in the corner, and F or Esc brings everything back. Pan, zoom, double-click to place and drag dots to link all still work. **Fit** uses the whole screen.
+
+### 7.5 Placing things: double-click to search, or drag from the shelf
+
+This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever you're looking.
+
+- **Double-click empty board.** A search box opens right there ("Search your Commonplace, or type a note…"):
+  - typing searches titles first, then text; it ignores accents ("Cord" finds Córdoba);
+  - the results include open questions written elsewhere;
+  - the last two rows are always **New note: "…"** and **New question: "…?"**, made from what you typed.
+  
+  ↑ ↓ choose, Enter places it at that spot, Esc closes. With nothing typed, the two *New* rows come first. Something already on the board isn't placed twice: the board shows where it is.
+- **The shelf: Your Commonplace**, a tab of the side panel, beside *Learning* (opened with **+** or the + key):
+  - a search box and kind chips (*All · Objects · Notes · Sources · Photos · Questions*);
+  - visual tiles: photos show their picture; Objects their kind and card line; notes and quotes their words; questions as amber tiles;
+  - **drag a tile onto the board** to place it where you drop it, or click to place it in the middle;
+  - a tile already on the board is faded and marked *On board*.
+- **The tools stay**: ✎ (N) and ? (Q), then click the board. Placed things are always placements, never copies, as §2.3 says.
+
+### 7.6 What Loci does, and doesn't
+
+- **Answers only when asked**: one question at a time, or **Answer the open stops** in one go. It never adds Lumens by itself (A2).
+- **Never marks a question answered.** Only *Did this answer it?* does, so the ring measures understanding, not viewing.
+- **A Lumen's brief is the question**, with the board as context:
+  - the cards linked to the question, and any labels;
+  - the goal;
+  - the learner's notes so far.
+  
+  It builds on Lumens already on the board and doesn't repeat them (B3). In law and medicine, a Lumen says it's a teaching sketch, not advice.
+- **Formats are views of one Lumen.** *Read* is its slides. *Watch* is the same slides narrated with captions (the voice Lumen design). *Listen* is narration with a transcript.
+
+### 7.7 Data
+
+- **The path:**
+  - *new* `board_path(board_id, inline_id, position)`;
+  - a question asked on the board joins it at the end;
+  - a question taken off the path keeps a `skipped` row, so it doesn't come back by itself.
+- **A Lumen placement** is §2.3's existing kind. A Lumen made for a stop records its source as `{ board, inline }` (B3's *Lumen source*, widened by one field).
+- **Answered in** a Lumen is `inline_answers.explainer_id`, already in the Questions design.
+- **A note written at a stop** is a Note placed on the board. Its stop is kept in the placement (`board_placements.stop_inline_id`, *new*), not in the note, so the same note can sit on other boards too.
+
+### 7.8 Phases
+
+These replace B3's single phase with three, in Stage 4, after B1 and B2. They need Q5 (*Explain this*) and the Lumen formats. B1 gains the full-screen canvas with floating panels (§7.4), and the double-click search and the shelf in place of the Add drawer.
+
+| ID | What | Tier | Migration |
+|---|---|---|---|
+| **LB1** | **The path**: numbers on question cards, the dotted route, the suggested next, the *Learning on this board* panel (reorder, take off, add, side questions) | MEDIUM | yes: `board_path` |
+| **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
+| **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
+| **LB5** | **Reading on the board**: entries open in the side panel beside their card; a long-note editor; a photo viewer; a PDF reader; a video player; notes at a page or a time; ↗ On the board; Note beside it (§7.12) | HIGH | no (uses `margin`, which exists) |
+| **LB4** | **Board craft**: fluid movement and curved links; Focus mode; the add-and-link menu; the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts (§7.11) | MEDIUM | no |
+
+### 7.10 Links: a link and a backlink
+
+**The owner's direction (29 Oct):** arrows with words like *leads to* and *causes* ask too much of the learner. Make them as simple as Miro's and Scrintal's: just a link, and a backlink.
+
+- **A link is a line between two cards.** Drag a card's blue dot onto another card and they're linked. Nothing to choose, nothing to fill in. The line has a small arrowhead showing which card you started from; **⇄ Reverse** flips it.
+- **A label is optional.** Click a line to add one, in any words ("explains", "same climate", "contrast"). No list, no *why* field. Most links have no label.
+- **Every link is a backlink.** Both cards' entries list it under **Appears in › On boards**: "Linked: → New Gourna Village (explains) · ← Hassan Fathy". The link belongs to the board, as before (C1: made in one place).
+- **Offers stay, without words.** Linking two Objects whose collections have a matching relation field offers **Keep as a field**. Linking a card and a question offers **Mark answered in…** (the old *explains* rule). The pop-over opens by itself only when there's an offer; otherwise a small toast says "Linked. Click the line to label it, if you like."
+- **What reads links:**
+  - Make a Lumen follows the links in path order;
+  - Recall covers labelled links ("A → B: how are they linked?");
+  - Loci treats a link as `related`, and quotes its label when there is one.
+- **Data:** `board_arrows` keeps `from`, `to` and a nullable `label`. The `word` and `why` columns are dropped from B1's migration before it ships.
+
+### 7.11 Board craft: quick, forgiving, a little fun
+
+**The owner's direction (29 Oct):** dragging a link from a card and letting go should open a small menu of what can be added. Plus the small things that make a board quick, productive and a pleasure to work on. All of it is phase **LB4**; none of it needs a migration.
+
+**The add-and-link menu.** Drag a card's blue dot and let go on empty board (or select a card and press **Tab**, or **→ Add linked** in its bar). A small menu opens where you let go, with a dashed line from the card to that spot:
+
+```
+ Add and link from Hassan Fathy
+ ┌────────┐ ┌──────────────┐ ┌────────┐
+ │ ✎ Note │ │ ? Ask about it│ │ ▶ Lumen│   ← big tiles; 1, 2, 3 pick one
+ └────────┘ └──────────────┘ └────────┘     (Lumen only from an open question)
+ [⌕ …or find something in your Commonplace ]
+ RELATED, NOT ON THIS BOARD
+ ¶ Lecture notes: passive cooling, week 3
+ ▤ Natural Energy and Vernacular Architecture
+```
+
+- **Note**: a new note, saved to Commonplace, placed there, linked, and open to write.
+- **Question** (on an entry, **Ask about it**): a question that belongs to the board, linked, and on the path.
+- **Lumen**, offered only from an open question: it is made and plays in its card where you let go, linked as that question's answer.
+- **Related, not on this board**: up to four entries linked to it by a relation field, or sharing its topics. One click places and links it.
+- **Search**: typing finds anything in Commonplace, as double-click does. Enter places and links the highlighted result, or makes the text a note when nothing matches.
+- A new card never lands on another: it slides down to the first clear space. If the entry is already on the board, the menu links to that card instead of placing a copy.
+- Esc, or a click away, cancels; nothing is made.
+
+**Selecting.**
+- A click selects a card; **⇧ click** adds or removes one; **⇧ drag** on empty board draws a box; **⌘A** selects all. A click on empty board clears the selection.
+- **The selection bar** floats over what's selected.
+  - For one card: **Open ↗** (or **Edit** for a question, **▶ Play** for a Lumen), **→ Add linked**, **? Ask about it** on entries, **▶ Lumen** on open questions without one, and **Remove**.
+  - For several: **Align left**, **Align top**, **Tidy** (a neat grid in reading order), **Link in order** (links them left to right, top to bottom; useful for a path) and **Remove**.
+- Dragging any selected card moves them all.
+
+**Moving.**
+- A dragged card snaps to the edges and centres of the others, and a thin guide shows what it lined up with. Hold ⌥ to place it freely.
+- The arrow keys nudge the selection (⇧ for bigger steps).
+
+**Forgiving.**
+- **⌘Z** undoes, and **⇧⌘Z** redoes, anything done on the board: place, add, move, link, remove, tidy, align, a Lumen made.
+- Remove says what it did ("Removed from the board. It's still in your Commonplace. ⌘Z to undo.").
+- Linking two cards that are already linked says so, instead of drawing a second line.
+
+**Fluid, not rigid.** *(The owner's direction, 29 Oct: movement and links should feel less rigid.)*
+- **Cards have weight.**
+  - A picked-up card lifts: a deeper shadow and a touch larger.
+  - It follows the pointer a little behind it, leaning a few degrees the way it's moving.
+  - Let go, and it settles into place with a small spring.
+  - Selected cards move together the same way.
+- **Nothing jumps.**
+  - Tidy, align, nudge, undo and redo glide cards to their new places, and their links follow as they go.
+  - Fit, ⇧2, *Show me the next stop*, a card picked in the panel, and opening an entry beside its card all ease the view there instead of cutting to it.
+- **The board drifts.** Flick it while panning and it keeps moving, then slows to a stop. Zoom (pinch, ⌘ scroll, − and +) glides, too.
+- **Links are soft curves.**
+  - Each link leaves its card from the side facing the other card and arrives at the near side of that card. It bends gently, so links fan out rather than cross in straight spokes.
+  - The arrowhead is small and notched, and a label sits at the curve's middle.
+  - The path to the goal is one smooth dotted curve through its stops. Field links and the lines from notes to their stop curve the same way.
+- **Linking feels alive.**
+  - While you drag a blue dot, a dashed curve flows from the card. Over another card it snaps to that card's edge, and the card lights up to show where it will land.
+  - When you let go, the new link draws itself in.
+  - A selected link shows its direction with a slow flowing dash.
+- All of it respects *reduce motion*: cards and the view then move at once, and nothing leans, flows or draws in.
+- **In the app:** this is the canvas library's job (for example, CSS transforms with a spring, and SVG cubic paths for links). It needs no data, because only the final positions are saved.
+
+**Finding your way.**
+- **The minimap**, bottom left, shows every card as a block and the visible area as a frame. Click or drag it to go there. Questions, Lumens and the goal take their colours; the selection is blue.
+- **⇧1** fits everything, and **⇧2** zooms to the selection.
+- Hovering a link lights up the two cards it joins.
+- **?** (or the ? beside Fit) opens a short sheet of every shortcut.
+
+**A little fun, never in the way.**
+- New cards arrive with a small pop.
+- When a stop is answered, its number turns to ✓ with a short pulse, and the ring moves.
+- Both respect *reduce motion*.
+
+**On a phone:**
+- the add-and-link menu and the selection bar work by touch;
+- the minimap and the shortcut sheet are hidden;
+- selecting several, nudging and the keys need a keyboard and a pointer, and are left out.
+
+**Data.**
+- Undo is client-side: a stack of the board's placements, links and own questions. It goes back up to 80 steps and is lost on reload.
+- Nothing new is stored. *Related* reads relation fields and shared topics that already exist.
+
+### 7.12 Reading and writing on the board: the board is the focus zone
+
+**The owner's direction (29 Oct):** open notes, photos, PDFs and videos *on* the board. View, watch, read and write there, without going back and forth between pages.
+
+**One rule: opening never leaves the board.** On a board, everything that opens an entry opens it in the **side panel**, beside its card:
+- double-clicking a card;
+- **Open** in the selection bar, or Enter;
+- **Open** on a tile in *Your Commonplace*, to read before you place it;
+- a mention or an entry card inside a note;
+- a row in **Appears in**.
+
+The panel widens to 560 px. You can drag its edge to resize it, or use **Wider**. The open entry's card on the canvas is outlined, and the board pans so the card stays in view beside the panel. **Full page ↗** is the one way out, for when you want the whole page. ← brings you back to the board as you left it.
+
+**Tabs, so you can flip between things.**
+- Each entry you open becomes a tab after *Learning* and *Your Commonplace*: its glyph (▣ Object, ¶ note, ◫ photo, ▤ PDF, ▷ video, ❝ quote), its name and ×.
+- Up to five stay open; the oldest closes first. Esc closes the one you're on.
+- In **Focus mode**, the panel stays if you're reading, with only that tab showing, so Focus becomes the canvas plus the thing you're working from.
+
+**What each kind shows, and where you write:**
+
+| Kind | You see | You write |
+|---|---|---|
+| Long or short note | Its title and the same block editor as the note page (`/`, `@`, images, cards) | In it, saved as you type; the card on the board fills in as you type |
+| Object | Portrait or photo, the card's facts, the description, relation fields as pills (they open as tabs too) | *What I took from it*, in the block editor |
+| Photo | The photo large; a click zooms in, to look at detail | Your notes on it |
+| PDF | A page reader: ‹ › through the pages; your notes are pinned to the page they're on ("✎ 2 of your notes here") | A note **at this page** ("p. 2") |
+| Video | A player; your notes are marks on the timeline | A note **at this time** ("12:40"); click a mark or a note's time to jump there |
+| Book, quote | Its details, or the quote large | Your notes on it |
+
+**From reading to the board:**
+- **Your notes on it** (the entry's margin notes) each have **↗ On the board**. It puts the note on the canvas beside the entry's card, linked: a question becomes a question card on the path, and anything else becomes a note card ("p. 2: Shade before mass").
+- **? Ask it as a question** saves a note as a question at that page or time. It shows in Questions and goals, and among the board's side questions.
+- **✎ Note beside it** makes a new note about the entry, placed and linked beside its card, and opens it in a tab to write.
+- **? Ask about it** puts a linked question card next to it.
+- **Place it**: an entry opened from *Your Commonplace* that isn't on the board yet says so, with one button to place it.
+- **Appears in** sits at the foot of every entry, so you can see where else it lives without leaving.
+
+**What it isn't:**
+- The panel is not a second app. It shows the entry itself, not a copy, so a change made there is the change, everywhere.
+- Lumens still play inside their own cards (LB2), because they belong to a question on the board.
+
+**Data.**
+- Nothing new is stored. Notes at a page or a time are the entry's existing margin notes, with `at` set ("p. 2", "12:40"), which Questions and goals already reads.
+- The open tabs, the panel width and the PDF page or video time are kept per person and per board, in the client.
+
+**In the app:**
+- the PDF reader is the app's own PDF viewer (pdf.js), opened at a page;
+- the video player is the embed the source already uses, and the time comes from its player API;
+- both need the source's file or URL to be reachable, as the full page does today.
+
+### 7.9 Decisions
+
+| ID | Decision | Recommendation |
+|---|---|---|
+| **LB-D1** | A board's questions form a suggested path; the canvas stays free | **Yes** |
+| **LB-D2** | Nothing is ever locked: any card works at any time, and the learner reorders, skips and adds | **Yes**: guided, not restrictive |
+| **LB-D3** | Loci answers with a Lumen only when asked | **Yes** |
+| **LB-D4** | Only the learner marks a stop answered (*Did this answer it?*) | **Yes**: the ring measures understanding |
+| **LB-D5** | Read, Watch and Listen are views of one Lumen | **Yes** |
+| **LB-D6** | Notes are ordinary Commonplace notes, placed beside their stop | **Yes** |
+| **LB-D7** | **No separate learning mode**: Lumens play inside their cards, and notes and Recall stay on the board | **Yes**: the board is the centre of learning |
+| **LB-D8** | Placing is a double-click search at the spot, or a drag from the visual shelf; the Add drawer goes | **Yes** |
+| **LB-D9** | A board opens as one full-screen, infinite canvas, with its title, tools, shelf, panel and zoom floating on it | **Yes**: like Miro, never a box inside a page |
+| **LB-D10** | Board links are just a line and a backlink, with an optional label; the fixed word list and *why* go | **Yes**: simple, like Miro and Scrintal |
+| **LB-D11** | The shelf is a tab of the one side panel, beside Learning; the left side stays clear | **Yes** |
+| **LB-D12** | A board has a **Focus mode** that hides everything but the canvas (F or Esc) | **Yes** |
+| **LB-D13** | Letting go of a link on empty board opens the **add-and-link menu**: Note, Question, Lumen (from an open question), related entries, search | **Yes** |
+| **LB-D15** | On a board, opening an entry never leaves the board: it opens in the side panel beside its card, as a tab; **Full page ↗** is the way out | **Yes** |
+| **LB-D16** | You write where you read: the block editor for notes and Objects; notes at a page or a time for PDFs and videos; **↗ On the board** turns any of them into a linked card | **Yes** |
+| **LB-D17** | The board moves fluidly: cards lift, lean and settle; the view eases and drifts; links are soft curves that snap to their target and draw themselves in; everything respects *reduce motion* | **Yes** |
+| **LB-D14** | Board craft ships as **LB4**: the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts | **Yes** |

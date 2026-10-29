@@ -146,7 +146,16 @@ body { background: light-dark(#f3f3ef, #131a20); -webkit-font-smoothing: antiali
 .m-card-head { padding: 18px 14px 0 16px; display: flex; gap: 10px; align-items: flex-start; touch-action: none; }
 .m-card-head .m-names { flex: 1; min-width: 0; }
 .m-kicker { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.m-card-head h2 { margin: 1px 0 0; font: 500 24px/1.15 var(--read); letter-spacing: -.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-card-head h2 { margin: 1px 0 0; font: 500 24px/1.15 var(--read); letter-spacing: -.005em; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.m-card-head h2 > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.m-card-head h2 small { font: 500 13px var(--ui); color: var(--ink-3); white-space: nowrap; flex: none; }
+.m-card:not([data-detent="peek"]) .m-peek-only { display: none; }
+/* peek: one line, about 54 px, so the map has the screen */
+.m-card[data-detent="peek"] { border-radius: 20px; }
+.m-card[data-detent="peek"] .m-card-head { padding: 17px 10px 0 16px; align-items: center; }
+.m-card[data-detent="peek"] .m-kicker { display: none; }
+.m-card[data-detent="peek"] .m-card-head h2 { font-size: 18.5px; margin: 0; }
+.m-card[data-detent="peek"] .m-close { width: 28px; height: 28px; margin-top: 0; }
 .m-card-head .m-close { width: 32px; height: 32px; border-radius: 16px; background: color-mix(in srgb, var(--ink) 7%, transparent); display: grid; place-items: center; color: var(--ink-2); flex: none; margin-top: 2px; }
 .m-card-head .m-close::after { content: ""; position: absolute; width: 44px; height: 44px; }
 .m-meta { padding: 3px 16px 0; color: var(--ink-2); font-size: 13.5px; display: flex; align-items: center; gap: 8px; min-height: 22px; }

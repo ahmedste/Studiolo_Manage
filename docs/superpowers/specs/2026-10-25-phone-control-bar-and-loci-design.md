@@ -201,24 +201,222 @@ On phones the List is the accessible, fastest way down. It shows the **same sele
 
 ＋ → **Write a note** turns the bar into *Note → Daylight & shading*. Return files it in Commonplace, tagged on what is open. Photo, link and file follow the same rule.
 
-## 7. Dictation in the bar
+## 7. Learn on a phone
 
-- One mic for every destination, the Lumen sheet's question, and *Ask the hosts* in the player. It uses the `DictationProvider` from the Moonshine proposal: Moonshine Tiny on phones (D1 there), then Web Speech, then hidden.
+Learn keeps the app's three tabs and everything in them, and adds the agreed formats from Learn slice 2 (Watch, Listen, Read, ● Live). What is **built** in the app today is Watch only, with the player, Home, Lumens and Courses. Listen, Read, Live, drive editions, marks and recall exist only in the slice 2 prototype and specs, and each is marked *new to build* below.
+
+### 7.1 The page
+
+- **Large title** *Learn* with its line: *Ask, pick up, and what's next* / *5 Lumens* / *2 courses*. It moves into the top bar as you scroll.
+- **Home · Lumens · Courses** as a segmented control, pinned under the top bar. Courses shows only while courses are on for the account (absent, not greyed out; `learnSections`).
+- **The bar is the make field.** Its placeholder is the app's heading, *What do you want to understand?*. Focused, the panel above it shows:
+  - **Make a Lumen**, with the format picker **Watch · Listen · Read | ● Live** (the last format used, Watch for new learners: LS2-2);
+  - with text typed: *In: <topic>* when the question names one of your topics, then **Make a Watch: "…"** with the format's hint, then **Ask Loci instead**;
+  - with nothing typed: **Explain <topic>** starters from My Focus.
+  - Return makes the Lumen; ● Live starts a live session.
+
+### 7.2 Home
+
+- **The make card:** *What do you want to understand?*, the format picker, the hint for the format, and the starters.
+  - Watch: *Slides and a narrator · 2–6 min · ready in about a minute*.
+  - Listen: *Two voices · 10–30 min · starts playing in about 30 seconds*.
+  - Read: *A long read with diagrams · 8–15 min*.
+  - Live: *Talk it through now, slide by slide, and interrupt any time*.
+  - The card says *Type it in the bar below, or hold the mic and say it*, so nobody hunts for a second field.
+- **Being made:** each Lumen in progress, with the app's steps (*Reading the source · Planning the story · Writing slide 3 of 5 · Recording voice, 4 of 9 lines*; Listen: *Chapter 1 is ready to play · writing the rest*) and a progress line. When it's done, a toast offers **Play** (or **Read**).
+- **Pick up where you left off:** a poster, a tag (format · topic), the title, the place line, and the buttons under the text (the app's phone rule, learn-home §3.2):
+  - Listen: *Chapter 3 of 6 · paused at 7:34 of 18:00*, **Resume** · **Drive edition**;
+  - Read: *20% read · Deep or shallow*, **Resume**;
+  - Course: *Shading & screens · paused at 1:44 · 2 of 6 watched*, **Continue**;
+  - Live session: *Stopped at slide 3 of 5 · 4 min live · Kept*, **Resume live** · **Play the Lumen**.
+- **Next for your goals** (*From your courses and My Focus*, **All Lumens →**): one card per goal, with its due date, and two steps each. A step is Resume, Continue part *k*, Watch, or **Make a Lumen on <topic>** (*Not made yet*).
+
+### 7.3 Lumens and Courses
+
+- **Lumens:**
+  - **Format chips:** All · Watch · Listen · Read · ● Live sessions.
+  - **State:** All · New · In progress · Watched.
+  - **Group:** By date (Today, Yesterday, This week, Earlier) or By topic (your areas).
+  - **Each row:** the poster, the title, the topic and date, a *New* or *Watched* mark, a progress line on the poster, and the **format pills**: each made format with its length, and **+ Listen** (dashed) for one not made yet. A pill opens that format or makes it.
+  - **⋯ menu:** Edit details…, Share…, Show in Loci, Delete…. An empty result says *No Lumens match.* with **Clear filters**.
+- **Live sessions:** *Stopped at slide k of n · … min live*, *Kept · Resumable for N more days*, then **Resume** and **Play the Lumen**.
+- **Posters tell the formats apart without colour** (slice 2 rule): Watch shows its title slide with a play mark, Listen the two hosts on a dark cover, Read a paper title page.
+- **Courses:**
+  - **Each course:** a 16:9 poster with *Course · N parts*, the topic, the title, *k of N watched*, a segmented progress strip (watched, playing, ready, not made), one button (**Continue: Part 2** / **Start: The whole topic** / **Watch again**) and ⋯ (Edit details…, Share course…, Report a problem, Delete course…).
+  - **Its outline:** the first four parts with ✓ / ▸ / dot and *Watched*, *Playing · 1:44 of 3:05*, *Ready · 4 min* or *Not made yet*, then **+ n more parts**.
+  - Parts are numbered as in the app: Part 0 is *The whole topic*.
+
+### 7.4 A Lumen's room (Watch, Listen, Read, ● Live)
+
+A Lumen opens in a room that slides in from the right, over whatever destination you were in.
+- **Its top bar:** ‹ the place you came from, the title, and Share (Aa as well in Read). A swipe from the left edge goes back, as on iOS.
+- **The bar stays at the foot**, and asks about what you're looking at: *Ask about this slide…*, *Ask the hosts…*, *Ask about this page…*, or *Talk or type to interrupt…* in Live.
+- **The switcher** is pinned under the top bar: **Watch · Listen · Read | ● Live**, each slot showing its length, **+** (not made) or **…** (being made). Switching changes only what's below it (the slice 2 rule).
+- **A format not made yet** shows its poster, *<title> has no Listen yet*, the hint, and **Make Listen**. It's made from the same Lumen, onto the same card, with its progress shown in place.
+
+**Watch (the video preview; built in the app):**
+- **A 16:9 stage, pinned under the switcher** as you scroll (the course viewer's phone rule). It shows the slide, its number, and captions over the foot of the slide.
+- **One control row:** back 10 s, play/pause, forward 10 s, the scrubber, the time, speed (1 → 1.25 → 1.5 → 0.75×), **CC** and full screen. Sideways, the slide fills the screen.
+- **Below:**
+  - the title, *6:00 · 5 slides · made 22 Oct*, and **Lives in <topic> ▾**;
+  - **Transcript | Slides**: lines with their times, the current one lit, and a tap seeks to it; or a two-column grid of slides;
+  - the citation chips, and *General knowledge*;
+  - **Questions to take further** as chips, which ask Loci.
+- **Asking from the bar pauses** and shows a **Written answer** card under the stage (it uses no voice minutes), with **Back to the Lumen**.
+
+**Listen (the audio preview; new to build, from slice 2):**
+- **A dark cover:**
+  - the two hosts (*Maya*, *Sam*), the one speaking ringed;
+  - the line being said, large, in Newsreader;
+  - a chapter-segmented progress bar, *Chapter 3 of 6 · The stack effect* and the time;
+  - back 15 s, a large play, next chapter;
+  - then **1×**, **Mark**, **Walk** and **Drive**.
+- **Below:**
+  - *Two voices · 18 min · 6 chapters*, with **Make a drive edition** and **Save for offline**;
+  - **Chapters** (*Played*, *Playing*, a time, or *Written when you get closer*);
+  - the **Transcript** (*Tap a line to play it*);
+  - **Your marks**;
+  - the **Your turn** recall card (*Answer out loud, type it below, or say "skip"*).
+- **Asking the hosts from the bar** pauses them, and the answer shows on the cover, under *You asked: …*.
+- **Walk:** a full-screen dark page with 72 px buttons and a 104 px play, **Mark this moment** and **Hold to ask**.
+- **Drive:** *Set it up before you move.* first (**Make a drive edition** / **Play it anyway** / **Start**), then four 84 px buttons: **Say that again**, **Mark**, **Next chapter**, **Hold to ask**.
+
+**Read (new to build, from slice 2):**
+- **Pinned under the switcher:** a reading progress line, then the section chips.
+- **The article:** *12 min read · 5 sections · Passive design* and the title, then Instrument Sans at 16/1.55 (18 and 20 with **Aa**). Its figures, the humidity slider with *Dry desert afternoon* and *Humid coast in August*, and **Check yourself** with three choices and its answer.
+- **At the end:** the **Sources** as chips (your Commonplace entries open in their viewer), and **Listen to this instead**.
+
+**● Live (new to build, from slice 2):**
+- The Watch stage with a **Live** badge, and the interruption chips: *Explain that another way · Go deeper · From my field · Simpler · Test me · Skip*.
+- **Back to the recording** and **Keep this version**, with *Tap a slide to ask about it, or hold the mic and talk. Live sessions are kept for 30 days.*
+- Holding the mic is talking. Typing is a written answer.
+
+**Share** (every format): *Share this Lumen*, the formats to include, *Not shared: your live sessions, your questions and marks, your goal and your Commonplace notes.*, then **Copy link** and **Preview as a viewer**.
+
+### 7.5 A course's room
+
+The same room, with:
+- **an episode bar** pinned in place of the switcher: ‹, *Part 2 of 5 · Shading & screens*, **Parts 2/5**, ›;
+- the Watch stage and controls;
+- **Reading · This part · Transcript · Slides**:
+  - Reading has *Where this is on your map* with **Open in Loci ↗**, and Sources;
+  - This part has *How useful was this part?* 1–5, and **Report a problem**;
+- **Up next**, with **Play part 3** or **Make part 4**.
+
+**The Parts sheet** lists every part as *Watched* / *Now playing* / *Ready · 4 min* / *Not made yet. Opening it makes it.*
+
+**Report a problem** is a sheet with the app's four choices and *Include the slide I'm on*. This is the full-screen course room the mobile design asked for (M-D16), with the bar in place of the app bar and tab bar.
+
+## 8. Commonplace on a phone
+
+Commonplace takes the **new header** (CP_HEADER, built behind its switch, and the approved v4 prototype) and folds it for a thumb. Labels are the app's (`wall-header.tsx`, `header-model.ts`, `filter-bar.tsx`, `card-menu.tsx`).
+
+### 8.1 The header
+
+- **The area switch is the title:** *COMMONPLACE* over **● All areas ⌄**, as Loci's title holds its view. The menu has:
+  - **All areas** with the total;
+  - each area that has entries, with its count;
+  - **No area yet**.
+  
+  The choice is remembered (the `studiolo-area` cookie), and new captures go into that area.
+- **Select** at the top right; it becomes **Done** while selecting.
+- **Under the large title**, pinned:
+  1. **Everything · Collections · To read · Templates** (segmented);
+  2. **The types:** All · Notes · Sources · Photos · Objects, each with an icon and a count. The chosen type is followed by **›** and its collections as pills with counts (Photos › Site visits · References · Renders · Drawings · Materials).
+  3. **The slim bar:**
+     - **All · Unsorted · ★ Picks**, with counts;
+     - **Topic ▾**;
+     - the type's own filter: Sources → **Status** (To read / Reading / Read); Notes → **Style** (Plain / Long / Quote); Photos → **Colour** (12 swatches) and **More** (Landscape / Portrait / Square / Panorama, Light / Dark);
+     - **Display**.
+- **Rows 2 and 3 fold away while you scroll down and come back when you scroll up**, as Safari's bars do. The tabs stay.
+- **The count line:** *32 photos · newest first*, the search as a removable chip (*"brick" ✕*), and **Wall | Shelves**.
+
+### 8.2 Search and capture: the bar again
+
+- **The bar is the search field.** Its placeholder follows the type:
+  - *Search, capture or ask…*;
+  - *Search notes and quotes…*;
+  - *Search books, lectures and links…*;
+  - *Search photos by place or note…*;
+  - *Search your collections…* on Collections.
+- **The wall filters as you type.** Above the bar: *N matches on the wall*, **Save "…" as a note** (*Looks like a Note*), and **Ask Loci "…"**. Return keeps the search as a chip.
+- **Focused and empty**, it lists your saved **Views** (*Warm brick references*, *Competition picks*, *Reading now*) and **Capture a thought, quote or link…**.
+- **＋ in the bar** is capture: a note, a photo or scan, a link, or a file or PDF.
+
+### 8.3 The wall
+
+- **Two columns of the app's card faces** (M-D4):
+  - **Photo:** frameless, with the caption and *collection · topic*, ★ for a pick, and the detail-note count.
+  - **Album:** one card with its count, on All.
+  - **Note:** paper with the blue edge. **Long note:** title and first lines. **Quote:** warm paper, italic Newsreader, attribution.
+  - **Book:** a 2:3 cover with a progress line. **Video:** a thumbnail with play, duration and a watched bar. **Link:** its picture and site. **PDF:** its first page on a white sheet.
+  - Each card has its collection as a kicker.
+- **Photos also have Rows** (justified, the photo-wall phase) and **Grid** (square, 2–4 across).
+- **Display** (a sheet):
+  - View: Wall / Shelves;
+  - Layout: Rows / Masonry / Grid (photos);
+  - Size: Small / Medium / Large;
+  - Sort: Newest / Oldest / Title;
+  - Captions: Show / Hide (photos);
+  - Views, and **Save these filters as a View…**.
+- **Shelves:** one shelf per collection, with its count and **Open shelf**, scrolling sideways on the shelf's edge, then **Not on a shelf**.
+- **Hold a card** for its menu: Move to collection · Area › · Explain… · Show connections · Copy link · Select · Delete….
+- **Select:**
+  - tap cards to tick them;
+  - the bar at the foot gives way to the selection bar: *N selected*, then **Add topics… · Move to… · Pick · Delete…**;
+  - **Move to…** lists the type's collections, *No collection* and **New collection…**.
+
+### 8.4 Collections, To read, Templates
+
+- **Collections:** two columns of tiles (cover or a paper stack, the name, *Photos · 10 items*), then **New collection**.
+  - New collection is a short sheet: Name; Type as four rows with one line each (*Notes: your writing and quotes* · *Sources: links, videos, PDFs, books* · *Photos: pictures and their groups* · *Objects: people, buildings, cases… with your own fields*); **Create**.
+  - Create opens the new, empty collection (M-D24).
+- **One collection** (CH-1, M-D22):
+  - ‹ Collections;
+  - a 72 px cover, *SOURCES COLLECTION*, the name, and the description in two lines;
+  - **Add items** and **Edit collection**;
+  - then its own wall or shelf.
+- **To read:** To read · Reading · Read with counts; each source with its cover, creator, kind and progress. The empty states are the app's:
+  - *Nothing to read yet. Sources you save start here.*
+  - *Nothing in progress. Set a Source to Reading on its page.*
+  - *Nothing finished yet.*
+- **Templates:** *The Four Types*, each with its line and **New … collection**.
+
+### 8.5 How each kind opens (card-open.ts)
+
+| Kind | Opens in | On the phone |
+|---|---|---|
+| Photo, album | the viewer (PHOTO_VIEWER) | Full screen on a dark mat. *3 of 32*, swipe between photos, swipe down to close, double-tap or pinch to zoom. Under it: title and caption; **Pick · Info · Lumen · On Loci · Share**. **Info** adds Album / Size / Kind / Taken / From, the topic chips (which open Loci) and *notes on a detail*. ⋯ has Copy image, Move to collection…, Note a detail, Delete… |
+| Video | the video quick view, then the watching room | A sheet with the 16:9 frame, its watched bar and play; *creator · 30:00 · 35% watched · Lectures*; Status; **Resume in the watching room**; **Explain… (make a Lumen or a course)**; topics |
+| Link | the web viewer | A sheet with the site, the page's picture, the reader view, Status, **Open in the browser ↗**, **Explain…**, topics |
+| PDF | the PDF reading room | Full screen: ‹ Commonplace, the title, Notes; the pages scrolling; a floating bar with *Page 1 of 96*, a page slider and **Explain…** |
+| Note, long note, quote | the item page | A tall sheet you can write in (Newsreader 17), topics, **Explain…**, **Show connections**, ⋯ (Move to collection…, Area ›, Copy link, Delete…) |
+| Book | the item page | A tall sheet with the cover, Status (To read · Reading · Read), topics and **Explain…** |
+
+**Explain…** is the app's explain dialog as a sheet:
+- *The whole thing*;
+- for books, PDFs and videos also *Part by part* (**Start with part 1**) and *One chapter* (*Choose pages instead*);
+- *Focus on… (optional)*;
+- then it makes a Lumen.
+
+## 9. Dictation in the bar
+
+- One mic for every destination, the Lumen sheet's question, Live, *Ask the hosts* in Listen, and **Hold to ask** in Walk and Drive. It uses the `DictationProvider` from the Moonshine proposal: Moonshine Tiny on phones (D1 there), then Web Speech, then hidden.
 - **Keyterms** come from the screen: the open place's name, its children's names, and the product words (*Lumen, Commonplace, Loci*), through `setKeyterms`, which can change while recording.
 - **Spoken commands** go to Loci as text, with no separate command parser: *"open passive design"*, *"suggest sub-topics"*, *"make me a Listen about this"*, *"mark this learned"*. The prototype simulates these four intents to show the flow. In the app they are Loci's tools, with Keep where the graph changes.
 - Hold-to-talk sends on release; tap-to-dictate never sends by itself.
 
-## 8. What stays
+## 10. What stays
 
 The phone patterns of the mobile design keep:
 - P5: confirmations as sheets;
 - P6: anchored menus;
 - P11: safe areas and the keyboard (the bar rides the keyboard through `visualViewport` on iOS);
-- P12: immersive rooms hide the bar.
+- P12: immersive rooms hide the bar (the photo viewer, the PDF room, Walk and Drive). A Lumen's room keeps it, because asking is part of learning.
 
 The Palace's levels, flights, labels, rooms, trail, the draft and suggestions, Keep / Dismiss and reduced motion are unchanged. The Map's layout is unchanged. iPads (700 px and up) keep the rail and the side panel; nothing here applies above 700 px.
 
-## 9. What changes in the app (for the builder)
+## 11. What changes in the app (for the builder)
 
 | Area | Change | Where |
 |---|---|---|
@@ -229,18 +427,26 @@ The Palace's levels, flights, labels, rooms, trail, the draft and suggestions, K
 | Palace | Touch pick: the nearest mark within 22 px. Phone framing: topics 0.42×, areas 0.72× the distance, at least 120. Two-finger tap = back. A hold opens the context menu (cancels the tap). Leave the 22 px left edge to the drawer. The key moves behind a button on phones | `palace-engine.ts` (`pick`, `frameOf`/`frameFor`, pointer handlers), `palace-workspace.tsx`, `palace-chrome.tsx` |
 | Map | Areas only at the whole-map level on phones; a hit target of 22 px around dots; hold for the context menu; two-finger tap = back | `graph-map.tsx`, `graph-workspace.tsx`, `features/topics/layout.ts` input |
 | Lumens | The make sheet with three format tiles; the mini player docked above the bar | `graph-player*.tsx`, Learn's format picker |
+| The card's height | Sticky and remembered: opening anything never changes it; only a drag or a tap on the peek does | `loci-side/use-loci-sheet.ts` (detent state moves out of the open/close path), `features/ui/drawer` |
+| Learn | The bar is the make field on Learn (the make bar's job on phones); the room for a Lumen and for a course, pushed over any destination, with the switcher pinned, the stage pinned, and the mini player in the dock | `explainers/learn-home.tsx`, `make-lumen-bar.tsx`, `explainer-list.tsx`, `courses/course-list.tsx`, `courses/course-viewer.tsx`, `features/explainers/player/*`, `src/styles/learn.css`, `explainer.css`, `courses.css` |
+| Listen, Read, Live | New formats from Learn slice 2: chapters, two-host transcript, Mark, Walk, Drive, the drive edition, offline; the article with figures and Check yourself; live interruptions and Keep | new, per `docs/superpowers/specs/2026-10-22-learn-slice-2-one-lumen.md` and `2026-10-22-learning-forms-and-dialogues.md` (this repo) |
+| Commonplace | The CP_HEADER header folded for phones: area in the title, Select in the top bar, the pinned tabs, the type and collection row and the slim bar folding on scroll; the bar searches; the selection bar takes the foot | `library/wall-header.tsx`, `search-bar.tsx`, `type-bar.tsx`, `filter-bar.tsx`, `area-picker.tsx`, `selection-bar.tsx`, `src/styles/library.css` (the 700 px block) |
+| Viewers | The photo viewer with Info and the five actions; the video and web viewers and item pages as sheets; the PDF room with its floating page bar | `photo-viewer.css`, `library/pdf-viewer.tsx`, `item-page.tsx`, `features/library/card-open.ts` |
 | Dictation | The `DictationProvider` and mic, per the Moonshine proposal, mounted in the bar | per that proposal's step 3 |
 
 Docs to update with the build: `project-docs/design/interface.md` (phone shell, replacing the tab-bar paragraph), `project-docs/design/graph.md` (phone Loci), and `project-docs/implementation/frontend.md`.
 
-## 10. Slices (each shippable alone, testers first)
+## 12. Slices (each shippable alone, testers first)
 
 1. **Palace and Map touch fixes.** Hit target, closer framing, two-finger tap, hold menu, the key behind a button. No shell change; fixes F3, F4 and F6 today.
 2. **The card.** The sheet becomes the card (actions + chips), with the List as a first-class phone view. Fixes F2.
 3. **The bar and the drawer.** The tab bar goes; the bar takes find + ask + ＋; the thread sheet. Fixes F1 and F7.
 4. **Naming and suggestions in the bar.** Rapid sub-topics with suggestion chips.
 5. **Lumens on the phone.** The make sheet, making on the card, the mini player.
-6. **Dictation.** Behind the Moonshine proposal's flag.
+6. **Learn on the phone.** The bar as the make field, Home / Lumens / Courses as above, and the Watch room and course room (what the app has today, rearranged).
+7. **Commonplace on the phone.** The CP_HEADER header folded for phones, the bar as search, the viewers and the selection bar. Needs CP_HEADER and PHOTO_VIEWER on for testers.
+8. **Listen, Read and Live.** Slice 2's formats, in the room, one by one.
+9. **Dictation.** Behind the Moonshine proposal's flag.
 
 Checks for every slice:
 - paired screenshots of today and the build at 390 × 844 and 360 × 780, light and dark;
@@ -248,7 +454,7 @@ Checks for every slice:
 - an end-to-end run of §6.1–6.4 on the specimen pages;
 - the owner on an iPhone on the hosted Dev site.
 
-## 11. Decisions for the owner
+## 13. Decisions for the owner
 
 | # | Decision | Recommendation |
 |---|---|---|
@@ -260,14 +466,24 @@ Checks for every slice:
 | **MB-D6** | Hold for a context menu on every mark, chip and row; a two-finger tap goes back | **Yes** |
 | **MB-D7** | Overview leaves the phone's view menu (Palace · Map · List only) | **Yes**; its numbers are on the whole-map card |
 | **MB-D8** | Spoken commands are plain messages to Loci (no separate parser); hold-to-talk sends on release | **Yes** |
+| **MB-D9** | The card's height is the learner's: peek by default, never changed by navigating, remembered on the device | **Yes** (asked for by the owner, 25 October) |
+| **MB-D10** | On Learn, the bar is the make field (Return makes a Lumen; **Ask Loci instead** is one tap) | **Yes** |
+| **MB-D11** | A Lumen opens in a room pushed over any destination, keeping the bar for asking; Watch and Listen dock as a mini player when you leave | **Yes** |
+| **MB-D12** | On Commonplace, the area switch is the title and Select is in the top bar; the type row and slim bar fold away on scroll | **Yes** |
+| **MB-D13** | On Commonplace, the bar is the search field (it filters as you type) and capture | **Yes** |
 
-## 12. What the prototype does and doesn't do
+## 14. What the prototype does and doesn't do
 
-**Does:** everything in §4–6, on the app's real Palace and Map engines, in light and dark, full screen on a phone (open the file on the phone) and in a 390 × 844 frame on a desktop. On a desktop a right-click stands in for a hold.
+**Does:** everything in §4–8, on the app's real Palace and Map engines, in light and dark, full screen on a phone and in a 390 × 844 frame on a desktop. On a desktop a right-click stands in for a hold. The sample is one learner across Loci, Learn and Commonplace: the specimen map, the approved Commonplace prototype's 45 entries, five Lumens in their formats, two courses, a live session and two goals.
 
 **Doesn't:**
 - Loci's answers are simulated: four intents (open, suggest or add, make a Lumen, set a status), plus a generic reply.
 - Nothing is saved: a reload starts again.
 - The Map's own + buttons and dots open the same flows, but the Map has no hold menu yet.
-- Photo, file, rename and move only say what they would do.
+- Photo, file, rename and move only say what they would do; so do Edit collection, Add items, a card's Area and Show connections.
+- **Stand-ins:**
+  - Lumens play on a clock, with no audio or video;
+  - slides are one wind-tower drawing, lit differently per slide;
+  - a PDF's pages are blank shapes;
+  - the video and web viewers show a frame and a reader stand-in.
 - The mic uses the browser's speech recognition where it's allowed, and otherwise a simulation (it says so). Moonshine needs the cross-origin isolated server from `prototypes/learn-lumens/serve.mjs`.

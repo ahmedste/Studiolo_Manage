@@ -1,0 +1,77 @@
+<meta charset="utf-8">
+<title>Objects, Questions and Boards Programme</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: a long reading document in Studiolo's own palette and faces; a contents rail on wide screens, one column on phones. */
+:root {
+  --paper: #f3f3ef; --panel: #fbfbf9; --line: #dbdbd3; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #98a3ab;
+  --accent: #1e3e9e; --accent-soft: #e6ebf8; --pick: #8a5a00; --pick-soft: #fbf3df; --code: #ebebe6;
+  --ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --read: "Newsreader", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --pick: #e8c27a; --pick-soft: #33291a; --code: #182128; color-scheme: dark; } }
+:root[data-theme="dark"] { --paper: #131a20; --panel: #1d272f; --line: #313d47; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --pick: #e8c27a; --pick-soft: #33291a; --code: #182128; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.6 var(--ui); margin: 0; }
+.page { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px; }
+nav.toc { position: sticky; top: 24px; align-self: start; font-size: 13.5px; }
+nav.toc p { margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+nav.toc a { color: var(--ink-2); text-decoration: none; } nav.toc a:hover { color: var(--accent); }
+.links { margin: 22px 0 0; padding: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; display: grid; gap: 6px; }
+.links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+main { min-width: 0; }
+header.top h1 { margin: 0 0 10px; font: 400 clamp(32px, 5vw, 46px)/1.08 var(--read); text-wrap: balance; letter-spacing: -0.01em; }
+header.top p { margin: 0; max-width: 64ch; font: 18px/1.55 var(--read); color: var(--ink-2); }
+.part { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 28px; }
+.eyebrow { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.part-title { margin: 0 0 14px; font: 400 clamp(26px, 3.6vw, 34px)/1.15 var(--read); text-wrap: balance; }
+h3 { margin: 34px 0 10px; font: 500 22px/1.25 var(--read); text-wrap: balance; }
+h4 { margin: 24px 0 8px; font: 600 15px/1.35 var(--ui); }
+h5 { margin: 18px 0 6px; font: 600 13px/1.35 var(--ui); color: var(--ink-2); }
+p { margin: 0 0 12px; max-width: 72ch; }
+.tier { display: inline-block; font-size: 12px; color: var(--pick); background: var(--pick-soft); padding: 3px 10px; border-radius: 10px; margin-bottom: 14px; }
+ul, ol { margin: 0 0 14px; padding-left: 22px; max-width: 72ch; } li { margin: 3px 0; }
+code { font: 0.88em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--code); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+pre.code { background: var(--code); padding: 12px 14px; border-radius: 3px; overflow-x: auto; font-size: 13px; }
+pre.code code { background: none; padding: 0; }
+.tbl { overflow-x: auto; margin: 4px 0 18px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); min-width: 90px; }
+th { font-weight: 600; font-size: 12.5px; color: var(--ink-2); }
+tr:last-child td { border-bottom: 0; }
+.diagram pre.mermaid { margin: 0; background: none; font: 13px/1.4 ui-monospace, Menlo, monospace; white-space: pre; }
+.diagram svg { max-width: 100%; height: auto; }
+.diagram { overflow-x: auto; margin: 6px 0 18px; padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 3px; }
+a { color: var(--accent); }
+@media (max-width: 900px) { .page { grid-template-columns: minmax(0, 1fr); gap: 20px; } nav.toc { position: static; } }
+</style>
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <p>Contents</p>
+    <ol>
+<!--NAV-->
+    </ol>
+    <div class="links"><span style="font-size:12px;color:var(--ink-2)">Prototypes</span>
+      <a href="https://claude.ai/artifact/U95rk7ZKi3c2wsFvqsiS1b" target="_blank" rel="noopener">Objects, boards, questions</a>
+      <a href="https://claude.ai/artifact/3sJpPHVcPMUJiDgA7MpCTH" target="_blank" rel="noopener">Objects phase by phase</a>
+      <a href="https://claude.ai/artifact/CVVpm4kM6pshfmURATKXvi" target="_blank" rel="noopener">Commonplace Boards</a>
+      <a href="https://claude.ai/artifact/XLHqoBxTXgaCoarmpUmo59" target="_blank" rel="noopener">Objects in any field</a>
+      <a href="https://claude.ai/artifact/JGxxJ7GzsU8kZkb3aL7QN4" target="_blank" rel="noopener">Linking, collections and templates</a>
+    </div>
+  </nav>
+  <main>
+    <header class="top"><h1>Objects, questions and goals, and boards</h1>
+      <p>One programme for Studiolo's Commonplace, in the order it's built: questions and goals first, Objects' fields, pages and views next, the long-note page, collections, templates and how things connect beside them, boards at the end. The programme comes first; then each design in full, Boards last. Proposed, 28 October 2026; nothing here is approved until the owner says so.</p></header>
+<!--PARTS-->
+  </main>
+</div>
+<script type="module">
+// Draws the ```mermaid diagrams. If the CDN can't be reached, they stay readable as text.
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+const theme = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: theme === "dark" ? "dark" : "neutral", fontFamily: "Instrument Sans, system-ui, sans-serif", flowchart: { htmlLabels: true, curve: "basis" } });
+try { await mermaid.run({ querySelector: "pre.mermaid" }); } catch (e) { console.warn("mermaid", e); }
+</script>
