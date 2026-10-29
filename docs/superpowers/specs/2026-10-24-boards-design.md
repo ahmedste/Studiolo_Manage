@@ -404,6 +404,7 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB1** | **The path**: numbers on question cards, the dotted route, the suggested next, the *Learning on this board* panel (reorder, take off, add, side questions) | MEDIUM | yes: `board_path` |
 | **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
 | **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
+| **LB5** | **Reading on the board**: entries open in the side panel beside their card; a long-note editor; a photo viewer; a PDF reader; a video player; notes at a page or a time; ↗ On the board; Note beside it (§7.12) | HIGH | no (uses `margin`, which exists) |
 | **LB4** | **Board craft**: Focus mode; the add-and-link menu; the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts (§7.11) | MEDIUM | no |
 
 ### 7.10 Links: a link and a backlink
@@ -481,6 +482,56 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 - Undo is client-side: a stack of the board's placements, links and own questions. It goes back up to 80 steps and is lost on reload.
 - Nothing new is stored. *Related* reads relation fields and shared topics that already exist.
 
+### 7.12 Reading and writing on the board: the board is the focus zone
+
+**The owner's direction (29 Oct):** open notes, photos, PDFs and videos *on* the board. View, watch, read and write there, without going back and forth between pages.
+
+**One rule: opening never leaves the board.** On a board, everything that opens an entry opens it in the **side panel**, beside its card:
+- double-clicking a card;
+- **Open** in the selection bar, or Enter;
+- **Open** on a tile in *Your Commonplace*, to read before you place it;
+- a mention or an entry card inside a note;
+- a row in **Appears in**.
+
+The panel widens to 560 px. You can drag its edge to resize it, or use **Wider**. The open entry's card on the canvas is outlined, and the board pans so the card stays in view beside the panel. **Full page ↗** is the one way out, for when you want the whole page. ← brings you back to the board as you left it.
+
+**Tabs, so you can flip between things.**
+- Each entry you open becomes a tab after *Learning* and *Your Commonplace*: its glyph (▣ Object, ¶ note, ◫ photo, ▤ PDF, ▷ video, ❝ quote), its name and ×.
+- Up to five stay open; the oldest closes first. Esc closes the one you're on.
+- In **Focus mode**, the panel stays if you're reading, with only that tab showing, so Focus becomes the canvas plus the thing you're working from.
+
+**What each kind shows, and where you write:**
+
+| Kind | You see | You write |
+|---|---|---|
+| Long or short note | Its title and the same block editor as the note page (`/`, `@`, images, cards) | In it, saved as you type; the card on the board fills in as you type |
+| Object | Portrait or photo, the card's facts, the description, relation fields as pills (they open as tabs too) | *What I took from it*, in the block editor |
+| Photo | The photo large; a click zooms in, to look at detail | Your notes on it |
+| PDF | A page reader: ‹ › through the pages; your notes are pinned to the page they're on ("✎ 2 of your notes here") | A note **at this page** ("p. 2") |
+| Video | A player; your notes are marks on the timeline | A note **at this time** ("12:40"); click a mark or a note's time to jump there |
+| Book, quote | Its details, or the quote large | Your notes on it |
+
+**From reading to the board:**
+- **Your notes on it** (the entry's margin notes) each have **↗ On the board**. It puts the note on the canvas beside the entry's card, linked: a question becomes a question card on the path, and anything else becomes a note card ("p. 2: Shade before mass").
+- **? Ask it as a question** saves a note as a question at that page or time. It shows in Questions and goals, and among the board's side questions.
+- **✎ Note beside it** makes a new note about the entry, placed and linked beside its card, and opens it in a tab to write.
+- **? Ask about it** puts a linked question card next to it.
+- **Place it**: an entry opened from *Your Commonplace* that isn't on the board yet says so, with one button to place it.
+- **Appears in** sits at the foot of every entry, so you can see where else it lives without leaving.
+
+**What it isn't:**
+- The panel is not a second app. It shows the entry itself, not a copy, so a change made there is the change, everywhere.
+- Lumens still play inside their own cards (LB2), because they belong to a question on the board.
+
+**Data.**
+- Nothing new is stored. Notes at a page or a time are the entry's existing margin notes, with `at` set ("p. 2", "12:40"), which Questions and goals already reads.
+- The open tabs, the panel width and the PDF page or video time are kept per person and per board, in the client.
+
+**In the app:**
+- the PDF reader is the app's own PDF viewer (pdf.js), opened at a page;
+- the video player is the embed the source already uses, and the time comes from its player API;
+- both need the source's file or URL to be reachable, as the full page does today.
+
 ### 7.9 Decisions
 
 | ID | Decision | Recommendation |
@@ -498,4 +549,6 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB-D11** | The shelf is a tab of the one side panel, beside Learning; the left side stays clear | **Yes** |
 | **LB-D12** | A board has a **Focus mode** that hides everything but the canvas (F or Esc) | **Yes** |
 | **LB-D13** | Letting go of a link on empty board opens the **add-and-link menu**: Note, Question, Lumen (from an open question), related entries, search | **Yes** |
+| **LB-D15** | On a board, opening an entry never leaves the board: it opens in the side panel beside its card, as a tab; **Full page ↗** is the way out | **Yes** |
+| **LB-D16** | You write where you read: the block editor for notes and Objects; notes at a page or a time for PDFs and videos; **↗ On the board** turns any of them into a linked card | **Yes** |
 | **LB-D14** | Board craft ships as **LB4**: the selection bar; selecting several, tidy and align; snapping guides; undo and redo; the minimap; shortcuts | **Yes** |

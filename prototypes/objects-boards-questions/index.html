@@ -5235,7 +5235,7 @@ body:has(.wz) .proto { display: none; }
 .stopn.burst { animation: burst .7s ease-out; }
 @keyframes burst { 0% { transform: scale(1); } 30% { transform: scale(1.45); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); } 100% { transform: scale(1); box-shadow: inset 0 0 0 1.5px var(--ok), 0 0 0 16px transparent; } }
 @media (prefers-reduced-motion: reduce) { .bpl.pop, .stopn.burst { animation: none; } }
-.cbar { position: absolute; z-index: 8; display: flex; gap: 2px; align-items: center; padding: 4px; border-radius: 9px; background: var(--surface-float); box-shadow: var(--shadow-float); white-space: nowrap; }
+.cbar { position: absolute; z-index: 6; display: flex; gap: 2px; align-items: center; padding: 4px; border-radius: 9px; background: var(--surface-float); box-shadow: var(--shadow-float); white-space: nowrap; }
 .cbar button { all: unset; cursor: pointer; padding: 5px 9px; border-radius: 6px; font: 12.5px var(--ui); color: var(--ink); }
 .cbar button:hover { background: var(--hover-fill); } .cbar button.rm { color: var(--warn); }
 .cbar span { padding: 0 8px; font-size: 12px; color: var(--ink-3); } .cbar .sep { width: 1px; height: 18px; padding: 0; background: var(--line); }
@@ -5243,11 +5243,60 @@ body:has(.wz) .proto { display: none; }
 .bmap svg { width: 100%; height: 100%; display: block; } .bmap rect { fill: var(--line); } .bmap rect.q { fill: var(--pick-rule); } .bmap rect.l, .bmap rect.g { fill: var(--status-1); } .bmap rect.s { fill: var(--accent); }
 .bmap rect.vw { fill: color-mix(in srgb, var(--accent) 7%, transparent); stroke: var(--accent); stroke-width: 1.5; }
 .bkeys { position: absolute; z-index: 9; right: 16px; bottom: 62px; width: 300px; padding: 14px 16px; border-radius: 12px; background: var(--surface-float); box-shadow: var(--shadow-float); font-size: 12.5px; }
-.bfull .bwrap.has-panel .bkeys { right: 352px; }
+.bfull .bwrap.has-panel .bkeys { right: calc(var(--pw, 320px) + 32px); }
 .bkeys h3 { margin: 0 0 8px; font: 400 16px var(--read); display: flex; justify-content: space-between; } .bkeys h3 button { border: 0; background: none; color: var(--ink-3); cursor: pointer; font-size: 16px; }
 .bkeys dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 5px 12px; } .bkeys dt { text-align: right; } .bkeys dd { margin: 0; color: var(--ink-2); }
 .bkeys kbd, .bhint kbd { font: 11px var(--ui); padding: 1px 5px; border-radius: 4px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
 body.focus .bmap, body.focus .bkeys { display: none !important; }
+/* reading on the board: entries open in the side panel, beside the canvas (LB5) */
+.bp-tabs { overflow-x: auto; scrollbar-width: none; } .bp-tabs::-webkit-scrollbar { display: none; }
+.bp-tabs [role="tab"] { flex: none; }
+.bp-tabs .bp-rt { max-width: 168px; padding-right: 4px; } .bp-rt em { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .bp-rt .rg { color: var(--ink-3); }
+.bp-rt i { font-style: normal; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 4px; color: var(--ink-3); font-size: 14px; } .bp-rt i:hover { background: var(--hover-fill); color: var(--ink); }
+.bfull .bpanel.reading { box-shadow: var(--shadow-float), 0 0 0 1px var(--line); }
+.bp-grip { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; cursor: ew-resize; z-index: 2; } .bp-grip:hover { background: linear-gradient(90deg, var(--accent) 2px, transparent 2px); }
+.rd { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+.rd-top { display: flex; gap: 6px; align-items: center; padding: 8px 12px 8px 18px; border-bottom: 1px solid var(--line); }
+.rd-k { margin: 0 auto 0 0; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-top .ip-saved { font-size: 11.5px; color: var(--ink-3); }
+.rd-b { border: 0; background: none; padding: 4px 8px; border-radius: 6px; font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; white-space: nowrap; } .rd-b:hover { background: var(--hover-fill); color: var(--ink); }
+.rd-body { overflow: auto; padding: 18px 26px 40px; display: flex; flex-direction: column; gap: 16px; } .rd-body > * { flex: none; }
+.rd-title { margin: 0; font: 400 26px/1.2 var(--read); letter-spacing: -.01em; }
+.rd-line { margin: -10px 0 0; font-size: 13px; color: var(--ink-2); }
+.rd-body .nbs { margin: 0; } .rd-body .nb-t { font-size: 15.5px; }
+.rd-body h3 { margin: 6px 0 0; font: 500 11px var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); display: flex; gap: 6px; } .rd-body h3 span { color: var(--ink-3); font-weight: 400; }
+.rd-hero { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 14px; align-items: center; } .rd-hero img, .rd-hero .ini { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; background: var(--board); font: 400 26px var(--read); color: var(--ink-3); }
+.rd-hero.wide { grid-template-columns: 1fr; } .rd-hero.wide img { width: 100%; height: 200px; border-radius: 8px; }
+.rd-props { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 13px; } .rd-props dt { color: var(--ink-3); } .rd-props dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.rd-img { margin: 0; border-radius: 8px; overflow: hidden; background: var(--board); cursor: zoom-in; max-height: 62vh; } .rd-img img { display: block; width: 100%; }
+.rd-img.z { overflow: auto; cursor: zoom-out; } .rd-img.z img { width: 220%; max-width: none; }
+.rd-desc { margin: 0; font: 15.5px/1.55 var(--read); color: var(--ink); }
+.rd-pdf { border-radius: 8px; background: var(--board); padding: 10px; display: grid; gap: 10px; }
+.rd-pdfbar { display: flex; gap: 8px; align-items: center; font-size: 12.5px; color: var(--ink-2); } .rd-pdfbar button { border: 0; width: 28px; height: 26px; border-radius: 6px; background: var(--surface-float); box-shadow: var(--shadow-pic); cursor: pointer; color: var(--ink); } .rd-pdfbar .rd-pn { margin-left: auto; color: var(--pick); }
+.rd-page { position: relative; aspect-ratio: 1 / 1.3; max-height: 56vh; margin: 0 auto; width: 100%; max-width: 480px; background: #fff; color: #222; box-shadow: var(--shadow-pic); border-radius: 2px; padding: 8% 9%; display: grid; gap: 8px; align-content: start; overflow: hidden; }
+.rd-page h4 { margin: 0 0 4px; font: 600 15px/1.25 var(--read); color: #111; } .rd-page h5 { margin: 0; font: 400 22px/1.2 var(--read); color: #111; } .rd-page p { margin: 0; font: 11.5px/1.5 var(--read); color: #333; }
+.rd-page i { display: block; height: 6px; border-radius: 3px; background: #e4e4e0; } .rd-page small { position: absolute; bottom: 4%; left: 0; right: 0; text-align: center; font-size: 10px; color: #999; }
+.rd-page .pin { position: absolute; right: 4%; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--pick); color: #fff; font: 600 11px var(--ui); box-shadow: var(--shadow-pic); }
+.rd-vid .lpl-frame { position: relative; } .rd-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .92); color: #141b21; font-size: 18px; cursor: pointer; }
+.rd-vid .lpl-frame b { margin-top: 70px; }
+.rd-vbar i { position: relative; cursor: pointer; height: 5px !important; overflow: visible !important; } .rd-vbar i b { height: 100%; } .rd-vbar u { position: absolute; top: -4px; width: 3px; height: 13px; margin-left: -1px; border-radius: 2px; background: var(--pick); text-decoration: none; }
+.rd-quote { margin: 0; padding: 18px 20px; border-radius: 6px; background: var(--quote-paper); box-shadow: inset 0 0 0 1px var(--quote-rule); font: italic 19px/1.45 var(--read); } .rd-quote p { margin: 0; }
+.rd-notes { display: grid; gap: 8px; }
+.rd-n { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; align-items: start; padding: 10px 12px; border-radius: 8px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.rd-n .markdown-body { font-size: 14px; } .rd-n .markdown-body p { margin: 0; }
+.rd-at { all: unset; cursor: pointer; font: 500 11.5px var(--ui); color: var(--accent-strong); padding: 2px 7px; border-radius: 9px; background: var(--accent-soft); white-space: nowrap; } .rd-at:empty { display: none; }
+.rd-pin { all: unset; cursor: pointer; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; opacity: 0; } .rd-n:hover .rd-pin, .rd-pin:focus { opacity: 1; } .rd-pin:hover { color: var(--accent); }
+.rd-add { display: grid; gap: 6px; } .rd-add textarea { width: 100%; min-height: 58px; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--paper); font: 14px/1.5 var(--ui); color: var(--ink); resize: vertical; box-sizing: border-box; } .rd-add textarea:focus { outline: none; border-color: var(--accent); }
+.rd-add .row2 { display: flex; gap: 6px; flex-wrap: wrap; }
+.rd-place { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); font-size: 13px; color: var(--accent-strong); }
+.rd-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.rd-body .ip-shelf { margin: 8px 0 0; } .rd-body .ip-shelf-h h2 { font-size: 18px; }
+.bpl.reading .mcard .ci, .bpl.reading .mcard[data-frame="picture"] .pic { box-shadow: inset 0 0 0 2px var(--accent), var(--shadow-lift); }
+.sh-read { position: absolute; right: 6px; bottom: 6px; z-index: 1; border: 0; padding: 2px 8px; border-radius: 9px; background: var(--surface-float); box-shadow: var(--shadow-pic); font: 11px var(--ui); color: var(--ink); cursor: pointer; opacity: 0; } .sh-t:hover .sh-read, .sh-read:focus { opacity: 1; }
+body.focus .bfull .bpanel.reading { display: grid !important; }
+.bfull .bwrap.has-panel .bhint { right: calc(var(--pw, 320px) + 32px); }
+body.focus .bpanel.reading .bp-tabs > :not([aria-selected="true"]) { display: none; }
+@media (max-width: 760px) { .bfull .bpanel.reading { max-height: 86%; } .bp-grip { display: none; } .rd-body { padding: 14px 16px 30px; } }
 @media (max-width: 760px) { .bmap, .bkeys { display: none; } }
 .qp { position: absolute; z-index: 9; width: 340px; background: var(--surface-float); box-shadow: var(--shadow-float); border-radius: 10px; padding: 8px; display: grid; gap: 6px; }
 .qp-s { display: flex; gap: 6px; align-items: center; padding: 7px 9px; border-radius: 6px; box-shadow: inset 0 0 0 1.5px var(--accent); background: var(--paper); color: var(--ink-3); }
@@ -5288,12 +5337,12 @@ body.board-full .main-stage { overflow: hidden; }
 .bright .button[aria-pressed="true"] { background: var(--hover-fill); }
 .bfull .btools { left: 16px; top: 50%; transform: translateY(-50%); border-radius: 10px; }
 .bfull .bshelf { position: absolute; z-index: 7; left: 68px; top: 70px; bottom: 16px; width: 270px; border: 0; border-radius: 12px; box-shadow: var(--shadow-float); overflow: hidden; background: var(--surface-float); }
-.bfull .bpanel { position: absolute; z-index: 7; right: 16px; top: 70px; bottom: 16px; width: 320px; border-radius: 12px; box-shadow: var(--shadow-float); overflow: hidden; background: var(--surface-float); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.bfull .bpanel { position: absolute; z-index: 7; right: 16px; top: 70px; bottom: 16px; width: var(--pw, 320px); border-radius: 12px; box-shadow: var(--shadow-float); overflow: hidden; background: var(--surface-float); display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .bfull .bpanel .inside { border: 0; background: none; min-height: 0; }
 .bp-h { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 4px; } .bp-h b { font: 400 16px var(--read); }
 .bpanel-chip { position: absolute; z-index: 7; right: 16px; top: 70px; border: 0; display: inline-flex; gap: 8px; align-items: center; padding: 6px 12px 6px 6px; border-radius: 20px; background: var(--surface-float); box-shadow: var(--shadow-float); font: 13px var(--ui); color: var(--ink); cursor: pointer; }
 .bfull .bzoom { left: auto; right: 16px; bottom: 16px; border-radius: 10px; }
-.bfull .bwrap.has-panel .bzoom { right: 352px; }
+.bfull .bwrap.has-panel .bzoom { right: calc(var(--pw, 320px) + 32px); }
 .bfull .bhint { left: 0; right: 0; bottom: 92px; }
 body.board-full .proto { left: 50%; bottom: 14px; }
 body.board-full .proto:not(:hover):not(:focus-within) > *:not(b) { display: none; }
@@ -6080,7 +6129,7 @@ function tileHTML(t, on) {
   if (t.r) return `<div class="sh-t q${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board"><span class="sh-gl">?</span><p>${esc(t.r.text)}</p><small>in ${esc(t.r.item.title || "a note")}</small></div>`;
   const x = t.x, pic = x.media ? `<img alt="" src="${MEDIA[x.media]}">` : "";
   const sub = x.type === "object" ? cardLine(x) : kindLabel(x);
-  return `<div class="sh-t${x.media ? " pic" : ""}${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board">${pic}<div class="sh-b"><small>${esc(kindLabel(x))}${on && !x.media ? " · on board" : ""}</small><b>${esc(x.title || plainBody(x).slice(0, 70))}</b>${x.type === "object" && sub ? `<span>${esc(sub)}</span>` : ""}</div>${on && x.media ? `<i class="sh-on">On board</i>` : ""}</div>`;
+  return `<div class="sh-t${x.media ? " pic" : ""}${on ? " on" : ""}" draggable="true" data-dragref="${esc(t.ref)}" data-act="shplace" data-ref="${esc(t.ref)}" title="Drag onto the board">${pic}<button class="sh-read" type="button" data-act="rdopen" data-id="${x.id}" title="Read it here first">Open</button><div class="sh-b"><small>${esc(kindLabel(x))}${on && !x.media ? " · on board" : ""}</small><b>${esc(x.title || plainBody(x).slice(0, 70))}</b>${x.type === "object" && sub ? `<span>${esc(sub)}</span>` : ""}</div>${on && x.media ? `<i class="sh-on">On board</i>` : ""}</div>`;
 }
 function shelfHTML(b) {
   const on = new Set(b.pl.map(p => p.ref)), tab = S.shtab || "all", list = shelfItems(S.shq, tab);
@@ -6185,7 +6234,8 @@ function placed(p, b) {
   const r = refOf(p.ref, b); if (!r) return "";
   const dot = `<span class="dot-c" data-dot="${p.id}" title="Drag onto a card to link, or let go on empty space to add a linked card"></span>`;
   const si = r.type === "inline" && r.kind === "question" ? stopsOf(b).indexOf(r.key) : -1, isNext = si >= 0 && nextStop(b) === r.key, sAns = si >= 0 && st(r.key, "question").status === "answered";
-  const wrap = (cls, inner) => `<div class="bpl${cls}${isNext ? " next" : ""}${isSel(p.id) ? " sel" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${si >= 0 ? `<span class="stopn${sAns ? " done" : ""}" title="Stop ${si + 1} on the path${isNext ? ", suggested next" : ""}">${sAns ? "✓" : si + 1}</span>` : ""}${inner}${dot}</div>`;
+  const rd = S.panel && S.ptab === "r:" + p.ref.slice(2) && p.ref.startsWith("i:");
+  const wrap = (cls, inner) => `<div class="bpl${cls}${isNext ? " next" : ""}${isSel(p.id) ? " sel" : ""}${rd ? " reading" : ""}" data-pid="${p.id}" style="left:${p.x}px;top:${p.y}px">${si >= 0 ? `<span class="stopn${sAns ? " done" : ""}" title="Stop ${si + 1} on the path${isNext ? ", suggested next" : ""}">${sAns ? "✓" : si + 1}</span>` : ""}${inner}${dot}</div>`;
   if (r.type === "inline") {
     const row = INL(r.key), s = st(r.key, r.kind);
     if (r.kind === "goal") { const qs = allInlines().filter(x => x.goalKey === r.key), d = qs.filter(x => st(x.key, x.kind).status === "answered").length; return wrap(" g", `<article class="mcard gcard" data-frame="paper" data-ph="Q-B"><div class="ci"><div class="body"><p class="kicker">◎ This board's goal</p><p class="nt">${esc(row.text)}</p></div><div class="ft"><div class="ft-meta"><span class="gprog" style="margin:0">${ring(d, qs.length, 18)}${d} of ${qs.length} answered</span></div>${stBtn(row)}</div></div></article>`); }
@@ -6218,17 +6268,75 @@ function drawerHTML(b) {
   if (S.dtab === "questions") list = `<p class="small">Open questions written elsewhere. Placing one shows it here; it stays where it was written.</p>` + allInlines().filter(r => r.kind === "question" && r.item.type !== "board" && st(r.key, r.kind).status === "open").map(r => it("q:" + r.key, "? " + r.text, `in ${r.item.title || "a note"}${r.at ? ", " + r.at : ""}`)).join("");
   return `<div class="bdrawer" data-ph="B1"><div class="dh"><b>Place from your Commonplace</b><button class="button button-link" type="button" data-act="drawer">Close</button></div><div class="shelf-tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" type="button" aria-selected="${S.dtab === k}" data-act="dtab" data-k="${k}">${t}</button>`).join("")}</div><div class="list">${list}</div></div>`;
 }
+/* ---------- reading on the board (LB5): any entry opens in the side panel, next to its card ---------- */
+const VDUR = 45 * 60, fmtT = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`, secsOf = a => { const m = (a || "").match(/^(\d+):(\d\d)$/); return m ? +m[1] * 60 + +m[2] : null; };
+const rdGlyph = it => it.type === "object" ? "▣" : it.type === "image" ? "◫" : it.type === "quote" ? "❝" : it.type === "source" ? (it.kind === "video" ? "▷" : it.kind === "pdf" ? "▤" : "▥") : "¶";
+const rdName = it => it.title || plainBody(it).slice(0, 40) || "Untitled note";
+const pdfPages = it => Math.max(4, ...it.margin.map(m => +((m.at || "").match(/p\. ?(\d+)/) || [])[1] || 0));
+const rdAt = it => it.type === "source" && it.kind === "pdf" ? "p. " + (S.rpage?.[it.id] || 1) : it.type === "source" && it.kind === "video" ? fmtT(S.vt?.[it.id] || 0) : "";
+function openReader(id, opts = {}) {
+  const it = I(id); if (!it) return;
+  if (it.type === "lumen") { playLumen(it); return; }
+  if (it.type === "board") { openEntry(id, true); return; }
+  S.reads = S.reads || []; if (!S.reads.includes(id)) { S.reads.push(id); if (S.reads.length > 5) S.reads.shift(); }
+  S.panel = true; S.ptab = "r:" + id; closeMenu(); render();
+  const p = I(S.board).pl.find(x => x.ref === "i:" + id);
+  requestAnimationFrame(() => { if (p) showCard(p.id); if (opts.write) { const n = document.querySelectorAll(".rd-body .nb-t"); n[n.length - 1]?.focus(); } });
+}
+function closeReader(id) { S.reads = (S.reads || []).filter(x => x !== id); if (S.ptab === "r:" + id) S.ptab = S.reads.length ? "r:" + S.reads.at(-1) : "learn"; if (S.vplay === id) S.vplay = null; render(); }
+/** Room the side panel takes on the right, so the board can keep cards in the part you can see. */
+function panelSpace() { const el = document.querySelector(".bfull .bpanel"), vp = $("#vp"); return el && vp && vp.clientWidth > 760 && getComputedStyle(el).display !== "none" ? el.offsetWidth + 32 : 0; }
+function showCard(pid) {
+  const el = document.querySelector(`[data-pid="${pid}"]`), vp = $("#vp"); if (!el || !vp) return;
+  const z = S.view.z, x = el.offsetLeft * z + S.view.x, y = el.offsetTop * z + S.view.y, w = el.offsetWidth * z, h = el.offsetHeight * z, W = vp.clientWidth - panelSpace();
+  if (x >= 80 && x + w <= W - 20 && y >= 70 && y + h <= vp.clientHeight - 20) return;
+  S.view.x = 80 + (W - 100 - w) / 2 - el.offsetLeft * z; S.view.y = Math.max(80, (vp.clientHeight - h) / 2) - el.offsetTop * z; applyView(); requestAnimationFrame(drawArrows);
+}
+function rdNotes(it) {
+  const at = rdAt(it);
+  return `<section class="rd-notes" data-ph="LB5 · N3"><h3>Your notes on it <span>${it.margin.length}</span></h3>${it.margin.map((m, i) => `<div class="rd-n"><button class="rd-at" type="button" data-act="rdjump" data-at="${esc(m.at || "")}">${esc(m.at || "")}</button><div class="markdown-body">${renderBody(it, i)}</div><button class="rd-pin" type="button" data-act="rdpin" data-i="${i}" title="Put it on the board, linked to this">↗ On the board</button></div>`).join("")}
+    <div class="rd-add"><textarea id="rdn" rows="2" placeholder="Write a note${at ? " at " + at : ""}…"></textarea><div class="row2"><button class="button" type="button" data-act="rdadd">Add note</button><button class="button button-quiet" type="button" data-act="rdadd" data-k="q">? Ask it as a question</button></div></div></section>`;
+}
+function pdfHTML(it) {
+  const n = pdfPages(it), pg = Math.min(S.rpage?.[it.id] || 1, n), pins = it.margin.filter(m => m.at === "p. " + pg), bars = k => Array.from({ length: k }, (_, j) => `<i style="width:${70 + ((j * 37 + pg * 13) % 30)}%"></i>`).join("");
+  const page = pg === 1 ? `<h5>${esc(it.title)}</h5><p>${esc(it.desc || it.creator || "")}</p>${bars(4)}<h4 style="margin-top:12px">Contents</h4>${bars(6)}` : `<h4>${pg - 1}. ${esc(["Climate and comfort", "Mass, shade and air", "Courtyards and towers", "Night and the sky", "Notes and sources"][(pg - 2) % 5])}</h4>${bars(5)}<p>${esc(pins[0] ? plainText(pins[0].body.replace(/^@question\s*/, "")) : it.desc || "")}</p>${bars(8)}`;
+  return `<div class="rd-pdf" data-ph="LB5"><div class="rd-pdfbar"><button type="button" data-act="rdpg" data-d="-1" aria-label="Previous page">‹</button><span>Page ${pg} of ${n}</span><button type="button" data-act="rdpg" data-d="1" aria-label="Next page">›</button><span class="rd-pn">${pins.length ? `✎ ${pins.length} of your notes here` : ""}</span></div><div class="rd-page">${page}${pins.map((m, j) => `<span class="pin" style="top:${18 + j * 12}%" title="${esc(plainText(m.body.replace(/^@question\s*/, "")))}">${/^@question/.test(m.body) ? "?" : "✎"}</span>`).join("")}<small>${pg}</small></div></div>`;
+}
+function vidHTML(it) {
+  const t = S.vt?.[it.id] || 0, on = S.vplay === it.id, marks = it.margin.map(m => secsOf(m.at)).filter(x => x != null);
+  return `<div class="lpl-video rd-vid" data-ph="LB5"><div class="lpl-frame"><button class="rd-play" type="button" data-act="rdplay" aria-label="${on ? "Pause" : "Play"}">${on ? "❚❚" : "▶"}</button><b>${esc(it.title)}</b></div><div class="lpl-bar rd-vbar"><span class="rd-t">${fmtT(t)}</span><i data-act="rdseek" title="Your notes are marked">${marks.map(x => `<u style="left:${x / VDUR * 100}%"></u>`).join("")}<b style="width:${t / VDUR * 100}%"></b></i><span>${fmtT(VDUR)}</span></div></div>`;
+}
+function readerHTML(it) {
+  const b = I(S.board), onB = b.pl.some(p => p.ref === "i:" + it.id), c = it.type === "object" ? COL(it.col) : null;
+  let body = "";
+  if (it.type === "note") body = `${it.title ? `<h2 class="rd-title">${esc(it.title)}</h2>` : ""}${editorHTML(it, { ph: "LB5 · N1" })}`;
+  else if (it.type === "object") {
+    const rels = c.fields.filter(f => f.t === "rel" && arr(it.v[f.id]).length), facts = c.card.map(id => it.v[id]).filter(Boolean).join(" · ");
+    body = `<div class="rd-hero${c.layout === "portrait" ? "" : it.media ? " wide" : ""}">${it.media ? `<img alt="" src="${MEDIA[it.media]}">` : c.layout === "portrait" ? `<span class="ini">${esc(initials(it.title))}</span>` : ""}<div><h2 class="rd-title">${esc(it.title)}</h2>${facts ? `<p class="rd-line" style="margin:4px 0 0">${esc(facts)}</p>` : ""}</div></div>
+      ${it.desc ? `<p class="rd-desc">${esc(it.desc)}</p>` : ""}
+      ${rels.length ? `<dl class="rd-props">${rels.map(f => `<dt>${esc(f.label)}</dt><dd>${arr(it.v[f.id]).map(I).filter(Boolean).map(x => `<button class="entity-pill obj" type="button" data-act="open" data-id="${x.id}">${esc(x.title)}</button>`).join("")}</dd>`).join("")}</dl>` : ""}
+      <h3>What I took from it</h3>${editorHTML(it, { ph: "LB5 · Q-O", empty: "What you took from it. / for blocks, @ for a question or an entry" })}`;
+  }
+  else if (it.type === "image") body = `<figure class="rd-img${S.rzoom === it.id ? " z" : ""}" data-act="rdzoom" title="${S.rzoom === it.id ? "Zoom out" : "Zoom in"}"><img alt="" src="${MEDIA[it.media]}"></figure><h2 class="rd-title">${esc(it.title)}</h2>${it.desc ? `<p class="rd-desc">${esc(it.desc)}</p>` : ""}${rdNotes(it)}`;
+  else if (it.type === "quote") body = `<blockquote class="rd-quote">${renderBody(it)}</blockquote>${it.src ? `<p class="rd-line" style="margin:0">${esc([it.src.b, it.src.em, it.src.loc].filter(Boolean).join(", "))}</p>` : ""}${rdNotes(it)}`;
+  else if (it.type === "source") body = `${it.kind === "pdf" ? pdfHTML(it) : it.kind === "video" ? vidHTML(it) : ""}<h2 class="rd-title">${esc(it.title)}</h2>${it.creator || it.meta ? `<p class="rd-line">${esc([it.creator, it.meta].filter(Boolean).join(" · "))}</p>` : ""}${it.desc ? `<p class="rd-desc">${esc(it.desc)}</p>` : ""}${rdNotes(it)}`;
+  const acts = `<div class="rd-acts">${it.type !== "note" ? `<button class="button button-quiet" type="button" data-act="rdnote" title="A note about it, placed beside its card and linked">✎ Note beside it</button>` : ""}<button class="button button-quiet" type="button" data-act="rdask">? Ask about it</button></div>`;
+  return `<div class="rd" data-ph="LB5"><div class="rd-top"><p class="rd-k">${esc(kindLabel(it))}${it.col ? " · " + esc(COL(it.col).name) : ""}</p><span class="ip-saved" id="saved" aria-live="polite"></span><button class="rd-b" type="button" data-act="rdwide">${S.rwide ? "Narrower" : "Wider"}</button><button class="rd-b" type="button" data-act="rdfull" data-id="${it.id}" title="Leave the board for its full page">Full page ↗</button></div>
+    <div class="rd-body" data-id="${it.id}">${onB ? "" : `<div class="rd-place"><span>Not on this board yet.</span><button class="button" type="button" data-act="rdplace">Place it</button></div>`}${body}${acts}${appearsSection(it)}</div></div>`;
+}
 function renderBoard() {
   const b = I(S.board) || boards()[0]; S.board = b.id;
   if (S.panel == null) S.panel = innerWidth > 900;
-  const ptab = S.ptab || "learn";
+  S.reads = (S.reads || []).filter(id => I(id));
+  let ptab = S.ptab || "learn"; if (ptab.startsWith("r:") && !S.reads.includes(ptab.slice(2))) ptab = S.ptab = "learn";
+  const rit = ptab.startsWith("r:") ? I(ptab.slice(2)) : null, pw = rit ? (S.rwide ? "min(880px, 58vw)" : (S.pw || 560) + "px") : "320px";
   const hint = S.tool === "note" ? "Click the canvas to write a note. It's saved to Commonplace." : S.tool === "question" ? "Click the canvas to ask a question. It belongs to this board." : "Double-click to add · drag a blue dot to link · <kbd>?</kbd> shortcuts";
   const stops = stopsOf(b), d = stops.filter(k => st(k, "question").status === "answered").length;
-  return `<h1 class="visually-hidden">${esc(b.title)}</h1><div class="bwrap${S.panel ? " has-panel" : ""}" data-ph="B1"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>${qpHTML()}</div>
+  return `<h1 class="visually-hidden">${esc(b.title)}</h1><div class="bwrap${S.panel ? " has-panel" : ""}${S.panel && rit ? " reading" : ""}" data-ph="B1" style="--pw:${pw}"><div class="viewport" id="vp"><div class="canvas" id="cv" style="transform:translate(${S.view.x}px,${S.view.y}px) scale(${S.view.z})"><svg class="arrows" id="arrows"></svg>${b.pl.map(p => placed(p, b)).join("")}</div>${qpHTML()}</div>
     <div class="btop"><button class="btop-back" type="button" data-act="back" title="Back" aria-label="Back">←</button><div class="btop-t"><p class="ip-kicker">Board</p><b>${esc(b.title)}</b></div><button class="place" type="button" data-ph="B4">${esc(b.place)}</button></div>
     <div class="bright"><label data-ph="B1 + F2"><input type="checkbox" id="fl" ${S.fieldLinks ? "checked" : ""}> Field links</label><button class="button button-quiet" type="button" data-act="toast" data-msg="Phase B3: Make a Lumen of the whole board follows your path and links; your notes become its check.">Make a Lumen</button><button class="button button-quiet" type="button" data-act="bpanel" aria-pressed="${!!S.panel}" title="Show or hide the side panel">Panel</button><button class="button" type="button" data-act="bfocus" title="Focus: hide everything but the board (F)" data-ph="LB4">⤢ Focus</button></div>
     <div class="btools" role="toolbar" aria-label="Tools">${[["select", "↖", "Select and move (V)"], ["note", "✎", "Note (N)"], ["question", "?", "Question (Q)"]].map(([k, l, t]) => `<button type="button" data-act="tool" data-k="${k}" aria-pressed="${S.tool === k}" title="${t}" aria-label="${t}">${l}</button>`).join("")}<button type="button" data-act="shelf" aria-pressed="${S.panel && ptab === "shelf"}" title="Your Commonplace (+)" aria-label="Your Commonplace">+</button></div>
-    ${S.panel ? `<div class="bpanel"><div class="bp-tabs" role="tablist"><button role="tab" type="button" data-act="ptab" data-k="learn" aria-selected="${ptab === "learn"}">${ring(d, stops.length, 18)} Learning</button><button role="tab" type="button" data-act="ptab" data-k="shelf" aria-selected="${ptab === "shelf"}" data-ph="B1">Your Commonplace</button><button class="bp-x" type="button" data-act="bpanel" aria-label="Hide the panel" title="Hide the panel">×</button></div>${ptab === "shelf" ? shelfHTML(b) : pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Panel</button>`}
+    ${S.panel ? `<div class="bpanel${rit ? " reading" : ""}">${rit ? `<span class="bp-grip" title="Drag to resize"></span>` : ""}<div class="bp-tabs" role="tablist"><button role="tab" type="button" data-act="ptab" data-k="learn" aria-selected="${ptab === "learn"}">${ring(d, stops.length, 18)} Learning</button><button role="tab" type="button" data-act="ptab" data-k="shelf" aria-selected="${ptab === "shelf"}" data-ph="B1">Your Commonplace</button>${S.reads.map(id => { const x = I(id); return `<button role="tab" class="bp-rt" type="button" data-act="ptab" data-k="r:${id}" aria-selected="${ptab === "r:" + id}" title="${esc(rdName(x))}" data-ph="LB5"><span class="rg">${rdGlyph(x)}</span><em>${esc(rdName(x))}</em><i data-act="rdclose" data-id="${id}" aria-label="Close ${esc(rdName(x))}">×</i></button>`; }).join("")}<button class="bp-x" type="button" data-act="bpanel" aria-label="Hide the panel" title="Hide the panel">×</button></div>${rit ? readerHTML(rit) : ptab === "shelf" ? shelfHTML(b) : pathPanel(b)}</div>` : `<button class="bpanel-chip" type="button" data-act="bpanel">${ring(d, stops.length, 22)}${d} of ${stops.length} stops · Panel</button>`}
     ${S.playing ? "" : `<div class="bhint"><span>${hint}</span></div>`}
     <div class="cbar" id="cbar" role="toolbar" aria-label="Selected cards" hidden data-ph="LB4"></div>
     <div class="bmap" id="bmap" title="Click to go there" data-ph="LB4"><svg id="bmapsvg"></svg></div>
@@ -6541,6 +6649,7 @@ function blockMenu(i) {
   return h;
 }
 function edKey(e, el) {
+  if (S.screen === "board" && ((e.key === "Escape" && !(pick && !$("#pick").hidden)) || ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f"))) { e.preventDefault(); if (e.key === "Escape") el.blur(); else { S.bfocus = !S.bfocus; const i = +el.dataset.bi, off = caretOff(el); render(); focusBlock(i, off); } return; }
   if ((e.key === "Escape" && S.nfocus && !(pick && !$("#pick").hidden)) || ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "f")) { e.preventDefault(); S.nfocus = e.key === "Escape" ? false : !S.nfocus; const i = +el.dataset.bi, off = caretOff(el); render(); focusBlock(i, off); return; }
   const i = +el.dataset.bi, bl = S.ed.blocks, b = bl[i];
   if (pick && !$("#pick").hidden) {
@@ -6596,13 +6705,23 @@ function render() {
   else if (S.screen === "customize") m.innerHTML = renderCustomize();
   else if (S.screen === "colls") m.innerHTML = renderColls();
   else if (S.screen === "tpl") m.innerHTML = renderTpl();
-  else if (S.screen === "board") { m.innerHTML = renderBoard(); popNew(); requestAnimationFrame(drawArrows); }
+  else if (S.screen === "board") { const rb = $(".rd-body"), keep = rb ? [rb.dataset.id, rb.scrollTop] : null; m.innerHTML = renderBoard(); popNew(); if (keep) { const nb = $(".rd-body"); if (nb?.dataset.id === keep[0]) nb.scrollTop = keep[1]; } requestAnimationFrame(drawArrows); }
   else { S.screen = "wall"; m.innerHTML = renderWall(); requestAnimationFrame(masonry); }
   document.querySelectorAll(".ip-title-field,.ip-lead").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
   const ta = document.querySelector("[data-qedit],[data-nedit],#mdedit"); if (ta && S.focusEdit) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); S.focusEdit = false; }
   $("#wiz").innerHTML = wizHTML() + howHTML() + (document.body.classList.contains("focus") ? `<button class="focus-exit" type="button" data-act="${S.screen === "board" ? "bfocus" : "nfocus"}" title="Leave focus (${S.screen === "board" ? "F or " : ""}Esc)">Leave focus</button>` : "");
   if (S.jump) requestAnimationFrame(doJump);
 }
+/** The video plays (in the prototype, a clock); notes take the time it's at. */
+let vT;
+function vidTick() { clearInterval(vT); vT = setInterval(() => { const id = S.vplay, bar = document.querySelector(".rd-vbar"); if (!id || !bar || S.ptab !== "r:" + id) { clearInterval(vT); S.vplay = S.vplay && bar ? S.vplay : null; return; } S.vt = S.vt || {}; S.vt[id] = Math.min(VDUR, (S.vt[id] || 0) + 4); bar.querySelector(".rd-t").textContent = fmtT(S.vt[id]); bar.querySelector("i b").style.width = S.vt[id] / VDUR * 100 + "%"; const ta = $("#rdn"); if (ta) ta.placeholder = `Write a note at ${fmtT(S.vt[id])}…`; }, 250); }
+document.addEventListener("pointerdown", e => {
+  const g = e.target.closest?.(".bp-grip"); if (!g) return; e.preventDefault(); e.stopPropagation();
+  const w = g.closest(".bwrap"), mv = ev => { S.pw = Math.round(Math.max(380, Math.min(innerWidth - 260, w.getBoundingClientRect().right - 16 - ev.clientX))); S.rwide = false; w.style.setProperty("--pw", S.pw + "px"); }, up = () => { removeEventListener("pointermove", mv); removeEventListener("pointerup", up); drawArrows(); }; addEventListener("pointermove", mv); addEventListener("pointerup", up);
+}, true);
+/* writing in the panel fills in the card on the board as you type */
+let rdT;
+document.addEventListener("input", e => { if (S.screen !== "board" || !e.target.closest?.(".rd-body")) return; clearTimeout(rdT); rdT = setTimeout(() => { const b = I(S.board), p = b.pl.find(x => x.ref === "i:" + S.ed?.id), el = p && document.querySelector(`[data-pid="${p.id}"]`); if (!el) return; const t = document.createElement("div"); t.innerHTML = placed(p, b); el.replaceWith(t.firstElementChild); drawArrows(); }, 300); });
 /** New cards on a board arrive with a small pop. */
 const KNOWN = { b: null, ids: new Set() };
 function popNew() { const els = [...document.querySelectorAll("#cv .bpl")]; if (KNOWN.b === S.board) els.forEach(el => { if (!KNOWN.ids.has(el.dataset.pid)) el.classList.add("pop"); }); KNOWN.b = S.board; KNOWN.ids = new Set(els.map(el => el.dataset.pid)); }
@@ -6692,7 +6811,7 @@ function cardBar() {
   let html;
   if (ids.length === 1) {
     const p = b.pl.find(x => x.id === ids[0]), r = p.ref.startsWith("l:") ? { type: "lumen" } : refOf(p.ref, b), openQ = r?.type === "inline" && r.kind === "question" && st(r.key, "question").status === "open";
-    html = (r?.type === "item" ? `<button type="button" data-act="cbopen">Open ↗</button>` : r?.type === "lumen" ? `<button type="button" data-act="cbopen">▶ Play</button>` : r?.own && r.kind === "question" ? `<button type="button" data-act="cbopen">Edit</button>` : "")
+    html = (r?.type === "item" ? `<button type="button" data-act="cbopen" title="Open it beside the board (Enter)">Open</button>` : r?.type === "lumen" ? `<button type="button" data-act="cbopen">▶ Play</button>` : r?.own && r.kind === "question" ? `<button type="button" data-act="cbopen">Edit</button>` : "")
       + `<button type="button" data-act="cblink" title="Add a linked card (Tab)">→ Add linked</button>`
       + (r?.type === "item" ? `<button type="button" data-act="cbask" title="A question about it, linked">? Ask about it</button>` : "")
       + (openQ && !lumensFor(r.key).length ? `<button type="button" data-act="lans" data-k="${esc(r.key)}">▶ Lumen</button>` : "")
@@ -6708,7 +6827,7 @@ function keysHTML() {
   const k = [["Double-click", "Add here: search, note or question"], ["Drag a dot", "Link to a card, or let go on empty space to add a linked card"], ["Tab", "Add a card linked to the selected one"], ["⇧ click / ⇧ drag", "Select several"], ["Drag", "Move; it snaps to the others (hold ⌥ to stop it)"], ["← → ↑ ↓", "Nudge (⇧ for more)"], ["Delete", "Remove from the board"], ["⌘Z · ⇧⌘Z", "Undo · redo"], ["⌘A", "Select all"], ["Enter", "Open or edit the selected card"], ["V · N · Q", "Select · note · question"], ["+", "Your Commonplace"], ["⇧1 · ⇧2", "Fit all · zoom to selection"], ["F", "Focus"]];
   return `<div class="bkeys" role="dialog" aria-label="Board shortcuts" data-ph="LB4"><h3>Shortcuts <button type="button" data-act="bkeys" aria-label="Close">×</button></h3><dl>${k.map(([a, b]) => `<dt><kbd>${a}</kbd></dt><dd>${b}</dd>`).join("")}</dl></div>`;
 }
-function zoomToSel() { const bx = boardBoxes().filter(x => isSel(x.id)); if (!bx.length) { fit(); return; } const vp = $("#vp"), x0 = Math.min(...bx.map(b => b.x)), y0 = Math.min(...bx.map(b => b.y)), x1 = Math.max(...bx.map(b => b.x + b.w)), y1 = Math.max(...bx.map(b => b.y + b.h)), R = S.panel && vp.clientWidth > 700 ? 352 : 24, aw = vp.clientWidth - 24 - R, ah = vp.clientHeight - 150, z = Math.min(1.4, Math.max(.35, Math.min(aw / (x1 - x0 + 80), ah / (y1 - y0 + 80)))); S.view = { z, x: 24 + aw / 2 - (x0 + x1) / 2 * z, y: 90 + ah / 2 - (y0 + y1) / 2 * z }; applyView(); }
+function zoomToSel() { const bx = boardBoxes().filter(x => isSel(x.id)); if (!bx.length) { fit(); return; } const vp = $("#vp"), x0 = Math.min(...bx.map(b => b.x)), y0 = Math.min(...bx.map(b => b.y)), x1 = Math.max(...bx.map(b => b.x + b.w)), y1 = Math.max(...bx.map(b => b.y + b.h)), R = Math.max(24, panelSpace()), aw = vp.clientWidth - 24 - R, ah = vp.clientHeight - 150, z = Math.min(1.4, Math.max(.35, Math.min(aw / (x1 - x0 + 80), ah / (y1 - y0 + 80)))); S.view = { z, x: 24 + aw / 2 - (x0 + x1) / 2 * z, y: 90 + ah / 2 - (y0 + y1) / 2 * z }; applyView(); }
 /** A small lift when a stop is answered: the number turns to ✓ with a pulse, and the ring moves. */
 function celebrate(key) { if (S.screen !== "board") return; requestAnimationFrame(() => { const pid = pidOfKey(I(S.board), key), n = document.querySelector(`[data-pid="${pid}"] .stopn`); n?.classList.add("burst"); }); }
 function openPlaced(pid) {
@@ -6717,7 +6836,7 @@ function openPlaced(pid) {
   const r = refOf(p.ref, b); if (!r) return;
   if (r.type === "inline" && r.kind === "question" && r.own) { S.editing = "inl:" + r.key; S.focusEdit = true; render(); }
   else if (r.type === "item" && r.it.type === "note" && !r.it.title) { S.editing = "note:" + r.it.id; S.focusEdit = true; render(); }
-  else if (r.type === "item") openEntry(r.it.id);
+  else if (r.type === "item") openReader(r.it.id);
 }
 document.addEventListener("pointerdown", e => {
   if (S.screen !== "board" || !e.target.closest("#vp") || e.target.closest(".btools,.bzoom,.bdrawer,.bhint,.qp,.btop,.bright,.bshelf,.bpanel,.bpanel-chip,button,a,textarea,input,.st,select")) return;
@@ -6773,7 +6892,7 @@ function zoomAt(f, cx, cy) { const r = $("#vp").getBoundingClientRect(); cx ??= 
 function fit() {
   const b = I(S.board), vp = $("#vp"); if (!b || !vp) return;
   const xs = b.pl.map(p => p.x), ys = b.pl.map(p => p.y), x0 = Math.min(...xs) - 30, y0 = Math.min(...ys) - 30, x1 = Math.max(...xs) + 340, y1 = Math.max(...ys) + 260;
-  const narrow = vp.clientWidth < 700, foc = S.bfocus, L = narrow || foc ? 24 : 76, R = narrow || foc ? 24 : S.panel ? 352 : 24, T = narrow ? 120 : foc ? 30 : 76, B = foc ? 30 : 70;
+  const narrow = vp.clientWidth < 700, foc = S.bfocus, L = narrow || foc ? 24 : 76, R = narrow ? 24 : Math.max(24, panelSpace()), T = narrow ? 120 : foc ? 30 : 76, B = foc ? 30 : 70;
   const aw = Math.max(200, vp.clientWidth - L - R), ah = Math.max(200, vp.clientHeight - T - B);
   const z = Math.min(1, Math.max(narrow ? .45 : .55, Math.min(aw / (x1 - x0), ah / (y1 - y0))));
   S.view = { z, x: L - x0 * z + Math.max(0, (aw - (x1 - x0) * z) / 2), y: T - y0 * z + Math.max(0, (ah - (y1 - y0) * z) / 2) }; applyView();
@@ -6831,11 +6950,32 @@ document.addEventListener("click", e => {
     case "selmargin": addMargin(S.ed.blocks[S.selBi], S.selRange?.toString().trim()); break;
     case "selexplain": $("#selbar").hidden = true; toast("Phase N4: Loci explains the selected words in a few lines beside the note. Keep it, and it becomes a margin note."); break;
     case "kb": kb(d.k); break;
-    case "openat": S.jump = d.t; openEntry(d.id); break;
+    case "openat": if (S.screen === "board") { openReader(d.id); break; } S.jump = d.t; openEntry(d.id); break;
     case "lplay": { const l = I(d.id); if (!l) break; if (S.screen !== "board" || S.board !== l.board) { pushHist(); S.board = l.board; go("board", true); } setTimeout(() => playLumen(l), 40); break; }
     case "lans": { e.stopPropagation(); menuKey = d.k; openMenu(a, mHead("Answer with a Lumen") + Object.entries(FMT).map(([k, t]) => mItem("lmake", `<b>${t}</b> <small style="color:var(--ink-3)">${k === "read" ? "slides" : k === "watch" ? "a short video" : "audio and transcript"}</small>`, false, `data-k="${esc(d.k)}" data-f="${k}"`)).join("") + `<p class="small" style="margin:6px 9px">From this board and your Commonplace. You decide if it answered the question.</p>`); break; }
     case "lmake": { closeMenu(); snap(); const b = I(S.board), l = makeLumen(b, d.k, d.f); l.making = true; S.playing = { lid: l.id, s: 0 }; render(); requestAnimationFrame(() => centreOn("p" + l.id, 1)); setTimeout(() => { l.making = false; render(); }, 900); break; }
     case "cbopen": openPlaced(selIds()[0]); break;
+    case "rdopen": e.stopPropagation(); openReader(d.id); break;
+    case "rdclose": e.stopPropagation(); closeReader(d.id); break;
+    case "rdwide": S.rwide = !S.rwide; render(); requestAnimationFrame(drawArrows); break;
+    case "rdfull": openEntry(d.id, true); break;
+    case "rdzoom": S.rzoom = S.rzoom === S.ptab.slice(2) ? null : S.ptab.slice(2); render(); break;
+    case "rdpg": { const it = I(S.ptab.slice(2)); S.rpage = S.rpage || {}; S.rpage[it.id] = Math.max(1, Math.min(pdfPages(it), (S.rpage[it.id] || 1) + +d.d)); render(); break; }
+    case "rdjump": { const it = I(S.ptab.slice(2)), at = d.at, pg = (at.match(/p\. ?(\d+)/) || [])[1], t = secsOf(at); if (pg) { S.rpage = S.rpage || {}; S.rpage[it.id] = +pg; } if (t != null) { S.vt = S.vt || {}; S.vt[it.id] = t; } render(); document.querySelector(".rd-body").scrollTop = 0; break; }
+    case "rdplay": { const id = S.ptab.slice(2); S.vplay = S.vplay === id ? null : id; render(); if (S.vplay) vidTick(); break; }
+    case "rdseek": { const it = I(S.ptab.slice(2)), r = a.getBoundingClientRect(); S.vt = S.vt || {}; S.vt[it.id] = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * VDUR); render(); break; }
+    case "rdadd": { const it = I(S.ptab.slice(2)), t = $("#rdn").value.trim(); if (!t) { $("#rdn").focus(); break; } const at = rdAt(it); it.margin.push({ at, body: d.k === "q" ? "@question " + t.replace(/\?*$/, "?") : t }); render(); const ta = $("#rdn"); ta?.focus(); toast(d.k === "q" ? `Asked${at ? " at " + at : ""}. It shows in Questions and goals, and its side questions here.` : `Noted${at ? " at " + at : ""}. ↗ On the board puts it on the canvas.`); break; }
+    case "rdpin": { const it = I(S.ptab.slice(2)), m = it.margin[+d.i], b = I(S.board), sp = b.pl.find(p => p.ref === "i:" + it.id), el = sp && document.querySelector(`[data-pid="${sp.id}"]`); snap();
+      const [x, y] = sp ? freeSpot(sp.x + (el?.offsetWidth || 240) + 60, sp.y, 240, 120, b) : (() => { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + (vp.width - panelSpace()) / 2, vp.top + vp.height / 2); return [c.x - 120, c.y - 60]; })();
+      const q = /^@question\s*/.test(m.body), text = m.body.replace(/^@question\s*/, ""), id = (q ? "q" : "n") + Date.now();
+      if (q) { b.inl.push({ id, kind: "question", text }); b.pl.push({ id: "p" + id, ref: "b:" + id, x, y }); } else { D().items.unshift(note(id, "notes", "", (m.at ? `${m.at}: ` : "") + text, { topics: b.topics, about: it.id })); b.pl.push({ id: "p" + id, ref: "i:" + id, x, y }); }
+      if (sp) b.arrows.push({ id: "a" + id, from: sp.id, to: "p" + id, label: "" });
+      render(); requestAnimationFrame(() => showCard("p" + id)); toast(q ? "On the board as a question, linked, and on the path." : "On the board as a note, linked to it."); break; }
+    case "rdnote": case "rdask": { const it = I(S.ptab.slice(2)), b = I(S.board), sp = b.pl.find(p => p.ref === "i:" + it.id), el = sp && document.querySelector(`[data-pid="${sp.id}"]`), [x, y] = sp ? freeSpot(sp.x + (el?.offsetWidth || 240) + 60, sp.y, 240, 120, b) : [40, 40];
+      if (d.act === "rdask") { addOnCanvas("question", x, y); if (sp) b.arrows.push({ id: "a" + Date.now(), from: sp.id, to: b.pl.at(-1).id, label: "" }); requestAnimationFrame(() => { drawArrows(); showCard(b.pl.at(-1).id); }); toast("Ask it on the board. It's linked, and joins the path."); break; }
+      snap(); const nid = "n" + Date.now(); D().items.unshift(note(nid, "notes", "", "", { topics: b.topics, about: it.id })); b.pl.push({ id: "p" + nid, ref: "i:" + nid, x, y }); if (sp) b.arrows.push({ id: "a" + nid, from: sp.id, to: "p" + nid, label: "" });
+      openReader(nid, { write: true }); toast("A note beside it, linked. Write here; the card fills in as you type."); break; }
+    case "rdplace": { const id = S.ptab.slice(2), vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + (vp.width - panelSpace()) / 2, vp.top + vp.height / 2); placeRef("i:" + id, c.x - 120, c.y - 60); break; }
     case "cblink": { const id = selIds()[0], p = I(S.board).pl.find(x => x.id === id), el = document.querySelector(`[data-pid="${id}"]`); if (p && el) openLinkMenu(id, p.x + el.offsetWidth + 90, p.y + 40); break; }
     case "cbask": { const b = I(S.board), from = selIds()[0], p = b.pl.find(x => x.id === from), el = document.querySelector(`[data-pid="${from}"]`); addOnCanvas("question", ...freeSpot(p.x + (el?.offsetWidth || 240) + 90, p.y, 240, 120, b)); b.arrows.push({ id: "a" + Date.now(), from, to: b.pl.at(-1).id, label: "" }); S.selSet = new Set([b.pl.at(-1).id]); S.sel = b.pl.at(-1).id; requestAnimationFrame(drawArrows); toast("Ask it. It's linked, and joins the path."); break; }
     case "cbrm": removeSel(); break;
@@ -6859,7 +6999,7 @@ document.addEventListener("click", e => {
     case "nfocus": S.nfocus = !S.nfocus; render(); if (S.nfocus) { focusBlock(S.ed?.blocks?.length ? S.ed.blocks.length - 1 : 0, "end"); toast("Focus: just your writing. Esc to come back."); } break;
     case "bpanel": S.panel = !S.panel; render(); requestAnimationFrame(drawArrows); break;
     case "shtab": S.shtab = d.k; render(); break;
-    case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + (vp.width - (S.panel ? 340 : 0)) / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
+    case "shplace": { const vp = $("#vp").getBoundingClientRect(), c = toCanvas(vp.left + (vp.width - panelSpace()) / 2, vp.top + vp.height / 2); placeRef(d.ref, c.x - 120, c.y - 60); break; }
     case "pathgo": { const b = I(S.board), nx = nextStop(b); if (!nx) break; const pid = pidOfKey(b, nx); centreOn(pid, Math.max(S.view.z, .9)); S.sel = pid; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${pid}"]`)?.classList.add("sel", "flash"); break; }
     case "precall": S.recallOpen = !S.recallOpen; render(); break;
     case "lansall": { const b = I(S.board), ks = stopsOf(b).filter(k => st(k, "question").status === "open" && !lumensFor(k).length); ks.forEach(k => makeLumen(b, k, "read")); render(); toast(`${ks.length} Lumens made, one beside each open stop. Nothing is marked answered until you say so.`); break; }
@@ -7057,6 +7197,7 @@ document.addEventListener("keydown", e => {
     if (e.code === "Digit2" && e.shiftKey) { zoomToSel(); return; }
     if (e.key === "?") { S.keys = !S.keys; render(); return; }
     if (e.key === "Escape" && (S.keys || selIds().length)) { S.keys = false; S.selSet = new Set(); S.sel = null; render(); return; }
+    if (e.key === "Escape" && S.panel && S.ptab?.startsWith("r:")) { closeReader(S.ptab.slice(2)); return; }
     if (k === "f") { S.bfocus = !S.bfocus; render(); requestAnimationFrame(drawArrows); return; }
     if (k === "v") { S.tool = "select"; render(); } else if (k === "n") { S.tool = "note"; render(); } else if (k === "q") { S.tool = "question"; render(); }
     else if (e.key === "+") { if (S.panel && S.ptab === "shelf") S.panel = false; else { S.panel = true; S.ptab = "shelf"; } render(); } else if (k === "0") fit();
@@ -7071,7 +7212,7 @@ document.addEventListener("dragend", () => { S.drag = null; document.querySelect
 
 /* ---------- moving between entries: one history, so ← always names where it goes ---------- */
 function pushHist() { S.hist.push({ screen: S.screen, item: S.item, board: S.board }); }
-function openEntry(id) { const it = I(id); if (!it) return; if (it.type === "lumen") { pushHist(); S.board = it.board; go("board", true); setTimeout(() => playLumen(it), 40); return; } closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
+function openEntry(id, full) { const it = I(id); if (!it) return; if (S.screen === "board" && !full && it.type !== "board") { openReader(id); return; } if (it.type === "lumen") { pushHist(); S.board = it.board; go("board", true); setTimeout(() => playLumen(it), 40); return; } closeMenu(); pushHist(); if (it.type === "board") { S.board = it.id; go("board", true); return; } S.item = id; S.ed = null; S.editing = null; go(isLong(it) ? "note" : "item", true); }
 function mentionPop(el) {
   const x = I(el.dataset.mention), bi = el.closest(".nb-t")?.dataset.bi;
   menuKey = { bi: bi == null ? null : +bi, id: el.dataset.mention };
