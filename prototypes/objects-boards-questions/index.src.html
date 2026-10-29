@@ -310,7 +310,8 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .wz { position: fixed; z-index: 86; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow-float); padding: 18px 24px 20px; }
 .wz h2 { margin: 6px 0 4px; font: 400 28px/1.2 var(--read); }
 .wz-top { display: flex; justify-content: space-between; align-items: center; }
-.wz-foot { display: flex; justify-content: space-between; margin-top: 20px; }
+.wz-foot { display: flex; justify-content: space-between; margin-top: 20px; position: sticky; bottom: -20px; padding: 12px 0 14px; background: var(--panel); border-top: 1px solid var(--line); }
+body:has(.wz) .proto { display: none; }
 .wz-kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; }
 .wz-kind, .wz-start { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 4px; align-content: start; padding: 16px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); background: var(--paper); }
 .wz-kind:hover, .wz-start:hover { box-shadow: inset 0 0 0 1px var(--ink-3); }
@@ -321,6 +322,14 @@ body:has(#kbar:not([hidden])) .proto { display: none; }
 .wz-fields { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .wz-fields span { font-size: 11.5px; padding: 2px 7px; border-radius: 9px; background: var(--hover-fill); color: var(--ink-2); }
 .wz-fields i { font-style: normal; margin-right: 4px; color: var(--ink-3); }
+.wz-g, .tp-gh { margin: 16px 0 8px; font: 600 11px var(--ui); letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); }
+.tp-gh.row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 22px; }
+.tp-fields { display: inline-flex; gap: 4px; text-transform: none; letter-spacing: 0; }
+.tp-fields button { border: 0; padding: 3px 10px; border-radius: 12px; background: none; box-shadow: inset 0 0 0 1px var(--line); font: 12.5px var(--ui); color: var(--ink-2); cursor: pointer; }
+.tp-fields button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); box-shadow: none; }
+.wz-th .th { width: 52px; height: 40px; margin-bottom: 4px; }
+.wz-start.gen, .tp-card.gen { box-shadow: inset 0 0 0 1px var(--status-1); border-top: 2px solid var(--accent); }
+.wz-start.gen.on { box-shadow: inset 0 0 0 2px var(--accent); }
 .wz-start.loci { background: none; box-shadow: inset 0 0 0 1px var(--line); border: 0; }
 .wz-flag { justify-self: start; font-size: 11px; color: var(--warn); }
 .wz-look { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; margin-top: 14px; align-items: start; }
@@ -733,7 +742,6 @@ const arr = v => v == null ? [] : Array.isArray(v) ? v : [v];
 const lower = s => s.charAt(0).toLowerCase() + s.slice(1);
 const cap = s => s[0].toUpperCase() + s.slice(1);
 const MEDIA = { arcade: "MEDIA_kairouan-arcade", courtyard: "MEDIA_kairouan-courtyard", baywide: "MEDIA_bay-wide", baylight: "MEDIA_bay-light", fathy: "MEDIA_fathy-portrait" };
-const WORDS = ["leads to", "explains", "example of", "contrasts with", "causes", "raises", "part of"];
 const SVG = {
   select: '<svg aria-hidden="true" fill="none" height="15" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16" width="15"><rect height="11" rx="3" width="11" x="2.5" y="2.5"></rect></svg>',
   search: '<svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16" width="16"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5l3.5 3.5"></path></svg>',
@@ -797,11 +805,11 @@ function makeDB() {
         ["Where does the cool night air come from?", "Shade first, or air movement first?"],
         [{ id: "p0", ref: "b:g", x: 40, y: 40 }, { id: "p1", ref: "i:fathy", x: 430, y: 40 }, { id: "p2", ref: "i:gourna", x: 760, y: 40 }, { id: "p3", ref: "i:malqaf", x: 760, y: 330 },
           { id: "p4", ref: "i:q-climate", x: 430, y: 330 }, { id: "p5", ref: "b:q2", x: 60, y: 330 }, { id: "p6", ref: "i:pdf", x: 1090, y: 40 }, { id: "p7", ref: "b:q1", x: 1090, y: 470 }],
-        [{ id: "a1", from: "p1", to: "p2", word: "explains", why: "his book explains how the village keeps cool" },
-          { id: "a2", from: "p2", to: "p3", word: "example of", why: "courts and towers working together" },
-          { id: "a3", from: "p4", to: "p5", word: "raises", why: "" },
-          { id: "a4", from: "p6", to: "p7", word: "explains", why: "p. 2: mass needs a night flush" },
-          { id: "a5", from: "p3", to: "p5", word: "raises", why: "humid air changes the order" }], { topics: [tp("Climate-responsive design")] })
+        [{ id: "a1", from: "p1", to: "p2", label: "explains" },
+          { id: "a2", from: "p2", to: "p3", label: "" },
+          { id: "a3", from: "p4", to: "p5", label: "" },
+          { id: "a4", from: "p6", to: "p7", label: "" },
+          { id: "a5", from: "p3", to: "p5", label: "" }], { topics: [tp("Climate-responsive design")] })
     ]
   };
   const lawyer = {
@@ -822,10 +830,10 @@ function makeDB() {
         ["Which category does a contractor's duty to a neighbour fall in?"],
         [{ id: "p0", ref: "b:g", x: 40, y: 40 }, { id: "p1", ref: "i:donoghue", x: 430, y: 40 }, { id: "p2", ref: "i:caparo", x: 430, y: 330 }, { id: "p3", ref: "i:robinson", x: 780, y: 180 },
           { id: "p4", ref: "q:seminar:question:0", x: 1120, y: 60 }, { id: "p5", ref: "i:incr", x: 1120, y: 330 }, { id: "p6", ref: "b:q1", x: 60, y: 380 }, { id: "p7", ref: "i:judgment", x: 780, y: 520 }],
-        [{ id: "a1", from: "p2", to: "p3", word: "contrasts with", why: "three stages against reasoning by analogy" },
-          { id: "a2", from: "p3", to: "p4", word: "explains", why: "para 21: Caparo is not a universal test" },
-          { id: "a3", from: "p3", to: "p5", word: "leads to", why: "" },
-          { id: "a4", from: "p5", to: "p6", word: "raises", why: "" }], { topics: [tp("Duty of care", 2)] })
+        [{ id: "a1", from: "p2", to: "p3", label: "contrasts with" },
+          { id: "a2", from: "p3", to: "p4", label: "" },
+          { id: "a3", from: "p3", to: "p5", label: "" },
+          { id: "a4", from: "p5", to: "p6", label: "" }], { topics: [tp("Duty of care", 2)] })
     ]
   };
   const doctor = {
@@ -848,9 +856,9 @@ function makeDB() {
         ["What changes if the patient is pregnant?"],
         [{ id: "p0", ref: "b:g", x: 40, y: 40 }, { id: "p1", ref: "i:ng158", x: 430, y: 40 }, { id: "p2", ref: "i:apix", x: 800, y: 40 }, { id: "p3", ref: "i:rivar", x: 800, y: 300 },
           { id: "p4", ref: "q:rotation:question:0", x: 430, y: 360 }, { id: "p5", ref: "i:tc1", x: 60, y: 360 }, { id: "p6", ref: "b:q1", x: 1130, y: 380 }, { id: "p7", ref: "i:wells", x: 1130, y: 60 }],
-        [{ id: "a1", from: "p1", to: "p4", word: "explains", why: "D-dimer only when PE is unlikely (Wells 4 or less)" },
-          { id: "a2", from: "p5", to: "p1", word: "example of", why: "Wells 4.5: imaging first" },
-          { id: "a3", from: "p7", to: "p5", word: "explains", why: "why the flight itself doesn't score" }], { topics: [tp("Pulmonary embolism", 1)] })
+        [{ id: "a1", from: "p1", to: "p4", label: "" },
+          { id: "a2", from: "p5", to: "p1", label: "" },
+          { id: "a3", from: "p7", to: "p5", label: "" }], { topics: [tp("Pulmonary embolism", 1)] })
     ]
   };
   return { architect, lawyer, doctor };
@@ -1132,7 +1140,22 @@ const STARTERS = {
     { name: "Teaching cases", label: "Teaching case", base: "thing", layout: "text", clinical: true, fields: [["Age band", "choice", ["30–39", "50–59", "70–79"]], ["Presenting complaint", "text"], ["Learning points", "long"]], card: [0, 1], write: ["What happened", "What I'd do differently"] }
   ]
 };
-const fromStarter = (st, id) => { const fs = st.fields.map(([l, t, o], k) => F(`${id}f${k}`, l, t, t === "choice" ? { opts: [...o] } : t === "rel" ? { to: o, many: true, inv: "" } : t === "date" ? { year: true } : {})); return C(id, st.name, "object", { label: st.label, base: st.base, layout: st.layout, fields: fs, card: st.card.map(k => fs[k].id), write: [...st.write], clinical: !!st.clinical, accent: "s3" }); };
+/* Three generic templates for any field, then the pre-made library: the same three ideas, set up for architecture,
+   law and medicine. A learner sees the generic three first, then their field's, and can open the others. */
+const GENERIC = [
+  { key: "g0", name: "People", label: "Person", base: "person", layout: "portrait", blurb: "Anyone you learn from: an architect, a judge, a clinician, an author.", fields: [["Role", "text"], ["Based in", "text"], ["Dates", "text"], ["Known for", "long"]], card: [0, 1, 2], write: ["Who they are", "Ideas", "Work I know", "What I'd borrow"] },
+  { key: "g1", name: "Precedents", label: "Precedent", base: "thing", layout: "picture", blurb: "Something made that you learn from: a building, a judgment, a study, a product.", fields: [["Made by", "rel", "people"], ["When", "date"], ["Where", "text"], ["Kind", "choice", ["Building", "Judgment", "Study", "Product"]], ["Why it matters", "long"], ["What I'd take", "long"]], card: [1, 2], write: ["What it is", "How it works", "Why it matters", "What I'd take"] },
+  { key: "g2", name: "Cases", label: "Case", base: "thing", layout: "text", blurb: "A situation worked through: a legal case, a patient, a project. Mark it Confidential or Clinical in Settings.", fields: [["When", "date"], ["Setting", "text"], ["The question", "text"], ["What happened", "long"], ["Outcome", "choice", ["Open", "Resolved"]], ["Lessons", "long"]], card: [1, 2], write: ["The situation", "The question", "What happened", "What I learned"] }
+];
+const FIELD_NAME = { architect: "Architecture", lawyer: "Law", doctor: "Medicine" };
+Object.entries(STARTERS).forEach(([f, list]) => list.forEach((x, i) => { x.key = f + i; x.field = f; }));
+const allStarters = () => [...GENERIC, ...Object.values(STARTERS).flat()];
+const starterBy = k => allStarters().find(x => x.key === k);
+const starterFor = c => allStarters().find(x => x.name === c.name || x.label === c.label);
+function starterCard(x, act, on) {
+  return `<button type="button" class="wz-start${on ? " on" : ""}${x.key.startsWith("g") ? " gen" : ""}" data-act="${act}" data-k="${x.key}"><span class="wz-th">${cardThumb(x.layout)}</span><b>${esc(x.name)}</b><small>${x.blurb ? esc(x.blurb) : `${x.base === "person" ? "People" : "Things"} · ${x.layout} cards`}</small><span class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</span>${x.clinical ? `<span class="wz-flag">Clinical</span>` : ""}</button>`;
+}
+const fromStarter = (st, id) => { const fs = st.fields.map(([l, t, o], k) => F(`${id}f${k}`, l, t, t === "choice" ? { opts: [...o] } : t === "rel" ? { to: COL(o) ? o : (D().cols.find(c => c.base === (o === "people" ? "person" : "thing") && c.shape === "object")?.id || id), many: true, inv: "" } : t === "date" ? { year: true } : {})); return C(id, st.name, "object", { label: st.label, base: st.base, layout: st.layout, fields: fs, card: st.card.map(k => fs[k].id), write: [...st.write], clinical: !!st.clinical, accent: "s3" }); };
 const colItems = c => D().items.filter(x => x.col === c.id);
 const kindOf = c => c.shape === "object" ? "object" : c.shape;
 
@@ -1154,10 +1177,14 @@ function renderColls() {
 /* New collection: three small steps, each with its picture */
 function wizHTML() {
   const w = S.wiz; if (!w) return "";
-  const st = STARTERS[S.field], pick = w.start != null ? st[w.start] : null;
+  const pick = w.start && w.start !== "blank" ? starterBy(w.start) : null;
   let body = "";
   if (w.step === 1) body = `<h2>What will you keep in it?</h2><p class="small">You can change its look and fields later; what it holds is chosen now.</p><div class="wz-kinds">${Object.entries(KIND).map(([k, [t, s, ic]]) => `<button type="button" class="wz-kind${w.kind === k ? " on" : ""}" data-act="wzkind" data-k="${k}"><span class="wz-ic">${ic}</span><b>${t}</b><small>${s}</small></button>`).join("")}</div>`;
-  if (w.step === 2) body = `<h2>Start from…</h2><p class="small">A starting point for ${esc(DB[S.field].label.toLowerCase())}s. Every field can be renamed, moved or removed.</p><div class="wz-starts">${st.map((x, i) => `<button type="button" class="wz-start${w.start === i ? " on" : ""}" data-act="wzstart" data-i="${i}"><b>${esc(x.name)}</b><small>${x.base === "person" ? "People" : "Things"} · ${x.layout} cards</small><span class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</span>${x.clinical ? `<span class="wz-flag">Clinical</span>` : ""}</button>`).join("")}<button type="button" class="wz-start${w.start === -1 ? " on" : ""}" data-act="wzstart" data-i="-1"><b>Blank</b><small>A name and nothing else</small><span class="wz-fields"><span><i>+</i>Add fields as you need them</span></span></button><button type="button" class="wz-start loci" data-act="toast" data-msg="Phase T3: describe what you keep in a sentence, and Loci fills in these steps for you to check." data-ph="T3"><b>Describe it</b><small>“Cases I cite, with court and holding”</small><span class="wz-fields"><span><i>✦</i>Loci drafts the fields</span></span></button></div>`;
+  if (w.step === 2) body = `<h2>Start from…</h2><p class="small">Every field can be renamed, moved or removed after.</p>
+    <p class="wz-g">For any field</p><div class="wz-starts">${GENERIC.map(x => starterCard(x, "wzstart", w.start === x.key)).join("")}</div>
+    <p class="wz-g">Made for ${esc(FIELD_NAME[S.field].toLowerCase())}</p><div class="wz-starts">${STARTERS[S.field].map(x => starterCard(x, "wzstart", w.start === x.key)).join("")}</div>
+    ${S.wzmore ? Object.keys(STARTERS).filter(f => f !== S.field).map(f => `<p class="wz-g">Made for ${esc(FIELD_NAME[f].toLowerCase())}</p><div class="wz-starts">${STARTERS[f].map(x => starterCard(x, "wzstart", w.start === x.key)).join("")}</div>`).join("") : `<button class="button button-link" type="button" data-act="wzmore">Show the ones made for ${Object.keys(STARTERS).filter(f => f !== S.field).map(f => FIELD_NAME[f].toLowerCase()).join(" and ")}</button>`}
+    <p class="wz-g">Or</p><div class="wz-starts"><button type="button" class="wz-start${w.start === "blank" ? " on" : ""}" data-act="wzstart" data-k="blank"><b>Blank</b><small>A name and nothing else</small><span class="wz-fields"><span><i>+</i>Add fields as you need them</span></span></button><button type="button" class="wz-start loci" data-act="toast" data-msg="Phase T3: describe what you keep in a sentence, and Loci fills in these steps for you to check." data-ph="T3"><b>Describe it</b><small>“Cases I cite, with court and holding”</small><span class="wz-fields"><span><i>✦</i>Loci drafts the fields</span></span></button></div>`;
   if (w.step === 3) {
     const prevC = { name: w.name || "Untitled", accent: w.accent, shape: w.kind === "object" ? "object" : w.kind, fields: pick ? pick.fields : [], clinical: !!pick?.clinical, id: "_p" };
     body = `<h2>Name and look</h2><div class="wz-look"><div class="wz-form"><div class="form-row"><label for="wz-name">Name</label><input id="wz-name" type="text" value="${esc(w.name)}" data-wz="name" placeholder="${esc(pick?.name || "e.g. Site visits")}"></div>${w.kind === "object" ? `<div class="form-row"><label for="wz-label">One entry is called</label><input id="wz-label" type="text" value="${esc(w.label)}" data-wz="label" placeholder="${esc(pick?.label || "e.g. Building")}"></div>` : ""}<div class="form-row"><span class="form-label">Colour</span><div class="cs-sw">${SWATCH.map(([k, t]) => `<button type="button" class="${w.accent === k ? "on" : ""}" data-act="wzacc" data-k="${k}"><span class="dot ${k}"></span>${t}</button>`).join("")}</div></div></div>
@@ -1222,7 +1249,7 @@ function renderCustomize() {
     <div class="cs-body"><div class="cs-stage">${stage}</div><aside class="cs-panel" aria-label="${esc(cap(tab))} settings">${panel}</aside></div></div>`;
 }
 function addPanel(c) {
-  const st = STARTERS[S.field].find(x => x.name === c.name || x.label === c.label), have = new Set(c.fields.map(f => f.label.toLowerCase()));
+  const st = starterFor(c), have = new Set(c.fields.map(f => f.label.toLowerCase()));
   const sug = (st ? st.fields : [["Where", "text"], ["Year", "date"], ["Notes", "long"]]).filter(([l]) => !have.has(l.toLowerCase()));
   return `<section class="cs-sec"><h3>Add a field</h3>${sug.length ? `<p class="small">Often kept for ${esc(lower(c.name))}:</p><div class="cs-sug">${sug.map(([l, t, o], n) => `<button type="button" data-act="cssug" data-i="${n}"><i>${FT[t][0]}</i>${esc(l)}</button>`).join("")}</div>` : ""}<p class="small" style="margin-top:14px">Or choose a kind:</p><div class="cs-types">${Object.entries(FT).map(([k, [ic, t, s]]) => `<button type="button" data-act="csnew" data-k="${k}"><i>${ic}</i><b>${t}</b><small>${s}</small></button>`).join("")}</div></section>`;
 }
@@ -1241,6 +1268,7 @@ function fieldPanel(c, f) {
 /* ---------- Templates: one gallery of what you can start from (C5) ----------
    "Template" means only this: a collection to start from, a long note to start from, a board to start from. Each shows
    what it makes, and Use makes it. How Commonplace works is a sheet, not a page of forms. */
+const GEN_WRITE_ANY = [["Study notes", ["The main idea", "Key points", "Words to look up"], "goal"], ["Comparing two", ["The two", "Where they agree", "Where they differ", "What I'd use"], "question"], ["Reflection", ["What happened", "What I noticed", "What I'd do next time"], null]];
 const GEN_WRITE = {
   architect: [["Site visit", ["Where and when", "What I saw", "Sketches and photos", "What I'd take"], "question"], ["Lecture notes", ["The main idea", "Key points", "Words to look up"], "goal"], ["Comparing two precedents", ["The two", "Where they agree", "Where they differ", "What I'd use"], "question"]],
   lawyer: [["Case brief", ["Facts", "Issue", "Held", "Reasoning", "Why it matters"], "question"], ["Seminar notes", ["The question", "Authorities", "My view"], "goal"], ["Advice outline", ["The question", "Short answer", "Analysis", "Risks"], "question"]],
@@ -1249,25 +1277,27 @@ const GEN_WRITE = {
 const BOARD_STARTS = [
   ["Toward a goal", "A goal, the questions under it, and room to place what answers them.", [["g", 6, 8, 46, 24], ["q", 6, 50, 28, 18], ["q", 38, 50, 28, 18], ["n", 70, 8, 26, 18], ["n", 70, 50, 26, 18]], [[3, 1, "explains"], [4, 2, "explains"]]],
   ["Compare two", "Two things side by side, an arrow that says how they differ, and the question it raises.", [["n", 6, 14, 30, 26], ["n", 62, 14, 30, 26], ["q", 34, 58, 30, 18]], [[0, 1, "contrasts with"], [1, 2, "raises"]]],
-  ["Cause and effect", "A chain: what leads to what, and why, ending in what you want to explain.", [["n", 4, 30, 22, 22], ["n", 30, 30, 22, 22], ["n", 56, 30, 22, 22], ["q", 80, 30, 18, 22]], [[0, 1, "leads to"], [1, 2, "leads to"], [2, 3, "raises"]]]
+  ["Cause and effect", "A chain of linked cards, ending in what you want to explain.", [["n", 4, 30, 22, 22], ["n", 30, 30, 22, 22], ["n", 56, 30, 22, 22], ["q", 80, 30, 18, 22]], [[0, 1, "leads to"], [1, 2, "leads to"], [2, 3, "raises"]]]
 ];
-function sketchPage(title, heads, extra) { return `<div class="tp-sketch"><b>${esc(title)}</b>${heads.map(h => `<span class="tp-h">${esc(h)}</span><i></i>`).join("")}${extra === "goal" ? `<span class="tp-g">◎ A goal for it</span>` : extra === "question" ? `<span class="tp-q">? A question to answer</span>` : ""}</div>`; }
+function sketchPage(title, heads, extra) { return `<div class="tp-sketch"><b>${esc(title)}</b>${heads.map(h => `<span class="tp-h">${esc(h)}</span><i></i>`).join("")}${extra === "goal" ? `<span class="tp-gh">◎ A goal for it</span>` : extra === "question" ? `<span class="tp-q">? A question to answer</span>` : ""}</div>`; }
 function sketchBoard(boxes, links) {
   const c = k => k === "g" ? "g" : k === "q" ? "q" : "";
   const mid = ([, x, y, w, h]) => [x + w / 2, y + h / 2];
   return `<div class="bcover tp-board">${links.map(([a, b]) => { const [x1, y1] = mid(boxes[a]), [x2, y2] = mid(boxes[b]); return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink-3)" stroke-width=".6" vector-effect="non-scaling-stroke"/></svg>`; }).join("")}${boxes.map(([k, x, y, w, h]) => `<i class="${c(k)}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></i>`).join("")}</div>`;
 }
 function renderTpl() {
-  const tab = S.tt || "all", st = STARTERS[S.field], gw = GEN_WRITE[S.field], cw = D().cols.filter(c => c.shape === "object" && c.write.length);
+  const tab = S.tt || "all", tf = S.tf || S.field, gw = GEN_WRITE[S.field], cw = D().cols.filter(c => c.shape === "object" && c.write.length);
   const sec = (k, h, sub, body) => tab === "all" || tab === k ? `<section class="tp-sec"><div class="tp-sh"><h2>${h}</h2><p class="small">${sub}</p></div>${body}</section>` : "";
-  const colls = `<div class="tp-grid">${st.map((x, i) => `<article class="tp-card"><div class="tp-prev tp-prev-c">${cardThumb(x.layout)}<div class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</div></div><div class="tp-t"><b>${esc(x.name)}</b><small>${x.base === "person" ? "People" : "Things"} · ${x.fields.length} fields · ${x.layout} cards${x.clinical ? ` · <span style="color:var(--warn)">Clinical</span>` : ""}</small></div><div class="tp-ft">${D().cols.some(c => c.name === x.name) ? `<span class="small">You have ${esc(x.name)}</span>` : "<span></span>"}<button class="button" type="button" data-act="tpcoll" data-i="${i}">Use</button></div></article>`).join("")}</div>`;
-  const writing = `<div class="tp-grid">${gw.map(([t, h, ex], i) => `<article class="tp-card"><div class="tp-prev">${sketchPage(t, h, ex)}</div><div class="tp-t"><b>${esc(t)}</b><small>Long note · ${h.length} headings${ex ? ` · with a ${ex === "goal" ? "goal" : "question"}` : ""}</small></div><div class="tp-ft"><span></span><button class="button" type="button" data-act="tpwrite" data-i="${i}">Use</button></div></article>`).join("")}${cw.map(c => `<article class="tp-card"><div class="tp-prev">${sketchPage("On " + (colItems(c)[0]?.title || c.label), c.write, null)}</div><div class="tp-t"><b>Writing about a ${esc(lower(c.label))}</b><small>From your ${esc(c.name)} collection · edit in its studio</small></div><div class="tp-ft"><button class="button button-link" type="button" data-act="tpedit" data-id="${c.id}">Edit headings</button><button class="button" type="button" data-act="tpabout" data-id="${c.id}">Use</button></div></article>`).join("")}</div>`;
+  const ccard = x => `<article class="tp-card${x.key.startsWith("g") ? " gen" : ""}"><div class="tp-prev tp-prev-c">${cardThumb(x.layout)}<div class="wz-fields">${x.fields.map(([l, t]) => `<span><i>${FT[t][0]}</i>${esc(l)}</span>`).join("")}</div></div><div class="tp-t"><b>${esc(x.name)}</b><small>${x.blurb ? esc(x.blurb) : `${x.base === "person" ? "People" : "Things"} · ${x.fields.length} fields · ${x.layout} cards`}${x.clinical ? ` · <span style="color:var(--warn)">Clinical</span>` : ""}</small></div><div class="tp-ft">${D().cols.some(c => c.name === x.name) ? `<span class="small">You have ${esc(x.name)}</span>` : "<span></span>"}<button class="button" type="button" data-act="tpcoll" data-k="${x.key}">Use</button></div></article>`;
+  const colls = `<p class="tp-gh">Three for any field</p><div class="tp-grid">${GENERIC.map(ccard).join("")}</div><div class="tp-gh row"><span>Pre-made for a field</span><span class="tp-fields">${Object.keys(STARTERS).map(f => `<button type="button" data-act="tf" data-k="${f}" aria-pressed="${tf === f}">${FIELD_NAME[f]}</button>`).join("")}</span></div><div class="tp-grid">${STARTERS[tf].map(ccard).join("")}</div>`;
+  const wcard = (t, h, ex, k) => `<article class="tp-card"><div class="tp-prev">${sketchPage(t, h, ex)}</div><div class="tp-t"><b>${esc(t)}</b><small>Long note · ${h.length} headings${ex ? ` · with a ${ex === "goal" ? "goal" : "question"}` : ""}</small></div><div class="tp-ft"><span></span><button class="button" type="button" data-act="tpwrite" data-k="${k}">Use</button></div></article>`;
+  const writing = `<p class="tp-gh">For any field</p><div class="tp-grid">${GEN_WRITE_ANY.map(([t, h, ex], i) => wcard(t, h, ex, "any:" + i)).join("")}</div><p class="tp-gh">Made for ${esc(FIELD_NAME[S.field].toLowerCase())}, and from your collections</p><div class="tp-grid">${gw.map(([t, h, ex], i) => wcard(t, h, ex, "field:" + i)).join("")}${cw.map(c => `<article class="tp-card"><div class="tp-prev">${sketchPage("On " + (colItems(c)[0]?.title || c.label), c.write, null)}</div><div class="tp-t"><b>Writing about a ${esc(lower(c.label))}</b><small>From your ${esc(c.name)} collection · edit in its studio</small></div><div class="tp-ft"><button class="button button-link" type="button" data-act="tpedit" data-id="${c.id}">Edit headings</button><button class="button" type="button" data-act="tpabout" data-id="${c.id}">Use</button></div></article>`).join("")}</div>`;
   const brds = `<div class="tp-grid">${BOARD_STARTS.map(([t, d, boxes, links], i) => `<article class="tp-card"><div class="tp-prev">${sketchBoard(boxes, links)}</div><div class="tp-t"><b>${esc(t)}</b><small>${esc(d)}</small></div><div class="tp-ft"><span></span><button class="button" type="button" data-act="tpboard" data-i="${i}" data-ph="B1">Use</button></div></article>`).join("")}</div>`;
-  return `${header("tpl", "Templates")}<div class="tp" data-ph="C5"><div class="tp-head"><div><h1 class="tp-title">Start from a template</h1><p class="small">Collections, long notes and boards, set up for ${esc(DB[S.field].label.toLowerCase())}s. Use one and change anything after.</p></div><button class="button button-quiet" type="button" data-act="how">? How Commonplace works</button></div>
+  return `${header("tpl", "Templates")}<div class="tp" data-ph="C5"><div class="tp-head"><div><h1 class="tp-title">Start from a template</h1><p class="small">Three generic templates work in any field: People, Precedents and Cases. Below them, the same ideas made for architecture, law and medicine. Use one, and change anything after.</p></div><button class="button button-quiet" type="button" data-act="how">? How Commonplace works</button></div>
     <nav class="cph-types tp-tabs" aria-label="Templates">${[["all", "All", SVG.all], ["coll", "Collections", SVG.object], ["write", "Long notes", SVG.note], ["board", "Boards", SVG.board]].map(([k, t, ic]) => `<button class="cph-type" type="button" data-act="tt" data-k="${k}" ${tab === k ? 'aria-current="true"' : ""}>${ic}${t}</button>`).join("")}</nav>
     ${sec("coll", "Collections", "What each entry records, and how its card and page look.", colls)}
     ${sec("write", "Long notes", "Headings to write into. Your collections' own appear here too.", writing)}
-    ${sec("board", "Boards", "A layout of cards and arrows to think on.", brds)}</div>`;
+    ${sec("board", "Boards", "A layout of cards and links to think on.", brds)}</div>`;
 }
 function howHTML() {
   if (!S.how) return "";
@@ -1275,9 +1305,9 @@ function howHTML() {
   return `<div class="wz-scrim" data-act="howclose"></div><div class="wz how" role="dialog" aria-modal="true" aria-label="How Commonplace works" data-ph="C5"><div class="wz-top"><span class="small">Commonplace</span><button class="button button-link" type="button" data-act="howclose">Close</button></div><h2>How Commonplace works</h2>
     <h3 class="how-h">Every entry is one of four kinds</h3><div class="how-kinds">${kinds.map(([k, t, d]) => `<div><span class="wz-ic">${KIND[k][2]}</span><b>${t}</b><small>${d}</small></div>`).join("")}</div>
     <div class="how-two"><div><h3 class="how-h">A collection says what it is</h3><p>Buildings, Cases, Drugs. One per entry, of its kind. Objects collections choose their fields, card and page.</p></div><div><h3 class="how-h">A topic says what it's about</h3><p>Topics live on Loci, your map. An entry can sit on several.</p></div></div>
-    <h3 class="how-h">Things connect in three ways</h3><div class="how-links"><div><b>Mention</b><small>Type <kbd>@</kbd> and a name while writing. Changed in the writing.</small></div><div><b>Property</b><small>A fact in the rail: Architect, Cites. Changed in the rail, shown on both pages.</small></div><div><b>Arrow</b><small>On a board: a word and why. Changed on the board.</small></div></div>
+    <h3 class="how-h">Things connect in three ways</h3><div class="how-links"><div><b>Mention</b><small>Type <kbd>@</kbd> and a name while writing. Changed in the writing.</small></div><div><b>Property</b><small>A fact in the rail: Architect, Cites. Changed in the rail, shown on both pages.</small></div><div><b>Link on a board</b><small>Drag from one card to another; label it if you like. Both cards show it as a backlink. Changed on the board.</small></div></div>
     <p class="small">Every entry shows <b>↩ Appears in</b>: each place that uses it, one click from the exact spot.</p>
-    <div class="how-two"><div><h3 class="how-h"><span style="color:var(--pick)">?</span> Questions and <span style="color:var(--accent)">◎</span> goals</h3><p>Write them inside anything with <kbd>@</kbd>. They stay where you wrote them, and all show on Questions and goals.</p></div><div><h3 class="how-h">▦ Boards</h3><p>Place entries, draw arrows that say why, toward a goal. A board is an entry too.</p></div></div></div>`;
+    <div class="how-two"><div><h3 class="how-h"><span style="color:var(--pick)">?</span> Questions and <span style="color:var(--accent)">◎</span> goals</h3><p>Write them inside anything with <kbd>@</kbd>. They stay where you wrote them, and all show on Questions and goals.</p></div><div><h3 class="how-h">▦ Boards</h3><p>Place entries, link them, and learn toward a goal. A board is an entry too.</p></div></div></div>`;
 }
 
 /* ---------- Appears in: backlinks on every page (C4) ----------
@@ -1299,7 +1329,7 @@ function appearsIn(it) {
     if (it.type === "source" && x.type === "quote" && x.src?.em === it.title) add({ g: "quoted", x, where: x.src.loc, snip: x.body });
   }
   allInlines().filter(r => st(r.key, r.kind).ans.includes(it.id)).forEach(r => add({ g: "answers", x: r.item, where: r.at ? `margin note at ${r.at}` : "", snip: r.text, key: r.key }));
-  onBoards(it).forEach(b => { const p = b.pl.find(q => q.ref === "i:" + it.id), arrows = b.arrows.filter(a => a.from === p.id || a.to === p.id).map(a => { const other = refOf(b.pl.find(q => q.id === (a.from === p.id ? a.to : a.from))?.ref || "", b); const nm = other ? (other.type === "item" ? other.it.title || "a note" : INL(other.key)?.text) : "?"; return a.from === p.id ? `${a.word} → ${nm}` : `${nm} → ${a.word} this`; }); add({ g: "boards", x: b, where: "", snip: arrows.length ? arrows.join(" · ") : "Placed, no arrows yet" }); });
+  onBoards(it).forEach(b => { const p = b.pl.find(q => q.ref === "i:" + it.id), arrows = b.arrows.filter(a => a.from === p.id || a.to === p.id).map(a => { const other = refOf(b.pl.find(q => q.id === (a.from === p.id ? a.to : a.from))?.ref || "", b); const nm = other ? (other.type === "item" ? other.it.title || "a note" : INL(other.key)?.text) : "?"; return `${a.from === p.id ? "→" : "←"} ${nm}${a.label ? ` (${a.label})` : ""}`; }); add({ g: "boards", x: b, where: "", snip: arrows.length ? "Linked: " + arrows.join(" · ") : "Placed, not linked yet" }); });
   return rows;
 }
 const AP_GROUPS = [["mention", "Mentioned in"], ["card", "Shown as a card in"], ["shown", "Shown in"], ["quoted", "Quoted in"], ["answers", "Answers"], ["boards", "On boards"]];
@@ -1369,12 +1399,12 @@ const nextStop = b => stopsOf(b).find(k => st(k, "question").status === "open");
 const stopNotes = (b, key) => D().items.filter(x => x.stop === key);
 function makeLumen(b, key, fmt = "read") {
   const r = INL(key), canned = LUMEN_TEXT[r.text], qp = b.pl.find(p => p.id === pidOfKey(b, key));
-  const whys = b.arrows.filter(a => qp && (a.to === qp.id || a.from === qp.id) && a.why).map(a => a.why);
+  const whys = b.arrows.filter(a => qp && (a.to === qp.id || a.from === qp.id) && a.label && !a.lumen).map(a => a.label);
   const slides = canned ? canned[1].map(([h, t]) => ({ h, t })) : [{ h: "The question", t: r.text }, { h: "What your board already says", t: whys.length ? whys.map(w => cap(w) + ".").join(" ") : "Nothing on the board points at this question yet." }, { h: "The explanation", t: "In the app, Loci writes this part from your board, your Commonplace and trusted sources, at your level." }];
   D().lumens = D().lumens || [];
   const l = { id: "lm" + Date.now() + Math.floor(Math.random() * 99), type: "lumen", title: canned ? canned[0] : "On: " + r.text, forQ: key, fmt, slides, board: b.id, body: "", topics: b.topics || [], margin: [], col: null };
   D().lumens.push(l);
-  if (qp) { const n = lumensFor(key).length - 1, pid = "p" + l.id; b.pl.push({ id: pid, ref: "l:" + l.id, x: qp.x + n * 30, y: qp.y + 200 + n * 30 }); b.arrows.push({ id: "a" + l.id, from: pid, to: qp.id, word: "explains", why: "made to answer it" }); }
+  if (qp) { const n = lumensFor(key).length - 1, pid = "p" + l.id; b.pl.push({ id: pid, ref: "l:" + l.id, x: qp.x + n * 30, y: qp.y + 200 + n * 30 }); b.arrows.push({ id: "a" + l.id, from: pid, to: qp.id, label: "", lumen: true }); }
   return l;
 }
 function lumenCard(p, b) {
@@ -1385,7 +1415,7 @@ function lumenCard(p, b) {
 }
 function recallItems(b) {
   const nm = pid => { const o = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); const t = o ? (o.type === "item" ? o.it.title || plainBody(o.it) : INL(o.key)?.text) : "?"; return t.length > 44 ? t.slice(0, 42).replace(/\s+\S*$/, "") + "…" : t; };
-  return [...stopsOf(b).flatMap(k => stopNotes(b, k).filter(n => n.body).map(n => ({ q: INL(k).text, t: plainBody(n), id: n.id }))), ...b.arrows.filter(a => a.why && !a.why.startsWith("made to")).map(a => ({ q: `${nm(a.from)} → ${a.word} → ${nm(a.to)}. Why?`, t: a.why, id: a.id }))];
+  return [...stopsOf(b).flatMap(k => stopNotes(b, k).filter(n => n.body).map(n => ({ q: INL(k).text, t: plainBody(n), id: n.id }))), ...b.arrows.filter(a => a.label && !a.lumen).map(a => ({ q: `${nm(a.from)} → ${nm(a.to)}: how are they linked?`, t: a.label, id: a.id }))];
 }
 function pathPanel(b) {
   const stops = stopsOf(b), nx = nextStop(b), d = stops.filter(k => st(k, "question").status === "answered").length, goal = allInlines().find(r => r.item === b && r.kind === "goal");
@@ -1546,7 +1576,7 @@ function drawArrows() {
     const objs = b.pl.map(p => ({ p, r: refOf(p.ref, b) })).filter(x => x.r?.type === "item" && x.r.it.type === "object");
     for (const A of objs) for (const f of COL(A.r.it.col).fields.filter(f => f.t === "rel")) for (const id of arr(A.r.it.v[f.id])) { const B = objs.find(x => x.r.it.id === id); if (!B) continue; const a = box(A.p.id), bb = box(B.p.id); if (!a || !bb) continue; const s = edge(a, center(bb)), e = edge(bb, center(a)); out += `<line class="fl" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><text class="flt" x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 + 14}" text-anchor="middle">${esc(f.label)} (field)</text>`; }
   }
-  for (const a of b.arrows) { const A = box(a.from), B = box(a.to); if (!A || !B) continue; const s = edge(A, center(B)), e = edge(B, center(A)); out += `<line class="hit" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><line class="a${S.selArrow === a.id ? " sel" : ""}" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" marker-end="url(#ah)"/><text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 - 6}" text-anchor="middle">${esc(a.word)}</text>`; }
+  for (const a of b.arrows) { const A = box(a.from), B = box(a.to); if (!A || !B) continue; const s = edge(A, center(B)), e = edge(B, center(A)); out += `<line class="hit" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}"/><line class="a${S.selArrow === a.id ? " sel" : ""}" data-arrow="${a.id}" x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" marker-end="url(#ah)"/><text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2 - 6}" text-anchor="middle">${esc(a.label || "")}</text>`; }
   if (S.ghost) out += `<line class="ghost" x1="${S.ghost.x1}" y1="${S.ghost.y1}" x2="${S.ghost.x2}" y2="${S.ghost.y2}"/>`;
   svg.innerHTML = out;
 }
@@ -1554,7 +1584,8 @@ function offersFor(a, b) {
   const A = refOf(b.pl.find(p => p.id === a.from)?.ref || "", b), B = refOf(b.pl.find(p => p.id === a.to)?.ref || "", b), out = [];
   if (A?.type === "item" && B?.type === "item" && A.it.type === "object" && B.it.type === "object")
     for (const [X, Y] of [[A.it, B.it], [B.it, A.it]]) { const f = COL(X.col).fields.find(f => f.t === "rel" && f.o.to === Y.col); if (f && !arr(X.v[f.id]).includes(Y.id)) out.push({ kind: "field", x: X.id, f: f.id, y: Y.id, label: f.o.many ? `Add ${Y.title} to ${X.title}'s ${f.label}` : `Set ${X.title}'s ${f.label} to ${Y.title}`, why: "Keep as a field: it becomes a fact on the Object, everywhere. The arrow stays this board's." }); }
-  if (a.word === "explains" && A?.type === "item" && B?.type === "inline" && B.kind === "question" && !st(B.key, "question").ans.includes(A.it.id)) out.push({ kind: "answer", key: B.key, id: A.it.id, label: `Mark answered in ${A.it.title}`, why: "This arrow says it explains the question." });
+  const [It, Qn] = A?.type === "item" && B?.type === "inline" ? [A, B] : B?.type === "item" && A?.type === "inline" ? [B, A] : [];
+  if (Qn?.kind === "question" && It.it.title && !st(Qn.key, "question").ans.includes(It.it.id)) out.push({ kind: "answer", key: Qn.key, id: It.it.id, label: `Mark answered in ${It.it.title}`, why: "It's linked to the question. Does it answer it?" });
   return out;
 }
 function openArrow(aid, x, y) {
@@ -1562,14 +1593,14 @@ function openArrow(aid, x, y) {
   S.selArrow = aid; drawArrows();
   const nm = pid => { const r = refOf(b.pl.find(p => p.id === pid)?.ref || "", b); return r ? (r.type === "item" ? r.it.title || plainBody(r.it).slice(0, 40) : INL(r.key).text) : "?"; };
   const off = offersFor(a, b), pop = $("#apop");
-  pop.innerHTML = `<div class="sent"><i>${esc(nm(a.from))}</i> <b>${esc(a.word)}</b> <i>${esc(nm(a.to))}</i>${a.why ? `, because ${esc(a.why)}` : ""}</div><div class="words" role="group" aria-label="Word">${WORDS.map(w => `<button type="button" data-act="aword" data-w="${w}" aria-pressed="${a.word === w}">${w}</button>`).join("")}</div><input id="awhy" placeholder="Why? One line, in your words" value="${esc(a.why)}">
+  pop.innerHTML = `<div class="sent"><i>${esc(nm(a.from))}</i> → <i>${esc(nm(a.to))}</i></div><input id="alabel" placeholder="Add a label, if you like (e.g. explains)" value="${esc(a.label || "")}"><p class="small" style="margin:0">Both cards list this link under Appears in › On boards.</p>
     ${off.map((o, i) => `<div class="offer" data-ph="${o.kind === "field" ? "B1 + F2" : "B3 + Q2"}"><span>${esc(o.why)}</span><div class="row2"><button class="button" type="button" data-act="offer" data-i="${i}">${esc(o.label)}</button><button class="button button-quiet" type="button" data-act="closeapop">Not now</button></div></div>`).join("")}
-    <div class="row2"><button class="button button-link" type="button" data-act="delarrow" style="color:var(--warn)">Remove arrow</button><button class="button button-quiet" type="button" data-act="closeapop">Done</button></div>`;
+    <div class="row2"><button class="button button-link" type="button" data-act="delarrow" style="color:var(--warn)">Remove link</button><button class="button button-quiet" type="button" data-act="arev">⇄ Reverse</button><button class="button button-quiet" type="button" data-act="closeapop">Done</button></div>`;
   pop.hidden = false; pop._a = aid; pop._off = off;
   const w = pop.offsetWidth, h = pop.offsetHeight;
   pop.style.left = Math.max(16, Math.min(x - w / 2, innerWidth - w - 16)) + "px"; pop.style.top = Math.max(16, Math.min(y + 12, innerHeight - h - 16)) + "px";
 }
-function closeApop() { const pop = $("#apop"); if (!pop.hidden && pop._a) { const a = I(S.board)?.arrows.find(z => z.id === pop._a), w = $("#awhy"); if (a && w) a.why = w.value.trim(); } pop.hidden = true; S.selArrow = null; drawArrows(); }
+function closeApop() { const pop = $("#apop"); if (!pop.hidden && pop._a) { const a = I(S.board)?.arrows.find(z => z.id === pop._a), w = $("#alabel"); if (a && w) a.label = w.value.trim(); } pop.hidden = true; S.selArrow = null; drawArrows(); }
 
 /* ---------- writing: one block editor for long notes, notes and Object writing (N1–N4) ----------
    The stored body stays Markdown (the app's own subset) plus four markers: @question / @goal paragraphs, an image
@@ -1947,7 +1978,7 @@ document.addEventListener("pointerup", e => {
   if (d.kind === "connect") {
     S.ghost = null;
     const tgt = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest?.("[data-pid]")).find(Boolean), b = I(S.board);
-    if (tgt && tgt.dataset.pid !== d.from) { const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, word: "leads to", why: "" }; b.arrows.push(a); drawArrows(); openArrow(a.id, e.clientX, e.clientY); } else drawArrows();
+    if (tgt && tgt.dataset.pid !== d.from) { const a = { id: "a" + Date.now(), from: d.from, to: tgt.dataset.pid, label: "" }; b.arrows.push(a); drawArrows(); if (offersFor(a, b).length) openArrow(a.id, e.clientX, e.clientY); else toast("Linked. Click the line to label it, if you like."); } else drawArrows();
   } else if (d.kind === "move" && !d.moved) { S.sel = d.p.id; document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); d.el.classList.add("sel"); }
 });
 document.addEventListener("wheel", e => {
@@ -2048,13 +2079,14 @@ document.addEventListener("click", e => {
     case "tt": S.tt = d.k; render(); break;
     case "how": S.how = true; render(); break;
     case "howclose": S.how = false; render(); break;
-    case "tpcoll": { const x = STARTERS[S.field][+d.i]; S.wiz = { step: 3, kind: "object", start: +d.i, name: D().cols.some(c => c.name === x.name) ? `${x.name} 2` : x.name, label: x.label, accent: "s3" }; render(); $("#wz-name")?.focus(); break; }
-    case "tpwrite": { const [t, heads, ex] = GEN_WRITE[S.field][+d.i], nid = "w" + Date.now(), blocks = heads.flatMap(h => [{ t: "h2", text: h }, { t: "p", text: "" }]); if (ex) blocks.push({ t: ex, text: "" }); D().items.unshift(note(nid, "essays", t, fromBlocks(blocks), {})); pushHist(); S.item = nid; S.ed = { id: nid, blocks }; go("note", true); focusBlock(1, "start"); toast(`A long note from the ${t} template. Rename it, and write under each heading.`); break; }
+    case "tpcoll": { const x = starterBy(d.k); S.wiz = { step: 3, kind: "object", start: d.k, name: D().cols.some(c => c.name === x.name) ? `${x.name} 2` : x.name, label: x.label, accent: "s3" }; render(); $("#wz-name")?.focus(); break; }
+    case "tf": S.tf = d.k; render(); break;
+    case "tpwrite": { const [g, n] = d.k.split(":"), [t, heads, ex] = (g === "any" ? GEN_WRITE_ANY : GEN_WRITE[S.field])[+n], nid = "w" + Date.now(), blocks = heads.flatMap(h => [{ t: "h2", text: h }, { t: "p", text: "" }]); if (ex) blocks.push({ t: ex, text: "" }); D().items.unshift(note(nid, "essays", t, fromBlocks(blocks), {})); pushHist(); S.item = nid; S.ed = { id: nid, blocks }; go("note", true); focusBlock(1, "start"); toast(`A long note from the ${t} template. Rename it, and write under each heading.`); break; }
     case "tpabout": { e.stopPropagation(); const c = COL(d.id); openMenu(a, mHead(`Write about which ${esc(lower(c.label))}?`) + colItems(c).map(x => mItem("writeabout", esc(x.title), false, `data-id="${x.id}"`)).join("") || mHead("No entries yet")); break; }
     case "tpedit": S.col = d.id; S.cst = "page"; S.csUndo = null; go("customize"); break;
     case "tpboard": { const [t, , boxes, links] = BOARD_STARTS[+d.i], id = "b" + Date.now(), pl = [], qs = [];
       boxes.forEach(([k, x, y], n) => { const ref = k === "g" ? "b:g" : k === "q" ? (qs.push(k === "q" ? (n === 1 || boxes.filter(b => b[0] === "q").length === 1 ? "What do you want to find out?" : "And what else?") : ""), "b:q" + qs.length) : (() => { const nid = "n" + id + n; D().items.push(note(nid, "notes", "", n === 0 && t === "Compare two" ? "The first thing" : n === 1 && t === "Compare two" ? "The second thing" : "Double-click to write, or + Place an entry here", {})); return "i:" + nid; })(); pl.push({ id: "p" + n, ref, x: Math.round(x * 13), y: Math.round(y * 9) }); });
-      const bd = board(id, t, "Choose a place on Loci", "What do you want to understand or be able to do?", qs, pl, links.map(([a, b, w], n) => ({ id: "a" + n, from: "p" + a, to: "p" + b, word: w, why: "" })), {});
+      const bd = board(id, t, "Choose a place on Loci", "What do you want to understand or be able to do?", qs, pl, links.map(([a, b], n) => ({ id: "a" + n, from: "p" + a, to: "p" + b, label: "" })), {});
       D().items.unshift(bd); pushHist(); S.board = id; go("board", true); toast(`A board from the ${t} template. Write its goal, then place entries with + Place.`); break; }
 
     case "openq": { const r = INL(d.k); if (!r) break; S.jump = "q:" + d.k; openEntry(r.item.id); break; }
@@ -2079,7 +2111,7 @@ document.addEventListener("click", e => {
     case "csaddmode": S.csField = "_add"; render(); break;
     case "csnew": case "cssug": { csSnap(); const c = COL(S.col); if (c.fields.length >= 24) { toast("A collection keeps up to 24 fields. Hide or delete one first."); break; }
       let label, t, o = {};
-      if (d.act === "cssug") { const st = STARTERS[S.field].find(x => x.name === c.name || x.label === c.label), have = new Set(c.fields.map(f => f.label.toLowerCase())), sug = (st ? st.fields : [["Where", "text"], ["Year", "date"], ["Notes", "long"]]).filter(([l]) => !have.has(l.toLowerCase())), s = sug[+d.i]; [label, t] = s; if (t === "choice") o = { opts: [...s[2]] }; if (t === "rel") o = { to: s[2], many: true, inv: "" }; if (t === "date") o = { year: true }; }
+      if (d.act === "cssug") { const st = starterFor(c), have = new Set(c.fields.map(f => f.label.toLowerCase())), sug = (st ? st.fields : [["Where", "text"], ["Year", "date"], ["Notes", "long"]]).filter(([l]) => !have.has(l.toLowerCase())), s = sug[+d.i]; [label, t] = s; if (t === "choice") o = { opts: [...s[2]] }; if (t === "rel") o = { to: s[2], many: true, inv: "" }; if (t === "date") o = { year: true }; }
       else { t = d.k; label = "New " + FT[t][1].toLowerCase().replace("…", ""); if (t === "choice") o = { opts: ["First", "Second"] }; if (t === "rel") o = { to: D().cols.find(x => x.shape === "object" && x.id !== c.id)?.id || c.id, many: true, inv: "" }; if (t === "date") o = { year: true }; }
       const f = F("f" + Date.now(), label, t, o); c.fields.push(f); S.csField = f.id; render(); if (d.act === "csnew") { const i = $("#csf-name"); i?.focus(); i?.select(); } toast(`${label} added to every ${lower(c.label)}. It shows in the rail${t === "long" ? " as a section" : ""}.`); break; }
     case "csftype": { csSnap(); const c = COL(S.col), f = FLD(c, S.csField), had = colItems(c).some(x => fieldText(f, x.v[f.id])); f.t = d.k; if (d.k === "choice" && !f.o.opts) f.o.opts = ["First", "Second"]; if (d.k === "rel" && !f.o.to) Object.assign(f.o, { to: D().cols.find(x => x.shape === "object" && x.id !== c.id)?.id || c.id, many: true }); if (d.k === "long") c.card = c.card.filter(x => x !== f.id); render(); if (had) toast("Values that don't fit the new kind are kept, and shown as text until you change them."); break; }
@@ -2093,13 +2125,14 @@ document.addEventListener("click", e => {
     case "csundo": { const u = S.csUndo; if (!u) break; const c = COL(u.id); Object.keys(c).forEach(k => delete c[k]); Object.assign(c, JSON.parse(u.c)); u.v.forEach(([id, v]) => { const x = I(id); if (x) x.v = v; }); S.csUndo = null; render(); toast("Undone."); break; }
     case "newcoll": closeMenu(); S.wiz = { step: 1, kind: null, start: null, name: "", label: "", accent: "s3" }; render(); break;
     case "wzkind": S.wiz.kind = d.k; render(); break;
-    case "wzstart": { const w = S.wiz, st = STARTERS[S.field][+d.i]; w.start = +d.i; if (st) { w.name = w.name || st.name; w.label = w.label || st.label; } render(); break; }
+    case "wzstart": { const w = S.wiz, st = starterBy(d.k); w.start = d.k; if (st) { w.name = st.name; w.label = st.label; } render(); break; }
+    case "wzmore": S.wzmore = true; render(); break;
     case "wznext": { const w = S.wiz; w.step = w.step === 1 && w.kind !== "object" ? 3 : w.step + 1; render(); $("#wz-name")?.focus(); break; }
     case "wzback": { const w = S.wiz; w.step = w.step === 3 && w.kind !== "object" ? 1 : w.step - 1; render(); break; }
     case "wzclose": S.wiz = null; render(); break;
     case "wzacc": S.wiz.accent = d.k; render(); break;
     case "wzmake": { const w = S.wiz, id = "c" + Date.now(); let c;
-      if (w.kind === "object") { const st = w.start >= 0 ? STARTERS[S.field][w.start] : null; c = st ? fromStarter(st, id) : C(id, "", "object", { base: "thing", layout: "text" }); c.name = w.name.trim() || st?.name || "Untitled"; c.label = w.label.trim() || st?.label || "Entry"; }
+      if (w.kind === "object") { const st = w.start && w.start !== "blank" ? starterBy(w.start) : null; c = st ? fromStarter(st, id) : C(id, "", "object", { base: "thing", layout: "text" }); c.name = w.name.trim() || st?.name || "Untitled"; c.label = w.label.trim() || st?.label || "Entry"; }
       else c = C(id, w.name.trim() || KIND[w.kind][0], w.kind);
       c.accent = w.accent; D().cols.push(c); S.wiz = null; S.col = id; S.cst = c.shape === "object" ? "fields" : "settings"; S.csField = null; S.csUndo = null; go("customize");
       toast(c.shape === "object" ? `${c.name} is made. These are its fields; change anything, then add your first ${lower(c.label)}.` : `${c.name} is made.`); break; }
@@ -2135,7 +2168,7 @@ document.addEventListener("click", e => {
     case "zoom": zoomAt(+d.d > 0 ? 1.15 : 1 / 1.15); break;
     case "fit": fit(); break;
     case "focuscard": { if (!d.pid) break; const p = I(S.board).pl.find(x => x.id === d.pid); if (!p) break; const vp = $("#vp"); S.view.x = vp.clientWidth / 2 - (p.x + 120) * S.view.z; S.view.y = vp.clientHeight / 2 - (p.y + 60) * S.view.z; S.sel = p.id; applyView(); document.querySelectorAll(".bpl.sel").forEach(x => x.classList.remove("sel")); document.querySelector(`[data-pid="${p.id}"]`)?.classList.add("sel"); break; }
-    case "aword": { const pop = $("#apop"), ar = I(S.board).arrows.find(z => z.id === pop._a); ar.why = $("#awhy").value.trim(); ar.word = d.w; openArrow(ar.id, pop.offsetLeft + pop.offsetWidth / 2, pop.offsetTop - 12); break; }
+    case "arev": { const pop = $("#apop"), ar = I(S.board).arrows.find(z => z.id === pop._a); ar.label = $("#alabel").value.trim(); [ar.from, ar.to] = [ar.to, ar.from]; openArrow(ar.id, pop.offsetLeft + pop.offsetWidth / 2, pop.offsetTop - 12); break; }
     case "offer": { const o = $("#apop")._off[+d.i]; if (o.kind === "field") { const X = I(o.x), f = FLD(COL(X.col), o.f); X.v[f.id] = f.o.many ? [...arr(X.v[f.id]), o.y] : [o.y]; toast(`${X.title}: ${f.label} is now ${I(o.y).title}. It shows on the Object's page and as a field link here.`); } else { const s = st(o.key, "question"); s.ans.push(o.id); s.status = "answered"; toast(`Answered in ${I(o.id).title}. Its page now lists the question under Answers.`); } closeApop(); render(); break; }
     case "delarrow": { const b = I(S.board); b.arrows = b.arrows.filter(z => z.id !== $("#apop")._a); $("#apop").hidden = true; drawArrows(); break; }
     case "closeapop": closeApop(); break;

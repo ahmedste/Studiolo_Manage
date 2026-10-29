@@ -26,7 +26,7 @@ The owner's direction (28 Oct): *questions and goals early; boards at the end; o
 |---|---|---|
 | **Objects** | *What is it, and what do I know about it?* A case, a building, a drug, with fields and links | an Objects collection (`content_items.shape = 'object'`) |
 | **Questions and goals** | *What do I want from it?* `@question` and `@goal`, written inside whatever you're writing | *new* `item_inlines`, hosted by an item |
-| **Boards** | *How does it fit together?* Things placed on a canvas, joined by arrows with a word and a why, toward a goal | a Commonplace entry of type Board, with *new* placements, arrows and frames |
+| **Boards** | *How does it fit together?* Things placed on a canvas, joined by simple links (a line, an optional label), toward a goal | a Commonplace entry of type Board, with *new* placements, arrows and frames |
 
 **Where they meet (the whole point):**
 
@@ -47,8 +47,8 @@ flowchart LR
 2. **A question can be answered in an Object.** *Answered in* links to the case, building or drug that answers it. The Object's page then shows **Answers**: the questions it answered.
 3. **A board's goal is a goal inline, and its questions are question inlines.** They appear in the same **Questions and goals** list as every other question, named by their board.
 4. **A board places Objects with their facts.** An Object card on the canvas shows its card fields and its "? · ◎" counts, and opens the Object's page.
-5. **Arrows and relation fields meet, but never merge.** An arrow stays the board's claim (word and why). When an arrow joins two Objects whose collections have a matching relation field, the arrow offers one tap: **Keep as a field** ("Set New Gourna's Architect to Hassan Fathy"). Relation fields already set between two placed Objects show as faint dashed **field links**.
-6. **An arrow into a question can answer it.** An arrow with the word *explains* from a card into a question card offers **Mark answered in Robinson?** One tap; never automatic.
+5. **Arrows and relation fields meet, but never merge.** A link stays the board's. When an arrow joins two Objects whose collections have a matching relation field, the arrow offers one tap: **Keep as a field** ("Set New Gourna's Architect to Hassan Fathy"). Relation fields already set between two placed Objects show as faint dashed **field links**.
+6. **A link to a question can answer it.** Linking a card to a question card offers **Mark answered in Robinson?** One tap; never automatic.
 
 ## 1. The order: five stages, six lanes
 
@@ -142,7 +142,7 @@ Boards design §3 stands, with what Stages 0–3 already built folded in. The ta
 
 | Rule | Why |
 |---|---|
-| **Three kinds of connection, each made in one place** (lane N): a *mention* in the writing, a *property* in the rail, an *arrow* on a board. Every page shows them the same way: the rail says what it is, the foot says where it shows up | So a learner always knows where to look and where to change it, and the code has one writer per kind (Long notes design §2) |
+| **Three kinds of connection, each made in one place** (lane N): a *mention* in the writing, a *property* in the rail, a *link* on a board. Every page shows them the same way: the rail says what it is, the foot says where it shows up | So a learner always knows where to look and where to change it, and the code has one writer per kind (Long notes design §2) |
 | **An arrow never writes a field, and a field never draws an arrow.** *Keep as a field* is one tap; field links are dashed and can't be edited on the board | An arrow is a claim on one board (Boards §2.1); a field is a fact everywhere. Mixing them makes both unreliable |
 | **A question has one host.** Placing a note's question on a board places a *view* of it ("from *Seminar notes*"); its status is the same everywhere | One question, everywhere (IN rule 3) |
 | **Answered in points at items, Lumens or boards** | A question is often answered by an Object, sometimes by a whole board |

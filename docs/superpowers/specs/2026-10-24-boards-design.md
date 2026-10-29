@@ -96,6 +96,7 @@ flowchart LR
 - **A board is an entry.** It has a title, **one place** (an area, topic or sub-topic), a goal, and a pick. It shows up in search, Views, Picks and Group by like any other type.
 - **A placement points at something; it never holds a copy.** It can point at a Commonplace entry, a detail (a photo and one of its region notes), a Lumen, a course, one slide of a Lumen, a lecture's saved moment, a Loci topic, or another board. Removing a placement never deletes what it points at.
 - **Unpacking** places a course's parts, a Lumen's slides or a lecture's moments. Each one remembers its parent (a dotted line). *Fold* takes them back, except the ones you moved or connected.
+- *Superseded on 29 October by §7.10: a link is a line with an optional label; the fixed list below is withdrawn.*
 - **An arrow** has a word from a fixed list (*leads to, explains, example of, contrasts with, causes, raises, part of*) and an optional *why* of one line. The word lets Learn and Loci read it; the why is the learner's own sentence.
 - **Writing on a board** creates the Commonplace entry first, then places it.
 
@@ -238,7 +239,7 @@ All four are hand-written SQL, applied only on the owner's word.
 | BD-1 | **The name "board" is already taken.** The *Lumen board* proposal (19 Oct, branch `claude/serene-franklin-bif1cg`) uses *board* for a whiteboard-sketch slide | Keep **Board** for this, the learner's canvas. Call the slide type a **sketch** |
 | BD-2 | A board as a Commonplace **type**, or its own destination in the rail | A type. It keeps one library, and it inherits Search, Views, Picks and the viewer for free. Loci and Learn link into it |
 | BD-3 | One place per board, or several | One. It is where the board lives; its cards keep their own topics |
-| BD-4 | Arrow words: a fixed list, or free | A fixed list of seven, plus a free *why*. The list lets a Lumen and the map read arrows |
+| BD-4 | Arrow words: a fixed list, or free | *Withdrawn 29 Oct (LB-D10):* no list; a link is a line with an optional free label |
 | BD-5 | Does Recall's *Not yet* write to memory without asking? | Yes, as *To revisit*, the same as a missed check; the learner can remove it |
 | BD-6 | Size limit | At most 300 placements per board in v1; the canvas stays fast and the cover readable |
 | BD-7 | Sharing a board | Not in this programme. It follows Learn's sharing design (Learn roadmap phase 3) |
@@ -337,7 +338,7 @@ flowchart LR
   - **Path to the goal**: each stop with its number, its Lumens (**▶ Watch**, **▶ Read**), or **▶ Answer with a Lumen**, its note count, ↑ and ×;
   - **Answer the open stops with Lumens**, when several have none;
   - **Side questions**, each with **+ Add to path**;
-  - **Recall**: **Test yourself** covers your notes and your arrows' whys ("Hassan Fathy → explains → New Gourna Village. Why?"). Each has **Show**, then *Got it* or *Not yet*, and *Not yet* goes to *To revisit* (BD-5). Then **Mark the goal reached**.
+  - **Recall**: **Test yourself** covers your notes and your labelled links ("Hassan Fathy → New Gourna Village: how are they linked?"). Each has **Show**, then *Got it* or *Not yet*, and *Not yet* goes to *To revisit* (BD-5). Then **Mark the goal reached**.
 - **Make a Lumen** (of the whole board, B3) follows the path and the arrows, and its check is built from your notes.
 
 ### 7.4 One infinite canvas, full screen
@@ -377,7 +378,7 @@ This replaces the *Add drawer* (§1, *Add drawer* row): the way in is wherever y
 - **Answers only when asked**: one question at a time, or **Answer the open stops** in one go. It never adds Lumens by itself (A2).
 - **Never marks a question answered.** Only *Did this answer it?* does, so the ring measures understanding, not viewing.
 - **A Lumen's brief is the question**, with the board as context:
-  - the cards and whys around the question;
+  - the cards linked to the question, and any labels;
   - the goal;
   - the learner's notes so far.
   
@@ -404,6 +405,20 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB2** | **Lumens on the board**: **Answer with a Lumen** on question cards and in the panel; Lumen cards that open in place (Read, Watch, Listen); *Did this answer it?* | HIGH | yes: the Lumen's source |
 | **LB3** | **Notes and Recall on the board**: ✎ Note from a Lumen, *Partly* as a follow-up question card, Recall in the panel, *Mark the goal reached*; Make a Lumen of the whole board follows the path | HIGH | yes: `board_placements.stop_inline_id` |
 
+### 7.10 Links: a link and a backlink
+
+**The owner's direction (29 Oct):** arrows with words like *leads to* and *causes* ask too much of the learner. Make them as simple as Miro's and Scrintal's: just a link, and a backlink.
+
+- **A link is a line between two cards.** Drag a card's blue dot onto another card and they're linked. Nothing to choose, nothing to fill in. The line has a small arrowhead showing which card you started from; **⇄ Reverse** flips it.
+- **A label is optional.** Click a line to add one, in any words ("explains", "same climate", "contrast"). No list, no *why* field. Most links have no label.
+- **Every link is a backlink.** Both cards' entries list it under **Appears in › On boards**: "Linked: → New Gourna Village (explains) · ← Hassan Fathy". The link belongs to the board, as before (C1: made in one place).
+- **Offers stay, without words.** Linking two Objects whose collections have a matching relation field offers **Keep as a field**. Linking a card and a question offers **Mark answered in…** (the old *explains* rule). The pop-over opens by itself only when there's an offer; otherwise a small toast says "Linked. Click the line to label it, if you like."
+- **What reads links:**
+  - Make a Lumen follows the links in path order;
+  - Recall covers labelled links ("A → B: how are they linked?");
+  - Loci treats a link as `related`, and quotes its label when there is one.
+- **Data:** `board_arrows` keeps `from`, `to` and a nullable `label`. The `word` and `why` columns are dropped from B1's migration before it ships.
+
 ### 7.9 Decisions
 
 | ID | Decision | Recommendation |
@@ -417,3 +432,4 @@ These replace B3's single phase with three, in Stage 4, after B1 and B2. They ne
 | **LB-D7** | **No separate learning mode**: Lumens play inside their cards, and notes and Recall stay on the board | **Yes**: the board is the centre of learning |
 | **LB-D8** | Placing is a double-click search at the spot, or a drag from the visual shelf; the Add drawer goes | **Yes** |
 | **LB-D9** | A board opens as one full-screen, infinite canvas, with its title, tools, shelf, panel and zoom floating on it | **Yes**: like Miro, never a box inside a page |
+| **LB-D10** | Board links are just a line and a backlink, with an optional label; the fixed word list and *why* go | **Yes**: simple, like Miro and Scrintal |

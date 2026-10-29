@@ -21,7 +21,7 @@ The owner's direction (28 Oct): *long notes should feel like Craft notes, where 
 |---|---|---|---|---|
 | **Mention** | *I wrote about this here* | `@` and a name while writing, or an **entry card** | the writing (read from the text) | **Mentioned in**, with the sentence |
 | **Property** | *This is a fact about it* (Architect: Hassan Fathy; Cites: Caparo) | the rail: a field, or **Link…** | the rail of the entry it describes | its other-side name, in the rail (Works; Cited by) |
-| **Arrow** | *On this board, A explains B, because…* | dragging on a board | the board | **On boards** |
+| **Link** (on a board) | *On this board, these two belong together* | dragging a line between two cards; a label if you like | the board | **On boards**, as a backlink |
 
 Everything else is not a connection kind: a note's **About** is the note's subject, *Answered in* is a question's property, and topics are Loci's.
 
@@ -61,7 +61,7 @@ The owner's worry is right: seven ways, with *Mentions* made by hand in a dialog
 
 **Property.** A named fact about an entry, in its rail: a relation field (*Architect*, *Cites*, *Recommends*; F2) or one of the named links from the Link dialog (*Compared with*, *Made by*). Both sides show it in their rails under its own name (*Works*, *Cited by*), because it is part of what each entry is.
 
-**Arrow.** A claim on one board, with a word and a why (Boards §2.1). It belongs to the board. The entry's page lists the board under **On boards**, saying how many arrows touch it there.
+**Link.** A line between two cards on one board, with an optional label (Boards §7.10). It belongs to the board. Both entries' pages list it under **On boards**, as a backlink naming the card at the other end.
 
 ### 2.2 Rules
 

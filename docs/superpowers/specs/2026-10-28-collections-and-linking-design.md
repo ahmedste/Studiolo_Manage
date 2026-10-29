@@ -31,13 +31,13 @@ Changes save as you make them, and **Undo** takes back the last one. Nothing del
 **Backlinks: every entry says where it appears.** At the top of every page, a chip reads **↩ Appears in 4 places**. At the foot, **Appears in** lists each place: *Mentioned in* (with the sentence), *Shown as a card in*, *Shown in* (for photos), *Quoted in* (for sources), *Answers*, and *On boards* (with the arrows). Each row opens that place **at the exact spot**, highlighted.
 
 **Templates: one gallery of what you can start from** (§2.6). The Templates tab stops being *The Four Types* (an explainer, plus nine create forms that duplicate Capture). It becomes a gallery in three groups, each with a picture of what it makes and **Use**:
-- **Collections**: the field's starters;
+- **Collections**: three generic templates for any field (**People, Precedents, Cases**), then the same ideas pre-made for architecture, law and medicine;
 - **Long notes**: writing templates, including each collection's *Write about it* headings;
 - **Boards**: starting layouts.
 
 The explainer becomes a short sheet, **How Commonplace works**, opened from **?**. The word *template* now means only this: the rail's "Template" row is renamed **Kind**.
 
-**Linking stays three kinds, each made in one place** (lane N): a *mention* in writing, a *property* in the rail, an *arrow* on a board. Backlinks go **one step**: what links here, never what links to what links here. That one rule avoids loops, floods and confusion (§4.4).
+**Linking stays three kinds, each made in one place** (lane N): a *mention* in writing, a *property* in the rail, a *link* on a board. Backlinks go **one step**: what links here, never what links to what links here. That one rule avoids loops, floods and confusion (§4.4).
 
 ## 1. What's there today
 
@@ -80,7 +80,8 @@ Three steps in one dialog, each with **Back**. Notes, Sources and Photos skip st
 
 1. **What will you keep in it?** Four large choices with icons: *Notes*, *Sources*, *Photos*, *Objects* ("people, places and things, each with its own fields"). This is the one choice that can't change later (the collection's shape), so it comes first, alone.
 2. **Start from…**:
-   - the field's starters (T1), each showing its fields as small chips with kind icons: *Buildings · Architects · Materials* for an architect; *Cases · Judges · Clauses* for a lawyer; *Drugs · Guidelines · Teaching cases* for a doctor, the last marked *Clinical*;
+   - **For any field**, first: three generic templates (§2.6), **People**, **Precedents** and **Cases**, each showing its card layout and its fields as chips with kind icons;
+   - **Made for** the learner's field: the pre-made library (T1). For an architect that's *Buildings · Architects · Materials*; for a lawyer *Cases · Judges · Clauses*; for a doctor *Drugs · Guidelines · Teaching cases*, the last marked *Clinical*. *Show the ones made for law and medicine* opens the rest of the library;
    - **Blank**;
    - **Describe it**: Loci drafts the fields from a sentence (T3).
 3. **Name and look**: name, *One entry is called*, colour, with the tile as it will look on the Collections page.
@@ -156,11 +157,22 @@ The programme changes most of what it describes, and its forms repeat Capture an
 
 | Group | A card shows | **Use** does |
 |---|---|---|
-| **Collections** | the card layout as a thumbnail, and every field as a chip with its kind icon (*◷ Built · Aa Where · ↗ Architect · ◉ Typology · ¶ Why it matters*); "Things · 5 fields · picture cards"; *You have Buildings* if you do | opens **New collection** at step 3 (name and look), already filled in; **Back** shows step 2 |
+| **Collections** | first **Three for any field**, the generic templates (below); then **Pre-made for a field**, with chips *Architecture · Law · Medicine* (the learner's field selected). Each card shows the card layout as a thumbnail, and every field as a chip with its kind icon (*◷ Built · Aa Where · ↗ Architect · ◉ Typology · ¶ Why it matters*); "Things · 5 fields · picture cards"; *You have Buildings* if you do | opens **New collection** at step 3 (name and look), already filled in; **Back** shows step 2 |
 | **Long notes** | a small page with the title and its headings, plus *◎ A goal for it* or *? A question to answer* when the template ends with one. General templates for the field (*Site visit · Lecture notes · Comparing two precedents*; *Case brief · Seminar notes · Advice outline*; *Ward round · Lecture notes · Guideline summary*). Then **each collection's own** *Write about it* headings ("Writing about a building"), with **Edit headings** | a general one starts a long note with its headings, the caret under the first; a collection's asks *Write about which building?* and starts *Write about it* on the one you choose |
-| **Boards** | a small board: the goal (accent), questions (amber), cards and arrows. *Toward a goal* (a goal, its questions, room for answers), *Compare two* (two cards, *contrasts with*, and the question it *raises*), *Cause and effect* (a chain of *leads to*, ending in a question) | makes the board with those cards, arrows and words; the goal and questions are inlines (B1); placeholder notes say "Double-click to write, or + Place an entry here" |
+| **Boards** | a small board: the goal (accent), questions (amber), cards and links. *Toward a goal* (a goal, its questions, room for answers), *Compare two* (two linked cards and the question between them), *Cause and effect* (a chain of linked cards, ending in a question) | makes the board with those cards and links; the goal and questions are inlines (B1); placeholder notes say "Double-click to write, or + Place an entry here" |
 
-- **Where the templates come from.** Collection starters are T1's per-field starter types. Writing templates are general ones per field, plus `collections.write_template` (N3). Board layouts are fixed in code (B1).
+- **Three generic templates, for any field.** One idea each, worded so they fit every field:
+
+  | Template | One entry is | Fields | Card | *Write about it* starts with |
+  |---|---|---|---|---|
+  | **People** | a person you learn from: an architect, a judge, a clinician, an author | Role · Based in · Dates · Known for (long) | Portrait; Role, Based in, Dates | Who they are · Ideas · Work I know · What I'd borrow |
+  | **Precedents** | something made that you learn from: a building, a judgment, a study, a product | Made by (link to People) · When (year) · Where · Kind (choice: Building, Judgment, Study, Product) · Why it matters (long) · What I'd take (long) | Picture; When, Where | What it is · How it works · Why it matters · What I'd take |
+  | **Cases** | a situation worked through: a legal case, a patient, a project | When (year) · Setting · The question · What happened (long) · Outcome (choice: Open, Resolved) · Lessons (long) | Text; Setting, The question | The situation · The question · What happened · What I learned |
+
+  A Case collection can be made Confidential or Clinical in Settings. A Precedent's *Made by* links to whichever People collection the learner has.
+- **The pre-made library.** The designs made for architecture, law and medicine ship as ready templates beside the generic three: *Buildings, Architects, Materials*; *Cases, Judges, Clauses*; *Drugs, Guidelines, Teaching cases*. They are the same three ideas with field words (a Building is a Precedent; a Judge is a Person; a Teaching case is a Case). A new field gets added as one more set, never a new mechanism.
+- **Long-note templates** follow the same pattern: three for any field (*Study notes* with a goal, *Comparing two* with a question, *Reflection*), then the field's own (*Site visit*, *Case brief*, *Ward round*…), then each collection's *Write about it* headings.
+- **Where the templates come from.** The generic three and the pre-made library are T1's starter types. Writing templates are general ones per field, plus `collections.write_template` (N3). Board layouts are fixed in code (B1).
 - **Your own templates (later).** *Save as template* on any long note or board, and your own collections' writing headings appear here already. Making one from a long note is N3's, and from a board is B3's.
 
 ### 2.7 How Commonplace works
@@ -240,10 +252,10 @@ flowchart TB
     R3["Quote"] -- "taken from" --> R4["Source"]
     R5["Photo"] -- "shows" --> R6["Object"]
   end
-  subgraph B["3 · Made on a board: arrows, the board's own claims"]
+  subgraph B["3 · Made on a board: links between cards"]
     direction LR
     B1["Board"] -- "places" --> B2["any entry, as a card"]
-    B2 -- "arrow: a word and why" --> B3["another card on the same board"]
+    B2 -- "link, label optional" --> B3["another card on the same board"]
   end
   subgraph A["A note's subject"]
     direction LR
@@ -265,7 +277,7 @@ flowchart TD
   Q -- "it comes up while I write" --> M["Mention<br/>type @ and its name"]
   Q -- "show it whole in my writing" --> C["Entry card<br/>/ Entry card"]
   Q -- "a fact about it" --> P["Property<br/>its rail: a field or Link…"]
-  Q -- "how two things relate, and why" --> A["Arrow<br/>place both on a board"]
+  Q -- "these two belong together" --> A["Link<br/>place both on a board, drag a line"]
   Q -- "a line beside it" --> MN["Margin note<br/>its page: Add a margin note"]
   Q -- "a study of it" --> W["Long note about it<br/>its page: Write about it"]
   M -. "offer: make it a property" .-> P
@@ -406,6 +418,7 @@ stateDiagram-v2
 | **CL-D11** | Retire *The Four Types* create forms; Capture and New collection make things | **Yes**: one way to make each thing |
 | **CL-D12** | The explainer becomes the **How Commonplace works** sheet, opened from **?** | **Yes** |
 | **CL-D13** | *Template* means only starting points; the rail's row is renamed **Kind** | **Yes** |
+| **CL-D14** | Templates are three generic ones for any field (People, Precedents, Cases), with the field designs kept as a pre-made library | **Yes**: one idea per template, field words on top |
 
 ## 9. What this is not
 

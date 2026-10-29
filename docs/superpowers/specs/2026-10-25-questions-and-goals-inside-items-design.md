@@ -189,7 +189,7 @@ Indexes: `(account_id, host_item_id, position)`; `(account_id, kind, status)`; `
 - A **question** on the canvas is a question inline hosted by the board, with `anchor = { x, y }`. It is no longer a Note on the wall. The rule "a note or question written on a board becomes a Note" becomes "a note becomes a Note; a question stays the board's own".
 - The board's **goal card** is a goal inline hosted by the board, with the role *the board's goal*. The board's own `goal` field goes away, and a board's goal shows in the same lists as every other goal.
 - A question on a note card that's placed on the board shows on that card. It still belongs to the note.
-- The arrow word *raises* (A raises question B) points at a question inline.
+- A board link from a card to a question card points at a question inline (Boards §7.10: links have no fixed words).
 - Board tool **Q** stays as it is; a new **G** places a goal.
 
 **Work** (changes `2026-10-24-work-design.md` §2):
