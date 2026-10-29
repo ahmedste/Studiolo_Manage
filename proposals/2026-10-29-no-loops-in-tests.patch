@@ -1,0 +1,39 @@
+diff --git a/project-docs/workflow/production-cutover.md b/project-docs/workflow/production-cutover.md
+index cca423b..3ad589b 100644
+--- a/project-docs/workflow/production-cutover.md
++++ b/project-docs/workflow/production-cutover.md
+@@ -150,7 +150,7 @@ Not part of any approved configuration today: the code is on branch `phase-signi
+ - [ ] **Make the invitation transactional** (recommended before inviting real people, L3): in Loops create a transactional email "Your Studiolo invitation" with an optional `firstName` data variable, publish it, set its id as `LOOPS_INVITE_TRANSACTIONAL_ID` in `.env.local` and on Vercel, and **switch off the `invited` workflow's email** at the same time, or invitees get two emails.
+ - [ ] Check one live request (the contact, its properties and the list in Loops, and the email) and one live invite (the event and the email with its sign-in link) on the hosted app.
+ - [x] **Abuse of the public request endpoint (the owner chose the recommendation, October 16, 2026).** `POST /api/invitation-requests` is public; its Origin check stops other websites' browsers, not a script. In place: the Loops workflows send once per contact, and the route's best-effort in-memory limit (five an hour per IP, three a day per address; [backend guide](../implementation/backend.md#marketing-contacts-loops)). The owner added the Vercel Firewall rule "Invitation requests rate limit" on October 16, 2026: `POST` to `/api/invitation-requests`, fixed window, 10 requests per 60 seconds per IP address, then Deny (403), which holds across instances; the form shows its usual "We couldn't send your request." for that answer. Cloudflare Turnstile stays an option if scripted requests appear.
+-- [ ] Before running the e2e suite once the keys are in `.env.local`, stop your own dev server on :3000: Playwright reuses an already running server (`reuseExistingServer`), and only the server the e2e scripts start blanks `LOOPS_API_KEY` and `LOOPS_WAITLIST_LIST_ID` so tests never reach Loops.
++- [ ] Before running the e2e suite once the keys are in `.env.local`, stop your own dev server on :3000: Playwright reuses an already running server (`reuseExistingServer`), and only the server the e2e scripts start blanks `LOOPS_API_KEY` and `LOOPS_WAITLIST_LIST_ID` so tests never reach Loops. Vitest runs (unit and integration) blank all three `LOOPS_*` settings in every worker ([`no-live-services.ts`](../../tests/support/no-live-services.ts)), so the invite command the integration suite starts never reaches Loops either; before that guard, each local `npm run test:integration` created an `operator-retry-…@example.test` contact in Loops.
+ - [ ] Replace the `/privacy` draft, which names Loops, with the reviewed text before public launch (legal decision, L1 and L2 above).
+ 
+ ## Acceptance required before live traffic
+diff --git a/tests/support/no-live-services.ts b/tests/support/no-live-services.ts
+new file mode 100644
+index 0000000..8bf1daa
+--- /dev/null
++++ b/tests/support/no-live-services.ts
+@@ -0,0 +1,8 @@
++/**
++ * Vitest setupFiles for every run (unit, integration, branches): runs in each worker before every test file, so no
++ * test, and no script a test starts (the invite command inherits this env), ever reaches the real Loops account, even
++ * with the owner's keys in `.env.local`. Tests that check Loops calls pass their own key and fetch stub.
++ */
++process.env.LOOPS_API_KEY = "";
++process.env.LOOPS_WAITLIST_LIST_ID = "";
++process.env.LOOPS_INVITE_TRANSACTIONAL_ID = "";
+diff --git a/vitest.config.ts b/vitest.config.ts
+index f480999..429bb4f 100644
+--- a/vitest.config.ts
++++ b/vitest.config.ts
+@@ -15,5 +15,7 @@ export default defineConfig({
+     // tests/live makes real, paid Anthropic calls: it is only collected when AI_LIVE=1 (the controller's opt-in run).
+     exclude: [...configDefaults.exclude, ".worktrees/**", "worktrees/**", ...(process.env.AI_LIVE === "1" ? [] : ["tests/live/**"])],
+     restoreMocks: true,
++    // No test run ever calls Loops: .env.local holds the owner's live key for the invite command (no-live-services.ts).
++    setupFiles: ["tests/support/no-live-services.ts"],
+   },
+ });
