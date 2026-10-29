@@ -1,6 +1,6 @@
 # Proposal: dictation with Moonshine (on-device, live)
 
-Status: proposal · 24 Oct 2026 · not yet approved
+Status: **parked** (29 Oct 2026). The owner chose ElevenLabs Scribe for dictation for now: see `2026-10-29-dictation-elevenlabs-brief.md`. Kept as the research for on-device dictation later.
 
 Scope: **dictation only.** The user taps the mic, sees their words appear live in the input, edits them, and sends. This is not Live Lumens or live explainers: there is no voice agent and no spoken reply. It is spec A7 ("voice is just a way of typing"), the mic in the composer.
 

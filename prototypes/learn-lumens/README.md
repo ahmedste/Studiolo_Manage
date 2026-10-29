@@ -48,10 +48,11 @@ Open `dist/learn-lumens-prototype.html`. It's published as a claude.ai artifact 
    - Filter by format (All, Watch, Listen, Read, **Live sessions**), by state and by area.
    - Group **by date** or **by topic**.
 7. **Dictation (real microphone).** Tap the mic on Home or in the bottom bar and speak. Your words appear in the input as you talk, the last few revised as the engine settles. Tap again (or press Escape) to stop; the text stays in the input to read, edit and send, and Send also stops the mic. Holding the mic, or holding Space in the player, is push-to-talk: in a live session the words go straight in when you let go. The **Mic** menu in the prototype bar picks the engine:
-   - **Moonshine (Tiny, Small, Medium)** runs on your device, free and private. Only when the page is served by `node serve.mjs` (it needs cross-origin isolation). The first tap downloads the model once; the mic's ring fills as it does.
+   - **ElevenLabs Scribe (cloud)** is the chosen engine. Only when the page is served by `ELEVENLABS_API_KEY=… node serve.mjs`: the server mints a single-use token and the browser streams the mic to ElevenLabs.
    - **Browser speech** is the Web Speech API (Chrome and Safari; Chrome sends the audio to Google).
    - **Simulated** streams a fixed phrase, as before.
-   - **Auto** picks Moonshine Small on a computer and Tiny on a phone, then browser speech, then the simulation. When it has to fall back, the bar says why.
+   - **Moonshine (parked)** runs on your device; it needs `node serve.mjs --moonshine`.
+   - **Auto** picks ElevenLabs, then browser speech, then the simulation. When it has to fall back, the bar says why.
 8. Everything from the earlier prototypes still works:
    - Watch: go live, interruptions, Keep, resume live sessions.
    - Listen: ask the hosts, marks, Walk and Drive modes, the mini player, the recall question.
@@ -90,11 +91,11 @@ Open `dist/learn-lumens-prototype.html`. It's published as a claude.ai artifact 
   - The two long reads are hand-written samples (`src/read.js`). A Read made in the prototype gets plain sections; in the app, the long-read generator would add the figures.
   - Sharing: the link is a placeholder and nothing leaves the page.
   - Browser voices stand in for ElevenLabs.
-- **Real microphone:** dictation (see Try it, 7). On-device with Moonshine through `node serve.mjs`; as a claude.ai artifact or opened as a file it uses the browser's speech or the simulation.
+- **Real microphone:** dictation (see Try it, 7). With ElevenLabs through `ELEVENLABS_API_KEY=… node serve.mjs`; as a claude.ai artifact or opened as a file it uses the browser's speech or the simulation.
   - Goals, Library items and Lumens are sample data.
 
 ## Build
 
 `node build.mjs` bundles the captured screens and CSS (`../live-lumens/capture/snap.json`), `src/learn.css` and `src/learn.js` (Learn: Home, Lumens, Courses, Watch, Read, Share), `src/listen.css` and `src/listen.js` (Listen, Walk and Drive modes), `src/read.css` and `src/read.js` (the long reads and their figures), and `src/dictation.js` (the mic) into `dist/learn-lumens-prototype.html`.
 
-**On-device dictation:** `node serve.mjs` serves that page at http://localhost:8080/ with `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, which Moonshine's multithreaded WebAssembly needs. The runtime (`@moonshine-ai/moonshine-wasm@0.1.5`) comes from jsDelivr, or from `node_modules` if you run `npm i --no-save @moonshine-ai/moonshine-wasm@0.1.5` here first. The models come from `download.moonshine.ai` and are cached in the browser. Plan and decisions: [`proposals/2026-10-24-dictation-moonshine.md`](../../proposals/2026-10-24-dictation-moonshine.md). `learn.js` and `learn.css` started as copies of slice 1 (`../learn-live`), and `listen.*` as copies of `../learn-dialogues`; those earlier prototypes are left as they were.
+**Real dictation:** `ELEVENLABS_API_KEY=… node serve.mjs` serves that page at http://localhost:8080/, with `POST /api/dictation/token` minting single-use Scribe tokens so the key never reaches the page. The client (`@elevenlabs/client@1.32.1`) comes from jsDelivr, or from `node_modules` if you run `npm i --no-save @elevenlabs/client@1.32.1` here first. `--moonshine` adds the cross-origin isolation headers for the parked on-device engine. Brief: [`proposals/2026-10-29-dictation-elevenlabs-brief.md`](../../proposals/2026-10-29-dictation-elevenlabs-brief.md); parked research: [`proposals/2026-10-24-dictation-moonshine.md`](../../proposals/2026-10-24-dictation-moonshine.md).
