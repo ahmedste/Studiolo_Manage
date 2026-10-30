@@ -2,6 +2,7 @@
 
 **For:** the owner, to decide whether and how to build routines; and the agent who later builds them in `studiolo`.
 **Status:** Proposed. Claude, 29 October 2026. Nothing here is approved until the owner says so in the conversation.
+**Update, 30 Oct:** the owner added a second kind of task, **studies** (long, in-depth work in the cloud). For studies, Claude Managed Agents *is* recommended (§5's verdict stands for routines). See [Loci's tasks: routines and studies](2026-10-30-loci-tasks-and-studies-design.md).
 **Owner's direction (29 Oct):** "How it starts needs some kind of integration, like Make.com or Zapier do … just more visual. … Is Routines the right name now? Where does this fit? Commonplace? Under Loci? … How it actually works and how it fits in our system. … Would it work on Trigger.dev? On Cloudflare Workers? … The tokens as well, the cost. Let's take this to realistic."
 **Prototype:** [`prototypes/routines/`](../../../prototypes/routines/README.md), version 8, published as **Studiolo Routines**.
 **Cost model:** [`routines-study/cost-model.mjs`](../../../routines-study/cost-model.mjs). Every figure in §7 comes from it; change a rate or an assumption there and run it again.

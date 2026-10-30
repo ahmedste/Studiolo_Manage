@@ -1,4 +1,10 @@
-/* Routines (prototype, version 7): a Commonplace tab, with a page and an editor for each routine, and Finds.
+/* Tasks (prototype, version 9): what Loci does for you, under Loci in the rail. Two kinds of task:
+   - Routines: things Loci does every time something happens (a trigger, then steps; version 8's flow editor).
+   - Studies (version 9): one long piece of work done once, in depth, in the cloud. Loci asks four questions, shows a
+     plan with its time and cost, and you agree it. Then it researches each question in its own thread, writes a
+     course, and (deep only) checks it against a rubric, while you get on with your day. It ends on Today, as a
+     course in Learn, readings in Commonplace and questions in Questions and goals. Progress is simulated.
+   Earlier versions, kept: Routines (prototype, version 7): a Commonplace tab, with a page and an editor for each routine, and Finds.
    - Finds (version 7): a routine kind that checks sources for a subject on a schedule and brings what's new to a
      Finds page. Each find has a summary and why it's for you (a question it may answer, a goal it serves, a topic),
      and one decision: Save, Read later, Not for me (and why), or Ask Loci (and make a Lumen from it).
@@ -110,6 +116,7 @@
     { id: "w" + ++wid, kind: "pile", rid: "r7", when: "1 Oct", items: [{ t: "Design with Climate, Victor Olgyay", k: "Book", since: "since June" }, { t: "Architecture for the Poor, Hassan Fathy", k: "PDF", since: "since May" }, { t: "Lecture: daylight in deep plans (example)", k: "Video", since: "since July" }] },
   ];
   const ACT = [
+    { day: "Today", t: "07:45", sid: "st2", what: "started: 3 questions to research", state: "study" },
     { day: "Today", t: "07:30", rid: "rf1", what: "brought 6 finds to a Finds page", state: "finds", iss: "i1" },
     { day: "Today", t: "07:52", rid: "r2", what: "suggests a place for “Climate Considerations in Building and Urban Design”", state: "waiting" },
     { day: "Today", t: "07:31", rid: "r3", what: "wrote out a voice note and suggests Precast", state: "waiting" },
@@ -208,7 +215,83 @@
   ];
 
   /* ================================================================ state */
-  const S = { view: "routines", seg: "routines", kind: "all", only: null, open: null, edit: null, newer: false, ptab: "all", pop: null, sendOpen: false, builder: false, sheet: false, flash: null, noticed: "open", sent: new Set(), issue: null, issueFrom: null, findNo: null };
+
+  /* ---------- studies (version 9): long work Loci does once, in depth, while you get on with your day.
+     Loci plans it (you agree the plan), researches each question in its own thread, writes a course, and (deep
+     only) checks it against a rubric. Each lesson is made when you reach it, in Learn. All content is an example. */
+  const MONTHLY = 10; // an assumed monthly AI allowance in dollars, for showing costs as a share (decision ST-6)
+  const DEPTHS = {
+    standard: { label: "Standard", mins: 20, segs: 3, base: 0.73, perSeg: 0.31, note: "about 20 minutes", how: "3 questions, about 20 minutes" },
+    deep: { label: "Deep", mins: 50, segs: 5, base: 1.55, perSeg: 0.5, note: "about 50 minutes", how: "5 questions, about 50 minutes, checked twice" },
+  };
+  const costFor = (depth, segs, mine) => DEPTHS[depth].base + DEPTHS[depth].perSeg * segs * (mine ? 0.8 : 1);
+  const pctAllow = (c) => Math.max(1, Math.round((c / MONTHLY) * 100));
+  const CONF = { Sure: "ok", Mostly: "ok", Mixed: "pick", Thin: "dim" };
+  const STUDIES = [
+    { id: "st2", subject: "Acoustics of large domed rooms", short: "Acoustics of domed rooms", on: "islamic", depth: "standard", state: "running", step: 2, tick: 1, mins: 20,
+      started: "Today, 7:45", use: "project", know: "some", time: 3, mine: false, special: "acoustics",
+      mission: "Understand how the prayer hall's dome will carry the imam's voice, and what to do about echoes, before the interior design starts.",
+      segs: [
+        { q: "Why domes focus sound, and where the echoes land", kept: 4, words: "dome focusing, concave reflections" },
+        { q: "How long a prayer hall should ring for speech and recitation", kept: 5, words: "reverberation time, mosques" },
+        { q: "What absorbs sound without spoiling the space", kept: 4, words: "hidden absorbers, perforated timber, plaster" },
+      ],
+      log: ["Kept 4 sources, and noted what they agree on", "Read 6 sources, 1 from your Commonplace", "Searched journals and books: “dome focusing, concave reflections”", "Plan agreed: 3 questions"] },
+    { id: "st1", subject: "Passive cooling for a prayer hall in Dubai", short: "Passive cooling", on: "climate", depth: "deep", state: "done", seen: true, step: 7, tick: 0, mins: 52,
+      started: "Thursday 22 October, 21:40", ready: "Thursday 22 October, 22:32", use: "project", know: "some", time: 3, done: 1, cost: 3.81,
+      tokens: "2.7 million tokens in, 118 thousand out · 38 searches · 52 minutes",
+      mission: "Know how to keep the prayer hall comfortable at Friday noon in June with as little cooling plant as possible, and be able to explain why to the client.",
+      read: 46, kept: 18, mine: 5, readings: 12, collection: "Study: Passive cooling",
+      segs: [
+        { q: "Where the heat comes from in a large hall in Dubai", kept: 3 }, { q: "Shading roofs, domes and walls", kept: 4 },
+        { q: "Thermal mass and night cooling in a hot, humid climate", kept: 4 }, { q: "Moving air: stack ventilation, wind catchers and fans", kept: 4 },
+        { q: "What has been measured in real mosques and halls", kept: 3 },
+      ],
+      found: [
+        { q: "Where the heat comes from", a: "Most of it comes through the roof and from the people. Sun on the roof is the largest single gain at noon, and a full hall adds roughly 100 W for every person.", conf: "Sure", n: 3 },
+        { q: "Shading", a: "Shade the roof first: a ventilated second skin or a shaded dome cuts more heat than any measure on the walls. Deep, small openings keep the sun off the floor.", conf: "Sure", n: 4 },
+        { q: "Thermal mass and the night", a: "Heavy walls help in spring and autumn, when nights are cool. From June to September Dubai's nights stay near 30 °C, so night cooling alone can't do it. Sources disagree on how much it helps.", conf: "Mixed", n: 4 },
+        { q: "Moving air", a: "Hot air gathers under a dome; openings at its base let it out. Ceiling fans let people feel comfortable a few degrees warmer. Wind catchers moved air in old Dubai, but on a humid coast they don't cool it much.", conf: "Mostly", n: 4 },
+        { q: "Measured buildings", a: "Measured studies of big prayer halls in hot, humid places are few; most measurements are of houses. The course says where it leans on house studies.", conf: "Thin", n: 3 },
+      ],
+      lessons: [
+        { t: "Where the heat comes from", win: "Name the four sources of heat in the hall, and which is largest at noon", f: "Read", min: 8, src: "Givoni, Passive and Low Energy Cooling of Buildings (1994)" },
+        { t: "Shade the roof first", win: "Choose between a second skin, a shaded dome and roof mass for the hall", f: "Watch", min: 5, src: "Brown and DeKay, Sun, Wind & Light (2014)" },
+        { t: "Heavy walls and the night", win: "Say when thermal mass helps in Dubai, and when it doesn't", f: "Watch", min: 6, src: "Dubai climate data, and a journal review (example)" },
+        { t: "Hot air up and out", win: "Size openings at the base of the dome so hot air can leave", f: "Watch", min: 5, src: "Givoni (1994)" },
+        { t: "Wind catchers in the Gulf", win: "Explain what Al Fahidi's wind towers did, and why they cool less on a humid coast", f: "Read", min: 10, src: "Fathy, Natural Energy and Vernacular Architecture (1986)" },
+        { t: "Fans, and feeling cooler", win: "Use air speed to raise the temperature people find comfortable", f: "Watch", min: 4, src: "ASHRAE Standard 55" },
+        { t: "What real buildings tell us", win: "Tell which numbers come from halls and which from houses", f: "Read", min: 7, src: "5 measured studies (examples)" },
+        { t: "A cooling plan for the hall", win: "Put the measures in order for the prayer hall, with a reason for each", f: "Read", min: 12, src: "This study's notes, and your site photos", check: true },
+      ],
+      questions: ["How big should the openings at the base of the dome be?", "Is a second roof skin worth its cost in Dubai?", "Can the courtyard cool the air before it enters the hall?"],
+      sources: [
+        ["Natural Energy and Vernacular Architecture", "Hassan Fathy, 1986 · Book", "mine"], ["Passive and Low Energy Cooling of Buildings", "Baruch Givoni, 1994 · Book", ""],
+        ["Sun, Wind & Light", "G. Z. Brown and Mark DeKay, 2014 · Book", ""], ["ASHRAE Standard 55", "Thermal comfort · Standard", ""],
+        ["Courtyard cooling study (example).pdf", "PDF · saved 12 Oct", "mine"], ["Measured temperatures in a domed hall (example)", "Paper · Building-science journal", ""],
+      ] },
+  ];
+  const ACOUSTICS = {
+    read: 31, kept: 13, mine: 2, readings: 7, collection: "Study: Acoustics of domed rooms", cost: 1.58,
+    tokens: "0.9 million tokens in, 48 thousand out · 14 searches · 21 minutes",
+    found: [
+      { q: "Domes and focusing", a: "A dome reflects sound back toward its centre of curvature. If that point is near where people stand or speak, echoes gather there; a dome sprung higher, or a less regular surface, spreads them.", conf: "Sure", n: 4 },
+      { q: "How long it should ring", a: "For speech and recitation, a hall this size should ring for about 1.5 seconds or less when full. Bare stone halls often ring for 3 seconds or more.", conf: "Mostly", n: 5 },
+      { q: "Absorbers that don't show", a: "The carpet does much of the work at high pitches. The low voice of recitation needs absorbers that can hide in the architecture, such as perforated timber or plaster with a cavity behind, around the dome's base.", conf: "Mostly", n: 4 },
+    ],
+    lessons: [
+      { t: "Why domes focus sound", win: "Find where echoes will gather under the hall's dome", f: "Watch", min: 5, src: "A room-acoustics textbook (example)" },
+      { t: "How long a hall should ring", win: "Set a target reverberation time for the prayer hall", f: "Watch", min: 4, src: "Measured reverberation in large mosques (example)" },
+      { t: "Measuring it", win: "Read a reverberation-time chart, and know what to ask an acoustician", f: "Read", min: 8, src: "A room-acoustics textbook (example)" },
+      { t: "Absorbers that don't show", win: "Choose where hidden absorbers go, and how much area they need", f: "Watch", min: 5, src: "Two product guides and a journal paper (examples)" },
+      { t: "A sound plan for the hall", win: "Put it together for the prayer hall, with a reason for each choice", f: "Read", min: 10, src: "This study's notes, and your site photos", check: true },
+    ],
+    questions: ["Where should the imam stand relative to the dome's centre?", "How much perforated panel does the hall need?"],
+    sources: [["A room-acoustics textbook (example)", "Book", ""], ["Measured reverberation in large mosques (example)", "Paper · Acoustics journal", ""], ["Dome interior, east (example)", "Photo · your site photos", "mine"], ["Perforated timber panels: a product guide (example)", "Guide · manufacturer", ""]],
+  };
+  const studyById = (id) => STUDIES.find((x) => x.id === id);
+
+  const S = { study: null, view: "routines", seg: "routines", kind: "all", only: null, open: null, edit: null, newer: false, ptab: "all", pop: null, sendOpen: false, builder: false, sheet: false, flash: null, noticed: "open", sent: new Set(), issue: null, issueFrom: null, findNo: null };
   const C = { all: [], per: {}, draft: null, previewed: false, q: [], cur: null, typing: null, input: "", pendingDelete: null, pendingSaid: null, srcOff: null, force: null, resetScroll: false };
   const curId = () => S.open || (S.issue ? issueById(S.issue)?.rid : null) || (S.edit && !S.edit.isNew ? S.edit.id : null);
 
@@ -356,6 +439,7 @@
     fold: '<path d="m6 9 6 6 6-6"/>',
     back: '<path d="m14.5 6-6 6 6 6"/>',
     search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+    study: '<path d="M3 5.5c3-1.2 6-1 9 1 3-2 6-2.2 9-1v13c-3-1.2-6-1-9 1-3-2-6-2.2-9-1z"/><path d="M12 6.5v13"/>',
     filter: '<path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"/>',
     check: '<path d="M12 3 4.5 6v5.5c0 4.4 3.2 8.2 7.5 9.5 4.3-1.3 7.5-5.1 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>',
     link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7L11.5 6.8"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>',
@@ -382,9 +466,9 @@
       return `<header class="destination-header"><div class="destination-crumb"><strong>Commonplace</strong>${crumb.map((c) => `<i aria-hidden="true">/</i><span>${esc(c)}</span>`).join("")}</div>
         <nav aria-label="Commonplace sections" class="destination-tabs">${tabs.map(([k, l]) => `<a class="destination-tab" href="#${k}" data-act="dtab" data-v="${k}"${tab === k ? ' aria-current="page"' : ""}>${l}</a>`).join("")}</nav></header>`;
     }
-    const tabs = [["routines", "Routines", null], ["finds", "Finds", newFinds()], ["waiting", "Waiting", W.length], ["activity", "Activity", null], ["connections", "Connections", null]];
+    const tabs = [["routines", "Tasks", STUDIES.filter((x) => x.state === "running").length || null], ["finds", "Finds", newFinds()], ["waiting", "Waiting", W.length], ["activity", "Activity", null], ["connections", "Connections", null]];
     return `<header class="destination-header"><div class="destination-crumb"><strong>Loci</strong>${crumb.map((c) => `<i aria-hidden="true">/</i><span>${esc(c)}</span>`).join("")}</div>
-      <nav aria-label="Loci sections" class="destination-tabs">${tabs.map(([k, l, n]) => `<a class="destination-tab" href="#${k}" data-act="seg" data-v="${k}"${S.seg === k && !S.edit && !S.newer && !S.open && !S.issue ? ' aria-current="page"' : S.seg === k ? ' aria-current="true"' : ""}>${l}${n ? `<span class="rx-count${k === "finds" ? " acc" : ""}">${n}</span>` : ""}</a>`).join("")}</nav></header>`;
+      <nav aria-label="Loci sections" class="destination-tabs">${tabs.map(([k, l, n]) => `<a class="destination-tab" href="#${k}" data-act="seg" data-v="${k}"${S.seg === k && !S.edit && !S.newer && !S.open && !S.issue && !S.study ? ' aria-current="page"' : S.seg === k ? ' aria-current="true"' : ""}>${l}${n ? `<span class="rx-count${k === "finds" ? " acc" : ""}">${n}</span>` : ""}</a>`).join("")}</nav></header>`;
   }
 
   /* ================================================================ the Routines tab: tiles, the bar, cards */
@@ -392,7 +476,8 @@
   function tiles() {
     const on = ROUTINES.filter((r) => r.on).length;
     const T = [
-      ["on", "g", svg("loop", 16), on, on === 1 ? "routine on" : "routines on", S.seg === "routines" && !S.only],
+      (() => { const w = STUDIES.filter((x) => x.state === "running").length, rd = STUDIES.filter((x) => x.state === "done" && !x.seen).length;
+        return ["studies", "g", svg("study", 16), w || rd || on, w ? (w === 1 ? "study working now" : "studies working now") : rd ? (rd === 1 ? "study ready" : "studies ready") : on === 1 ? "routine on" : "routines on", S.seg === "routines" && S.kind === "study"]; })(),
       ["waiting", "q", "?", W.length, W.length === 1 ? "thing waiting for you" : "things waiting for you", S.seg === "waiting"],
       ["finds", "f", svg("search", 16), newFinds(), newFinds() === 1 ? "new find to look through" : "new finds to look through", S.seg === "finds"],
       ["activity", "a", "✓", filedThisWeek(), "filed for you this week", S.seg === "activity"],
@@ -401,10 +486,10 @@
   }
   function bar() {
     const n = (t) => ROUTINES.filter((r) => r.type === t).length;
-    const kinds = [["all", "All kinds"], ["arrive", `When I send · ${n("arrive")}`], ["schedule", `On a schedule · ${n("schedule")}`], ["after", `After I do something · ${n("after")}`]];
+    const kinds = [["all", "All"], ["study", `Studies · ${STUDIES.length}`], ["arrive", `When I send · ${n("arrive")}`], ["schedule", `On a schedule · ${n("schedule")}`], ["after", `After I do something · ${n("after")}`]];
     return `<div class="cph-bar rx-bar">
       ${S.seg === "routines" ? `<div class="qg-topics" role="group" aria-label="Kind">${kinds.map(([k, l]) => `<button type="button" data-act="kind" data-v="${k}" aria-pressed="${S.kind === k}">${l}</button>`).join("")}${S.only === "paused" ? `<button type="button" data-act="tile" data-v="on" aria-pressed="true">Paused only ×</button>` : ""}</div>` : ""}
-      <span class="rx-grow"></span><button type="button" class="button rx-new" data-act="new">${svg("plus")}New routine</button></div>`;
+      <span class="rx-grow"></span><button type="button" class="button rx-new" data-act="new">${svg("plus")}New task</button></div>`;
   }
   function card(r) {
     const waiting = W.filter((w) => w.rid === r.id && w.kind === "single");
@@ -428,10 +513,12 @@
       <p class="rk-next new"><b>Next</b><span>Turn it on, or edit it first.</span></p><div class="rk-ft"><span class="rk-stat">${d.type === "arrive" ? `${hitsOf(d).length} of your last 20 would fit` : "Loci made this"}</span><span class="rx-acts">${btn("Edit", 'data-act="draft-edit"', "quiet")}${btn("Turn it on", 'data-act="turn-on"')}</span></div></article>`;
   }
   function routinesSeg() {
+    if (S.kind === "study") return studiesSec();
+    const lead = S.kind === "all" && S.only !== "paused" ? studiesSec() : "";
     const shown = ROUTINES.filter((r) => (S.kind === "all" || r.type === S.kind) && (S.only !== "paused" || !r.on));
     const types = (S.kind === "all" ? ["arrive", "schedule", "after"] : [S.kind]).filter((t) => shown.some((r) => r.type === t) || (C.draft && C.previewed && C.draft.type === t));
-    if (!types.length) return `<div class="qg-empty"><span class="qc-gl">–</span><p>${S.only === "paused" ? "Nothing is paused." : "No routines of this kind yet."} ${btn("Make one", 'data-act="new"', "link")}</p></div>`;
-    return types.map((t) => `<section class="rx-sec" aria-labelledby="rx-g-${t}"><h2 id="rx-g-${t}">${GROUP[t]} <span>${shown.filter((r) => r.type === t).length}</span></h2><p class="rx-sub">${GROUP_NOTE[t]}</p>
+    if (!types.length) return lead + `<div class="qg-empty"><span class="qc-gl">–</span><p>${S.only === "paused" ? "Nothing is paused." : "No routines of this kind yet."} ${btn("Make one", 'data-act="new"', "link")}</p></div>`;
+    return lead + types.map((t) => `<section class="rx-sec" aria-labelledby="rx-g-${t}"><h2 id="rx-g-${t}">${GROUP[t]} <span>${shown.filter((r) => r.type === t).length}</span></h2><p class="rx-sub">${GROUP_NOTE[t]}</p>
       <div class="rk-grid">${draftCard(t)}${shown.filter((r) => r.type === t).map(card).join("")}</div></section>`).join("");
   }
   const topicSel = (id, cur) => `<select class="sm-select rx-sel" id="${id}" aria-label="Topic">${TOPICS.map((p) => `<option value="${p}"${p === cur ? " selected" : ""}>${esc(PLACES[p].name)}</option>`).join("")}</select>`;
@@ -460,10 +547,10 @@
     const rows = ACT.map((a, i) => {
       const r = RR(a.rid), h = a.day !== day ? `<li class="rx-day">${esc(a.day)}</li>` : "";
       day = a.day;
-      const end = a.state === "finds" ? btn("Look through", `data-act="open-issue" data-v="${a.iss}"`, "link") : a.state === "waiting" ? btn("Check it", 'data-act="seg" data-v="waiting"', "link") : a.undo ? btn("Undo", `data-act="act-undo" data-i="${i}"`, "link") : a.state === "undone" ? `<span class="rx-dim">Undone</span>` : "";
-      return `${h}<li class="rx-arow"><time>${esc(a.t)}</time><span>${r ? `<button type="button" class="rx-link" data-act="open-r" data-r="${a.rid}">${esc(r.name)}</button>` : "A routine"} ${esc(a.what)}</span>${end}</li>`;
+      const end = a.state === "study" ? btn("Open", `data-act="open-study" data-v="${a.sid}"`, "link") : a.state === "finds" ? btn("Look through", `data-act="open-issue" data-v="${a.iss}"`, "link") : a.state === "waiting" ? btn("Check it", 'data-act="seg" data-v="waiting"', "link") : a.undo ? btn("Undo", `data-act="act-undo" data-i="${i}"`, "link") : a.state === "undone" ? `<span class="rx-dim">Undone</span>` : "";
+      return `${h}<li class="rx-arow"><time>${esc(a.t)}</time><span>${r ? `<button type="button" class="rx-link" data-act="open-r" data-r="${a.rid}">${esc(r.name)}</button>` : a.sid && studyById(a.sid) ? `The study <button type="button" class="rx-link" data-act="open-study" data-v="${a.sid}">${esc(studyById(a.sid).short)}</button>` : "A routine"} ${esc(a.what)}</span>${end}</li>`;
     }).join("");
-    return `<section class="rx-sec"><h2>Activity</h2><p class="rx-sub">Everything your routines did, newest first. Tap a routine's name to open it.</p><ol class="rx-act">${rows}</ol></section>`;
+    return `<section class="rx-sec"><h2>Activity</h2><p class="rx-sub">Everything your routines and studies did, newest first. Tap a name to open it.</p><ol class="rx-act">${rows}</ol></section>`;
   }
 
   /* ================================================================ Finds: a page per run, to look through */
@@ -513,7 +600,7 @@
       <div class="iss-left"><p><b>Left out ${leftN}:</b> ${iss.left.map(([k, w]) => `${k} ${w}`).join(" · ")}.</p><button type="button" class="rk-go" data-act="left-see">See them</button></div>
       <footer class="rp-foot">${open ? `${btn("Read the rest later", `data-act="iss-later" data-v="${iss.id}"`, "quiet")}${btn("Clear the rest", `data-act="iss-clear" data-v="${iss.id}"`, "quiet")}` : ""}<span class="rx-grow"></span>${r ? btn("Change what it looks for", `data-act="edit" data-r="${r.id}"`, "link") : ""}</footer></article>`;
   }
-  function openIssue(id, from) { S.issue = id; S.issueFrom = from || S.open || "finds"; S.open = null; S.edit = null; S.newer = false; S.findNo = null; S.ptab = "this"; S.pop = null; C.resetScroll = true; }
+  function openIssue(id, from) { S.study = null; S.issue = id; S.issueFrom = from || S.open || "finds"; S.open = null; S.edit = null; S.newer = false; S.findNo = null; S.ptab = "this"; S.pop = null; C.resetScroll = true; }
 
   /* ================================================================ Connections: where things come from (the "apps", as in Zapier) */
   const usedBy = (pred) => ROUTINES.filter(pred).map((r) => r.name);
@@ -567,7 +654,7 @@
 
   /* ================================================================ the editor: one short form, for Edit and for New routine */
   function startEdit(d, isNew, from) {
-    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null, chosen: from !== "pick" }; S.issue = null; S.fnOpen = null; S.fnAdd = null;
+    S.edit = { d: clone(d), id: isNew ? "new" : d.id, isNew, from: from || null, chosen: from !== "pick" }; S.issue = null; S.study = null; S.fnOpen = null; S.fnAdd = null;
     S.newer = false; S.pop = null;
     if (isNew) { S.open = null; S.ptab = "all"; } else { S.open = d.id; S.ptab = "this"; }
     C.resetScroll = true;
@@ -674,7 +761,7 @@
     return o;
   }
   // what a routine costs, from the study's unit costs (routines-study/cost-model.mjs); the learner sees a share of the allowance
-  const ALLOWANCE = 2; // dollars a month of a learner's AI allowance that routines may use (study, decision RT-7)
+  const ALLOWANCE = MONTHLY; // costs show as a share of the whole monthly allowance; routines may use up to $2 of it (RT-7)
   function costOf(d) {
     if (d.type === "arrive") {
       const n = Math.max(1, Math.round((hitsOf(d).length / 20) * 120)), t = d.then;
@@ -743,9 +830,13 @@
     const types = [["arrive", "When I send something", "File what arrives from WhatsApp, email, your phone or the browser.", "any"], ["follow", "Find new things for me", "Watch sources for a subject, and bring finds to a page.", "search"], ["schedule", "On a schedule", "Sort Unsorted, or quiz you on what slipped.", "schedule"], ["after", "After I do something", "Follow up after a Lumen.", "lumen"]];
     const tplCard = (d, i) => `<article class="rk ghost tpl"><button type="button" class="rx-hit" data-act="tpl" data-v="${i}" aria-label="Use “${esc(d.name)}”"></button><div class="rk-top"><span class="rk-gl">${svg(iconOf(d), 18)}</span><div class="rk-h"><p class="rk-k">${esc(GROUP[d.type])}</p><h3>${esc(d.name)}</h3></div></div>
       <ul class="rk-rows">${cardRows(d).map(([k, t]) => `<li class="${k}"><span class="rk-dot">${svg({ when: "in", loci: "spark", then: "out" }[k], 12)}</span><span class="rk-t">${esc(t)}</span></li>`).join("")}</ul><div class="rk-ft"><span class="rk-stat">${d.type === "arrive" ? `${hitsOf(d).length} of your last 20 would fit` : "A template"}</span><span class="st active">Use ›</span></div></article>`;
-    return `<article class="rp nr" aria-label="New routine">
-      <nav class="rp-back"><button type="button" class="rx-backbtn" data-act="back">${svg("back", 14)}Routines</button></nav>
-      <header class="rp-head"><span class="rk-gl lg">${svg("plus", 22)}</span><div class="rp-h"><p class="rk-k">New routine</p><h1 class="rp-title">What should Loci do for you?</h1><p class="rp-lead">Start whichever way suits you. You'll see what it would do before anything changes.</p></div></header>
+    return `<article class="rp nr" aria-label="New task">
+      <nav class="rp-back"><button type="button" class="rx-backbtn" data-act="back">${svg("back", 14)}Tasks</button></nav>
+      <header class="rp-head"><span class="rk-gl lg">${svg("plus", 22)}</span><div class="rp-h"><p class="rk-k">New task</p><h1 class="rp-title">What should Loci do for you?</h1><p class="rp-lead">Once, in depth: a study. Or every time something happens: a routine. You'll see what it would do, and what it costs, before anything starts.</p></div></header>
+      <section class="nr-way nr-study"><p class="rk-k">Once, in depth</p><h2>Study something in depth</h2><p>Loci plans it with you, researches it for 20 minutes to an hour, and builds you a course. You don't wait: it's on Today when it's ready.</p>
+        <form class="nr-st" data-form="study"><label class="visually-hidden" for="st-subject">What do you want to understand?</label><input id="st-subject" class="sm-input" type="text" placeholder="What do you want to understand?" autocomplete="off"><button type="submit" class="button" data-act="st-begin">Plan it with Loci</button></form>
+        <div class="ed-chips">${["Acoustics of large domed rooms", "Mashrabiya and daylight in prayer halls", "Precast concrete for curved façades"].map((x) => `<button type="button" class="ed-chip" data-act="st-idea" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div></section>
+      <h2 class="nr-or">Or make a routine: something Loci does every time</h2>
       <div class="nr-ways">
         <section class="nr-way"><p class="rk-k">Easiest</p><h2>Tell Loci</h2><p>Say it the way you'd tell an assistant. Loci asks only what's missing, then shows you the routine.</p>
           <div class="ed-chips">${["When I email myself a PDF, sum it up in three lines and put it on its topic", "Every evening, sort what I haven't sorted"].map((x) => `<button type="button" class="ed-chip" data-act="idea" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>
@@ -756,8 +847,205 @@
       <section class="rx-sec"><h2>Or start from one of these</h2><p class="rx-sub">Each opens in the form, ready to change.</p><div class="rk-grid">${TPL.map(tplCard).join("")}</div></section></article>`;
   }
 
+
+  /* ================================================================ studies: a card, a page while it works, a page when it's done */
+  const TPS = 4; // ticks per phase in the prototype's simulated clock
+  let CLK = 11; const clk = () => `08:${String(Math.min(59, ++CLK)).padStart(2, "0")}`; // minutes past 8 for live events
+  const stepsOf = (st) => [{ k: "plan" }, ...st.segs.map((s, i) => ({ k: "seg", i })), { k: "write" }, ...(st.depth === "deep" ? [{ k: "check" }] : [])];
+  const stPct = (st) => (st.state === "done" ? 100 : Math.min(99, Math.round(((st.step + st.tick / TPS) / stepsOf(st).length) * 100)));
+  const stLeft = (st) => Math.max(1, Math.round(st.mins * (1 - stPct(st) / 100)));
+  const stPhase = (st) => { const p = stepsOf(st)[st.step]; if (!p) return "Finishing"; return p.k === "seg" ? `Researching question ${p.i + 1} of ${st.segs.length}` : { plan: "Planning", write: "Writing the course", check: "Checking the course" }[p.k]; };
+  const stNext = (st) => st.lessons?.[st.done || 0];
+  const stCost = (st) => st.cost || costFor(st.depth, st.segs.length, st.mine);
+  const stCap = (st) => Math.ceil(stCost(st) * 1.5 * 2) / 2;
+  const lessonsTxt = (st) => st.lessons ? `${plural(st.lessons.length, "lesson")}, about ${st.lessons.reduce((a, l) => a + l.min, 0)} minutes` : `about ${plural(st.segs.length + 2, "lesson")}`;
+  function lineFor(st) {
+    const p = stepsOf(st)[st.step], i = st.tick;
+    if (!p) return "Finishing";
+    if (p.k === "seg") { const s = st.segs[p.i]; return [`Searched journals and books: “${s.words || s.q.toLowerCase()}”`, `Read ${4 + (p.i % 3)} sources${st.mine ? "" : `, ${p.i % 2} from your Commonplace`}`, `Kept ${s.kept} sources, and noted what they agree on`, `Wrote up question ${p.i + 1}`][i] || ""; }
+    if (p.k === "write") return [`Outlined the course: ${lessonsTxt(st).split(",")[0]}`, "Gave each lesson one thing you'll be able to do", "Chose a source for each lesson", "Saved the readings to your Commonplace"][i] || "";
+    if (p.k === "check") return ["Checked every lesson has a source", `Checked it fits ${st.time} hours a week`, "One lesson was too long, so it was split", "Passed the check"][i] || "";
+    return "Plan agreed";
+  }
+  function resultsFor(st) {
+    if (st.special === "acoustics") return clone(ACOUSTICS);
+    const names = ["The ideas everything rests on", "How it's done in practice", "Where it's been done well", "What's argued about", "How it applies to your work"];
+    const confs = ["Sure", "Sure", "Mostly", "Mixed", "Thin"];
+    const found = st.segs.map((s, i) => ({ q: s.q, a: `${names[i] || "What Loci found"}: in the app, two or three sentences with their sources (example).`, conf: confs[i] || "Mostly", n: s.kept }));
+    const lessons = [...(st.know === "new" ? [{ t: `${st.short}: the basics`, win: "Know the words and the main ideas", f: "Watch", min: 5, src: "An introductory book (example)" }] : []),
+      ...st.segs.map((s, i) => ({ t: s.q, win: `Explain ${s.q.toLowerCase()}, with an example`, f: i % 2 ? "Read" : "Watch", min: i % 2 ? 8 : 5, src: `${s.kept} sources from question ${i + 1} (examples)` })),
+      { t: "Put it together", win: st.use === "project" ? "Apply it to the prayer hall, with a reason for each choice" : "Explain it to someone else in five minutes", f: "Read", min: 10, src: "This study's notes", check: true }];
+    const kept = st.segs.reduce((a, s) => a + s.kept, 0);
+    return { found, lessons, read: kept * 2 + 5, kept, mine: st.mine ? kept : 2, readings: Math.min(kept, 9), collection: `Study: ${st.short}`, cost: costFor(st.depth, st.segs.length, st.mine) * 0.95,
+      tokens: st.depth === "deep" ? "2.8 million tokens in, 120 thousand out · 40 searches · 50 minutes" : "0.9 million tokens in, 50 thousand out · 15 searches · 20 minutes",
+      questions: [`What would change if the prayer hall were twice the size?`, `Which part of ${st.short.toLowerCase()} is still argued about?`].slice(0, st.use === "project" ? 2 : 1),
+      sources: [["An introductory book (example)", "Book", ""], ["A review paper (example)", "Paper · journal", ""], ["Something you saved (example)", "From your Commonplace", "mine"]] };
+  }
+  function finishStudy(st) {
+    const t = clk(); st.state = "done"; st.seen = false; st.ready = `Today, ${t.replace(/^0/, "")}`; st.done = 0;
+    Object.assign(st, resultsFor(st));
+    ACT.unshift({ day: "Today", t, sid: st.id, what: `finished: a course of ${plural(st.lessons.length, "lesson")}, ${st.readings} readings saved`, state: "study", live: true });
+    toast(`Your study “${st.short}” is ready: a course of ${plural(st.lessons.length, "lesson")}.`);
+  }
+  function advance(st) {
+    st.tick++;
+    if (st.tick >= TPS) { st.tick = 0; st.step++; }
+    if (st.step >= stepsOf(st).length) { finishStudy(st); return; }
+    const l = lineFor(st); if (l && l !== st.log[0]) st.log.unshift(l);
+  }
+  function openStudy(id) { const st = studyById(id); if (!st) return; S.study = id; S.open = null; S.issue = null; S.edit = null; S.newer = false; S.ptab = "this"; S.pop = null; if (st.state === "done") st.seen = true; C.resetScroll = true; }
+
+  function studyCard(st) {
+    const run = st.state === "running" || st.state === "stopped", fresh = st.state === "done" && !st.seen;
+    const cls = ["rk", "stc", run ? "running" : fresh ? "ready" : "", st.state === "stopped" ? "paused" : ""].filter(Boolean).join(" ");
+    const kick = `Study · ${DEPTHS[st.depth].label} · ${st.state === "stopped" ? "stopped" : run ? "working" : fresh ? "ready" : "done"}`;
+    const rows = [["when", `Once · started ${st.started.replace(/^Today, /, "")}`], ["loci", run ? stPhase(st) : `Read ${st.read} sources, kept ${st.kept}`], ["then", run ? `A course of ${lessonsTxt(st)}` : `A course of ${lessonsTxt(st)}, in Learn`]];
+    const nx = stNext(st);
+    const next = run ? `<p class="rk-next"><b>${st.state === "stopped" ? "Stopped" : "Now"}</b><span>${esc(st.log[0] || "Starting")}</span></p><div class="stc-bar" role="progressbar" aria-valuenow="${stPct(st)}" aria-valuemin="0" aria-valuemax="100" aria-label="${esc(st.short)}: ${stPct(st)}% done"><i style="width:${stPct(st)}%"></i></div>`
+      : fresh ? `<p class="rk-next ready"><b>Ready</b><span>Your course is ready to start.</span></p>`
+      : `<p class="rk-next"><b>Course</b><span>${nx ? `Lesson ${(st.done || 0) + 1} of ${st.lessons.length}: ${esc(nx.t)}` : "All lessons done"}</span></p>`;
+    const ft = run ? `<span class="gprog">${stPct(st)}% · ${st.state === "stopped" ? "paused" : `about ${plural(stLeft(st), "minute")} left`}</span><span class="st active">${st.state === "stopped" ? "Stopped" : "Working"} ›</span>`
+      : `<span class="rk-stat">${plural(st.lessons.length, "lesson")} · ${st.readings} readings</span><span class="st active">Open ›</span>`;
+    return `<article class="${cls}" data-st="${st.id}"><button type="button" class="rx-hit" data-act="open-study" data-v="${st.id}" aria-label="Open the study “${esc(st.short)}”"></button>
+      <div class="rk-top"><span class="rk-gl">${svg("study", 18)}</span><div class="rk-h"><p class="rk-k">${esc(kick)}</p><h3>${esc(st.short)}</h3></div></div>
+      <ul class="rk-rows">${rows.map(([k, t]) => `<li class="${k}"><span class="rk-dot">${svg({ when: "in", loci: "spark", then: "out" }[k], 12)}</span><span class="rk-t">${esc(t)}</span></li>`).join("")}</ul>
+      ${next}<div class="rk-ft">${ft}</div></article>`;
+  }
+  function studiesSec() {
+    return `<section class="rx-sec" aria-labelledby="rx-g-study"><h2 id="rx-g-study">Studies <span>${STUDIES.length}</span></h2><p class="rx-sub">Long pieces of work Loci does once, in depth, while you get on with your day. Each ends in a course.</p>
+      <div class="rk-grid">${STUDIES.map(studyCard).join("")}<button type="button" class="rk ghost rx-addfind" data-act="new-study"><span class="rk-gl">${svg("plus", 18)}</span><b>Study something in depth</b><span>Loci plans it, researches it and builds you a course</span></button></div></section>`;
+  }
+  function studyPage(st) {
+    const run = st.state !== "done", steps = stepsOf(st);
+    const back = `<nav class="rp-back"><button type="button" class="rx-backbtn" data-act="back">${svg("back", 14)}Tasks</button></nav>`;
+    const builder = S.builder ? `<p class="sp-builder"><b>Builder</b> One Managed Agents session: an Opus 5.5 coordinator at high effort, ${plural(st.segs.length, "Sonnet 5.5 researcher")} in their own threads${st.depth === "deep" ? ", and a grader with a rubric" : ""}. Session budget $${stCap(st).toFixed(2)}. ${run ? `Spent so far about $${(stCost(st) * stPct(st) / 100).toFixed(2)} of an estimated $${stCost(st).toFixed(2)}.` : `Spent $${stCost(st).toFixed(2)}: ${esc(st.tokens)}.`}</p>` : "";
+    if (run) {
+      const ph = (p, i) => {
+        const done = i < st.step, now = i === st.step && st.state === "running";
+        const t = p.k === "seg" ? st.segs[p.i].q : { plan: "Plan the study", write: "Write the course", check: "Check it against the plan" }[p.k];
+        const k = p.k === "seg" ? `Question ${p.i + 1}` : { plan: "Plan", write: "Course", check: "Check" }[p.k];
+        const sub = done ? (p.k === "seg" ? `Kept ${st.segs[p.i].kept} sources` : p.k === "plan" ? "You agreed it" : "Done") : now ? esc(st.log[0] || "") : i === st.step ? "Stopped here" : "Next";
+        return `<li class="sp-ph ${done ? "done" : now ? "run" : "wait"}"><span class="sp-mk" aria-hidden="true">${done ? "✓" : now ? "" : i + 1}</span><span><em>${k}</em><b>${esc(t)}</b><small>${sub}</small></span></li>`;
+      };
+      return `<article class="rp sp" aria-label="Study: ${esc(st.subject)}">${back}
+        <header class="rp-head sp-head run"><span class="rk-gl lg">${svg("study", 22)}</span><div class="rp-h"><p class="rk-k">Study · ${DEPTHS[st.depth].label} · started ${esc(st.started.replace(/^Today, /, "today at "))}</p><h1 class="rp-title">${esc(st.subject)}</h1>
+          <div class="rp-meta"><span>${st.state === "stopped" ? "Stopped. What it found so far is kept." : `${esc(stPhase(st))} · about ${plural(stLeft(st), "minute")} left`}</span></div></div>
+          <div class="sp-pct"><b>${stPct(st)}%</b><span>${st.state === "stopped" ? "stopped" : "done"}</span></div></header>
+        <div class="stc-bar lg" aria-hidden="true"><i style="width:${stPct(st)}%"></i></div>
+        <p class="iss-how">You don't need to wait. Close Studiolo if you like: it will be on <b>Today</b> when it's ready, and Loci will tell you on WhatsApp.</p>
+        <section class="rp-sec"><h2 class="rp-sh">What Loci is doing</h2><ol class="sp-phases">${steps.map(ph).join("")}</ol></section>
+        <section class="rp-sec"><h2 class="rp-sh">The aim you agreed</h2><p class="sp-mission">${esc(st.mission)}</p></section>
+        <section class="rp-sec"><h2 class="rp-sh">Lately</h2><ul class="sp-log">${st.log.slice(0, 6).map((l, i) => `<li${i ? "" : ' class="now"'}>${esc(l)}</li>`).join("")}</ul></section>
+        ${builder}
+        <footer class="rp-foot">${st.state === "stopped" ? btn("Finish it", `data-act="st-resume" data-v="${st.id}"`) : btn("Stop the study", `data-act="st-stop" data-v="${st.id}"`, "quiet")}<span class="rx-grow"></span>${st.state === "running" ? btn("Skip ahead (prototype)", `data-act="st-skip" data-v="${st.id}"`, "link") : ""}</footer></article>`;
+    }
+    const nx = stNext(st), mins = st.lessons.reduce((a, l) => a + l.min, 0);
+    const les = st.lessons.map((l, i) => { const d = i < (st.done || 0), now = i === (st.done || 0);
+      return `<li class="sp-l${d ? " done" : now ? " next" : ""}"><span class="sp-mk" aria-hidden="true">${d ? "✓" : i + 1}</span><span class="sp-lt"><b>${esc(l.t)}</b><em>You'll be able to: ${esc(l.win.charAt(0).toLowerCase() + l.win.slice(1))}</em><small>${l.f} · ${l.min} min${l.check ? " · with a check" : ""} · ${esc(l.src)}</small></span>${now ? btn((st.done || 0) ? "Continue" : "Start", `data-act="st-lesson" data-v="${st.id}"`) : ""}</li>`; }).join("");
+    return `<article class="rp sp" aria-label="Study: ${esc(st.subject)}">${back}
+      <header class="rp-head sp-head"><span class="rk-gl lg">${svg("study", 22)}</span><div class="rp-h"><p class="rk-k">Study · ${DEPTHS[st.depth].label} · ready ${esc(st.ready.replace(/^Today, /, "today, "))}</p><h1 class="rp-title">${esc(st.subject)}</h1>
+        <div class="rp-meta"><span>Researched for ${st.mins} minutes · read ${st.read} sources, kept ${st.kept} · ${st.mine} from your Commonplace</span></div></div>
+        <div class="sp-pct"><b>${st.done || 0}/${st.lessons.length}</b><span>lessons done</span></div></header>
+      <section class="rp-sec"><h2 class="rp-sh">The aim</h2><p class="sp-mission">${esc(st.mission)}</p></section>
+      <section class="rp-sec"><h2 class="rp-sh">What Loci found</h2><ol class="sp-finds">${st.found.map((x) => `<li><p class="sp-fq">${esc(x.q)}<span class="sp-conf ${CONF[x.conf]}">${x.conf}</span><span class="rx-dim">${plural(x.n, "source")}</span></p><p>${esc(x.a)}</p></li>`).join("")}</ol></section>
+      <section class="rp-sec"><div class="sp-sh"><h2 class="rp-sh">Your course · ${plural(st.lessons.length, "lesson")}, about ${mins} minutes</h2><span class="rx-dim">In Learn › Courses. Each lesson is made when you reach it.</span></div><ol class="sp-les">${les}</ol></section>
+      <section class="rp-sec"><h2 class="rp-sh">Also from this study</h2><div class="sp-also">
+        <div class="sp-a"><span class="rk-gl sm">${svg("out", 13)}</span><span><b>${st.readings} readings saved</b><em>In your Commonplace, in a new collection, ${esc(st.collection)}</em></span>${btn("See them", `data-act="st-readings" data-v="${st.id}"`, "link")}</div>
+        <div class="sp-a"><span class="rk-gl sm q">?</span><span><b>${plural(st.questions.length, "new question")}</b><em>${st.questions.map((q) => `“${esc(q)}”`).join(" · ")}</em></span>${btn("Open Questions and goals", `data-act="st-questions"`, "link")}</div>
+        <div class="sp-a"><span class="rk-gl sm">${svg("search", 13)}</span><span><b>Keep it up to date</b><em>A Finds routine that watches the best sources this study found</em></span>${btn("Watch for new work", `data-act="st-watch" data-v="${st.id}"`, "link")}</div></div></section>
+      <section class="rp-sec"><h2 class="rp-sh">Sources it kept · ${st.kept}</h2><ul class="sp-src">${st.sources.map(([t, m, mine]) => `<li><b>${esc(t)}</b><em>${esc(m)}${mine ? " · in your Commonplace" : ""}</em></li>`).join("")}${st.kept > st.sources.length ? `<li class="more">${btn(`and ${st.kept - st.sources.length} more`, `data-act="st-sources"`, "link")}</li>` : ""}</ul></section>
+      ${builder}
+      <footer class="rp-foot">${nx ? btn((st.done || 0) ? `Continue: lesson ${(st.done || 0) + 1}` : "Start the course", `data-act="st-lesson" data-v="${st.id}"`) : ""}<span class="rx-grow"></span>${btn("Study it again, deeper", `data-act="st-again" data-v="${st.id}"`, "link")}</footer></article>`;
+  }
+
+  /* ---------- making a study: four questions, then a plan to agree */
+  const STUDY_RE = /\b(in[ -]depth|deep[ -]dive|deeply|thoroughly|properly|study|research|teach me|a course (on|about)|learn (all )?about|really understand)\b/;
+  const studyIntent = (s) => STUDY_RE.test(s) && !/\bevery\b|\bwhen i (send|email|share|forward|save)|keep me up to date|\bafter i\b|each (day|week|morning)|\bdaily\b|\bweekly\b|new papers/.test(s) && !/^(what|how|why|which|where|who)\b/.test(s);
+  const subjectFrom = (t) => t.replace(/[?.!]+$/, "").replace(/^(please |can you |could you |i (want|would like|'d like|need) to |help me |i want |i'd like )+/i, "")
+    .replace(/\b(study|research|learn( all)? about|teach me( about)?|really understand|understand|make me a course (on|about)|a course (on|about)|do a deep[ -]dive (into|on)|deep[ -]dive (into|on)?|properly|thoroughly|deeply|in[ -]depth|for me|please)\b/gi, " ").replace(/\s+/g, " ").replace(/^(about|on|into|the subject of) /i, "").trim();
+  function beginStudy(subject) {
+    const sub = cap(subject.trim());
+    if (!sub || sub.length < 3) { C.sq = { awaiting: true }; lociSay("What should I study? Say it in a few words, for example “acoustics of domed rooms”."); return; }
+    C.sq = { subject: sub };
+    lociSay(`A study of “${sub}”. I'll plan it, research it properly and build you a course, while you get on with your day. Four quick questions first.\nHow much do you know about it already?`, { opts: optsOf([["New to me", "st-know", "new"], ["I know some", "st-know", "some"], ["I work with it", "st-know", "lot"]]) });
+  }
+  function startStudyChat(subject, said) {
+    if (mobile()) S.sheet = true;
+    S.ptab = "all"; C.force = "all";
+    meSay(said || `Study ${subject.charAt(0).toLowerCase() + subject.slice(1)} in depth`);
+    think(() => beginStudy(subject), 600); C.force = null;
+  }
+  function makePlan(q) {
+    const sub = q.subject, low = sub.toLowerCase(), depth = q.depth || "standard";
+    const ac = /acoustic|sound|echo/.test(low);
+    const all = ac ? STUDIES.find((x) => x.id === "st2").segs.map((s) => s.q).concat(["How other domed prayer halls handled it", "What to ask an acoustician"])
+      : [`What ${low} is, and the ideas everything else rests on`, `How it's done in practice: methods, tools and numbers`, `Where it's been done well: precedents worth knowing`, `What's argued about, and what's still unknown`, `How it applies to the prayer hall`];
+    let segs = all.slice(0, DEPTHS[depth].segs);
+    if (q.use === "project" && depth === "standard" && !ac) segs = [all[0], all[1], all[4]];
+    const mission = q.use === "project" ? `Understand ${low} well enough to use it on the prayer hall, and explain it to the client.` : q.use === "talk" ? `Be ready to talk about ${low} with confidence, and answer the hard questions.` : `Understand ${low}: the ideas, how it's done, and what's still open.`;
+    return { subject: sub, short: sub.length > 34 ? sub.split(" ").slice(0, 4).join(" ") : sub, depth, know: q.know, use: q.use, time: q.time, segs, mission, mine: false, special: ac ? "acoustics" : null };
+  }
+  const planCost = (p) => costFor(p.depth, p.segs.length, p.mine);
+  function planCard(p, state) {
+    const done = state !== "live";
+    const c = planCost(p), lessons = p.segs.length + 1 + (p.know === "new" ? 1 : 0), weeks = Math.max(1, Math.round((lessons * 7 + 30) / 60 / p.time * 2));
+    return `<div class="cp-card rx-draft sp-plan"><p class="cp-card-title">${esc(p.subject)}<span class="tag${state === "started" ? " rx-on" : state === "live" ? " ag" : ""}">${{ started: "Started", old: "Earlier plan", live: "Plan" }[state]}</span></p>
+      <p class="sp-pl-aim">${esc(p.mission)}</p>
+      <p class="sp-pl-k">I'll research ${plural(p.segs.length, "question")}:</p><ol class="sp-pl-q">${p.segs.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
+      <p class="sp-pl-k">Where I'll look</p><p class="note">${p.mine ? "Only your Commonplace (14 things on this) and books. No open web." : "Your Commonplace first (14 things on this), then journals, books and the open web."}</p>
+      <p class="sp-pl-k">What you'll get</p><p class="note">A course of about ${plural(lessons, "lesson")}, Watch and Read, about ${plural(weeks, "week")} at ${p.time} hours a week. The readings, saved to your Commonplace, and new questions for your goals.</p>
+      <p class="sp-pl-cost">${svg("schedule", 13)}<span>Ready in ${DEPTHS[p.depth].note}${p.depth === "deep" ? ", checked twice" : ""}. You don't need to wait.<br>Uses about ${pctAllow(c)}% of your monthly allowance, and never more than ${pctAllow(c * 1.5)}%.${S.builder ? ` <b>$${c.toFixed(2)} estimated, budget $${(Math.ceil(c * 1.5 * 2) / 2).toFixed(2)}</b>` : ""}</span></p>
+      ${done ? "" : `<div class="acts">${btn("Start the study", 'data-act="st-start"')}${btn("Change the plan", 'data-act="st-change"', "quiet")}${btn("Not now", 'data-act="st-not"', "quiet")}</div>`}</div>`;
+  }
+  function startStudy() {
+    const p = C.plan; if (!p) return;
+    const st = { id: "st" + ++iid, subject: p.subject, short: p.short, on: "you", depth: p.depth, state: "running", step: 1, tick: 0, mins: DEPTHS[p.depth].mins,
+      started: `Today, ${clk().replace(/^0/, "")}`, use: p.use, know: p.know, time: p.time, mine: p.mine, special: p.special, mission: p.mission,
+      segs: p.segs.map((q, i) => ({ q, kept: 3 + ((i + q.length) % 3) })), log: [`Plan agreed: ${plural(p.segs.length, "question")}`] };
+    STUDIES.unshift(st);
+    ACT.unshift({ day: "Today", t: st.started.replace("Today, ", "0"), sid: st.id, what: `started: ${plural(st.segs.length, "question")} to research`, state: "study", live: true });
+    const msg = [...C.all, ...Object.values(C.per).flat()].reverse().find((m) => m.card === "plan" && !m.started); if (msg) msg.started = true;
+    C.plan = null; C.sq = null;
+    openStudy(st.id); S.ptab = "all";
+    C.force = "all"; lociSay(`Started. It's open on the left, and in Tasks. You can leave: it'll be on Today when it's ready, in ${DEPTHS[st.depth].note}.`); C.force = null;
+    toast(`Loci is studying “${st.short}”.`);
+  }
+  function studyAnswer(s, st, text) {
+    const run = st.state !== "done";
+    if (/how('s| is) it going|progress|how long|when will|ready yet|status/.test(s)) {
+      lociSay(run ? `${stPct(st)}% done. ${stPhase(st)}${st.state === "stopped" ? ", stopped" : `; about ${plural(stLeft(st), "minute")} left`}. So far it has kept ${st.segs.slice(0, Math.max(0, st.step - 1)).reduce((a, x) => a + x.kept, 0)} sources.` : `It finished ${st.ready.replace(/^Today, /, "today, ")}: a course of ${plural(st.lessons.length, "lesson")}, and ${st.readings} readings saved.`); return true;
+    }
+    if (run && /\b(stop|cancel|pause)\b/.test(s)) { st.state = "stopped"; lociSay("Stopped. What it found so far is kept. Say “finish it” or press Finish it to carry on."); return true; }
+    if (run && /\b(finish it|carry on|resume|continue)\b/.test(s)) { st.state = "running"; lociSay("Carrying on from where it stopped."); return true; }
+    if (run && /add (a )?question|also (look|research)|look into/.test(s)) {
+      const q = text.replace(/^.*?(add (a )?question|also (look at|research)|look into)( about| on)?:?\s*/i, "").replace(/[?.!]$/, "").trim() || "How it applies to the prayer hall";
+      st.segs.push({ q: cap(q), kept: 3 }); st.mins += Math.round(st.mins / st.segs.length);
+      lociSay(`Added as question ${st.segs.length}: “${cap(q)}”. It adds about ${Math.round(DEPTHS[st.depth].mins / DEPTHS[st.depth].segs)} minutes and ${pctAllow(DEPTHS[st.depth].perSeg)}% of your allowance.`); return true;
+    }
+    if (!run && /\bwhy\b.*lesson|why these|why this order/.test(s)) {
+      lociSay(`Each lesson answers a question from the plan, in the order you'll need them: ${andJoin(st.lessons.slice(0, 3).map((l) => `“${l.t}”`))}, and so on. ${st.know === "new" ? "You said it's new to you, so it starts with the basics." : "You said you know some, so it skips the basics."} The last one puts it together${st.use === "project" ? " for the prayer hall" : ""}, with a check.`); return true;
+    }
+    if (!run && /unsure|not sure|open|gaps?|confiden|disagree/.test(s)) {
+      const weak = st.found.filter((x) => x.conf === "Mixed" || x.conf === "Thin");
+      lociSay(weak.length ? `Where it's least sure:\n${weak.map((x) => `${x.q} (${x.conf.toLowerCase()}): ${x.a}`).join("\n")}` : "Every finding has at least three sources that agree. Nothing is marked unsure."); return true;
+    }
+    if (!run && /shorter|fewer lessons|too long/.test(s)) {
+      const n = Math.max(3, st.lessons.length - 2);
+      lociSay(`I can merge it into ${plural(n, "lesson")}, keeping the first and the last. Nothing you've done is lost.`, { opts: optsOf([[`Make it ${plural(n, "lesson")}`, "st-shorter", st.id], ["Keep it as it is", "st-keep"]]) }); return true;
+    }
+    if (!run && /up to date|new work|watch for|keep (an eye|me)/.test(s)) { watchFromStudy(st); C.force = "all"; lociSay("It's in the form on the left: a Finds routine on this subject, reading the best sources this study found. Turn it on when you're ready."); return true; }
+    lociSay(run ? "I can tell you how it's going, add a question, or stop it. What it finds is kept either way." : "Ask me why these lessons, what's still unsure, or to make the course shorter. Or keep it up to date with a Finds routine.");
+    return true;
+  }
+  function watchFromStudy(st) {
+    const d = blank("schedule"); edSet(d, "skind", "follow");
+    d.every = "w1"; d.time = "08:00"; d.label = st.short; d.name = `New work: ${st.short}`; d.place = TOPICS.includes(st.on) ? st.on : "you";
+    d.sources = st.sources.filter(([, m]) => /journal|Paper/.test(m)).map(([t, m]) => m.split(" · ")[1] || t).slice(0, 2).concat(["Building-science journal"]).filter((x, i, a) => a.indexOf(x) === i);
+    startEdit(d, true, null);
+  }
+
   /* ================================================================ the right: the Loci panel, as everywhere in the app */
-  const tkey = () => (S.ptab === "this" && curId() ? curId() : "all");
+  const tkey = () => (S.ptab === "this" && S.study ? S.study : S.ptab === "this" && curId() ? curId() : "all");
   const threadOf = (k) => (k === "all" ? C.all : (C.per[k] = C.per[k] || []));
   const thread = () => threadOf(C.force || tkey());
   const lociSay = (text, extra = {}) => thread().push({ from: "ai", text, ...extra });
@@ -777,6 +1065,8 @@
       extra = `<div class="cp-card rx-draft" id="rx-draft"><p class="cp-card-title">${esc(d.name)}<span class="tag ag">Draft</span></p><p class="rx-say">${sentence(d, "draft")}</p>
         ${d.type === "arrive" ? `<p class="note">${chip("draft", "mode", modeLabel(d))} · tap an underlined word to change it.</p>${tryHTML(d)}` : `<p class="note">Tap an underlined word to change it.</p>`}${S.builder ? builderNote(d) : ""}
         <div class="acts">${btn("Turn it on", 'data-act="turn-on"')}${btn("Edit in full", 'data-act="draft-edit"', "quiet")}${btn("Discard", 'data-act="discard"', "quiet")}</div></div>`;
+    } else if (m.card === "plan" && m.plan) {
+      extra = planCard(m.plan, m.started ? "started" : m.plan === C.plan ? "live" : "old");
     } else if (m.card === "snap") {
       extra = `<div class="cp-card rx-draft" data-snap><p class="cp-card-title">${esc(m.snapName || "Routine")}<span class="tag${m.done ? " rx-on" : ""}">${m.done ? "On" : "Earlier draft"}</span></p><p class="rx-say">${m.snap}</p></div>`;
     } else if (m.rows) {
@@ -800,11 +1090,13 @@
     const on = ROUTINES.filter((r) => r.on).length;
     const ideas = [
       S.noticed === "open" ? { a: "noticed", b: "File dezeen.com links as Precedents", em: "You did this by hand 7 times this month", small: "Do it" } : null,
+      { a: "st-idea", v: "Mashrabiya and daylight in prayer halls", b: "Study mashrabiya and daylight, in depth", em: "You have 2 open questions on Daylight & shading", small: "Plan it" },
       { a: "idea", v: "Every evening, sort what I haven't sorted", b: "Sort Unsorted every evening", em: "9 things are sitting in Unsorted", small: "Set up" },
       { a: "idea", v: "Every Monday, find new papers on Daylight & shading", b: "New papers on Daylight & shading", em: "You have 2 open questions there", small: "Set up" },
     ].filter(Boolean);
     return `<div class="cp-home"><h2 class="hello">Good morning, Layla.</h2>
       <div class="progress-card"><div class="rx-big" aria-hidden="true">${on}</div><div><b>${plural(on, "routine")} on</b><span>${filedThisWeek()} things filed for you this week</span></div></div>
+      ${STUDIES.filter((x) => x.state === "running" || (x.state === "done" && !x.seen)).map((x) => `<button type="button" class="rx-waitline rx-studyline" data-act="open-study" data-v="${x.id}"><span aria-hidden="true" class="rk-gl sm">${svg("study", 13)}</span><span><b>${x.state === "done" ? `Your study is ready: ${esc(x.short)}` : `Studying ${esc(x.short)} · ${stPct(x)}%`}</b><em>${x.state === "done" ? `A course of ${plural(x.lessons.length, "lesson")}` : x.state === "stopped" ? "Stopped" : `Ready in about ${plural(stLeft(x), "minute")}`}</em></span><span aria-hidden="true">›</span></button>`).join("")}
       ${newFinds() ? `<button type="button" class="rx-waitline rx-findline" data-act="seg" data-v="finds"><span aria-hidden="true" class="rk-gl sm">${svg("search", 13)}</span><span><b>${plural(newFinds(), "new find")} to look through</b><em>Top pick: ${esc((() => { const iss = ISSUES.find((x) => openOf(x)); return iss ? (iss.items.find((f) => f.top && !f.st) || iss.items.find((f) => !f.st)).title : ""; })())}</em></span><span aria-hidden="true">›</span></button>` : ""}
       ${W.length ? `<button type="button" class="rx-waitline" data-act="seg" data-v="waiting"><span aria-hidden="true" class="rk-gl q sm">?</span><span><b>${plural(W.length, "thing")} waiting for a quick look</b><em>Your routines weren't sure about these</em></span><span aria-hidden="true">›</span></button>` : ""}
       <div class="cp-sec"><div class="sec-h"><span>Ideas for you</span></div><div class="rx-rows">${ideas.map((x) => `<button type="button" class="cp-row" data-act="${x.a}" data-v="${esc(x.v || "")}"><span aria-hidden="true" class="dot rx-dot-ghost"></span><span><b>${esc(x.b)}</b><em>${esc(x.em)}</em></span><small>${esc(x.small)}</small></button>`).join("")}</div></div></div>`;
@@ -812,21 +1104,29 @@
   function panel() {
     const id = curId(), r = id ? RR(id) : null, inThis = !!(r && S.ptab === "this"), peek = mobile() && !S.sheet;
     const fold = mobile() ? `<button aria-label="Fold Loci away" class="icb" title="Fold Loci away" type="button" data-act="fold">${svg("fold")}</button>` : "";
-    const head = r
+    const st = S.study ? studyById(S.study) : null, inSt = !!(st && S.ptab === "this");
+    const head = st
+      ? `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Study · ${DEPTHS[st.depth].label}</span><button aria-label="Close this study" class="icb" title="Close this study" type="button" data-act="back">${svg("close", 15)}</button>${fold}</div>
+        <div class="cp-title"><span aria-hidden="true" class="dot ${st.state === "running" ? "s1" : "s2"}"></span><h2>${esc(st.short)}</h2></div>
+        <div aria-label="Conversation" class="cp-tabs" role="tablist"><button aria-selected="${!inSt}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="all"><span class="cp-tab-name">All tasks</span></button><button aria-selected="${inSt}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="this"><span class="cp-tab-name">This study</span></button></div></div>`
+      : r
       ? `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Routine · ${esc(GROUP[r.type])}</span><button aria-label="Close this routine" class="icb" title="Close this routine" type="button" data-act="back">${svg("close", 15)}</button>${fold}</div>
         <div class="cp-title"><span aria-hidden="true" class="dot ${r.on ? "s2" : "s0"}"></span><h2>${esc(r.name)}</h2></div>
         <div aria-label="Conversation" class="cp-tabs" role="tablist"><button aria-selected="${!inThis}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="all"><span class="cp-tab-name">All routines</span></button><button aria-selected="${inThis}" class="cp-tab" role="tab" type="button" data-act="ptab" data-v="this"><span class="cp-tab-name">This routine</span></button></div></div>`
-      : `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Loci · Routines</span>${fold}</div><div class="cp-title cp-peek-title"><h2>Your routines</h2></div></div>`;
+      : `<div class="cp-head"><div class="cp-toprow"><span class="cp-kicker">Loci · Tasks</span>${fold}</div><div class="cp-title cp-peek-title"><h2>Your tasks</h2></div></div>`;
     const editing = S.edit && (S.edit.isNew ? !inThis : inThis);
-    const body = inThis
+    const body = inSt
+      ? (threadOf(st.id).length ? "" : `<p class="cp-empty">${st.state === "done" ? `Ask me anything about this study: why these lessons, what's still unsure, or what to change.` : `Ask how it's going, add a question, or stop it. What it finds is kept either way.`}</p>`) + threadHTML(st.id)
+      : inThis
       ? (threadOf(r.id).length ? "" : `<p class="cp-empty">${S.edit ? `Tell me what to change, and I'll change it in the form. Nothing is saved until you press Save.` : `Ask me anything about “${esc(r.name)}”, or tell me what to change. Changes show on the page, with Undo.`}</p>`) + threadHTML(r.id)
       : (S.edit && S.edit.isNew && !C.all.length ? `<p class="cp-empty">Tell me what this routine should do, and I'll fill in the form for you.</p>` : homeBody()) + threadHTML("all");
-    const prompts = inThis && r.kind === "follow" ? ["What did you find today?", "Only papers", "Up to 10 finds", r.on ? "Pause it" : "Turn it back on", S.edit ? null : "Edit it"].filter(Boolean)
+    const prompts = inSt ? (st.state === "done" ? ["Why these lessons?", "What's still unsure?", "Make the course shorter", "Keep me up to date on this"] : ["How is it going?", "Add a question about precedents", st.state === "stopped" ? "Finish it" : "Stop it"])
+      : inThis && r.kind === "follow" ? ["What did you find today?", "Only papers", "Up to 10 finds", r.on ? "Pause it" : "Turn it back on", S.edit ? null : "Edit it"].filter(Boolean)
       : inThis
       ? [S.edit ? null : "What did it do this week?", r.type === "arrive" ? (r.mode === "own" ? "Ask me before filing" : "Stop asking, just file them") : null, r.type === "arrive" && !S.edit ? "Why did it file the last one there?" : null, r.on ? "Pause it" : "Turn it back on", S.edit ? null : "Edit it"].filter(Boolean)
-      : ["What did you find today?", "What did my routines do this week?", "What's waiting for me?", "Why was something filed where it was?", "How do routines work?"];
+      : ["What are you working on?", "Study something in depth", "What did you find today?", "What did my routines do this week?", "What's waiting for me?", "How do tasks work?"];
     const comp = `<div class="cp-comp"><div class="prompts">${prompts.map((p) => `<button type="button" data-act="prompt" data-v="${esc(p)}">${esc(p)}</button>`).join("")}</div>
-      <form class="box" data-form="chat">${inThis ? `<span class="scope">About ${esc(r.name)}<button aria-label="Ask about all routines instead" type="button" data-act="ptab" data-v="all">×</button></span>` : ""}<label class="visually-hidden" for="rx-text">Ask Loci</label><textarea id="rx-text" maxlength="4000" rows="2" placeholder="${inThis ? (peek ? `Ask Loci about ${esc(r.name)}…` : `Ask about ${esc(r.name)}, or say what to change…`) : peek ? "Ask Loci about your routines…" : editing ? "Tell Loci what it should do…" : "Ask about your routines, or say what should happen…"}">${esc(C.input)}</textarea><div class="tools"><span class="grow"></span><button aria-label="Send" class="send" type="submit">${svg("send")}</button></div></form></div>`;
+      <form class="box" data-form="chat">${inSt ? `<span class="scope">About ${esc(st.short)}<button aria-label="Ask about all tasks instead" type="button" data-act="ptab" data-v="all">×</button></span>` : inThis ? `<span class="scope">About ${esc(r.name)}<button aria-label="Ask about all routines instead" type="button" data-act="ptab" data-v="all">×</button></span>` : ""}<label class="visually-hidden" for="rx-text">Ask Loci</label><textarea id="rx-text" maxlength="4000" rows="2" placeholder="${inSt ? `Ask about ${esc(st.short)}…` : inThis ? (peek ? `Ask Loci about ${esc(r.name)}…` : `Ask about ${esc(r.name)}, or say what to change…`) : peek ? "Ask Loci about your tasks…" : editing ? "Tell Loci what it should do…" : "Ask about your tasks, say what should happen, or what to study…"}">${esc(C.input)}</textarea><div class="tools"><span class="grow"></span><button aria-label="Send" class="send" type="submit">${svg("send")}</button></div></form></div>`;
     return `${mobile() && S.sheet ? '<div class="rx-scrim" data-act="fold"></div>' : ""}<div class="cpwrap rx-cpwrap${mobile() ? " is-sheet" : ""}${S.sheet && mobile() ? " is-open" : ""}"${peek ? ' data-drawer="peek"' : ""}><section aria-label="Loci" class="cp" tabindex="-1">${peek ? "" : head + `<div class="cp-body gin" id="rx-body" role="tabpanel">${body}</div>`}${comp}</section></div>`;
   }
 
@@ -1043,6 +1343,10 @@
     return `“${x.t}” was filed ${x.w.replace(/ · you checked it$/, "")} because ${andJoin(conds)}.${pos > 1 ? ` “${r.name}” is ${ord(pos)} in line, and none of the ${plural(pos - 1, "routine")} above it fit.` : ` “${r.name}” is first in line, so it gets the first look.`}\nIf it's wrong, undo it in Activity and I'll count it as a miss.`;
   }
   function answer(s, r) {
+    if (!r && /working on|what are you (doing|studying)|\bstudies\b|my studies/.test(s)) {
+      lociSay(`${plural(STUDIES.filter((x) => x.state === "running").length, "study is", "studies are")} working now, and ${plural(ROUTINES.filter((x) => x.on).length, "routine is", "routines are")} on:`, { rows: STUDIES.map((x) => ({ a: "open-study", v: x.id, b: x.short, em: x.state === "done" ? `A course of ${plural(x.lessons.length, "lesson")} · ready ${x.ready.replace(/^Today, /, "today, ")}` : `${stPct(x)}% · ${stPhase(x)}`, small: x.state === "done" ? (x.seen ? "Done" : "Ready") : x.state === "stopped" ? "Stopped" : "Working", dot: x.state === "done" ? "s2" : "s1" })), opts: optsOf([["What did my routines do this week?", "say"]]) });
+      return true;
+    }
     if (/\bfinds?\b|what's new|what did (you|it) find|\bnews\b/.test(s) && !(r && r.kind !== "follow")) {
       const iss = r ? issuesOf(r.id)[0] : ISSUES.find((x) => openOf(x)) || ISSUES[0];
       if (!iss) { lociSay(r ? `“${r.name}” hasn't run yet. Its first finds come ${fNext(nextRun(r))}.` : "No finds yet."); return true; }
@@ -1071,11 +1375,11 @@
       lociSay(whyText(rr, x), { opts: optsOf([["Open Activity", "goto", "activity"], ...(r ? [] : [[`Open “${rr.name}”`, "open", rr.id]])]) });
       return true;
     }
-    if (!r && /how (do|does|can|would)|how .* work|what (is|are) (a )?routines?/.test(s)) {
-      lociSay("A routine is something I do for you, the way you asked. There are three kinds:\nWhen you send something (from WhatsApp, email, your phone or the browser), I file it where you said.\nOn a schedule, I tidy, bring things in, or quiz you.\nAfter you do something, like finishing a Lumen, I follow up.\nTo make one, press New routine, or just tell me what should happen. To change one, open its card.", { opts: optsOf([["When I send a voice note on WhatsApp, write it out", "say"], ["Every evening, sort what I haven't sorted", "say"]]) });
+    if (!r && /how (do|does|can|would)|how .* work|what (is|are) (a )?(routines?|tasks?|stud(y|ies))/.test(s)) {
+      lociSay("A task is work I do for you while you're away. There are two kinds.\nA routine runs every time something happens: when you send something, on a schedule, or after you do something. I file it, bring things in, or follow up.\nA study runs once, in depth. I ask four questions, show you a plan with its time and cost, and once you agree I research it for 20 minutes to an hour and build you a course. You don't need to wait: it's on Today when it's ready.\nTo make either, press New task, or just tell me.", { opts: optsOf([["When I send a voice note on WhatsApp, write it out", "say"], ["Every evening, sort what I haven't sorted", "say"]]) });
       return true;
     }
-    if (/cost|how much|allowance/.test(s)) { lociSay("Your routines use about 4% of your monthly allowance. Plain rules (where something came from, what kind it is, a tag, a site) cost nothing. A little is used only when I read an item, to find a book or describe a photo, and a run with nothing new costs nothing."); return true; }
+    if (/cost|how much|allowance/.test(s)) { lociSay("A study uses about 17% of your monthly allowance (standard) or 40% (deep), and I show it before it starts. Your routines use about 4%. Plain rules (where something came from, what kind it is, a tag, a site) cost nothing. A little is used only when I read an item, to find a book or describe a photo, and a run with nothing new costs nothing."); return true; }
     if (r && /what does|what is it|explain/.test(s)) { lociSay(`“${r.name}”: ${sentence(r).replace(/<[^>]+>/g, "")}`); return true; }
     return false;
   }
@@ -1088,7 +1392,11 @@
     if (hit) { onOpt(pending, hit, text); return; }
     meSay(text);
     think(() => {
-      const s = low, r = tkey() !== "all" ? RR(tkey()) : null;
+      const s = low, r = tkey() !== "all" ? RR(tkey()) : null, stx = studyById(tkey());
+      if (stx) { studyAnswer(s, stx, text); return; }
+      if (C.sq && C.sq.awaiting) { beginStudy(subjectFrom(text) || text); return; }
+      if (/^study something( new)?( in depth)?$/.test(s)) { beginStudy(""); return; }
+      if (!r && studyIntent(s)) { if (S.edit && S.edit.isNew) S.edit = null; beginStudy(subjectFrom(text)); return; }
       if (C.pendingDelete) { const x = RR(C.pendingDelete); C.pendingDelete = null; if (/\b(yes|delete)\b/.test(s)) deleteRoutine(x); else lociSay("Kept it."); return; }
       if (/^(cancel|never mind|forget it|stop)$/.test(s)) { snapDrafts(); clearDraft(); lociSay("Cancelled. Nothing changed."); return; }
       if (r) {
@@ -1143,6 +1451,17 @@
         case "set-delay": d.delay = v; break;
         case "anyway": if (C.draft.type === "arrive") { queueArrive(C.pendingSaid || {}); lociSay(understood(C.draft)); } ask(); return;
         case "open-issue-opt": openIssue(v, "finds"); lociSay("It's open on the left."); return;
+        case "find-study": { const [f] = findById(v); if (!f) return; beginStudy(f.title.replace(/ \(example[^)]*\)$/, "")); return; }
+        case "st-know": C.sq.know = v; lociSay("What is it for?", { opts: optsOf([["The prayer hall project", "st-use", "project"], ["A talk or a client meeting", "st-use", "talk"], ["Just to understand it", "st-use", "general"]]) }); return;
+        case "st-use": C.sq.use = v; lociSay("How much time a week can you give it?", { opts: optsOf([["About 1 hour", "st-time", "1"], ["About 3 hours", "st-time", "3"], ["5 hours or more", "st-time", "5"]]) }); return;
+        case "st-time": C.sq.time = Number(v); lociSay("How deep should I go?", { opts: optsOf([[`Standard: ${DEPTHS.standard.how}, about ${pctAllow(costFor("standard", 3))}% of your allowance`, "st-depth", "standard"], [`Deep: ${DEPTHS.deep.how}, about ${pctAllow(costFor("deep", 5))}%`, "st-depth", "deep"]]) }); return;
+        case "st-depth": C.sq.depth = v; C.plan = makePlan(C.sq); lociSay("Here's my plan. Nothing starts until you say so.", { card: "plan", plan: C.plan }); return;
+        case "st-fewer": if (C.plan && C.plan.segs.length > 2) C.plan.segs.pop(); C.plan = { ...C.plan }; lociSay("One question fewer:", { card: "plan", plan: C.plan }); return;
+        case "st-addapp": if (C.plan && !C.plan.segs.some((x) => /prayer hall/.test(x))) C.plan.segs.push("How it applies to the prayer hall"); C.plan = { ...C.plan }; lociSay("Added:", { card: "plan", plan: C.plan }); return;
+        case "st-mine": C.plan = { ...C.plan, mine: !C.plan.mine }; lociSay(C.plan.mine ? "Only your Commonplace and books, no open web. It costs a little less, and finds less that's new." : "Back to the open web too:", { card: "plan", plan: C.plan }); return;
+        case "st-deeper": { const d2 = C.plan.depth === "deep" ? "standard" : "deep"; C.plan = makePlan({ ...C.sq, depth: d2 }); C.sq.depth = d2; lociSay(d2 === "deep" ? "Deeper: five questions, and a second check." : "Lighter: three questions.", { card: "plan", plan: C.plan }); return; }
+        case "st-shorter": { const st = studyById(v); if (!st) return; const mid = st.lessons.slice(1, -1), drop = new Set([...mid].sort((a, b) => a.min - b.min).slice(0, Math.min(2, mid.length - 1))); const keep = [st.lessons[0], ...mid.filter((l) => !drop.has(l)), st.lessons[st.lessons.length - 1]]; st.lessons = keep; st.done = Math.min(st.done || 0, keep.length - 1); lociSay(`Done: ${plural(keep.length, "lesson")} now. The page shows it.`); return; }
+        case "st-keep": lociSay("Kept as it is."); return;
         case "find-lumen": { const [f] = findById(v); if (!f) return; f.st = "saved"; lociSay(`Saved, and I've started a Lumen from it: “${f.title.replace(/ \(example[^)]*\)$/, "")}”. It'll be in Learn in a few minutes, on ${PLACES[f.on]?.name || "your map"}.`); return; }
         case "find-compare": { const [f] = findById(v); if (!f) return; lociSay(`Closest in your Commonplace, on ${PLACES[f.topic]?.name || "your map"}:`, { rows: [{ a: "noop", b: "Courtyard cooling study (example).pdf", em: "PDF · saved 12 Oct", small: "Agrees" }, { a: "noop", b: "Climate Considerations in Building and Urban Design", em: "Book · Baruch Givoni", small: "Older view" }] }); return; }
         case "find-save": { const [f] = findById(v); if (!f) return; f.st = "saved"; lociSay(`Saved as ${f.as} on ${PLACES[f.on]?.name || "your map"}.`); return; }
@@ -1166,8 +1485,8 @@
     C.force = "all";
     lociSay(`Deleted “${r.name}”. What it filed stays where it is.`, { opts: optsOf([["Bring it back", "restore"]]) });
   }
-  function openRoutine(id) { S.issue = null; S.open = id; S.edit = null; S.newer = false; S.ptab = "this"; S.seg = "routines"; S.pop = null; C.resetScroll = true; }
-  function goSeg(v) { S.issue = null; S.seg = v; S.open = null; S.edit = null; S.newer = false; S.ptab = "all"; C.resetScroll = true; if (mobile()) S.sheet = false; }
+  function openRoutine(id) { S.study = null; S.issue = null; S.open = id; S.edit = null; S.newer = false; S.ptab = "this"; S.seg = "routines"; S.pop = null; C.resetScroll = true; }
+  function goSeg(v) { S.study = null; S.issue = null; S.seg = v; S.open = null; S.edit = null; S.newer = false; S.ptab = "all"; C.resetScroll = true; if (mobile()) S.sheet = false; }
   function flash(id, ms) { S.flash = id; setTimeout(() => { if (S.flash === id) { S.flash = null; render(); } }, ms); }
 
   /* ================================================================ tap a word to change it */
@@ -1264,7 +1583,7 @@
     $$(".td-ev", root).forEach((x) => x.remove());
     const dl = $(".td-dayline", root); if (dl) dl.innerHTML = "<b>Today</b> · your routines filed 6 things overnight";
     const filed = 6 + ACT.filter((a) => a.live && a.state === "filed").length;
-    $(".td-top", root)?.insertAdjacentHTML("afterend", `<section class="rx-today" aria-labelledby="rx-today-h"><div class="td-h is-plain"><h2 id="rx-today-h">From your routines</h2><span><a href="#routines" data-act="go-routines">All routines</a></span></div>
+    $(".td-top", root)?.insertAdjacentHTML("afterend", `<section class="rx-today" aria-labelledby="rx-today-h"><div class="td-h is-plain"><h2 id="rx-today-h">From Loci</h2><span><a href="#routines" data-act="go-routines">All tasks</a></span></div>${STUDIES.filter((x) => x.state !== "done" || !x.seen || stNext(x)).slice(0, 2).map((x) => x.state !== "done" ? `<button type="button" class="rx-todaycard study" data-act="today-study" data-v="${x.id}"><span class="kicker">Loci is studying for you</span><b>“${esc(x.short)}”: ${stPct(x)}% done${x.state === "stopped" ? ", stopped" : `, ready in about ${plural(stLeft(x), "minute")}`}.</b><em>See how it's going</em></button>` : !x.seen ? `<button type="button" class="rx-todaycard study ready" data-act="today-study" data-v="${x.id}"><span class="kicker">Your study is ready</span><b>“${esc(x.short)}”: a course of ${plural(x.lessons.length, "lesson")}, and ${x.readings} readings saved.</b><em>Start the course</em></button>` : `<button type="button" class="rx-todaycard study" data-act="today-study" data-v="${x.id}"><span class="kicker">Next in your study · ${esc(x.short)}</span><b>Lesson ${(x.done || 0) + 1} of ${x.lessons.length}: ${esc(stNext(x).t)}. ${stNext(x).f}, ${stNext(x).min} minutes.</b><em>Continue</em></button>`).join("")}
       <button type="button" class="rx-todaycard" data-act="today-look"><span class="kicker">Since yesterday evening</span><b>Your routines filed ${filed} things for you.${W.length ? ` ${plural(W.length, "thing is", "things are")} waiting for a quick look.` : ""}</b><em>${W.length ? "Look now" : "See your routines"}</em></button>${(() => { const iss = ISSUES.find((x) => openOf(x)); if (!iss) return ""; const fr = RR(iss.rid), top = iss.items.find((f) => f.top) || iss.items[0]; return `<button type="button" class="rx-todaycard finds" data-act="today-finds" data-v="${iss.id}"><span class="kicker">This morning's finds · ${esc(fr ? fr.name : "")}</span><b>${plural(openOf(iss), "new find")}. Top pick: “${esc(top.title)}”.</b><em>Look through them</em></button>`; })()}</section>`);
   }
   function everythingView() {
@@ -1294,6 +1613,7 @@
   function canvas() {
     if (S.edit) return editorView();
     if (S.newer) return newView();
+    if (S.study && studyById(S.study)) return studyPage(studyById(S.study));
     if (S.issue && issueById(S.issue)) return issuePage(issueById(S.issue));
     const r = S.open && RR(S.open);
     if (r) return routinePage(r);
@@ -1305,11 +1625,12 @@
   }
   function crumb() {
     const r = S.open && RR(S.open);
-    if (S.edit) return ["Routines", S.edit.isNew ? "New routine" : `${RR(S.edit.id)?.name || ""}: editing`];
-    if (S.newer) return ["Routines", "New routine"];
+    if (S.edit) return ["Tasks", S.edit.isNew ? "New routine" : `${RR(S.edit.id)?.name || ""}: editing`];
+    if (S.newer) return ["Tasks", "New task"];
+    if (S.study && studyById(S.study)) return ["Tasks", studyById(S.study).short];
     if (S.issue && issueById(S.issue)) return ["Finds", issueById(S.issue).date];
-    if (r) return ["Routines", r.name];
-    return [{ routines: "Routines", finds: "Finds", waiting: "Waiting", activity: "Activity", connections: "Connections" }[S.seg]];
+    if (r) return ["Tasks", r.name];
+    return [{ routines: "Tasks", finds: "Finds", waiting: "Waiting", activity: "Activity", connections: "Connections" }[S.seg]];
   }
   function render() {
     const scroll = window.scrollY, active = document.activeElement?.id;
@@ -1320,13 +1641,13 @@
     else {
       shell("library");
       $$(`.navigation-rail .navigation-link[href="/loci"], .tab-bar .tab-bar-link[href="/loci"]`, root).forEach((a) => a.setAttribute("aria-current", "page"));
-      $("main", root).innerHTML = `<h1 class="visually-hidden">Routines</h1>${header("routines", crumb())}<div class="rx-split"><div class="rx-canvas">${canvas()}</div>${panel()}</div>`;
+      $("main", root).innerHTML = `<h1 class="visually-hidden">Tasks</h1>${header("routines", crumb())}<div class="rx-split"><div class="rx-canvas">${canvas()}</div>${panel()}</div>`;
       const c = $(".rx-canvas", root); if (c) c.scrollTop = canvasScroll;
       const st = $(".main-stage", root); if (st) st.scrollTop = stageScroll;
       const b = $("#rx-body", root); if (b && (threadOf(tkey()).length || C.typing)) b.scrollTop = b.scrollHeight;
     }
     if (S.pop) root.insertAdjacentHTML("beforeend", popHTML());
-    root.insertAdjacentHTML("beforeend", `<div class="sm-proto rx-proto" role="group" aria-label="Prototype controls"><span>Prototype</span>${[["routines", "Routines"], ["today", "Today"]].map(([k, l]) => `<button type="button" data-act="view" data-v="${k}" aria-pressed="${S.view === k}">${l}</button>`).join("")}<i class="sm-proto-sep" aria-hidden="true"></i><button type="button" data-act="send-open" aria-expanded="${S.sendOpen}">Send something…</button><button type="button" data-act="builder" aria-pressed="${S.builder}">Builder</button></div>`);
+    root.insertAdjacentHTML("beforeend", `<div class="sm-proto rx-proto" role="group" aria-label="Prototype controls"><span>Prototype</span>${[["routines", "Loci"], ["today", "Today"]].map(([k, l]) => `<button type="button" data-act="view" data-v="${k}" aria-pressed="${S.view === k}">${l}</button>`).join("")}<i class="sm-proto-sep" aria-hidden="true"></i><button type="button" data-act="send-open" aria-expanded="${S.sendOpen}">Send something…</button><button type="button" data-act="builder" aria-pressed="${S.builder}">Builder</button></div>`);
     if (S.sendOpen) root.insertAdjacentHTML("beforeend", `<div class="rx-sendpop" role="dialog" aria-label="Send something"><p class="rx-popk">Send something to Studiolo (simulated)</p>${SEND.map((m) => `<button type="button" class="rx-opt rx-plain" data-act="send" data-v="${m.id}"${S.sent.has(m.id) ? " disabled" : ""}>${esc(m.label)}</button>`).join("")}<p class="rx-sendnote">See what your routines do with it: filed on its own, waiting for you, or not covered yet.</p></div>`);
     if (toastMsg) root.insertAdjacentHTML("beforeend", `<div class="sm-toast rx-toast" role="status"><span>${esc(toastMsg.t)}</span>${toastMsg.undo ? '<button type="button" data-act="toast-undo">Undo</button>' : ""}</div>`);
     window.scrollTo(0, C.resetScroll ? 0 : scroll);
@@ -1337,6 +1658,7 @@
 
   /* ================================================================ events */
   root.addEventListener("submit", (ev) => {
+    if (ev.target.matches('[data-form="study"]')) { ev.preventDefault(); const v = ($("#st-subject", root)?.value || "").trim(); if (v) startStudyChat(cap(v)); return; }
     if (!ev.target.matches('[data-form="chat"]')) return;
     ev.preventDefault();
     const t = ($("#rx-text", root)?.value || "").trim(); if (!t || C.typing) return;
@@ -1391,18 +1713,19 @@
         else { toast(`In the app this opens ${t.textContent.trim()}. This prototype has Everything and Routines.`); }
         break;
       }
-      case "tile": { const v = t.dataset.v; if (v === "waiting" || v === "activity" || v === "finds") goSeg(v); else { goSeg("routines"); S.only = v === "paused" ? "paused" : null; } break; }
+      case "tile": { const v = t.dataset.v; if (v === "studies") { goSeg("routines"); S.kind = S.kind === "study" ? "all" : "study"; break; } if (v === "waiting" || v === "activity" || v === "finds") goSeg(v); else { goSeg("routines"); S.only = v === "paused" ? "paused" : null; } break; }
       case "seg": goSeg(t.dataset.v); break;
       case "kind": S.kind = t.dataset.v; break;
       case "open-r": if (!r) return; openRoutine(r.id); break;
       case "back":
-        if (S.issue) { const from = S.issueFrom; S.issue = null; if (from && from !== "finds" && RR(from)) S.open = from; else { S.seg = "finds"; S.ptab = "all"; } }
+        if (S.study) { S.study = null; S.ptab = "all"; }
+        else if (S.issue) { const from = S.issueFrom; S.issue = null; if (from && from !== "finds" && RR(from)) S.open = from; else { S.seg = "finds"; S.ptab = "all"; } }
         else if (S.edit) { S.edit = null; }
         else { S.open = null; S.newer = false; S.ptab = "all"; }
         C.resetScroll = true; break;
       case "ptab": S.ptab = t.dataset.v; break;
       case "fold": S.sheet = false; break;
-      case "new": S.issue = null; S.newer = true; S.open = null; S.edit = null; S.ptab = "all"; C.resetScroll = true; break;
+      case "new": S.study = null; S.issue = null; S.newer = true; S.open = null; S.edit = null; S.ptab = "all"; C.resetScroll = true; break;
       case "tell": {
         if (mobile()) S.sheet = true;
         const lastMsg = C.all[C.all.length - 1];
@@ -1575,7 +1898,7 @@
         if (mobile()) S.sheet = true;
         S.ptab = "this"; C.force = iss.rid; meSay(`Tell me about “${f.title}”`);
         const q = f.why.find((w) => w.t === "q");
-        think(() => lociSay(`${f.sum}\nIt fits ${PLACES[f.topic]?.name || "your map"}, beside 3 things you've saved there.${q ? ` It may answer your question “${q.v}”.` : ""}`, { opts: optsOf([["Save it and make a Lumen", "find-lumen", f.id], ["Compare with what I've saved", "find-compare", f.id], ["Just save it", "find-save", f.id]]) }), 500);
+        think(() => lociSay(`${f.sum}\nIt fits ${PLACES[f.topic]?.name || "your map"}, beside 3 things you've saved there.${q ? ` It may answer your question “${q.v}”.` : ""}`, { opts: optsOf([["Save it and make a Lumen", "find-lumen", f.id], ["Study this in depth", "find-study", f.id], ["Compare with what I've saved", "find-compare", f.id], ["Just save it", "find-save", f.id]]) }), 500);
         C.force = null; return;
       }
       case "iss-later": case "iss-clear": {
@@ -1598,6 +1921,23 @@
         return;
       }
       case "today-finds": go("routines"); openIssue(t.dataset.v, "finds"); break;
+      case "open-study": go("routines"); openStudy(t.dataset.v); break;
+      case "today-study": go("routines"); openStudy(t.dataset.v); break;
+      case "new-study": S.study = null; S.issue = null; S.newer = true; S.open = null; S.edit = null; S.ptab = "all"; C.resetScroll = true; break;
+      case "st-begin": { const v = ($("#st-subject", root)?.value || "").trim(); if (!v) { $("#st-subject", root)?.focus(); toast("Say what to study first, in a few words."); render(); return; } startStudyChat(cap(v)); return; }
+      case "st-idea": startStudyChat(t.dataset.v); return;
+      case "st-start": startStudy(); break;
+      case "st-change": C.force = "all"; lociSay("What should change?", { opts: optsOf([["One question fewer", "st-fewer"], ["Add: how it applies to the prayer hall", "st-addapp"], [C.plan?.mine ? "Use the open web too" : "Only my Commonplace and books", "st-mine"], [C.plan?.depth === "deep" ? "Make it standard" : "Make it deep", "st-deeper"]]) }); C.force = null; break;
+      case "st-not": C.force = "all"; C.plan = null; C.sq = null; lociSay("Fine, nothing started. Say “study …” whenever you want one."); C.force = null; break;
+      case "st-stop": { const st = studyById(t.dataset.v); if (st) { st.state = "stopped"; toast("Stopped. What it found so far is kept."); } break; }
+      case "st-resume": { const st = studyById(t.dataset.v); if (st) st.state = "running"; break; }
+      case "st-skip": { const st = studyById(t.dataset.v); if (!st) return; for (let i = 0; i < TPS && st.state === "running"; i++) advance(st); break; }
+      case "st-lesson": { const st = studyById(t.dataset.v); if (!st) return; const l = stNext(st); toast(`In the app, this opens “${l ? l.t : ""}” in Learn › Courses. Each lesson is made when you reach it.`); break; }
+      case "st-readings": { const st = studyById(t.dataset.v); toast(`In the app, this opens the collection “${st ? st.collection : ""}” in Commonplace.`); break; }
+      case "st-questions": toast("In the app, this opens Questions and goals, with the new questions at the top."); break;
+      case "st-sources": toast("In the app, this lists every source it kept, with why."); break;
+      case "st-watch": { const st = studyById(t.dataset.v); if (st) watchFromStudy(st); break; }
+      case "st-again": { const st = studyById(t.dataset.v); if (!st) return; S.study = null; S.ptab = "all"; C.force = "all"; meSay(`Study ${st.subject.toLowerCase()} again, deeper`); C.sq = { subject: st.subject, know: "some", use: st.use, time: st.time, depth: "deep" }; C.plan = makePlan(C.sq); lociSay("Here's a deeper plan. It starts from what the first study found, so it costs a little less.", { card: "plan", plan: C.plan }); C.force = null; break; }
       case "ed-addsrc": { const v = ($("#ed-src", root)?.value || "").trim(); if (!v) return; if (!S.edit.d.sources.includes(v)) S.edit.d.sources.push(v); break; }
       case "today-look": go("routines"); goSeg(W.length ? "waiting" : "routines"); break;
       case "go-routines": go("routines"); goSeg("routines"); break;
@@ -1618,6 +1958,17 @@
   if (start === "everything") S.view = "everything";
   if (["waiting", "activity"].includes(start)) S.seg = start;
   if (start === "new") S.newer = true;
+  if (start === "tasks") S.seg = "routines";
+  // the prototype's clock for studies: every 1.4 s a running study moves on a step; the page redraws if it shows it
+  setInterval(() => {
+    const run = STUDIES.filter((x) => x.state === "running"); if (!run.length) return;
+    run.forEach(advance);
+    const ae = document.activeElement;
+    if ((ae && /^(TEXTAREA|INPUT|SELECT)$/.test(ae.tagName) && ae.value) || S.pop || S.sendOpen || C.typing) return;
+    if (S.view === "today" || (S.view === "routines" && !S.edit && !S.newer && (S.study || (!S.open && !S.issue && S.seg === "routines")))) render();
+  }, 1400);
+  if (start === "study") { S.study = "st1"; S.ptab = "this"; }
+  if (start === "studying") { S.study = "st2"; S.ptab = "this"; }
   if (["finds", "connections"].includes(start)) S.seg = start;
   render();
 })();

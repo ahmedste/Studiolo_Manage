@@ -1,4 +1,14 @@
-# Routines (version 8): a Loci place, a flow editor of a trigger and steps, Finds and Connections
+# Tasks (version 9): studies and routines under Loci, with a flow editor, Finds and Connections
+
+**New in version 9: studies.** A study is a task Loci does **once, in depth, in the cloud**: it plans, researches each question in its own thread for 20 minutes to an hour, writes a course, and (deep only) checks it, while you get on with your day. Loci's tab is now **Tasks**, holding studies and routines: *Loci / Tasks · Finds · Waiting · Activity · Connections*.
+- **Start one** from **New task** (*Study something in depth*), by telling Loci ("I want to really understand stack ventilation"), or with **Study this in depth** on a find.
+- **Four questions** (what you know, what it's for, time a week, how deep), then **a plan** in Loci: the aim, the questions, where it'll look, what you'll get, when it's ready, and its cost as a share of your allowance with a ceiling. Nothing runs until **Start the study**.
+- **While it works:** a card with a progress bar in Tasks and on Today; the study's page shows each phase and what it's doing now. Ask how it's going, add a question, or stop it.
+- **When it's ready:** what Loci found (each finding marked Sure, Mostly, Mixed or Thin), the course (each lesson with what you'll be able to do and its source), readings saved, new questions, and **Keep it up to date** (a Finds routine).
+
+How it would run, on what, and at what cost: [`docs/superpowers/specs/2026-10-30-loci-tasks-and-studies-design.md`](../../docs/superpowers/specs/2026-10-30-loci-tasks-and-studies-design.md), with the cost model in [`routines-study/study-cost.mjs`](../../routines-study/study-cost.mjs).
+
+## Version 8: a Loci place, a flow editor of a trigger and steps, Finds and Connections
 
 Routines now live under **Loci**, in its own place in the rail after Graph (on a phone, a fifth tab): *Loci / Routines · Finds · Waiting · Activity · Connections*. Commonplace keeps its own tabs. The card language is the one designed for questions and goals in another session ([`prototypes/objects-boards-questions/`](https://github.com/ahmedste/Studiolo_Manage/tree/claude/gifted-cerf-w0cwoi/prototypes/objects-boards-questions) on branch `claude/gifted-cerf-w0cwoi`, Questions and goals design §10). Each routine has its own page and its own editor, and the Loci panel on the right is the app's own.
 
@@ -54,9 +64,18 @@ Design: [`docs/superpowers/specs/2026-10-29-routines-chat-ux-design.md`](../../d
 
 It's built on **Studiolo's real shell, Library and Today screens and styles**, captured read-only from `studiolo` (`../live-lumens/capture/snap.json`). Two parts come from the newer app.css used by the Questions and goals prototype: the segmented bar and the amber "needs you" colour. The sample learner, Layla, is an architect working on a prayer hall in Dubai. "Now" is Monday 26 October, 8:10.
 
-Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#waiting`, `#activity`, `#connections`, `#new`, `#everything`, `#today`.
+Open `dist/routines-prototype.html`. Links: `#routines` (default, the Tasks tab), `#studying` (a study at work), `#study` (a finished study), `#finds`, `#waiting`, `#activity`, `#connections`, `#new`, `#everything`, `#today`.
 
 ## Try it
+
+**Studies (version 9):**
+1. On **Tasks**, *Acoustics of domed rooms* is working. Watch its bar move, then open it: each phase, and what it's doing now. Ask Loci *How is it going?*, then **Skip ahead (prototype)** until it's ready.
+2. **New task → Study something in depth**: type a subject and press **Plan it with Loci**. Answer the four questions, read the plan, press **Change the plan → Only my Commonplace and books** (the cost drops), then **Start the study**.
+3. Open *Passive cooling* (done): read what Loci found, then ask *What's still unsure?* and *Make the course shorter*. Press **Builder** to see what it cost, and **Watch for new work** to make a Finds routine from it.
+4. **Today** shows the study at work, the one that's ready, and the next lesson.
+5. On a find, **Ask Loci → Study this in depth**.
+
+**Routines:**
 
 1. **Look at the cards.**
    - *Books* has an amber top line and a **Waiting** line, because it asked you about a book this morning.
@@ -101,6 +120,7 @@ Open `dist/routines-prototype.html`. Links: `#routines` (default), `#finds`, `#w
 ## Real or simulated
 
 - No model runs. A keyword reader stands in for Loci's understanding (§5 of the design), so common phrasings work; the chips cover the rest.
+- Studies run on a simulated clock (a step every 1.4 seconds). Their findings, lessons and sources are examples; the four real books and ASHRAE Standard 55 in *Passive cooling* are real, but what's said about them is a summary written for the prototype.
 - *What it would do* and the editor's count use the prototype's real matcher on 20 example arrivals.
 - Nothing is sent or received; *Send something…* simulates arrivals.
 - Every find is an example: no source is fetched. Sources are named generically, so no real publication is credited with an invented article.
