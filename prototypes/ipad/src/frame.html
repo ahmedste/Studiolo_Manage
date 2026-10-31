@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studiolo on iPad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper: #eeeee9; --panel: #fbfbf9; --line: #d6d6ce; --ink: #22303a; --ink-2: #5d6c77; --ink-3: #8f9aa3; --accent: #1e3e9e; --accent-soft: #e3e9f8; --bezel: #1c2329; --wall: linear-gradient(140deg, #c9d3e6, #e9dccb 60%, #d8c7b3); color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #11171c; --panel: #1b242c; --line: #2e3a44; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --bezel: #05080a; --wall: linear-gradient(140deg, #1e2a3e, #2e2a26 60%, #2a231d); color-scheme: dark; } }
+  :root[data-theme="dark"] { --paper: #11171c; --panel: #1b242c; --line: #2e3a44; --ink: #e2e5e0; --ink-2: #9ba7b0; --ink-3: #6b7984; --accent: #9db0f3; --accent-soft: #263156; --bezel: #05080a; --wall: linear-gradient(140deg, #1e2a3e, #2e2a26 60%, #2a231d); color-scheme: dark; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--paper); color: var(--ink); font: 14px/1.45 "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .top { position: fixed; inset: 0 0 auto 0; height: 56px; display: flex; align-items: center; gap: 18px; padding: 0 20px; box-sizing: border-box; border-bottom: 1px solid var(--line); background: var(--paper); z-index: 5; overflow-x: auto; scrollbar-width: none; }
+  .top h1 { font: 500 21px/1 "Newsreader", Georgia, serif; margin: 0 6px 0 0; white-space: nowrap; }
+  .grp { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .grp > span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .seg { display: inline-flex; padding: 2px; border-radius: 10px; background: color-mix(in srgb, var(--ink) 8%, transparent); }
+  .seg button { height: 30px; padding: 0 11px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
+  .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+  .main { position: fixed; inset: 56px 0 0 0; display: flex; }
+  .stagearea { flex: 1; min-width: 0; display: grid; place-items: center; position: relative; }
+  .guide { width: 330px; flex: none; overflow-y: auto; padding: 18px 22px 28px; box-sizing: border-box; border-left: 1px solid var(--line); background: var(--panel); }
+  .guide p { color: var(--ink-2); margin: 0 0 12px; }
+  .guide h2 { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 18px 0 8px; }
+  .guide ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+  .guide li::marker { color: var(--ink-3); }
+  .guide b { font-weight: 600; }
+  .guide kbd { font: 600 11.5px "Instrument Sans", system-ui; padding: 1px 5px; border-radius: 5px; border: 1px solid var(--line); background: var(--paper); }
+  .note { margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: var(--accent-soft); color: var(--ink); font-size: 13px; }
+  @media (max-width: 1100px) { .guide { display: none; } }
+  /* the device */
+  .dev { position: relative; width: calc(var(--w) * var(--k) * 1px + 28px); height: calc(var(--h) * var(--k) * 1px + 28px); border-radius: calc(18px * var(--k) + 14px); background: var(--bezel); padding: 14px; box-sizing: border-box; box-shadow: 0 30px 80px rgba(20, 30, 40, .3), inset 0 0 0 1.5px rgba(255, 255, 255, .08); }
+  .scr { position: relative; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px); transform: scale(var(--k)); transform-origin: 0 0; border-radius: 18px; overflow: hidden; background: var(--wall); }
+  .cam { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #2a333b; }
+  .dev[data-o="p"] .cam { top: 4px; left: 50%; margin-left: -3px; }
+  .dev[data-o="l"] .cam { left: 4px; top: 50%; margin-top: -3px; }
+  /* windows inside the screen */
+  .win { position: absolute; top: 0; bottom: 0; overflow: hidden; background: #000; }
+  .win iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .other { position: absolute; top: 0; bottom: 0; overflow: hidden; background: #fff; color: #1d2329; font: 14px/1.5 -apple-system, system-ui, sans-serif; }
+  .other .bar { height: 44px; margin-top: 24px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e3e3e3; font-size: 13px; color: #555; gap: 6px; }
+  .other .bar i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1.6px solid #888; }
+  .other article { padding: 18px 22px 40px; overflow-y: auto; position: absolute; inset: 68px 0 0 0; }
+  .other h3 { font: 600 22px/1.2 Georgia, serif; margin: 0 0 6px; }
+  .other small { color: #777; }
+  .other figure { margin: 14px 0; }
+  .other figure img { width: 100%; border-radius: 8px; display: block; cursor: grab; }
+  .other figcaption { font-size: 12px; color: #777; margin-top: 4px; }
+  .other a { color: #0b57d0; }
+  .other .tip { background: #fff7e0; border: 1px solid #f0dfa4; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; }
+  .divider[hidden] { display: none; }
+  .divider { position: absolute; top: 0; bottom: 0; width: 10px; margin-left: -5px; z-index: 3; cursor: ew-resize; display: grid; place-items: center; background: #000; touch-action: none; }
+  .divider::before { content: ""; width: 4px; height: 44px; border-radius: 2px; background: #6d747b; }
+  .win.is-slide { top: 30px; bottom: 30px; border-radius: 18px; box-shadow: 0 10px 40px rgba(0, 0, 0, .4); }
+  .win.is-stage { border-radius: 14px; box-shadow: 0 16px 60px rgba(0, 0, 0, .35); }
+  .wall-only { position: absolute; inset: 0; background: var(--wall); }
+  .stage-strip { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); display: grid; gap: 14px; }
+  .stage-strip i { display: block; width: 70px; height: 50px; border-radius: 8px; background: rgba(255, 255, 255, .5); box-shadow: 0 4px 12px rgba(0, 0, 0, .15); }
+  .size { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="framed">
+<header class="top">
+  <h1>Studiolo on iPad</h1>
+  <div class="grp"><span>iPad</span><div class="seg" id="devSeg"><button data-dev="air">Air 11″</button><button data-dev="pro">Pro 13″</button><button data-dev="mini">mini</button></div></div>
+  <div class="grp"><span>Turn</span><div class="seg" id="oSeg"><button data-o="l">Landscape</button><button data-o="p">Portrait</button></div></div>
+  <div class="grp"><span>Window</span><div class="seg" id="winSeg"><button data-win="full">Full screen</button><button data-win="two">Split ⅔</button><button data-win="half">Split ½</button><button data-win="stage">Stage Manager</button><button data-win="slide">Slide Over</button></div></div>
+  <div class="grp"><span>Look</span><div class="seg" id="thSeg"><button data-th="auto">Auto</button><button data-th="light">Light</button><button data-th="dark">Dark</button></div></div>
+</header>
+<div class="main">
+  <div class="stagearea" id="area">
+    <div class="dev" id="dev"><div class="scr" id="scr"><div class="wall-only" id="wallonly" hidden><div class="stage-strip"><i></i><i></i><i></i></div></div><div class="other" id="other"></div><div class="divider" id="div" hidden></div><div class="win" id="win"><iframe id="screen" title="Studiolo on iPad (prototype)" allow="microphone; picture-in-picture; fullscreen"></iframe></div></div><span class="cam"></span></div>
+    <div class="size" id="size"></div>
+  </div>
+  <aside class="guide">
+    <p>The phone made the foot of the screen for doing. The iPad keeps that and adds the room around it: a sidebar for going, the bar for doing, and the canvas, the room or the wall in between.</p>
+    <h2>Try this</h2>
+    <ol>
+      <li><b>Sidebar.</b> Landscape docks it; portrait hides it behind the toolbar button or a swipe from the left edge. It holds Learn’s sections, your collections and Loci’s areas.</li>
+      <li><b>The bar</b> is still the one field. Press <kbd>⌘K</kbd> (or <kbd>Ctrl K</kbd>), type, press Return. Hold <kbd>⌘</kbd> for the shortcuts; hold <kbd>⌘⇧D</kbd> to talk. The mic: tap to dictate, hold to talk.</li>
+      <li><b>Loci.</b> In landscape the card is an inspector on the right: drag its foot to change its height, its left edge to change its width. Both stay. Turn to portrait and it is a sheet. Try <b>List</b> for columns.</li>
+      <li><b>Hold</b> a mark (right-click with a mouse) for its menu. Two fingers: pinch, twist to turn, tap to go back.</li>
+      <li><b>Learn.</b> Open <b>Cooling without machines</b>: Listen with chapters beside the hosts. Leave while it plays: it is in the sidebar’s Now Playing. Try Walk, Drive and Read.</li>
+      <li><b>Watch.</b> Open <b>How a malqaf moves air</b>, then leave: it keeps playing in a corner. Drag it. ● Live: hold the mic and interrupt.</li>
+      <li><b>Commonplace.</b> A wall of three or four columns. In landscape an item opens beside the wall. <b>Drag a picture</b> from the page on the left (Split ½) into Studiolo.</li>
+      <li><b>Window:</b> Slide Over and Split ½ go compact: the phone shell, same place, same card, still playing. Drag the divider across 700 px and back.</li>
+    </ol>
+    <div class="note">The Palace and the Map are Studiolo’s own engines. Loci’s answers, making and playback are simulated; the mic is real where the browser allows it. Open this page on an iPad to use it full screen.</div>
+  </aside>
+</div>
+</div>
+<script>
+(() => {
+  const APP = /*APP*/"";
+  const SIDE = /*SIDE*/{};
+  const q = new URLSearchParams(location.search);
+  // On an iPad or a phone (a touch device without a fine pointer), the app replaces this page and runs full screen.
+  const ua = navigator.userAgent;
+  const touchDevice = /iPad|iPhone|Android/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) || (matchMedia("(pointer: coarse)").matches && !matchMedia("(any-pointer: fine)").matches);
+  if (q.get("frame") === "0" || (touchDevice && q.get("frame") !== "1")) {
+    document.getElementById("framed").hidden = true;
+    addEventListener("load", () => setTimeout(() => { document.open(); document.write(APP); document.close(); }), { once: true });
+    return;
+  }
+  const DEV = { air: [820, 1180], pro: [1024, 1366], mini: [744, 1133] };
+  const st = { dev: q.get("dev") || "air", o: q.get("o") || "l", win: q.get("win") || "full", th: "auto", split: null };
+  const $ = (s) => document.querySelector(s);
+  const frame = $("#screen"), win = $("#win"), other = $("#other"), div = $("#div"), dev = $("#dev"), scr = $("#scr");
+  other.innerHTML = `<div class="bar"><i></i>archdaily.com</div><article><h3>Five courtyards that cool without machines</h3><small>Shade, water and wind, from Fez to Kuwait City</small>
+    <p class="tip">Drag a picture or the link into Studiolo. It lands in your Commonplace, on what you have open.</p>
+    ${Object.entries(SIDE).map(([k, src], i) => `<figure><img draggable="true" data-title="${["Courtyard, morning", "Zellige, close", "Stair and light"][i]}" src="${src}" alt=""><figcaption>${["A courtyard in the morning shade", "Zellige: tile that throws back the heat", "A stair lit from above"][i]}</figcaption></figure>`).join("")}
+    <p>Read more: <a href="https://www.archdaily.com/courtyards-and-climate" draggable="true">Courtyards and climate, a guide</a></p></article>`;
+  other.addEventListener("dragstart", (e) => {
+    const im = e.target.closest("img");
+    if (im) { e.dataTransfer.setData("text/uri-list", im.src); e.dataTransfer.setData("text/x-studiolo-title", im.dataset.title); e.dataTransfer.setData("text/plain", im.dataset.title); e.dataTransfer.effectAllowed = "copy"; }
+  });
+  frame.srcdoc = APP.replace('<html lang="en">', '<html lang="en" class="framed">');
+
+  function place() {
+    let [w, h] = DEV[st.dev];
+    if (st.o === "l") [w, h] = [h, w];
+    const area = $("#area"), aw = area.clientWidth - 40, ah = area.clientHeight - 56;
+    const k = Math.min(1, (aw - 28) / w, (ah - 28) / h);
+    dev.style.setProperty("--w", w); dev.style.setProperty("--h", h); dev.style.setProperty("--k", k.toFixed(4)); dev.dataset.o = st.o;
+    // the window's width: Split View fractions follow iPadOS (a 10 px divider); Slide Over is 320; Stage Manager a window
+    const third = w >= 1300 ? 375 : 320, wins = { full: w, two: w - 10 - third, half: Math.round((w - 10) / 2), slide: 320, stage: Math.min(694, w - 120) };
+    const ww = st.split ?? wins[st.win];
+    win.className = "win"; win.style.cssText = ""; other.hidden = true; div.hidden = true; $("#wallonly").hidden = true;
+    if (st.win === "full") { win.style.left = "0"; win.style.width = `${w}px`; }
+    else if (st.win === "slide") { other.hidden = false; other.style.left = "0"; other.style.width = `${w}px`; win.classList.add("is-slide"); win.style.left = `${w - 320 - 12}px`; win.style.width = "320px"; }
+    else if (st.win === "stage") { $("#wallonly").hidden = false; win.classList.add("is-stage"); win.style.left = `${Math.round((w - ww) / 2) + 30}px`; win.style.width = `${ww}px`; win.style.top = "40px"; win.style.bottom = "40px"; }
+    else { other.hidden = false; div.hidden = false; const ow = w - 10 - ww; other.style.left = "0"; other.style.width = `${ow}px`; div.style.left = `${ow + 5}px`; win.style.left = `${ow + 10}px`; win.style.width = `${ww}px`; }
+    $("#size").textContent = `${st.dev === "air" ? "iPad Air 11″" : st.dev === "pro" ? "iPad Pro 13″" : "iPad mini"} · ${w} × ${h} · Studiolo’s window ${ww} × ${st.win === "stage" ? h - 80 : st.win === "slide" ? h - 60 : h} · ${ww < 700 ? "compact: the phone shell" : "regular: the iPad layout"}`;
+    for (const [id, key] of [["#devSeg", "dev"], ["#oSeg", "o"], ["#winSeg", "win"], ["#thSeg", "th"]]) document.querySelectorAll(`${id} button`).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset[key === "th" ? "th" : key] === st[key])));
+  }
+  document.querySelector(".top").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const d = b.dataset;
+    if (d.dev) st.dev = d.dev; if (d.o) st.o = d.o; if (d.win) st.win = d.win;
+    if (d.dev || d.o || d.win) st.split = null;
+    if (d.th) { st.th = d.th; d.th === "auto" ? delete document.documentElement.dataset.theme : (document.documentElement.dataset.theme = d.th); theme(); }
+    place();
+  });
+  // The app follows the frame's look: its own Appearance control is in its sidebar (and its drawer when compact).
+  function theme() {
+    try { const w = frame.contentWindow, b = w.document.querySelector(`[data-theme="${st.th}"]`); if (b) b.click(); else if (st.th === "auto") delete w.document.documentElement.dataset.theme; else w.document.documentElement.dataset.theme = st.th; } catch { /* not ready */ }
+  }
+  // Drag the Split View divider: Studiolo's window crosses 700 px live, and keeps its state.
+  div.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); div.setPointerCapture(e.pointerId);
+    const k = parseFloat(getComputedStyle(dev).getPropertyValue("--k")), w = parseInt(getComputedStyle(dev).getPropertyValue("--w"), 10), r = scr.getBoundingClientRect();
+    frame.style.pointerEvents = "none";
+    const move = (ev) => { const x = (ev.clientX - r.left) / k; st.split = Math.round(Math.max(320, Math.min(w - 330, w - x - 5))); place(); };
+    const up = () => { div.removeEventListener("pointermove", move); div.removeEventListener("pointerup", up); frame.style.pointerEvents = ""; };
+    div.addEventListener("pointermove", move); div.addEventListener("pointerup", up);
+  });
+  addEventListener("resize", place);
+  place();
+})();
+</script>
+</body>
+</html>
