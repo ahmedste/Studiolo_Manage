@@ -1,9 +1,11 @@
 /* Dictation for Learn: the mic turns speech into text in the input, live, word by word.
-   Engines, best first (proposals/2026-10-24-dictation-moonshine.md):
-   - Moonshine Streaming, on-device through WebAssembly (@moonshine-ai/moonshine-wasm). Free, private, live. It needs
-     SharedArrayBuffer, so the page must be cross-origin isolated: serve it with `node serve.mjs`.
+   Engines, best first (proposals/2026-10-29-dictation-elevenlabs-brief.md):
+   - ElevenLabs Scribe v2 Realtime (@elevenlabs/client). The page asks its own server for a single-use token, then the
+     browser streams the mic straight to ElevenLabs over a WebSocket. Needs `ELEVENLABS_API_KEY=… node serve.mjs`.
    - The browser's Web Speech API (Chrome and Safari; Chrome sends the audio to Google).
    - A simulation that streams a fixed phrase, so the prototype still works with no microphone.
+   - Parked: Moonshine Streaming on-device (@moonshine-ai/moonshine-wasm; proposals/2026-10-24-dictation-moonshine.md).
+     Pick it from the Mic menu; it needs cross-origin isolation, `node serve.mjs --moonshine`.
    Sets window.Dictation before learn.js runs. */
 (() => {
   const VERSION = "0.1.5";
@@ -11,18 +13,22 @@
   const LOCAL = "/vendor/moonshine/index.js";
   const CDN = `https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine-wasm@${VERSION}/dist/index.js`;
   const KEY = "studiolo.dictation.engine";
+  // serve.mjs serves @elevenlabs/client here when it's installed; otherwise the same version comes from jsDelivr.
+  const EL_LOCAL = "/vendor/elevenlabs/lib.iife.js";
+  const EL_CDN = "https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.32.1/dist/lib.iife.js";
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
   const ENGINES = [
     ["auto", "Auto"],
-    ["moonshine-tiny", "Moonshine Tiny (on-device, ~40 MB)"],
-    ["moonshine-small", "Moonshine Small (on-device, ~130 MB)"],
-    ["moonshine-medium", "Moonshine Medium (on-device, ~255 MB)"],
+    ["elevenlabs", "ElevenLabs Scribe (cloud)"],
     ["web-speech", "Browser speech"],
     ["simulated", "Simulated"],
+    ["moonshine-tiny", "Moonshine Tiny (parked, on-device)"],
+    ["moonshine-small", "Moonshine Small (parked, on-device)"],
+    ["moonshine-medium", "Moonshine Medium (parked, on-device)"],
   ];
   const ARCH = { "moonshine-tiny": "TinyStreaming", "moonshine-small": "SmallStreaming", "moonshine-medium": "MediumStreaming" };
-  const SHORT = { "moonshine-tiny": "on-device · Tiny", "moonshine-small": "on-device · Small", "moonshine-medium": "on-device · Medium", "web-speech": "browser speech", simulated: "simulated" };
+  const SHORT = { "moonshine-tiny": "on-device · Tiny", "moonshine-small": "on-device · Small", "moonshine-medium": "on-device · Medium", "web-speech": "browser speech", simulated: "simulated", elevenlabs: "ElevenLabs" };
 
   const canMoonshine = () => !!(window.crossOriginIsolated && typeof SharedArrayBuffer !== "undefined" && navigator.mediaDevices?.getUserMedia);
   // Phones and low-memory machines get Tiny; the rest get Small (decision D1).
@@ -31,13 +37,22 @@
   let choice = ENGINES.some(([id]) => id === read()) ? read() : "auto";
   let failed = new Set(); // engines that broke this page load; the next best takes over
   let keyterms = [];
+  // Only a page served by serve.mjs with a key can mint ElevenLabs tokens; anywhere else (an artifact, a file) it can't.
+  let scribeOk = false;
+  if (/^https?:$/.test(location.protocol)) {
+    fetch("/api/dictation/status").then((r) => (r.ok ? r.json() : null)).then((j) => {
+      scribeOk = !!j?.elevenlabs;
+      dispatchEvent(new Event("dictation:engines"));
+    }).catch(() => {});
+  }
 
   /** Which engine `choice` gives here, and why if it had to fall back. */
   function resolve() {
     const fallback = () => (SR && !failed.has("web-speech") ? "web-speech" : "simulated");
     let id = choice, why = "";
-    if (id === "auto") id = canMoonshine() ? (smallDevice() ? "moonshine-tiny" : "moonshine-small") : fallback();
-    if (ARCH[id] && (!canMoonshine() || failed.has(id))) { why = failed.has(id) ? "Moonshine didn't load" : "Moonshine needs node serve.mjs"; id = fallback(); }
+    if (id === "auto") id = scribeOk && !failed.has("elevenlabs") ? "elevenlabs" : fallback();
+    if (id === "elevenlabs" && (!scribeOk || failed.has(id))) { why = failed.has(id) ? "ElevenLabs didn't connect" : "ElevenLabs needs ELEVENLABS_API_KEY=… node serve.mjs"; id = fallback(); }
+    if (ARCH[id] && (!canMoonshine() || failed.has(id))) { why = failed.has(id) ? "Moonshine didn't load" : "Moonshine needs node serve.mjs --moonshine"; id = fallback(); }
     if (id === "web-speech" && (!SR || failed.has(id))) { why = why || "No browser speech here"; id = "simulated"; }
     return { id, short: SHORT[id], onDevice: !!ARCH[id], why };
   }
@@ -94,6 +109,68 @@
     };
   }
 
+  /* ---------- ElevenLabs Scribe v2 Realtime: partial transcripts are the live line, committed ones are kept.
+     The API key stays on the server: the page gets a single-use token (15 minutes, consumed on connect). */
+  let el = null;
+  function elevenlabs() {
+    if (window.ElevenLabsClient) return Promise.resolve(window.ElevenLabsClient);
+    if (el) return el;
+    const load = (src) => new Promise((res, rej) => { const t = document.createElement("script"); t.src = src; t.onload = () => (window.ElevenLabsClient ? res(window.ElevenLabsClient) : rej(new Error("ElevenLabs client didn't load"))); t.onerror = rej; document.head.appendChild(t); });
+    el = load(EL_LOCAL).catch(() => load(EL_CDN));
+    el.catch(() => (el = null));
+    return el;
+  }
+  async function scribeToken() {
+    const r = await fetch("/api/dictation/token", { method: "POST" });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.token) throw new Error(j.error || `Token request failed (${r.status})`);
+    return j.token;
+  }
+  function startElevenLabs(h) {
+    const s = { lines: [], partial: "", stopped: false };
+    const text = () => [...s.lines, s.partial].filter(Boolean).join(" ");
+    let committed = null; // resolves on the next committed transcript, for stop()
+    h.onState("connecting");
+    s.ready = (async () => {
+      const [EL, token] = await Promise.all([elevenlabs(), scribeToken()]);
+      if (s.stopped) return;
+      const E = EL.RealtimeEvents;
+      const conn = (s.conn = EL.Scribe.connect({
+        token,
+        modelId: "scribe_v2_realtime",
+        // The server commits a segment after a pause, so long dictation is kept piece by piece.
+        commitStrategy: EL.CommitStrategy.VAD,
+        // At most 50 terms of up to 20 characters each.
+        keyterms: keyterms.filter((k) => k.length <= 20).slice(0, 50),
+        // What's already typed, for casing, punctuation and continuing the sentence.
+        previousText: h.previous || undefined,
+        microphone: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }));
+      conn.on(E.SESSION_STARTED, () => { if (!s.stopped) h.onState("listening"); });
+      conn.on(E.PARTIAL_TRANSCRIPT, (d) => { s.partial = d.text || ""; h.onText(text()); });
+      conn.on(E.COMMITTED_TRANSCRIPT, (d) => { if (d.text?.trim()) s.lines.push(d.text.trim()); s.partial = ""; h.onText(text()); committed?.(); });
+      conn.on(E.ERROR, (d) => { if (!s.stopped) h.onError(new Error(d?.error || d?.message || "ElevenLabs error")); });
+      conn.on(E.CLOSE, () => { if (!s.stopped) h.onEnd?.(); });
+    })();
+    s.ready.catch((e) => { if (/token|client|load|fetch/i.test(String(e?.message))) failed.add("elevenlabs"); if (!s.stopped) h.onError(e); });
+    return {
+      // Commit what's being said, wait briefly for its final text, then close the socket.
+      async stop() {
+        s.stopped = true;
+        if (s.conn) {
+          if (s.partial) {
+            const got = new Promise((res) => (committed = res));
+            try { s.conn.commit(); } catch { /* already closed */ }
+            await Promise.race([got, new Promise((res) => setTimeout(res, 1500))]);
+          }
+          try { s.conn.close(); } catch { /* already closed */ }
+        }
+        return text();
+      },
+      cancel() { s.stopped = true; try { s.conn?.close(); } catch { /* already closed */ } },
+    };
+  }
+
   /* ---------- Web Speech: interim results give the same live line */
   function startWebSpeech(h) {
     const r = new SR();
@@ -138,11 +215,12 @@
     setKeyterms(list) { keyterms = [...new Set(list.filter(Boolean))]; },
     /**
      * Starts listening. `h`: onText(textSoFar), onState("loading", {fraction}) | onState("listening"), onError(err),
-     * onEnd() when the engine stops by itself, and `phrase` for the simulation. Returns { stop() → final text, cancel() }.
+     * onEnd() when the engine stops by itself, `previous` (text already in the input) and `phrase` for the simulation.
+     * onState may also report "connecting". Returns { stop() → final text, cancel() }.
      */
     start(h) {
       const { id } = resolve();
-      return ARCH[id] ? startMoonshine(id, h) : id === "web-speech" ? startWebSpeech(h) : startSimulated(h);
+      return id === "elevenlabs" ? startElevenLabs(h) : ARCH[id] ? startMoonshine(id, h) : id === "web-speech" ? startWebSpeech(h) : startSimulated(h);
     },
   };
 })();

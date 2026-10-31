@@ -1,6 +1,6 @@
 # Brief: dictation in the composer (first prototype)
 
-Status: brief for the building agent · 25 Oct 2026 · not yet approved for merge
+Status: **superseded** (29 Oct 2026) by `2026-10-29-dictation-elevenlabs-brief.md`. On-device Moonshine is parked.
 
 Written for an AI agent working in the main app, `studiolo`. Background and the reasoning behind every choice: `Studiolo_Manage/proposals/2026-10-24-dictation-moonshine.md`. A working mock of the interaction: the **Learn Dictation** artifact (https://claude.ai/artifact/X9VuMHqmqNujmxGxH4dxHx), source in `Studiolo_Manage/prototypes/learn-lumens/src/dictation.js`.
 

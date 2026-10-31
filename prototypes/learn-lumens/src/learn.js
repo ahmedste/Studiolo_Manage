@@ -430,6 +430,7 @@
     setState("hearing", `Hearing you · ${DICT.resolve().short}`); ld.dataset.captioning = "true"; LD.live.dataset.who = "you"; LD.live.innerHTML = '<span class="ld-hear">Listening…</span>';
     h.session = DICT.start({
       phrase,
+      previous: base.trim(),
       onText: (t) => {
         if (held !== h) return;
         h.text = t;
@@ -442,6 +443,7 @@
         const loading = st === "loading";
         micsFor(where, (m) => { m.toggleAttribute("data-loading", loading); m.style.setProperty("--dl", String(info?.fraction || 0)); });
         if (loading) setState("hearing", `Getting the speech model${info?.fraction ? ` · ${Math.round(info.fraction * 100)}%` : "…"}`);
+        else if (st === "connecting") setState("hearing", "Connecting…");
         else setState("hearing", `Hearing you · ${DICT.resolve().short}`);
       },
       onError: (err) => {
@@ -1209,6 +1211,7 @@ Items under 9 words. "say" is exactly what you speak over that slide: 35 to 60 w
     $("#ll-eng-why", bar).textContent = r.why ? `${r.why}: using ${r.short}` : "";
   }
   eng.addEventListener("change", () => { dropMic(); DICT.setChoice(eng.value); engBadge(); });
+  addEventListener("dictation:engines", engBadge);
   engBadge();
   $("#ll-how", bar).addEventListener("click", (e) => { const h = $(".hint", bar); h.hidden = !h.hidden; e.currentTarget.setAttribute("aria-expanded", String(!h.hidden)); });
   aiBadge();
